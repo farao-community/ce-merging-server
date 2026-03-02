@@ -11,14 +11,21 @@ public abstract class AbstractServiceException extends RuntimeException {
     private final String code;
     private final String title;
 
-    public AbstractServiceException(String status, String code, String title, String message) {
+    protected AbstractServiceException(final String status,
+                                       final String code,
+                                       final String title,
+                                       final String message) {
         super(message);
         this.status = status;
         this.code = code;
         this.title = title;
     }
 
-    public AbstractServiceException(String status, String code, String title, String message, Throwable throwable) {
+    protected AbstractServiceException(final String status,
+                                       final String code,
+                                       final String title,
+                                       final String message,
+                                       final Throwable throwable) {
         super(message, throwable);
         this.status = status;
         this.code = code;

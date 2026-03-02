@@ -11,15 +11,19 @@ public class CeMergingException extends AbstractServiceException {
     private static final String EXCEPTION_ERROR_CODE = "500-CE-MERGING-RUNTIME-EXCEPTION";
     private static final String EXCEPTION_TITLE = "Runtime exception encountered in ce-merging server";
 
-    public CeMergingException(String message) {
+    public CeMergingException(final String message) {
         super(EXCEPTION_HTTP_STATUS, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
     }
 
-    public CeMergingException(String status, String code, String title, String message) {
+    public CeMergingException(final String status,
+                              final String code,
+                              final String title,
+                              final String message) {
         super(status, code, title, message);
     }
 
-    public CeMergingException(String message, Throwable throwable) {
+    public CeMergingException(final String message,
+                              final Throwable throwable) {
         super(EXCEPTION_HTTP_STATUS, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, throwable);
     }
 }

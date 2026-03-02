@@ -24,14 +24,18 @@ import java.nio.file.Paths;
 @NoArgsConstructor(access = AccessLevel.NONE)
 @Slf4j
 public final class JaxbUtils {
-    public static <T> T read(Class<T> clazz,
-                             String path) {
+    public static <T> T read(final Class<T> clazz,
+                             final String path) {
         try (final InputStream fileContent = Files.newInputStream(Paths.get(path))) {
-            final Unmarshaller jaxbUnmarshaller = JAXBContext.newInstance(clazz).createUnmarshaller();
-            final JAXBElement<T> requestMessageTypeElement = jaxbUnmarshaller.unmarshal(new StreamSource(fileContent), clazz);
+            final Unmarshaller jaxbUnmarshaller = JAXBContext
+                .newInstance(clazz)
+                .createUnmarshaller();
+            final JAXBElement<T> requestMessageTypeElement = jaxbUnmarshaller
+                .unmarshal(new StreamSource(fileContent), clazz);
             return requestMessageTypeElement.getValue();
         } catch (final JAXBException | IOException e) {
-            final String errorMessage = String.format("Error occurred when converting xml file %s to object of type %s", path, clazz.getName());
+            final String errorMessage = String.format("Error occurred when converting xml file %s to object of type %s",
+                                                      path, clazz.getName());
             log.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }

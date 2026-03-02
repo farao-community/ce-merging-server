@@ -27,14 +27,11 @@ public class Configurations implements Serializable {
      */
     @ElementCollection(fetch = LAZY)
     private List<VirtualHubRecord> virtualHubList = new ArrayList<>();
-
     /**
      * Border direction list
      */
     @ElementCollection(fetch = LAZY)
     private List<BorderDirectionRecord> borderDirectionRecords = new ArrayList<>();
-
-
     /**
      * The dc load flow parameters file
      */

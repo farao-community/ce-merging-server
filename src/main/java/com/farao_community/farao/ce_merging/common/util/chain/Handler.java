@@ -8,5 +8,5 @@ package com.farao_community.farao.ce_merging.common.util.chain;
 
 public interface Handler<T> {
 
-    boolean handle(T request);
+    boolean handle(final T request);
 }

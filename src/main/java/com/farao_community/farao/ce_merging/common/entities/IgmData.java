@@ -54,10 +54,10 @@ public class IgmData implements Serializable {
         igmFile.setPath(igmFilePath);
     }
 
-    private void checkUcteNameConvention(final String igmFilePath) {
-        final Matcher ucteNaming = UCTE_PATTERN.matcher(igmFilePath);
+    private void checkUcteNameConvention(final String igmFileName) {
+        final Matcher ucteNaming = UCTE_PATTERN.matcher(igmFileName);
         if (!ucteNaming.matches()) {
-            throw new InputMismatchException(String.format(NAMING_ERROR, igmFilePath));
+            throw new InputMismatchException(String.format(NAMING_ERROR, igmFileName));
         }
         country = ucteNaming.group("countryCode");
         type = IgmType.fromTypeCode(ucteNaming.group("type"));

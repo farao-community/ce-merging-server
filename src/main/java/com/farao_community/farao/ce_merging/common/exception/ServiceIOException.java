@@ -11,11 +11,12 @@ public class ServiceIOException extends AbstractServiceException {
     private static final String EXCEPTION_ERROR_CODE = "500-IO-EXCEPTION";
     private static final String EXCEPTION_TITLE = "IO exception";
 
-    public ServiceIOException(String message) {
+    public ServiceIOException(final String message) {
         super(EXCEPTION_HTTP_STATUS, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
     }
 
-    public ServiceIOException(String message, Throwable throwable) {
+    public ServiceIOException(final String message,
+                              final Throwable throwable) {
         super(EXCEPTION_HTTP_STATUS, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, throwable);
     }
 }

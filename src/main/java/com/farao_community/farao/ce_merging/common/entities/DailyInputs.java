@@ -11,7 +11,6 @@ import jakarta.persistence.OneToOne;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.nio.file.Paths;
 
 import static jakarta.persistence.CascadeType.ALL;
 
@@ -25,9 +24,7 @@ public class DailyInputs implements Serializable {
     @OneToOne(cascade = ALL)
     private SavedFile mergingRequest = new SavedFile();
 
-    public void setMergingRequestFilePath(String mergingRequestFilePath) {
-        String filename = Paths.get(mergingRequestFilePath).getFileName().toString();
-        mergingRequest.setPath(mergingRequestFilePath);
-        mergingRequest.setOriginalName(filename);
+    public void setMergingRequestFilePath(final String mergingRequestFilePath) {
+        mergingRequest.feedPathAndName(mergingRequestFilePath);
     }
 }
