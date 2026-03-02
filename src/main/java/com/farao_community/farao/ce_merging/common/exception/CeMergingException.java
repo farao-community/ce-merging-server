@@ -8,8 +8,8 @@ package com.farao_community.farao.ce_merging.common.exception;
 
 public class CeMergingException extends AbstractServiceException {
     private static final String EXCEPTION_HTTP_STATUS = "500";
-    private static final String EXCEPTION_ERROR_CODE = "500-CORE-MERGING-RUNTIME-EXCEPTION";
-    private static final String EXCEPTION_TITLE = "Runtime exception encountered in core-merging server";
+    private static final String EXCEPTION_ERROR_CODE = "500-CE-MERGING-RUNTIME-EXCEPTION";
+    private static final String EXCEPTION_TITLE = "Runtime exception encountered in ce-merging server";
 
     public CeMergingException(String message) {
         super(EXCEPTION_HTTP_STATUS, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);

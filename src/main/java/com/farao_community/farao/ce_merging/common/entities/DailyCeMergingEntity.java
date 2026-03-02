@@ -26,7 +26,7 @@ import static jakarta.persistence.GenerationType.AUTO;
  */
 @Entity
 @Data
-public class DailyCoreMergingEntity implements Serializable {
+public class DailyCeMergingEntity implements Serializable {
     /**
      * Generated Id of daily merging operation
      */
@@ -48,7 +48,7 @@ public class DailyCoreMergingEntity implements Serializable {
      * List of tasks composing a daily merging operation
      */
     @ElementCollection(fetch = EAGER)
-    private List<Long> coreMergingTaskIdsList = new ArrayList<>();
+    private List<Long> ceMergingTaskIdsList = new ArrayList<>();
 
     /**
      * the Outputs of the merging day

@@ -23,7 +23,7 @@ import static jakarta.persistence.GenerationType.AUTO;
  */
 @Entity
 @Data
-public class CoreMergingTaskEntity implements Serializable {
+public class CeMergingTaskEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = AUTO)
     private long taskId;
