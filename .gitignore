@@ -1,0 +1,8 @@
+target/
+# Ignore custom environment script
+.env
+
+# IntelliJ
+.idea
+*.iml
+.attach_pid*
