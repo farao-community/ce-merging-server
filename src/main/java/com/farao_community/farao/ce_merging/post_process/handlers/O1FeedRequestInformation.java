@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class O1FeedRequestInformation implements Handler<PostProcessRequest> {
 
-    private static final String NO_INTERVAL_ERROR = "Error in merging request file : Payload is empty or doesn't contains timeInterval";
+    private static final String NO_INTERVAL_ERROR = "Error in merging request file : payload is empty or doesn't contain timeInterval";
 
     @Override
     public boolean handle(final PostProcessRequest request) {
