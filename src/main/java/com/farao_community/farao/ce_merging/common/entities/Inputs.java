@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.common.entities;
 
-import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeDeserializer;
-import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeSerializer;
+import com.farao_community.farao.ce_merging.common.util.serialization.OffsetDateTimeDeserializer;
+import com.farao_community.farao.ce_merging.common.util.serialization.OffsetDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

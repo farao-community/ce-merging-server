@@ -6,6 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.common.util.chain;
 
+/**
+ * Class used to create a Chain<T> object that chains treatments of classes implementing Handler<T>
+ * @param <T> the request type of the chain
+ */
 public final class ChainBuilder<T> {
 
     public static <T> ChainBuilder<T> chainBuilder() {

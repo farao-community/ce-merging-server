@@ -7,6 +7,5 @@
 package com.farao_community.farao.ce_merging.common.util.chain;
 
 public interface Chain<T> {
-
     void handle(final T t);
 }

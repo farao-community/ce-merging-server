@@ -12,7 +12,7 @@ import ch.iec.tc57._2011.schema.message.RequestMessageType;
 import com.farao_community.farao.ce_merging.common.entities.DailyCeMergingEntity;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.post_process.PostProcessRequest;
-import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
+import com.farao_community.farao.ce_merging.common.util.serialization.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.chain.Handler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.annotation.Order;

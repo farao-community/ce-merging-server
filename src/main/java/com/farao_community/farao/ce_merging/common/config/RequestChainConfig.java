@@ -16,6 +16,10 @@ import org.springframework.context.annotation.Configuration;
 import java.util.List;
 import java.util.stream.IntStream;
 
+/**
+ * class used to define handler chain beans
+ * to create a new one, use the same implementation with a different request type
+ */
 @Configuration
 public class RequestChainConfig {
 
