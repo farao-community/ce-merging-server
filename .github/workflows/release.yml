@@ -13,10 +13,12 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref_name, 'hotfix')
+    if: github.ref == 'refs/heads/main' || startsWith(github.ref_name, 'hotfix')
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4.5.0
@@ -48,7 +50,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Commit and tag release version
-        uses: stefanzweifel/git-auto-commit-action@master
+        uses: stefanzweifel/git-auto-commit-action@v7.1.0
         with:
           branch: release-v${{ env.RELEASE_VERSION }}
           create_branch: true
@@ -73,7 +75,7 @@ jobs:
           NEXT_VERSION: ${{ github.event.inputs.nextVersion }}
 
       - name: Commit next version
-        uses: stefanzweifel/git-auto-commit-action@master
+        uses: stefanzweifel/git-auto-commit-action@v7.1.0
         with:
           branch: next-release-v${{ env.NEXT_VERSION  }}
           create_branch: true
@@ -84,7 +86,7 @@ jobs:
           NEXT_VERSION: ${{ github.event.inputs.nextVersion }}
 
       - name: Merge automatically into source branch
-        uses: devmasx/merge-branch@master
+        uses: devmasx/merge-branch@v1.4.0
         with:
           type: now
           from_branch: next-release-v${{ env.NEXT_VERSION }}
