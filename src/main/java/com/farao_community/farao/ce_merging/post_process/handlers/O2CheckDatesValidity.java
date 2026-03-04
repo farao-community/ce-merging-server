@@ -15,9 +15,10 @@ import java.util.List;
 import java.util.Set;
 
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.convertToZFormat;
+import static com.farao_community.farao.ce_merging.common.util.TaskPredicates.isBetween;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static java.util.Comparator.comparing;
-
+import static java.util.function.Predicate.not;
 
 @Component
 @Order(10)
@@ -37,16 +38,16 @@ public class O2CheckDatesValidity implements Handler<PostProcessRequest> {
         final OffsetDateTime requestEnd = request.getEndDateTime().minusMinutes(1);
 
         request.getCeMergingTaskEntities()
-            .forEach(task -> {
-                final OffsetDateTime taskDate = task.getInputs().getTargetDate();
-                if (!(taskDate.isAfter(requestStart) && taskDate.isBefore(requestEnd))) {
-                    String errorMessage = String.format("Task's %s target date %s outside merging request time interval %s",
-                                                        task.getTaskId(),
-                                                        taskDate,
-                                                        request.getRequestTimeInterval());
-                    log.error(errorMessage);
-                    throw new CeMergingException(errorMessage);
-                }
+            .stream()
+            .filter(not(isBetween(requestStart, requestEnd)))
+            .findAny()
+            .ifPresent(task -> {
+                String errorMessage = String.format("Task's %s target date %s outside merging request time interval %s",
+                                                    task.getTaskId(),
+                                                    task.getInputs().getTargetDate(),
+                                                    request.getRequestTimeInterval());
+                log.error(errorMessage);
+                throw new CeMergingException(errorMessage);
             });
 
     }
@@ -60,7 +61,7 @@ public class O2CheckDatesValidity implements Handler<PostProcessRequest> {
             .forEach(interval -> {
                 if (!tasksIntervals.add(interval)) {
                     final String errorMessage = String.format("More than one task with same target date inside interval %s",
-                                                        interval);
+                                                              interval);
                     log.error(errorMessage);
                     throw new CeMergingException(errorMessage);
                 }
