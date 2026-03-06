@@ -1,6 +1,6 @@
 package com.farao_community.farao.ce_merging.post_process.handlers;
 
-import com.farao_community.farao.ce_merging.common.entities.CeMergingTaskEntity;
+import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.chain.Handler;
 import com.farao_community.farao.ce_merging.post_process.PostProcessRequest;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.convertToZFormat;
-import static com.farao_community.farao.ce_merging.common.util.TaskPredicates.isBetween;
+import static com.farao_community.farao.ce_merging.merging.MergingTaskPredicates.isBetween;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static java.util.Comparator.comparing;
 import static java.util.function.Predicate.not;
@@ -27,9 +27,9 @@ public class O2CheckDatesValidity implements Handler<PostProcessRequest> {
     @Override
     public boolean handle(final PostProcessRequest request) {
         checkIfTargetDatesInRequestInterval(request);
-        checkIfDistinctTargetDates(request.getCeMergingTaskEntities());
-        final Comparator<CeMergingTaskEntity> byTargetDateTime = comparing(task -> task.getInputs().getTargetDate());
-        request.getCeMergingTaskEntities().sort(byTargetDateTime);
+        checkIfDistinctTargetDates(request.getMergingTasks());
+        final Comparator<MergingTask> byTargetDateTime = comparing(task -> task.getInputs().getTargetDate());
+        request.getMergingTasks().sort(byTargetDateTime);
         return false;
     }
 
@@ -37,7 +37,7 @@ public class O2CheckDatesValidity implements Handler<PostProcessRequest> {
         final OffsetDateTime requestStart = request.getStartDateTime();
         final OffsetDateTime requestEnd = request.getEndDateTime().minusMinutes(1);
 
-        request.getCeMergingTaskEntities()
+        request.getMergingTasks()
             .stream()
             .filter(not(isBetween(requestStart, requestEnd)))
             .findAny()
@@ -52,7 +52,7 @@ public class O2CheckDatesValidity implements Handler<PostProcessRequest> {
 
     }
 
-    private void checkIfDistinctTargetDates(final List<CeMergingTaskEntity> tasksList) {
+    private void checkIfDistinctTargetDates(final List<MergingTask> tasksList) {
         final Set<String> tasksIntervals = new HashSet<>();
 
         tasksList.stream()

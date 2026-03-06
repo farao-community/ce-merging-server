@@ -6,6 +6,9 @@
  */
 package com.farao_community.farao.ce_merging.common.exception;
 
+import lombok.Data;
+
+@Data
 public abstract class AbstractServiceException extends RuntimeException {
     private final String status;
     private final String code;

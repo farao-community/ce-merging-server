@@ -9,7 +9,7 @@ package com.farao_community.farao.ce_merging.post_process.handlers;
 import ch.iec.tc57._2011.schema.message.HeaderType;
 import ch.iec.tc57._2011.schema.message.PayloadType;
 import ch.iec.tc57._2011.schema.message.RequestMessageType;
-import com.farao_community.farao.ce_merging.common.entities.DailyCeMergingEntity;
+import com.farao_community.farao.ce_merging.daily_aggregation.entities.DailyTask;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.post_process.PostProcessRequest;
 import com.farao_community.farao.ce_merging.common.util.serialization.JaxbUtils;
@@ -27,7 +27,7 @@ public class O1FeedRequestInformation implements Handler<PostProcessRequest> {
 
     @Override
     public boolean handle(final PostProcessRequest request) {
-        final DailyCeMergingEntity mergingEntity = request.getDailyCeMergingEntity();
+        final DailyTask mergingEntity = request.getDailyCeMergingEntity();
 
         try {
             final RequestMessageType requestMessageType = JaxbUtils.read(RequestMessageType.class,

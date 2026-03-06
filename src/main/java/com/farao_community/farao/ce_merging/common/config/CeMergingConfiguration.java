@@ -1,0 +1,51 @@
+package com.farao_community.farao.ce_merging.common.config;
+
+import com.farao_community.farao.ce_merging.daily_aggregation.entities.DailyTask;
+import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+
+import static java.io.File.separator;
+
+@Configuration
+public class CeMergingConfiguration {
+    private static final String INPUTS_DIRECTORY = "inputs";
+    private static final String OUTPUTS_DIRECTORY = "outputs";
+    private static final String DAILY_OUTPUTS_DIRECTORY = "daily-outputs";
+    private static final String DAILY_INPUTS_DIRECTORY = "daily-inputs";
+    private static final String ARTIFACTS_DIRECTORY = "artifacts";
+
+    @Value("${ce-merging-server.filesystem.root}")
+    private String ceMergingRoot;
+
+    @Value("${ce-merging-server.filesystem.daily-root}")
+    private String dailyMergingRoot;
+
+    public String getDirectoryPath(final MergingTask task) {
+        return ceMergingRoot + separator + task.getTaskId();
+    }
+
+    public String getDirectoryPath(final DailyTask task) {
+        return dailyMergingRoot + separator + task.getDailyMergingTaskId();
+    }
+
+    public String getOutputsDirectoryPath(final MergingTask task) {
+        return getDirectoryPath(task) + separator + OUTPUTS_DIRECTORY;
+    }
+
+    public String getDailyOutputsDirectoryPath(final DailyTask task) {
+        return getDirectoryPath(task) + separator + DAILY_OUTPUTS_DIRECTORY;
+    }
+
+    public String getInputsDirectoryPath(final MergingTask task) {
+        return getDirectoryPath(task) + separator + INPUTS_DIRECTORY;
+    }
+
+    public String getDailyInputsDirectoryPath(final DailyTask task) {
+        return getDirectoryPath(task) + separator + DAILY_INPUTS_DIRECTORY;
+    }
+
+    public String getArtifactsDirectoryPath(final MergingTask task) {
+        return getDirectoryPath(task) + separator + ARTIFACTS_DIRECTORY;
+    }
+}

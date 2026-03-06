@@ -7,19 +7,17 @@
 package com.farao_community.farao.ce_merging.post_process;
 
 import com.farao_community.farao.ce_merging.common.GenericMergingRequest;
-import com.farao_community.farao.ce_merging.common.entities.CeMergingTaskEntity;
-import com.farao_community.farao.ce_merging.common.entities.DailyCeMergingEntity;
-import lombok.AllArgsConstructor;
+import com.farao_community.farao.ce_merging.daily_aggregation.entities.DailyTask;
+import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
 import lombok.Data;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
 @Data
-@AllArgsConstructor
 public class PostProcessRequest implements GenericMergingRequest {
-    private final DailyCeMergingEntity dailyCeMergingEntity;
-    private final List<CeMergingTaskEntity> ceMergingTaskEntities;
+    private final DailyTask dailyCeMergingEntity;
+    private final List<MergingTask> mergingTasks;
     private String requestTimeInterval;
     private OffsetDateTime mergingDay;
     private String noun;
