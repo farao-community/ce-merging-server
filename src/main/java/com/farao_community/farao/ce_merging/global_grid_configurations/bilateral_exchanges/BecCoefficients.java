@@ -10,10 +10,12 @@ import jakarta.persistence.Embeddable;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Embeddable
 @Data
 @NoArgsConstructor
-public class BecCoefficients {
+public class BecCoefficients implements Serializable {
     private String countryCode;
     private Double coefficient;
 }

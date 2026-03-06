@@ -10,18 +10,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import java.io.Serializable;
+
+import static jakarta.persistence.GenerationType.AUTO;
+
 @Entity
 @Table(name = "tsoinfos")
 @Data
-public class TsoInfos {
+public class TsoInfos implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = AUTO)
     private long ref;
 
     @Column(name = "name")
