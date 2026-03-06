@@ -7,6 +7,8 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +30,7 @@ import java.util.zip.ZipOutputStream;
 import static java.io.File.separator;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.NONE)
 public class ZipUtils {
 
     private static final int BUFFER_SIZE = 4096;

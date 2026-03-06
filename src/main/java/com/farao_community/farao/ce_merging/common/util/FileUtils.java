@@ -27,7 +27,7 @@ public class FileUtils {
     private static final String ATTACHMENT_ERROR = "Cannot return attachment file";
     private static final String RETRIEVE_ERROR = "Cannot retrieve content of ";
 
-    public static ResponseEntity toAttachmentFileResponse(final byte[] fileContent,
+    public static ResponseEntity<byte[]> toAttachmentFileResponse(final byte[] fileContent,
                                                           final String fileName) {
         try {
             final ContentDisposition contentDisposition = ContentDisposition.builder("attachment").filename(fileName).build();
@@ -44,7 +44,7 @@ public class FileUtils {
         }
     }
 
-    public static ResponseEntity toAttachmentFileResponse(final SavedFile savedFile) {
+    public static ResponseEntity<byte[]> toAttachmentFileResponse(final SavedFile savedFile) {
         try {
             final byte[] fileContent = Files.readAllBytes(Paths.get(savedFile.getPath()));
             final String fileName = savedFile.getOriginalName();

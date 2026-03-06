@@ -61,7 +61,7 @@ public class MergingTaskManagementService {
         return taskMapper.mergingTaskToMergingTaskDto(run(taskEntity));
     }
 
-    public JsonApiDocument getTaskJsonDoc(final long taskId) {
+    public JsonApiDocument<MergingTaskDto> getTaskJsonDoc(final long taskId) {
         return JsonApiDocument.fromData(taskMapper.mergingTaskToMergingTaskDto(getTask(taskId)));
     }
 

@@ -19,8 +19,6 @@ public final class JsonApiDocument<T extends JsonApiData> {
     @JsonInclude(NON_EMPTY)
     public List<JsonApiError> errors;
     @JsonInclude(NON_NULL)
-    public JsonApiMeta meta;
-    @JsonInclude(NON_NULL)
     public List<T> data;
 
     private JsonApiDocument(List<T> data) {
@@ -38,7 +36,6 @@ public final class JsonApiDocument<T extends JsonApiData> {
     private JsonApiDocument(final AbstractServiceException exception) {
         this.errors = Collections.singletonList(JsonApiError.fromServiceException(exception));
         this.data = null;
-        this.meta = null;
     }
 
     public static  <T extends JsonApiData>  JsonApiDocument<T> fromServiceException(final AbstractServiceException exception) {
