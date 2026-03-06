@@ -8,8 +8,6 @@ import com.farao_community.farao.ce_merging.merging.global_grid_configurations.r
 import java.io.Serializable;
 
 /**
- * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
- * @author Belgacem Najjari {@literal <belgacem.najjari at rte-france.com>}
  * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
  */
 public class ConfigurationsDto implements Serializable {

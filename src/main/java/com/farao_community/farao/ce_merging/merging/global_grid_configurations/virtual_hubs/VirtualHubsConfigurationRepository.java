@@ -6,10 +6,6 @@ package com.farao_community.farao.ce_merging.merging.global_grid_configurations.
 import com.farao_community.farao.ce_merging.merging.global_grid_configurations.GridConfigurationRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * @author Oualid Aloui {@literal <oualid.aloui at rte-france.com>}
- */
-
 @Repository
 public interface VirtualHubsConfigurationRepository extends GridConfigurationRepository<VirtualHubsConfigurationRecord> {
 }

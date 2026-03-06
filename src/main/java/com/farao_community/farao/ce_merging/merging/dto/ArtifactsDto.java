@@ -8,7 +8,6 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 
 /**
- * @author Sebastien Murgey {@literal <sebastien.murgey at rte-france.com>}
  * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
