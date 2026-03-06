@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.List;
 
 import static jakarta.persistence.FetchType.LAZY;
@@ -24,7 +25,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Entity
 @Data
 @NoArgsConstructor
-public class BecByBoundary {
+public class BecByBoundary implements Serializable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

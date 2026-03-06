@@ -182,10 +182,10 @@ public class MergingTaskManagementService {
         final MergingTask task = getTask(taskId);
         if (task.getTaskStatus() == CREATED) {
             throw new ResourceNotRunException(String.format("Task %d has not been run",
-                                                            task.getTaskId()));
+                                                            taskId));
         } else if (task.getTaskStatus() == RUNNING) {
             throw new ResourceNotRunException(String.format("Task %d currently running",
-                                                            task.getTaskId()));
+                                                            taskId));
         }
         return task;
     }

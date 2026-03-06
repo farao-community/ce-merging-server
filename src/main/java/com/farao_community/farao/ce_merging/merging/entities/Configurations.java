@@ -15,7 +15,6 @@ import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.Transient;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -98,7 +97,6 @@ public class Configurations implements Serializable {
 
     private String defaultSlackNode;
 
-    @Transient
-    private LoadFlowParameters loadFlowParameters;
+    private transient LoadFlowParameters loadFlowParameters;
 
 }

@@ -24,6 +24,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +35,7 @@ import static jakarta.persistence.GenerationType.AUTO;
 @Table(name = "regionconfiguration")
 @Data
 @Slf4j
-public class RegionConfiguration {
+public class RegionConfiguration implements Serializable {
     @Id
     @GeneratedValue(strategy = AUTO)
     private long ref;
