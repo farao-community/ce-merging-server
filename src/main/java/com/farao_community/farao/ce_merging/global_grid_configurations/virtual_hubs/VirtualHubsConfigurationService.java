@@ -47,8 +47,7 @@ public class VirtualHubsConfigurationService {
 
     public VirtualHubsConfiguration getVirtualHubsConfiguration(final OffsetDateTime targetDate) throws IOException {
         try {
-            final VirtualHubsConfigurationRecord cfg = repository.findLastPublishedValidBetween(targetDate.toLocalDateTime(),
-                                                                                          targetDate.toLocalDateTime());
+            final VirtualHubsConfigurationRecord cfg = repository.findLastPublishedValid(targetDate.toLocalDateTime());
 
             return JsonVirtualHubsConfiguration.importConfiguration(new ByteArrayInputStream(cfg.getConfigurationJson()
                                                                                                  .getBytes()));

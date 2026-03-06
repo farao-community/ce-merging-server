@@ -59,8 +59,7 @@ public class RegionConfigurationService {
     public JsonRegionConfiguration getRegionConfiguration(final OffsetDateTime targetDate) throws
         IOException {
         try {
-            final RegionConfigurationRecord cfg = repository.findLastPublishedValidBetween(targetDate.toLocalDateTime(),
-                                                                                           targetDate.toLocalDateTime());
+            final RegionConfigurationRecord cfg = repository.findLastPublishedValid(targetDate.toLocalDateTime());
             return new JsonRegionConfiguration(cfg.getRegionConfiguration());
         } catch (final Exception e) {
             log.warn("No region eic configuration could be found on the config repository, Default configuration will be used");

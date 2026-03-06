@@ -99,8 +99,7 @@ public class HvdcAlignmentConfigurationService {
 
     public JsonHvdcAlignmentConfiguration getHvdcXNodeAlignmentConfiguration(final OffsetDateTime targetDate) throws IOException {
         try {
-            final HvdcAlignmentConfigurationRecord cfg = repository.findLastPublishedValidBetween(targetDate.toLocalDateTime(),
-                                                                                            targetDate.toLocalDateTime());
+            final HvdcAlignmentConfigurationRecord cfg = repository.findLastPublishedValid(targetDate.toLocalDateTime());
             return new JsonHvdcAlignmentConfiguration(cfg.getHvdcXNodeAlignmentCouplesDto(),
                                                       cfg.getZeroFlowNodeDtos(),
                                                       cfg.getDkHvdcXnodes(),

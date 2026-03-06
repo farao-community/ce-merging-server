@@ -114,8 +114,7 @@ public class BECKeyConfigurationService {
 
     public JsonBecConfiguration getBECKeyConfiguration(final OffsetDateTime targetDate) throws Exception {
         try {
-            final BECKeyConfigurationRecord cfg = repository.findLastPublishedValidBetween(targetDate.toLocalDateTime(),
-                                                                                           targetDate.toLocalDateTime());
+            final BECKeyConfigurationRecord cfg = repository.findLastPublishedValid(targetDate.toLocalDateTime());
             log.info("BEC keys configuration is retrieved from configuration server");
             return new JsonBecConfiguration(cfg.getBecMatrix());
         } catch (final Exception e) {

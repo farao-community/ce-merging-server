@@ -65,8 +65,7 @@ public class XNodeConfigurationService {
 
     public JsonXNodeConfiguration getXNodesConfiguration(final OffsetDateTime targetDate) throws IOException {
         try {
-            final XNodeConfigurationRecord cfg = repository.findLastPublishedValidBetween(targetDate.toLocalDateTime(),
-                                                                                          targetDate.toLocalDateTime());
+            final XNodeConfigurationRecord cfg = repository.findLastPublishedValid(targetDate.toLocalDateTime());
             return new JsonXNodeConfiguration(cfg.getXNodeList());
         } catch (final Exception e) {
             return getDefaultConfiguration(targetDate);
