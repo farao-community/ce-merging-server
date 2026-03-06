@@ -6,10 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.merging.entities;
 
-import com.farao_community.farao.ce_merging.merging.global_grid_configurations.bilateral_exchanges.BecByBoundary;
-import com.farao_community.farao.ce_merging.merging.global_grid_configurations.hvdc_alignment.HvdcAlignmentXNodeCouple;
-import com.farao_community.farao.ce_merging.merging.global_grid_configurations.hvdc_alignment.ZeroFlowNode;
-import com.farao_community.farao.ce_merging.merging.global_grid_configurations.region_eic.RegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.bilateral_exchanges.BecByBoundary;
+import com.farao_community.farao.ce_merging.global_grid_configurations.hvdc_alignment.HvdcAlignmentXNodeCouple;
+import com.farao_community.farao.ce_merging.global_grid_configurations.hvdc_alignment.ZeroFlowNode;
+import com.farao_community.farao.ce_merging.global_grid_configurations.region_eic.RegionConfiguration;
 import com.powsybl.loadflow.LoadFlowParameters;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
