@@ -4,13 +4,10 @@
 package com.farao_community.farao.ce_merging.merging.global_grid_configurations.region_eic;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import lombok.Getter;
-import lombok.Setter;
-
+import lombok.Data;
+@Data
 public class JsonRegionConfiguration {
 
-    @Getter
-    @Setter
     private RegionConfigurationDto regionConfiguration;
 
     @JsonCreator

@@ -4,12 +4,14 @@
 package com.farao_community.farao.ce_merging.merging.dto;
 
 import com.farao_community.farao.ce_merging.merging.entities.enums.IgmType;
+import lombok.Data;
 
 import java.io.Serializable;
 
 /**
  * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
  */
+@Data
 public class IgmDto implements Serializable {
     /**
      * The country of the IGM
@@ -27,36 +29,4 @@ public class IgmDto implements Serializable {
      * The location  of the IGM quality check file
      */
     private String igmQualityReportLocation;
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
-    public IgmType getType() {
-        return type;
-    }
-
-    public void setType(IgmType type) {
-        this.type = type;
-    }
-
-    public String getIgmFileLocation() {
-        return igmFileLocation;
-    }
-
-    public void setIgmFileLocation(String location) {
-        this.igmFileLocation = location;
-    }
-
-    public String getIgmQualityReportLocation() {
-        return igmQualityReportLocation;
-    }
-
-    public void setIgmQualityReportFileLocation(String igmQualityReportFileLocation) {
-        this.igmQualityReportLocation = igmQualityReportFileLocation;
-    }
 }
