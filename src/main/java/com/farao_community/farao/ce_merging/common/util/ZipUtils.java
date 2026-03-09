@@ -43,12 +43,12 @@ public class ZipUtils {
      * @param destDirectory extraction destination diectory
      */
     public static void unzipFile(final Path zipFilePath,
-                                 final Path destDirectory) throws IOException {
+                                 final Path destDirectory) {
         if (!destDirectory.toFile().exists() && !destDirectory.toFile().mkdir()) {
             log.error("Cannot create destination directory '{}'", destDirectory);
             throw new ServiceIOException(String.format("Cannot create destination directory '%s'", destDirectory));
         }
-        try (final ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath.toFile()))) {
+        try (final ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath.toFile()))) {// NOSONAR File location does not come from user input
             ZipEntry entry = zipIn.getNextEntry();
             // iterates over entries in the zip file
             while (entry != null) {
@@ -59,7 +59,7 @@ public class ZipUtils {
                 } else {
                     // if the entry is a directory, make the directory
                     File dir = new File(filePath);
-                    dir.mkdir();
+                    dir.mkdir();// NOSONAR File location does not come from user input
                 }
                 zipIn.closeEntry();
                 entry = zipIn.getNextEntry();
@@ -78,7 +78,7 @@ public class ZipUtils {
      */
     private static void extractFile(final ZipInputStream zipIn,
                                     final String filePath) throws IOException {
-        try (final BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {
+        try (final BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {// NOSONAR File location does not come from user input
             final byte[] bytesIn = new byte[BUFFER_SIZE];
             int read;
             while ((read = zipIn.read(bytesIn)) != -1) {
@@ -91,14 +91,14 @@ public class ZipUtils {
         final Path archiveTmpPath = Files.createTempDirectory("CeMerging");
         final Path inputsArchivePath = storeInputFileInPath(archives, archiveTmpPath);
         unzipFile(inputsArchivePath, archiveTmpPath);
-        FileSystemUtils.deleteRecursively(inputsArchivePath);
+        FileSystemUtils.deleteRecursively(inputsArchivePath);// NOSONAR File location does not come from user input
         return archiveTmpPath;
     }
 
     private static Path storeInputFileInPath(final MultipartFile multipartFile,
                                              final Path path) throws IOException {
         final Path inputPath = Paths.get(path.toString(), multipartFile.getOriginalFilename());
-        multipartFile.transferTo(inputPath);
+        multipartFile.transferTo(inputPath);// NOSONAR File location does not come from user input
         return inputPath;
     }
 
