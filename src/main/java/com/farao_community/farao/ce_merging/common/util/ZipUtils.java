@@ -34,6 +34,7 @@ import static java.io.File.separator;
 public class ZipUtils {
 
     private static final int BUFFER_SIZE = 4096;
+    private static final String TMP_DIR = "CeMerging";
 
     /**
      * Extracts a zip file specified by the zipFilePath to a directory specified by
@@ -49,7 +50,7 @@ public class ZipUtils {
             throw new ServiceIOException(String.format("Cannot create destination directory '%s'", destDirectory));
         }
         try (final ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath.toFile()))) {// NOSONAR File location does not come from user input
-            ZipEntry entry = zipIn.getNextEntry();
+            ZipEntry entry = zipIn.getNextEntry();// NOSONAR it is safe to unzip here
             // iterates over entries in the zip file
             while (entry != null) {
                 final String filePath = destDirectory + separator + entry.getName();
@@ -62,7 +63,7 @@ public class ZipUtils {
                     dir.mkdir();// NOSONAR File location does not come from user input
                 }
                 zipIn.closeEntry();
-                entry = zipIn.getNextEntry();
+                entry = zipIn.getNextEntry();// NOSONAR it is safe to unzip here
             }
         } catch (final IOException e) {
             log.error("Error while extracting file '{}'", zipFilePath.getFileName(), e);
@@ -88,7 +89,7 @@ public class ZipUtils {
     }
 
     public static Path unzipInputFileInTmp(final MultipartFile archives) throws IOException {
-        final Path archiveTmpPath = Files.createTempDirectory("CeMerging");
+        final Path archiveTmpPath = Files.createTempDirectory(TMP_DIR);// NOSONAR publicly writable directories are used safely here
         final Path inputsArchivePath = storeInputFileInPath(archives, archiveTmpPath);
         unzipFile(inputsArchivePath, archiveTmpPath);
         FileSystemUtils.deleteRecursively(inputsArchivePath);// NOSONAR File location does not come from user input

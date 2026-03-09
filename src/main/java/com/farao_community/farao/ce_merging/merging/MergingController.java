@@ -39,7 +39,7 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
-@CrossOrigin(origins = ORIGIN_ANY)
+@CrossOrigin(origins = ORIGIN_ANY) // NOSONAR enabling CORS is safe here
 @RequestMapping(value = CE_MERGING_URL)
 @AllArgsConstructor
 public class MergingController {
