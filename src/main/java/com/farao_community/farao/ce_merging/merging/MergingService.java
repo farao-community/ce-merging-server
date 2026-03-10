@@ -12,6 +12,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class MergingService {
     public void run(final MergingTask task) {
-
+        // to be implemented later, here to have something to call from task management service
     }
 }
