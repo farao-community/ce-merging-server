@@ -24,7 +24,7 @@ public class CeMergingException extends AbstractServiceException {
     }
 
     public CeMergingException(final String message,
-                              final Throwable throwable) {
-        super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, throwable);
+                              final Throwable cause) {
+        super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, cause);
     }
 }

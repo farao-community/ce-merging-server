@@ -12,11 +12,11 @@ public class InvalidTaskException extends AbstractServiceException {
     private static final String EXCEPTION_ERROR_CODE = "400-INVALID-TASK";
     private static final String EXCEPTION_TITLE = "Invalid task";
 
-    public InvalidTaskException(String message) {
+    public InvalidTaskException(final String message) {
         super(BAD_REQUEST, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
     }
 
-    public InvalidTaskException(String message, Throwable throwable) {
-        super(BAD_REQUEST, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, throwable);
+    public InvalidTaskException(final String message, final Throwable cause) {
+        super(BAD_REQUEST, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, cause);
     }
 }

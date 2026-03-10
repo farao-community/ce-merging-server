@@ -30,8 +30,8 @@ public abstract class AbstractServiceException extends RuntimeException {
                                        final String code,
                                        final String title,
                                        final String message,
-                                       final Throwable throwable) {
-        super(message, throwable);
+                                       final Throwable cause) {
+        super(message, cause);
         this.status = status;
         this.code = code;
         this.title = title;

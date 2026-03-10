@@ -12,11 +12,11 @@ public class ResourceNotFoundException extends AbstractServiceException {
     private static final String EXCEPTION_ERROR_CODE = "404-RESOURCE-NOT-FOUND";
     private static final String EXCEPTION_TITLE = "Resource not found";
 
-    public ResourceNotFoundException(String message) {
+    public ResourceNotFoundException(final String message) {
         super(NOT_FOUND, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
     }
 
-    public ResourceNotFoundException(String message, Throwable throwable) {
-        super(NOT_FOUND, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, throwable);
+    public ResourceNotFoundException(final String message, final Throwable cause) {
+        super(NOT_FOUND, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, cause);
     }
 }

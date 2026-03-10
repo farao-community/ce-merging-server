@@ -17,6 +17,7 @@ public class CeMergingConstants {
     public static final String MERGING_TASK_ID = "Merging task ID";
     public static final String TASK_NOT_RUN = "Merging task with given ID has not been run";
     public static final String OK = "200";
+    public static final String CREATED = "201";
     public static final String BAD_REQUEST = "400";
     public static final String NOT_FOUND = "404";
     public static final String INTERNAL_ERROR = "500";

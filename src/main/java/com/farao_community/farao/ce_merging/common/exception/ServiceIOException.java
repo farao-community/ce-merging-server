@@ -9,7 +9,6 @@ package com.farao_community.farao.ce_merging.common.exception;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INTERNAL_ERROR;
 
 public class ServiceIOException extends AbstractServiceException {
-    private static final String EXCEPTION_HTTP_STATUS = "500";
     private static final String EXCEPTION_ERROR_CODE = "500-IO-EXCEPTION";
     private static final String EXCEPTION_TITLE = "IO exception";
 
@@ -18,7 +17,7 @@ public class ServiceIOException extends AbstractServiceException {
     }
 
     public ServiceIOException(final String message,
-                              final Throwable throwable) {
-        super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, throwable);
+                              final Throwable cause) {
+        super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, cause);
     }
 }

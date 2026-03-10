@@ -27,6 +27,7 @@ import org.springframework.web.util.UriComponents;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BAD_REQUEST;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_MERGING_URL;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CREATED;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JSON_API_MIME_TYPE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_TASK_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NOT_FOUND;
@@ -64,7 +65,7 @@ public class MergingController {
     @Operation(tags = TASK_MGT,
         summary = "Create a new merging task and returns its data.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "The merging task has been created successfully."),
+        @ApiResponse(responseCode = CREATED, description = "The merging task has been created successfully."),
         @ApiResponse(responseCode = BAD_REQUEST, description = "Invalid merging task.")
     })
     public ResponseEntity<MergingTaskDto> createTask(@Parameter(description = "Input files ZIP archive")

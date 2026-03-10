@@ -12,11 +12,11 @@ public class ResourceNotRunException extends AbstractServiceException {
     private static final String EXCEPTION_ERROR_CODE = "500-RESOURCE-NOT-RUN";
     private static final String EXCEPTION_TITLE = "Resource not run";
 
-    public ResourceNotRunException(String message) {
+    public ResourceNotRunException(final String message) {
         super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
     }
 
-    public ResourceNotRunException(String message, Throwable throwable) {
-        super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, throwable);
+    public ResourceNotRunException(final String message, final Throwable cause) {
+        super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, cause);
     }
 }
