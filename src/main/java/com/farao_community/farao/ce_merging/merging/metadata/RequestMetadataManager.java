@@ -106,9 +106,9 @@ public class RequestMetadataManager {
                "feasibility-ranges", inputs.getFeasibilityRanges(),
                "dc-links", inputs.getDcLinks(),
                "net-position-forecast", inputs.getNetPositionForecast())
-            .forEach((location, inputFile) -> {
+            .forEach((fileLocation, inputFile) -> {
                 makePathAbsolute(inputFile);
-                inputFile.setLocation(location);
+                inputFile.setLocation(inputsLocation + fileLocation);
             });
 
         task.setInputs(inputs);
@@ -122,9 +122,9 @@ public class RequestMetadataManager {
                "ac-load-flow-parameters", configs.getAcLoadFlowParameters(),
                "basecase-improvement-parameters", configs.getBaseCaseImprovementParameters(),
                "balances-adjustment-parameters", configs.getBalancesAdjustmentParameters())
-            .forEach((location, paramFile) -> {
+            .forEach((fileLocation, paramFile) -> {
                 makePathAbsolute(paramFile);
-                paramFile.setLocation(location);
+                paramFile.setLocation(configLocation + fileLocation);
             });
 
         setRecessivityConfiguration(configs, configLocation);

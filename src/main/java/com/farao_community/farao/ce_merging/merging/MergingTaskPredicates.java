@@ -24,7 +24,8 @@ public class MergingTaskPredicates {
     }
 
     public static Predicate<MergingTask> isBefore(final OffsetDateTime dateTime) {
-        return task -> task.getInputs().getTargetDate().isBefore(dateTime);
+        return task -> task.getInputs().getTargetDate() != null
+                       && task.getInputs().getTargetDate().isBefore(dateTime);
     }
 
     public static Predicate<MergingTask> isBetween(final OffsetDateTime startInclusive,

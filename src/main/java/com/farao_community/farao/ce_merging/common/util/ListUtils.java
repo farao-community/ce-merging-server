@@ -13,13 +13,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.Collections.emptyList;
-
 @NoArgsConstructor(access = AccessLevel.NONE)
 public class ListUtils {
 
     public static <T> List<T> deNulledList(final List<T> nullable) {
-        return Optional.ofNullable(nullable).orElse(emptyList());
+        return Optional.ofNullable(nullable).orElse(new ArrayList<>());
     }
 
     public static <T> List<T> clonedList(final List<T> original) {

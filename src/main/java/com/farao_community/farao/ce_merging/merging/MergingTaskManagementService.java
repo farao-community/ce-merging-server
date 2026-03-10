@@ -77,7 +77,6 @@ public class MergingTaskManagementService {
         }
 
         final MergingTask task = new MergingTask();
-        taskRepository.save(task);
 
         try {
             final Path tmpInputPath = ZipUtils.unzipInputFileInTmp(inputZip);
@@ -144,7 +143,16 @@ public class MergingTaskManagementService {
     private MergingTask run(final MergingTask task) {
         try {
             task.setRunTraceId(tracer.currentSpan().context().traceIdString());
-            setTaskRunning(task);
+
+            if (task.getTaskStatus() == RUNNING) {
+                throw new TaskAlreadyRunningException(String.format("Task '%d' already running, could not be run again",
+                                                                    task.getTaskId()));
+            }
+            task.setTaskStatus(RUNNING);
+
+            log.info("Merging task {} is running.", task.getTaskId());
+            taskRepository.save(task);
+
             log.info("Running merging task: '{}' ", task.getTaskId());
             mergingService.run(task);
             task.setTaskStatus(SUCCESS);
@@ -157,16 +165,6 @@ public class MergingTaskManagementService {
         } finally {
             taskRepository.save(task);
         }
-    }
-
-    private synchronized void setTaskRunning(final MergingTask task) {
-        if (task.getTaskStatus() == RUNNING) {
-            throw new TaskAlreadyRunningException(String.format("Task '%d' already running, could not be run again",
-                                                                task.getTaskId()));
-        }
-        task.setTaskStatus(RUNNING);
-        log.info("Merging task {} is running.", task.getTaskId());
-        taskRepository.save(task);
     }
 
     private MergingTask getTask(final long taskId) {
