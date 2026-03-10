@@ -10,6 +10,8 @@ import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
+import java.nio.file.Path;
+
 import static java.io.File.separator;
 
 @Configuration
@@ -23,22 +25,22 @@ public class CeMergingConfiguration {
     @Value("${ce-merging-server.filesystem.root}")
     private String ceMergingRoot;
 
-    @Value("${ce-merging-server.filesystem.daily-root}")
+    @Value("${ce-merging-server.filesystem.root-daily}")
     private String dailyMergingRoot;
 
-    public String getDirectoryPath(final MergingTask task) {
-        return ceMergingRoot + separator + task.getTaskId();
+    public Path getDirectoryPath(final MergingTask task) {
+        return Path.of(ceMergingRoot + separator + task.getTaskId());
     }
 
     public String getOutputsDirectoryPath(final MergingTask task) {
-        return getDirectoryPath(task) + separator + OUTPUTS_DIRECTORY;
+        return getDirectoryPath(task).resolve(OUTPUTS_DIRECTORY).toString();
     }
 
     public String getInputsDirectoryPath(final MergingTask task) {
-        return getDirectoryPath(task) + separator + INPUTS_DIRECTORY;
+        return getDirectoryPath(task).resolve(INPUTS_DIRECTORY).toString();
     }
 
     public String getArtifactsDirectoryPath(final MergingTask task) {
-        return getDirectoryPath(task) + separator + ARTIFACTS_DIRECTORY;
+        return getDirectoryPath(task).resolve(ARTIFACTS_DIRECTORY).toString();
     }
 }

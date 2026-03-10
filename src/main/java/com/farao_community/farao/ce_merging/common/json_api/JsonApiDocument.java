@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.common.json_api;
 import com.farao_community.farao.ce_merging.common.exception.AbstractServiceException;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,12 +18,13 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 public final class JsonApiDocument<T extends JsonApiData> {
     @JsonInclude(NON_EMPTY)
-    public List<JsonApiError> errors;
+    public final List<JsonApiError> errors;
     @JsonInclude(NON_NULL)
-    public List<T> data;
+    public final List<T> data;
 
     private JsonApiDocument(final List<T> data) {
         this.data = data;
+        this.errors = new ArrayList<>();
     }
 
     public static <T extends JsonApiData> JsonApiDocument<T> fromDataList(final List<T> data) {

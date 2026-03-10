@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,21 +29,13 @@ import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 @NoArgsConstructor(access = AccessLevel.NONE)
 public final class JsonUtils {
 
-    public static <T> T read(final Class<T> clazz, final String path) {
-        try (final InputStream inputStream = new FileInputStream(path)) {
-            return new ObjectMapper().enable(INDENT_OUTPUT).readValue(inputStream, clazz);
-        } catch (final IOException e) {
-            final String errorMessage = String.format("Error occurred when converting Json file %s to object of type %s",
-                                                path,
-                                                clazz.getName());
-            log.error(errorMessage);
-            throw new ServiceIOException(errorMessage, e);
-        }
+    public static <T> T read(final Class<T> clazz, final String path) throws FileNotFoundException {
+        return read(clazz, new FileInputStream(path));
     }
 
     public static <T> T read(final Class<T> clazz, final InputStream inputStream) {
         try (inputStream) {
-            return new ObjectMapper().enable(INDENT_OUTPUT).readValue(inputStream, clazz);
+            return mapperWithIndent().readValue(inputStream, clazz);
         } catch (final IOException e) {
             final String errorMessage = String.format("Error occurred when converting Json file to object of type %s",
                                                       clazz.getName());
@@ -51,41 +44,34 @@ public final class JsonUtils {
         }
     }
 
-    public static <T> T read(final Class<T> clazz, final MultipartFile file) {
-        try (final ByteArrayInputStream inputStream = new ByteArrayInputStream(file.getBytes())) {
-            return new ObjectMapper().enable(INDENT_OUTPUT).readValue(inputStream, clazz);
+    public static <T> T read(final Class<T> clazz, final MultipartFile file) throws IOException {
+        return read(clazz, new ByteArrayInputStream(file.getBytes()));
+    }
+
+    public static <T> byte[] writeToBytes(final Class<T> clazz, final T object) {
+        final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        writeInStream(clazz, object, outputStream);
+        return outputStream.toByteArray();
+    }
+
+    public static <T> void writeInPath(final Class<T> clazz, final T object, final Path filePath) throws IOException {
+        writeInStream(clazz, object, Files.newOutputStream(filePath));
+
+    }
+
+    public static <T> void writeInStream(final Class<T> clazz, final T object, final OutputStream outputStream) {
+        try (outputStream) {
+             mapperWithIndent().writeValue(outputStream, object);
         } catch (final IOException e) {
-            final String errorMessage = String.format("Error occurred when converting Json file to object of type %s",
+            final String errorMessage = String.format("Error occurred when writing content of object of type %s",
                                                       clazz.getName());
             log.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }
 
-    public static <T> byte[] writeInBytes(final Class<T> clazz, final T object) {
-        try (final ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-            new ObjectMapper().enable(INDENT_OUTPUT).writeValue(outputStream, object);
-            return outputStream.toByteArray();
-        } catch (final IOException e) {
-            final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes",
-                                                      clazz.getName());
-            log.error(errorMessage);
-            throw new ServiceIOException(errorMessage, e);
-        }
-    }
-
-    public static <T> void writeInPath(final Class<T> clazz, final T object, final Path filePath) {
-        try (final OutputStream outputStream = Files.newOutputStream(filePath)) {
-            new ObjectMapper()
-                .enable(INDENT_OUTPUT)
-                .writeValue(outputStream, object);
-        } catch (final IOException e) {
-            final String errorMessage = String.format("Error occurred when writing content of object of type %s to path %s",
-                                                      clazz.getName(),
-                                                      filePath);
-            log.error(errorMessage);
-            throw new ServiceIOException(errorMessage, e);
-        }
+    private static ObjectMapper mapperWithIndent() {
+        return new ObjectMapper().enable(INDENT_OUTPUT);
     }
 
 }
