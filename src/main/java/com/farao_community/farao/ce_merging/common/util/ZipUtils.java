@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -19,11 +20,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
+import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -105,50 +105,35 @@ public class ZipUtils {
     }
 
     public static byte[] zipDirectory(final String directory) {
-        final ByteArrayOutputStream os = new ByteArrayOutputStream();
-        try (final ZipOutputStream zos = new ZipOutputStream(os)) {
-            recursiveZip(directory, zos, directory);
+        final ByteArrayOutputStream zipBytesStream = new ByteArrayOutputStream();
+        try (final ZipOutputStream zipOutputStream = new ZipOutputStream(zipBytesStream);
+             final Stream<Path> allFiles = Files.walk(Paths.get(directory))) {
+
+            allFiles.filter(Files::isRegularFile)
+                .map(Path::toString)
+                .forEach(filePath -> addFileToZip(filePath, zipOutputStream));
+
         } catch (final IOException e) {
             log.error("Error while compressing directory '{}'", directory, e);
             throw new ServiceIOException(String.format("Error while compressing directory '%s'", directory), e);
         }
-        return os.toByteArray();
+        return zipBytesStream.toByteArray();
     }
 
-    private static void recursiveZip(final String currentDirectory,
-                                     final ZipOutputStream outputStream,
-                                     final String rootZippingDirectory) {
+    private static void addFileToZip(final String filePath,
+                                     final ZipOutputStream os) {
 
-        //create a new File object based on the directory we have to zip
-        final File dirAsZip = new File(currentDirectory);
-        //get a listing of the directory content
-        final String[] children = Optional.ofNullable(dirAsZip.list()).orElse(new String[]{});
         final byte[] readBuffer = new byte[2156];
         int bytesIn;
-        //loop through children, and zip the files
-        for (final String fileOrDir : children) {
-            final File child = new File(dirAsZip, fileOrDir);
-            final String path = child.getPath();
-            if (child.isDirectory()) {
-                //if the File object is a directory, call this
-                //function again to add its content recursively
-                recursiveZip(path, outputStream, rootZippingDirectory);
-                //loop again (go to next file/dir)
-                continue;
+        try (final FileInputStream fileStream = new FileInputStream(filePath)) {
+            os.putNextEntry(new ZipEntry(filePath));
+            while ((bytesIn = fileStream.read(readBuffer)) != -1) {
+                os.write(readBuffer, 0, bytesIn);
             }
-            //if we reached here, the File object child was not a directory
-            //create a FileInputStream on top of child
-            try (final FileInputStream inputStream = new FileInputStream(child)) {
-                final String relativeToZippingDir = Paths.get(rootZippingDirectory).relativize(Paths.get(path)).toString();
-                //create a new zip entry and place it in the ZipOutputStream object
-                outputStream.putNextEntry(new ZipEntry(relativeToZippingDir));
-                //now write the content of the file to the ZipOutputStream
-                while ((bytesIn = inputStream.read(readBuffer)) != -1) {
-                    outputStream.write(readBuffer, 0, bytesIn);
-                }
-            } catch (final IOException e) {
-                throw new UncheckedIOException(e);
-            }
+
+        } catch (final IOException e) {
+            throw new CeMergingException("Error during output ZIP creation", e);
         }
     }
+
 }

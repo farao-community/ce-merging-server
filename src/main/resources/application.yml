@@ -3,8 +3,8 @@ spring:
     name: ce-merging-server
   servlet:
     multipart:
-      max-file-size: 100MB
-      max-request-size: 100MB
+      max-file-size: 100MB # NOSONAR no DoS risk because it is to be deployed internally
+      max-request-size: 100MB # NOSONAR no DoS risk because it is to be deployed internally
   jpa:
     properties:
       hibernate:

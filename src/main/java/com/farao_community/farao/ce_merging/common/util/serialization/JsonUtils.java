@@ -29,11 +29,13 @@ import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 @NoArgsConstructor(access = AccessLevel.NONE)
 public final class JsonUtils {
 
-    public static <T> T read(final Class<T> clazz, final String path) throws FileNotFoundException {
+    public static <T> T read(final Class<T> clazz,
+                             final String path) throws FileNotFoundException {
         return read(clazz, new FileInputStream(path));
     }
 
-    public static <T> T read(final Class<T> clazz, final InputStream inputStream) {
+    public static <T> T read(final Class<T> clazz,
+                             final InputStream inputStream) {
         try (inputStream) {
             return mapperWithIndent().readValue(inputStream, clazz);
         } catch (final IOException e) {
@@ -44,24 +46,30 @@ public final class JsonUtils {
         }
     }
 
-    public static <T> T read(final Class<T> clazz, final MultipartFile file) throws IOException {
+    public static <T> T read(final Class<T> clazz,
+                             final MultipartFile file) throws IOException {
         return read(clazz, new ByteArrayInputStream(file.getBytes()));
     }
 
-    public static <T> byte[] writeToBytes(final Class<T> clazz, final T object) {
+    public static <T> byte[] writeToBytes(final Class<T> clazz,
+                                          final T object) {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         writeInStream(clazz, object, outputStream);
         return outputStream.toByteArray();
     }
 
-    public static <T> void writeInPath(final Class<T> clazz, final T object, final Path filePath) throws IOException {
+    public static <T> void writeInPath(final Class<T> clazz,
+                                       final T object,
+                                       final Path filePath) throws IOException {
         writeInStream(clazz, object, Files.newOutputStream(filePath));
 
     }
 
-    public static <T> void writeInStream(final Class<T> clazz, final T object, final OutputStream outputStream) {
+    public static <T> void writeInStream(final Class<T> clazz,
+                                         final T object,
+                                         final OutputStream outputStream) {
         try (outputStream) {
-             mapperWithIndent().writeValue(outputStream, object);
+            mapperWithIndent().writeValue(outputStream, object);
         } catch (final IOException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s",
                                                       clazz.getName());

@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.metadata;
 
 import com.farao_community.farao.ce_merging.common.exception.InvalidTaskException;
+import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
@@ -148,6 +149,9 @@ public class RequestMetadataManager {
                 paramFile.feedPathAndName(new ClassPathResource(RECESSIVITY_DEFAULT_CONFIGURATION).getFile().getAbsolutePath());
             } catch (final IOException e) {
                 log.warn("No default recessivity configuration file could be found, no country will be considered recessive");
+                throw new ServiceIOException("Default recessivity configuration file not found on classpath: %s"
+                                                 .formatted(RECESSIVITY_DEFAULT_CONFIGURATION),
+                                             e);
             }
         }
     }

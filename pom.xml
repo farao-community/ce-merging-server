@@ -37,6 +37,12 @@
                         <goals>
                             <goal>xjc</goal>
                         </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/xsd</source>
+                            </sources>
+                            <packageName>com.farao_community.farao.ce_merging.xsd</packageName>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -173,6 +179,11 @@
         </dependency>
 
         <!-- RUNTIME DEPENDENCIES -->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <scope>runtime</scope>
+        </dependency>
         <dependency>
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-config-classic</artifactId>

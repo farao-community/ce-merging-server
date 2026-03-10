@@ -35,7 +35,6 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OK;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ORIGIN_ANY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_NOT_RUN;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.toAttachmentFileResponse;
-import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
@@ -153,9 +152,7 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getOutputsByTaskId(@Parameter(description = MERGING_TASK_ID)
                                                      @PathVariable final long taskId) {
-        return ResponseEntity.ok()
-            .contentType(APPLICATION_OCTET_STREAM)
-            .body(taskManager.getOutputs(taskId));
+        return toAttachmentFileResponse(taskManager.getOutputs(taskId), "outputs_%s.zip".formatted(taskId));
     }
 
     @GetMapping(value = "/tasks/{taskId}/artifacts/cgm-net-positions",
