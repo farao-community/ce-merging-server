@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.merging.dto;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.region_eic.RegionConfiguration;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -42,10 +41,5 @@ public class ConfigurationsDto implements Serializable {
      * The BEC keys configuration
      */
     private String becConfig;
-
-    /**
-     * The EIC Codes configuration
-     */
-    private RegionConfiguration regionConfiguration;
 
 }

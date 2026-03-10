@@ -6,14 +6,9 @@
  */
 package com.farao_community.farao.ce_merging.merging.entities;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.bilateral_exchanges.BecByBoundary;
-import com.farao_community.farao.ce_merging.global_grid_configurations.hvdc_alignment.HvdcAlignmentXNodeCouple;
-import com.farao_community.farao.ce_merging.global_grid_configurations.hvdc_alignment.ZeroFlowNode;
-import com.farao_community.farao.ce_merging.global_grid_configurations.region_eic.RegionConfiguration;
 import com.powsybl.loadflow.LoadFlowParameters;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import lombok.Data;
 
@@ -70,27 +65,6 @@ public class Configurations implements Serializable {
      */
     @OneToOne(cascade = ALL)
     private SavedFile recessivityParameters = new SavedFile();
-
-    /**
-     * The BEC keys configuration
-     */
-    @OneToMany(cascade = ALL)
-    private List<BecByBoundary> becMatrixConfig = new ArrayList<>();
-
-    /**
-     * The region Configuration
-     */
-    @OneToOne(cascade = ALL)
-    private RegionConfiguration regionConfiguration;
-
-    /**
-     * reference/recessive country couple for hvdc alignment
-     */
-    @ElementCollection(fetch = LAZY)
-    private List<HvdcAlignmentXNodeCouple> virtualHubsAlignmentCouples = new ArrayList<>();
-
-    @ElementCollection(fetch = LAZY)
-    private List<ZeroFlowNode> zeroFlowNodes = new ArrayList<>();
 
     @ElementCollection(fetch = LAZY)
     private List<String> dkHvdcXnodes = new ArrayList<>();
