@@ -8,7 +8,6 @@ package com.farao_community.farao.ce_merging.merging;
 
 import brave.Tracer;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.merging.entities.SavedFile;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ResourceNotFoundException;
 import com.farao_community.farao.ce_merging.common.exception.ResourceNotRunException;
@@ -18,9 +17,10 @@ import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
 import com.farao_community.farao.ce_merging.merging.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.mapper.MergingTaskMapper;
-import com.farao_community.farao.ce_merging.merging.metadata.model.RequestMetadata;
 import com.farao_community.farao.ce_merging.merging.metadata.RequestMetadataManager;
+import com.farao_community.farao.ce_merging.merging.metadata.model.RequestMetadata;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
@@ -158,6 +158,9 @@ public class MergingTaskManagementService {
             task.setTaskStatus(SUCCESS);
             log.info("Merging task: '{}' is finished with success", task.getTaskId());
             return task;
+
+        } catch (final TaskAlreadyRunningException e) {
+            throw e;
         } catch (final Exception e) {
             task.setStatusDetail(e.getMessage());
             task.setTaskStatus(ERROR);

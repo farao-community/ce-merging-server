@@ -111,7 +111,7 @@ public class ZipUtils {
 
             allFiles.filter(Files::isRegularFile)
                 .map(Path::toString)
-                .forEach(filePath -> addFileToZip(filePath, zipOutputStream));
+                .forEach(filePath -> addFileToZip(filePath, directory, zipOutputStream));
 
         } catch (final IOException e) {
             log.error("Error while compressing directory '{}'", directory, e);
@@ -121,12 +121,14 @@ public class ZipUtils {
     }
 
     private static void addFileToZip(final String filePath,
+                                     final String rootDir,
                                      final ZipOutputStream os) {
 
         final byte[] readBuffer = new byte[2156];
         int bytesIn;
-        try (final FileInputStream fileStream = new FileInputStream(filePath)) {
-            os.putNextEntry(new ZipEntry(filePath));
+        final String fileRelativePath = Paths.get(rootDir).relativize(Paths.get(filePath)).toString();
+        try (final FileInputStream fileStream = new FileInputStream(fileRelativePath)) {
+            os.putNextEntry(new ZipEntry(fileRelativePath));
             while ((bytesIn = fileStream.read(readBuffer)) != -1) {
                 os.write(readBuffer, 0, bytesIn);
             }

@@ -7,7 +7,6 @@
 package com.farao_community.farao.ce_merging.merging.metadata;
 
 import com.farao_community.farao.ce_merging.common.exception.InvalidTaskException;
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
@@ -15,7 +14,6 @@ import com.farao_community.farao.ce_merging.merging.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.metadata.model.RequestMetadata;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
@@ -144,15 +142,8 @@ public class RequestMetadataManager {
         if (paramFile.getPath() != null) {
             paramFile.feedPathAndName(Paths.get(inputsPath, configurations.getRecessivityParameters().getPath()).toString());
         } else {
-            try {
-                log.info("No recessivity parameters file could be found on the input directory, Default recessivity configuration will be used");
-                paramFile.feedPathAndName(new ClassPathResource(RECESSIVITY_DEFAULT_CONFIGURATION).getFile().getAbsolutePath());
-            } catch (final IOException e) {
-                log.warn("No default recessivity configuration file could be found, no country will be considered recessive");
-                throw new ServiceIOException("Default recessivity configuration file not found on classpath: %s"
-                                                 .formatted(RECESSIVITY_DEFAULT_CONFIGURATION),
-                                             e);
-            }
+            log.info("No recessivity parameters file could be found on the input directory, Default recessivity configuration will be used");
+            paramFile.feedPathAndName(Paths.get(RECESSIVITY_DEFAULT_CONFIGURATION).toString());
         }
     }
 }
