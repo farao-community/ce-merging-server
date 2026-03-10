@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.region_eic;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
+import com.farao_community.farao.ce_merging.global_grid_configurations.abstraction.GridConfigurationRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository

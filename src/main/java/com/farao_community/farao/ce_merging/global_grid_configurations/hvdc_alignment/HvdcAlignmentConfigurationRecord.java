@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.common.util.ListUtils.clonedList;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
@@ -42,31 +43,27 @@ public class HvdcAlignmentConfigurationRecord {
 
     private String defaultSlackNode;
 
-    private static <T> List<T> copyList(final List<T> original) {
-        return (original != null) ? new ArrayList<>(original) : new ArrayList<>();
-    }
-
     public List<HvdcAlignmentXNodeCoupleDto> getHvdcXNodeAlignmentCouplesDto() {
-        return copyList(hvdcXNodeAlignmentCouplesDto);
+        return clonedList(hvdcXNodeAlignmentCouplesDto);
     }
 
     public void setHvdcXNodeAlignmentCouplesDto(final List<HvdcAlignmentXNodeCoupleDto> hvdcXNodeAlignmentCouplesDto) {
-        this.hvdcXNodeAlignmentCouplesDto = copyList(hvdcXNodeAlignmentCouplesDto);
+        this.hvdcXNodeAlignmentCouplesDto = clonedList(hvdcXNodeAlignmentCouplesDto);
     }
 
     public List<ZeroFlowNodeDto> getZeroFlowNodeDtos() {
-        return copyList(zeroFlowNodeDtos);
+        return clonedList(zeroFlowNodeDtos);
     }
 
     public void setZeroFlowNodeDtos(final List<ZeroFlowNodeDto> zeroFlowNodeDtos) {
-        this.zeroFlowNodeDtos = copyList(zeroFlowNodeDtos);
+        this.zeroFlowNodeDtos = clonedList(zeroFlowNodeDtos);
     }
 
     public List<String> getDkHvdcXnodes() {
-        return copyList(dkHvdcXnodes);
+        return clonedList(dkHvdcXnodes);
     }
 
     public void setDkHvdcXnodes(final List<String> dkHvdcXnodes) {
-        this.dkHvdcXnodes = copyList(dkHvdcXnodes);
+        this.dkHvdcXnodes = clonedList(dkHvdcXnodes);
     }
 }

@@ -6,14 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.bilateral_exchanges;
 
-import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import com.farao_community.farao.ce_merging.common.util.serialization.JsonUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.abstraction.AbstractGridConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.region_eic.RegionConfigurationDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.region_eic.RegionConfigurationService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,46 +23,46 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CSV_SEPARATOR;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 @AllArgsConstructor
 @Slf4j
-public class BECKeyConfigurationService {
+public class BECKeyConfigurationService extends AbstractGridConfigurationService<BECKeyConfigurationRecord, JsonBecConfiguration> {
 
-    public static final String BEC_KEYS_DEFAULT_CONFIGURATION = "gridDefaultConfigurations/sharingKeysBEC.csv";
     private static final String ARROW = "->";
-    private final BECKeyConfigurationRepository repository;
     private final RegionConfigurationService regionConfigurationService;
 
-    public void publishBECKeyConfiguration(final MultipartFile configurationFile,
-                                           final OffsetDateTime validFrom,
-                                           final OffsetDateTime validTo) {
-        try {
-            final String configFileCsvContent = new String(configurationFile.getBytes(), UTF_8);
-            if (!configFileCsvContent.isEmpty()) {
-                final List<BecByBoundaryDto> becMatrix = parseSharingKeysBEC(validFrom, configFileCsvContent);
-                final BECKeyConfigurationRecord cfgRrecord = new BECKeyConfigurationRecord(UUID.randomUUID().toString(),
-                                                                                           validFrom.toLocalDateTime(),
-                                                                                           validTo.toLocalDateTime(),
-                                                                                           LocalDateTime.now(),
-                                                                                           becMatrix);
-                repository.save(cfgRrecord);
-            }
-        } catch (final Exception e) {
-            log.error("Bec Keys configuration cannot be published to server");
-            throw new CeMergingException("Bec Keys configuration could not be published, file or dates could be invalid.");
-        }
+    @Override
+    protected JsonBecConfiguration getDefaultConfiguration(final OffsetDateTime targetDate) throws IOException {
+        final String defaultCsvBecContent = new String(getDefaultFileBytes());
+        return new JsonBecConfiguration(parseBecSharingKeys(targetDate, defaultCsvBecContent));
     }
 
-    public List<BecByBoundaryDto> parseSharingKeysBEC(final OffsetDateTime validFrom,
+    @Override
+    protected JsonBecConfiguration getConfigurationfromRecord(final BECKeyConfigurationRecord cfgRecord) {
+        return new JsonBecConfiguration(cfgRecord.getBecMatrix());
+    }
+
+    @Override
+    protected BECKeyConfigurationRecord buildFromFile(final MultipartFile configurationFile,
+                                                      final OffsetDateTime validFrom,
+                                                      final OffsetDateTime validTo) throws IOException {
+        final String configFileCsvContent = getTextContent(configurationFile);
+        final List<BecByBoundaryDto> becMatrix = parseBecSharingKeys(validFrom, configFileCsvContent);
+        return new BECKeyConfigurationRecord(generateId(),
+                                             validFrom.toLocalDateTime(),
+                                             validTo.toLocalDateTime(),
+                                             LocalDateTime.now(),
+                                             becMatrix);
+    }
+
+    public List<BecByBoundaryDto> parseBecSharingKeys(final OffsetDateTime validFrom,
                                                       final String csvContent) throws IOException {
         final List<List<String>> exchanges = new ArrayList<>();
         final RegionConfigurationDto regionConfiguration = regionConfigurationService
-            .getRegionConfiguration(validFrom)
+            .getConfiguration(validFrom)
             .getRegionConfiguration();
 
         // extract CSV elements as strings
@@ -106,24 +104,4 @@ public class BECKeyConfigurationService {
         }
         return becMatrix;
     }
-
-    public byte[] retrieveBECKeyConfiguration(final OffsetDateTime targetDate) throws Exception {
-        return JsonUtils.writeInBytes(JsonBecConfiguration.class,
-                                      getBECKeyConfiguration(targetDate));
-    }
-
-    public JsonBecConfiguration getBECKeyConfiguration(final OffsetDateTime targetDate) throws Exception {
-        try {
-            final BECKeyConfigurationRecord cfg = repository.findLastPublishedValid(targetDate.toLocalDateTime());
-            log.info("BEC keys configuration is retrieved from configuration server");
-            return new JsonBecConfiguration(cfg.getBecMatrix());
-        } catch (final Exception e) {
-            final String defaultCsvBecContent = new String(new ClassPathResource(BEC_KEYS_DEFAULT_CONFIGURATION)
-                                                               .getInputStream()
-                                                               .readAllBytes());
-
-            return new JsonBecConfiguration(parseSharingKeysBEC(targetDate, defaultCsvBecContent));
-        }
-    }
-
 }

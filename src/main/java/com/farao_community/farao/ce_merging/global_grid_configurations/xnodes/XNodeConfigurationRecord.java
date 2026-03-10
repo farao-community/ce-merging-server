@@ -8,7 +8,6 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.xnodes;
 
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,6 +16,8 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
 @Data
@@ -29,7 +30,7 @@ public class XNodeConfigurationRecord {
     private LocalDateTime validTo;
     private LocalDateTime publishedOn;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = LAZY)
     private List<XnodeDto> xNodeList = new ArrayList<>();
 
 }

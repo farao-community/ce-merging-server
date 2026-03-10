@@ -16,6 +16,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NAME;
 import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
@@ -27,7 +28,7 @@ public class TsoInfos implements Serializable {
     @GeneratedValue(strategy = AUTO)
     private long ref;
 
-    @Column(name = "name")
+    @Column(name = NAME)
     @JsonProperty(value = "tsoName")
     private String name;
 

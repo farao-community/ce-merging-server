@@ -28,6 +28,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NAME;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.AUTO;
 
@@ -40,10 +42,10 @@ public class RegionConfiguration implements Serializable {
     @GeneratedValue(strategy = AUTO)
     private long ref;
 
-    @Column(name = "name")
+    @Column(name = NAME)
     private String name;
 
-    @Column(name = "id")
+    @Column(name = ID)
     private String id;
 
     @ElementCollection
@@ -77,7 +79,7 @@ public class RegionConfiguration implements Serializable {
         try {
             return new ObjectMapper().writeValueAsString(this);
         } catch (final JsonProcessingException e) {
-            final String errorMsg = "Error during json parse regions configuration";
+            final String errorMsg = "Error during JSON parsing of regions configuration";
             log.error(errorMsg);
             throw new ServiceIOException(errorMsg, e);
         }

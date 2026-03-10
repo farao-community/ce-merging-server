@@ -23,6 +23,7 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -49,8 +50,8 @@ public class ZipUtils {
             log.error("Cannot create destination directory '{}'", destDirectory);
             throw new ServiceIOException(String.format("Cannot create destination directory '%s'", destDirectory));
         }
-        try (final ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath.toFile()))) {// NOSONAR File location does not come from user input
-            ZipEntry entry = zipIn.getNextEntry();// NOSONAR it is safe to unzip here
+        try (final ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath.toFile()))) { // NOSONAR File location does not come from user input
+            ZipEntry entry = zipIn.getNextEntry(); // NOSONAR it is safe to unzip here
             // iterates over entries in the zip file
             while (entry != null) {
                 final String filePath = destDirectory + separator + entry.getName();
@@ -60,10 +61,10 @@ public class ZipUtils {
                 } else {
                     // if the entry is a directory, make the directory
                     File dir = new File(filePath);
-                    dir.mkdir();// NOSONAR File location does not come from user input
+                    dir.mkdir(); // NOSONAR File location does not come from user input
                 }
                 zipIn.closeEntry();
-                entry = zipIn.getNextEntry();// NOSONAR it is safe to unzip here
+                entry = zipIn.getNextEntry(); // NOSONAR it is safe to unzip here
             }
         } catch (final IOException e) {
             log.error("Error while extracting file '{}'", zipFilePath.getFileName(), e);
@@ -79,7 +80,7 @@ public class ZipUtils {
      */
     private static void extractFile(final ZipInputStream zipIn,
                                     final String filePath) throws IOException {
-        try (final BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) {// NOSONAR File location does not come from user input
+        try (final BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) { // NOSONAR File location does not come from user input
             final byte[] bytesIn = new byte[BUFFER_SIZE];
             int read;
             while ((read = zipIn.read(bytesIn)) != -1) {
@@ -89,17 +90,17 @@ public class ZipUtils {
     }
 
     public static Path unzipInputFileInTmp(final MultipartFile archives) throws IOException {
-        final Path archiveTmpPath = Files.createTempDirectory(TMP_DIR);// NOSONAR publicly writable directories are used safely here
+        final Path archiveTmpPath = Files.createTempDirectory(TMP_DIR); // NOSONAR directories are used safely here
         final Path inputsArchivePath = storeInputFileInPath(archives, archiveTmpPath);
         unzipFile(inputsArchivePath, archiveTmpPath);
-        FileSystemUtils.deleteRecursively(inputsArchivePath);// NOSONAR File location does not come from user input
+        FileSystemUtils.deleteRecursively(inputsArchivePath); // NOSONAR File location does not come from user input
         return archiveTmpPath;
     }
 
     private static Path storeInputFileInPath(final MultipartFile multipartFile,
                                              final Path path) throws IOException {
         final Path inputPath = Paths.get(path.toString(), multipartFile.getOriginalFilename());
-        multipartFile.transferTo(inputPath);// NOSONAR File location does not come from user input
+        multipartFile.transferTo(inputPath); // NOSONAR File location does not come from user input
         return inputPath;
     }
 
@@ -114,14 +115,14 @@ public class ZipUtils {
         return os.toByteArray();
     }
 
-    private static void recursiveZip(final String directory,
+    private static void recursiveZip(final String currentDirectory,
                                      final ZipOutputStream outputStream,
-                                     final String referencePath) {
+                                     final String rootZippingDirectory) {
 
         //create a new File object based on the directory we have to zip
-        final File dirAsZip = new File(directory);
+        final File dirAsZip = new File(currentDirectory);
         //get a listing of the directory content
-        final String[] children = dirAsZip.list();
+        final String[] children = Optional.ofNullable(dirAsZip.list()).orElse(new String[]{});
         final byte[] readBuffer = new byte[2156];
         int bytesIn;
         //loop through children, and zip the files
@@ -131,16 +132,16 @@ public class ZipUtils {
             if (child.isDirectory()) {
                 //if the File object is a directory, call this
                 //function again to add its content recursively
-                recursiveZip(path, outputStream, referencePath);
+                recursiveZip(path, outputStream, rootZippingDirectory);
                 //loop again (go to next file/dir)
                 continue;
             }
             //if we reached here, the File object child was not a directory
             //create a FileInputStream on top of child
             try (final FileInputStream inputStream = new FileInputStream(child)) {
-                final String fileRelativePath = Paths.get(referencePath).relativize(Paths.get(path)).toString();
+                final String relativeToZippingDir = Paths.get(rootZippingDirectory).relativize(Paths.get(path)).toString();
                 //create a new zip entry and place it in the ZipOutputStream object
-                outputStream.putNextEntry(new ZipEntry(fileRelativePath));
+                outputStream.putNextEntry(new ZipEntry(relativeToZippingDir));
                 //now write the content of the file to the ZipOutputStream
                 while ((bytesIn = inputStream.read(readBuffer)) != -1) {
                     outputStream.write(readBuffer, 0, bytesIn);

@@ -30,9 +30,11 @@ public class FileUtils {
     public static ResponseEntity<byte[]> toAttachmentFileResponse(final byte[] fileContent,
                                                           final String fileName) {
         try {
-            final ContentDisposition contentDisposition = ContentDisposition.builder("attachment").filename(fileName).build();
             final HttpHeaders headers = new HttpHeaders();
-            headers.setContentDisposition(contentDisposition);
+            headers.setContentDisposition(ContentDisposition
+                                              .builder("attachment")
+                                              .filename(fileName)
+                                              .build());
             return ResponseEntity.ok()
                 .contentType(APPLICATION_OCTET_STREAM)
                 .headers(headers)

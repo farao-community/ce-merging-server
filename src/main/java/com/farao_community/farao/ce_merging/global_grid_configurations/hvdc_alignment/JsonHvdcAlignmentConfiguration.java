@@ -11,9 +11,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Optional;
 
-import static java.util.Collections.emptyList;
+import static com.farao_community.farao.ce_merging.common.util.ListUtils.deNulledList;
 
 @Data
 public class JsonHvdcAlignmentConfiguration {
@@ -28,9 +27,9 @@ public class JsonHvdcAlignmentConfiguration {
                                           @JsonProperty("setZeroFlowNodes") List<ZeroFlowNodeDto> setZeroFlowNodes,
                                           @JsonProperty("dkHvdcXnodes") List<String> dkHvdcXnodes,
                                           @JsonProperty("defaultSlackNode") String defaultSlackNode) {
-        this.hvdcXNodeAlignment = Optional.ofNullable(hvdcXNodeAlignment).orElse(emptyList());
-        this.setZeroFlowNodes =  Optional.ofNullable(setZeroFlowNodes).orElse(emptyList());
-        this.dkHvdcXnodes =  Optional.ofNullable(dkHvdcXnodes).orElse(emptyList());
+        this.hvdcXNodeAlignment = deNulledList(hvdcXNodeAlignment);
+        this.setZeroFlowNodes =  deNulledList(setZeroFlowNodes);
+        this.dkHvdcXnodes =  deNulledList(dkHvdcXnodes);
         this.defaultSlackNode = defaultSlackNode;
     }
 }

@@ -17,6 +17,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NAME;
+
 @Entity
 @Data
 @Table(name = "tsoinfosdto")
@@ -26,7 +28,7 @@ public class TsoInfosDto {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long ref;
 
-    @Column(name = "name")
+    @Column(name = NAME)
     @JsonProperty(value = "tsoName")
     @Getter
     @Setter

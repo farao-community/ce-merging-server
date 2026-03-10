@@ -31,14 +31,15 @@ import static java.lang.Boolean.TRUE;
 @NoArgsConstructor(access = AccessLevel.NONE)
 @Slf4j
 public final class JaxbUtils {
-    public static <T> T read(final Class<T> clazz,
-                             final String path) {
+    public static <T> T readFromPath(final Class<T> clazz,
+                                     final String path) {
         try (final InputStream fileContent = Files.newInputStream(Paths.get(path))) {
             return JAXBContext
                 .newInstance(clazz)
                 .createUnmarshaller()
                 .unmarshal(new StreamSource(fileContent), clazz)
                 .getValue();
+
         } catch (final JAXBException | IOException e) {
             final String errorMessage = String.format("Error occurred when converting xml file %s to object of type %s",
                                                       path, clazz.getName());
@@ -47,8 +48,8 @@ public final class JaxbUtils {
         }
     }
 
-    public static <T> T readBytes(final Class<T> clazz,
-                                  final byte[] fileContent) {
+    public static <T> T readFromBytes(final Class<T> clazz,
+                                      final byte[] fileContent) {
         try {
             return (T) JAXBContext
                 .newInstance(clazz)
@@ -61,62 +62,67 @@ public final class JaxbUtils {
         }
     }
 
-    public static <T> byte[] writeInBytes(final Class<T> clazz, final T type) {
+    public static <T> byte[] writeToBytes(final Class<T> objectsClass,
+                                          final T object) {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            marshallerFormatOutput(clazz).marshal(type, bos);
+            marshallerFormatOutput(objectsClass).marshal(object, bos);
             return bos.toByteArray();
         } catch (final JAXBException e) {
-            final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes", clazz.getName());
+            final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes", objectsClass.getName());
             log.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }
 
-    public static <T> void writeInPath(final Class<T> clazz,
-                                       final T type,
+    public static <T> void writeToPath(final Class<T> objectsClass,
+                                       final T object,
                                        final Path filePath) {
         try {
-            marshallerFormatOutput(clazz).marshal(type, filePath.toFile());
+            marshallerFormatOutput(objectsClass).marshal(object, filePath.toFile());
         } catch (JAXBException e) {
-            final String errorMessage = String.format("Error occurred when writing content of object of type %s to path %s", clazz.getName(), filePath.toString());
+            final String errorMessage = String.format("Error occurred when writing content of object of type %s to path %s", objectsClass.getName(), filePath.toString());
             log.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }
 
     // Solution to marshal an object without @XmlRootElement annotation
-    public static <T> byte[] writeInBytes(final Class<T> clazz,
-                                          final T type,
+    public static <T> byte[] writeToBytes(final Class<T> objectsClass,
+                                          final T object,
                                           final String nameSpaceURI,
                                           final String rootElement) {
         try {
             final JAXBElement<T> jaxbElement =
                 new JAXBElement<>(new QName(nameSpaceURI, rootElement),
-                                   clazz,
-                                   type);
-            final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            marshallerFormatOutput(clazz).marshal(jaxbElement, bos);
-            return bos.toByteArray();
+                                   objectsClass,
+                                   object);
+            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            marshallerFormatOutput(objectsClass).marshal(jaxbElement, outputStream);
+            return outputStream.toByteArray();
         } catch (final JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes",
-                                                      clazz.getName());
+                                                      objectsClass.getName());
             log.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }
 
-    // Solution to marshal a object without @XmlRootElement annotation
-    public static <T> void writeInPath(Class<T> clazz, T type, String nameSpaceURI, String rootElement, Path filePath) {
+    // Solution to marshal an object without @XmlRootElement annotation
+    public static <T> void writeToPath(final Class<T> objectsClass,
+                                       final T object,
+                                       final String nameSpaceURI,
+                                       final String rootElement,
+                                       final Path filePath) {
         try {
             final JAXBElement<T> jaxbElement =
                 new JAXBElement<>(new QName(nameSpaceURI, rootElement),
-                                   clazz,
-                                   type);
-            marshallerFormatOutput(clazz).marshal(jaxbElement, filePath.toFile());
+                                   objectsClass,
+                                   object);
+            marshallerFormatOutput(objectsClass).marshal(jaxbElement, filePath.toFile());
         } catch (final JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to path %s",
-                                                      clazz.getName(), filePath.toString());
+                                                      objectsClass.getName(), filePath.toString());
             log.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }

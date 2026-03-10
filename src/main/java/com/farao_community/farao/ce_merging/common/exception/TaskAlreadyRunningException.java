@@ -6,16 +6,18 @@
  */
 package com.farao_community.farao.ce_merging.common.exception;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BAD_REQUEST;
+
 public class TaskAlreadyRunningException extends AbstractServiceException {
     private static final String EXCEPTION_HTTP_STATUS = "400";
     private static final String EXCEPTION_ERROR_CODE = "400-TASK-ALREADY-RUNNING";
     private static final String EXCEPTION_TITLE = "Task already running";
 
     public TaskAlreadyRunningException(String message) {
-        super(EXCEPTION_HTTP_STATUS, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
+        super(BAD_REQUEST, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
     }
 
     public TaskAlreadyRunningException(String message, Throwable throwable) {
-        super(EXCEPTION_HTTP_STATUS, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, throwable);
+        super(BAD_REQUEST, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, throwable);
     }
 }

@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ID;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
@@ -29,7 +30,7 @@ public class BecByBoundaryDto {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Basic(optional = false)
-    @Column(name = "id", unique = true, nullable = false)
+    @Column(name = ID, unique = true, nullable = false)
     private long id;
 
     @Embedded

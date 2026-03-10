@@ -21,15 +21,15 @@ public final class JsonApiDocument<T extends JsonApiData> {
     @JsonInclude(NON_NULL)
     public List<T> data;
 
-    private JsonApiDocument(List<T> data) {
+    private JsonApiDocument(final List<T> data) {
         this.data = data;
     }
 
-    public static <T extends JsonApiData> JsonApiDocument<T> fromDataList(List<T> data) {
+    public static <T extends JsonApiData> JsonApiDocument<T> fromDataList(final List<T> data) {
         return new JsonApiDocument<>(data);
     }
 
-    public static <T extends JsonApiData> JsonApiDocument<T> fromData(T data) {
+    public static <T extends JsonApiData> JsonApiDocument<T> fromData(final T data) {
         return new JsonApiDocument<>(Collections.singletonList(data));
     }
 
