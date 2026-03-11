@@ -1,0 +1,65 @@
+{
+  "name": "CORE",
+  "id": "10Y1001C--00059P",
+  "areasIn": {
+    "BE": "10YBE----------2",
+    "SK": "10YSK-SEPS-----K",
+    "DE": "10YCB-GERMANY--8",
+    "HU": "10YHU-MAVIR----U",
+    "NL": "10YNL----------L",
+    "AT": "10YAT-APG------L",
+    "CZ": "10YCZ-CEPS-----N",
+    "HR": "10YHR-HEP------M",
+    "PL": "10YPL-AREA-----S",
+    "RO": "10YRO-TEL------P",
+    "SI": "10YSI-ELES-----O",
+    "FR": "10YFR-RTE------C"
+  },
+  "areasOut": {
+    "AL": "10YCB-ALBANIA--1",
+    "BA": "10YBA-JPCC-----D",
+    "BG": "10YCA-BULGARIA-R",
+    "CH": "10YCB-SWITZERL-D",
+    "DK": "10YDK-1--------W",
+    "ES": "10YES-REE------0",
+    "GR": "10YCB-GREECE---2",
+    "IT": "10YIT-GRTN-----B",
+    "ME": "10YCS-CG-TSO---S",
+    "MK": "10YMK-MEPSO----8",
+    "PT": "10YPT-REN------W",
+    "RS": "10YCS-SERBIATSOV",
+    "TR": "10YCB-TURKEY---V",
+    "UA": "10Y1001C--00003F",
+    "XK": "10Y1001C--00100H",
+    "GB": "10YGB----------A",
+    "SE": "10YSE-1--------K",
+    "IS": "10Y1001A1001A958",
+    "CY": "10YCY-1001A0003J",
+    "MA": "10YMA-ONE------O",
+    "LT": "10YLT-1001A0008Q",
+    "NO": "10YNO-0--------C",
+    "MD" : "10Y1001A1001A990"
+  },
+  "germanyZones": {
+    "D2": {
+      "tsoName": "TenneT DE",
+      "eic": "10XDE-EON-NETZ-C"
+    },
+    "D4": {
+      "tsoName": "TransnetBW",
+      "eic": "11XENBW-N------E"
+    },
+    "D7": {
+      "tsoName": "Amprion",
+      "eic": "10XDE-RWENET---W"
+    },
+    "D8": {
+      "tsoName": "50Hertz",
+      "eic": "10XDE-VE-TRANSMK"
+    },
+    "D6": {
+      "tsoName": "Creos",
+      "eic": "21X000000001333E"
+    }
+  }
+}

@@ -4,14 +4,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.metadata;
+package com.farao_community.farao.ce_merging.merging.request_metadata;
 
 import com.farao_community.farao.ce_merging.common.exception.InvalidTaskException;
 import com.farao_community.farao.ce_merging.merging.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.metadata.model.RequestMetadata;
+import com.farao_community.farao.ce_merging.merging.request_metadata.model.RequestMetadata;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.FileSystemUtils;

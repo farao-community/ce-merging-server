@@ -19,6 +19,8 @@
         <org.mapstruct.version>1.6.3</org.mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <io.swagger.core.v3.version>2.2.37</io.swagger.core.v3.version>
+        <assertj-core.version>3.26.3</assertj-core.version>
+        <!-- POWSYBL VERSIONS -->
         <powsybl.core.version>6.8.1</powsybl.core.version>
         <powsybl.entsoe.version>2.14.0</powsybl.entsoe.version>
         <powsybl.open-loadflow.version>1.16.0</powsybl.open-loadflow.version>
@@ -238,6 +240,22 @@
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-config-test</artifactId>
             <version>${powsybl.core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
