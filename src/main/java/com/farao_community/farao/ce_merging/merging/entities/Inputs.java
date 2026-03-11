@@ -47,11 +47,11 @@ public class Inputs implements Serializable {
     private ZoneOffset realOffset;
     /**
      * mergingWithInternalHvdc = True if there is an internal HVDC line in CE
-     * else mergingWithInternalHvdc = True since 02/11/2020
+     * else mergingWithInternalHvdc = true
      */
     private Boolean mergingWithInternalHvdc;
     /**
-     * alegroThreshold = 1000 MW by default since 02/11/2020
+     * alegroThreshold = 2000 MW by default
      * This threshold is used to compare loads between the two xnodes of Alegro
      */
     private Integer alegroThreshold;
