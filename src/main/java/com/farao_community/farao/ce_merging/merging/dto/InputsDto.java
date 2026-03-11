@@ -13,9 +13,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
- */
+
 @Data
 public class InputsDto implements Serializable {
 

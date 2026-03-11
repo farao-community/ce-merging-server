@@ -17,9 +17,7 @@ import java.util.Map;
 
 import static jakarta.persistence.CascadeType.ALL;
 
-/**
- * WARNING: this class is linked to the merging supervisor. Please contact them if any modification is needed to check compatibility
- */
+
 @Embeddable
 @Data
 public class Outputs implements Serializable {

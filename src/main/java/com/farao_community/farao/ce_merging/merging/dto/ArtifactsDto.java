@@ -13,9 +13,7 @@ import java.io.Serializable;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
-/**
- * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
- */
+
 @JsonInclude(NON_NULL)
 @Data
 public class ArtifactsDto implements Serializable {

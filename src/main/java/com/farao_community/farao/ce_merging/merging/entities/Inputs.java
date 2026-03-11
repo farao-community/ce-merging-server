@@ -26,9 +26,7 @@ import java.util.Optional;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 
-/**
- * WARNING: this class is linked to the merging supervisor. Please contact them if any modification is needed to check compatibility
- */
+
 @Embeddable
 @Data
 public class Inputs implements Serializable {
