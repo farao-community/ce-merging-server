@@ -1,0 +1,34 @@
+{
+  "hvdcXNodeAlignment": [
+    {
+      "referenceXNode": "XED_EE1N",
+      "recessiveXNode": "XED_EE1D"
+    },
+    {
+      "referenceXNode": "XAR_GA1I",
+      "recessiveXNode": "XAR_GA1G"
+    }
+  ],
+  "setZeroFlowNodes": [
+    {
+      "xnode": "XBA_KF31",
+      "countryCode": "DE"
+    },
+    {
+      "xnode": "XBA_KF32",
+      "countryCode": "DE"
+    }
+  ],
+  "dkHvdcXnodes": [
+    "FG_HK",
+    "TJ_K1",
+    "TJ_K2",
+    "TJ_K3",
+    "TJ_K4",
+    "VH_L1",
+    "VH_L2",
+    "BI_R1",
+    "BI_R2"
+  ],
+  "defaultSlackNode": "ELA MU11"
+}

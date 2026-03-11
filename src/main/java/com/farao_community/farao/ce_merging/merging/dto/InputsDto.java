@@ -29,7 +29,7 @@ public class InputsDto implements Serializable {
      */
     private Boolean mergingWithInternalHvdc;
     /**
-     * alegroThreshold = 50 MW by default
+     * alegroThreshold = 2 GW by default
      * This threshold is used to compare loads between the two xnodes of Alegro
      */
     private Integer alegroThreshold;
@@ -42,11 +42,11 @@ public class InputsDto implements Serializable {
      */
     private String generationLoadShiftKeysLocation;
     /**
-     * The location of the generation load shift key
+     * The location of the external constraints
      */
     private String externalConstraintsLocation;
     /**
-     * The location of the generation load shift key
+     * The location of the feasibility ranges
      */
     private String feasibilityRangesLocation;
     /**

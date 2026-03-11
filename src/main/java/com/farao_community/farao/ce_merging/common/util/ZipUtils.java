@@ -127,7 +127,7 @@ public class ZipUtils {
         final byte[] readBuffer = new byte[2156];
         int bytesIn;
         final String fileRelativePath = Paths.get(rootDir).relativize(Paths.get(filePath)).toString();
-        try (final FileInputStream fileStream = new FileInputStream(fileRelativePath)) {
+        try (final FileInputStream fileStream = new FileInputStream(filePath)) {
             os.putNextEntry(new ZipEntry(fileRelativePath));
             while ((bytesIn = fileStream.read(readBuffer)) != -1) {
                 os.write(readBuffer, 0, bytesIn);

@@ -16,6 +16,7 @@ import com.farao_community.farao.ce_merging.common.exception.TaskAlreadyRunningE
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
 import com.farao_community.farao.ce_merging.merging.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.mapper.MergingTaskMapper;
@@ -34,7 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.merging.entities.enums.TaskStatus.CREATED;
 import static com.farao_community.farao.ce_merging.merging.entities.enums.TaskStatus.ERROR;
@@ -164,10 +165,10 @@ public class MergingTaskManagementService {
         } catch (final Exception e) {
             task.setStatusDetail(e.getMessage());
             task.setTaskStatus(ERROR);
-            throw new CeMergingException(e.getMessage(), e);
-        } finally {
             taskRepository.save(task);
+            throw new CeMergingException(e.getMessage(), e);
         }
+
     }
 
     private MergingTask getTask(final long taskId) {
@@ -194,12 +195,15 @@ public class MergingTaskManagementService {
     private void handleDaylightSavingTime(final MergingTask task) {
         // necessary treatment for the case of DST:
         // the changed hour (second 02:30 AM) will have an offset= +2 but really should be + 1
-        final OffsetDateTime targetDate = task.getInputs().getTargetDate();
-        final ZoneOffset realOffset = task.getInputs().getRealOffset();
+        final Inputs inputs = task.getInputs();
+        Optional.ofNullable(inputs.getTargetDate())
+            .ifPresent(targetDate ->
+                           Optional.ofNullable(inputs.getRealOffset())
+                               .filter(targetDate.getOffset()::equals)
+                               .ifPresent(offset ->
+                                              inputs.setTargetDate(OffsetDateTime.of(targetDate.toLocalDateTime(),
+                                                                                     offset))));
 
-        if (targetDate != null && !targetDate.getOffset().equals(realOffset)) {
-            task.getInputs().setTargetDate(OffsetDateTime.of(targetDate.toLocalDateTime(),
-                                                             realOffset));
-        }
+
     }
 }

@@ -19,12 +19,12 @@ import org.springframework.util.FileSystemUtils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.ZONE_OF_PARIS;
+import java.util.function.Function;
 
 @AllArgsConstructor
 @Slf4j
@@ -36,6 +36,13 @@ public class RequestMetadataManager {
     private static final String RECESSIVITY_DEFAULT_CONFIGURATION = "gridDefaultConfigurations/default-recessivity-parameters.json";
     private static final String MISSING_FILES_ERROR = "Some input files are declared in request metadata but missing in provided archive: %s. Please ensure that files are present within archive and have the same name as request metadata.";
 
+    private static final Map<String, Function<Inputs, SavedFile>> INPUT_GETTERS_BY_LOCATION = Map.of(
+        "generation-load-shift-keys", Inputs::getGenerationLoadShiftKeys,
+        "external-constraints", Inputs::getExternalConstraints,
+        "feasibility-ranges", Inputs::getFeasibilityRanges,
+        "dc-links", Inputs::getDcLinks,
+        "net-position-forecast", Inputs::getNetPositionForecast);
+
     public ZoneOffset getRealRequestOffset() {
         return requestMetadata
             .getData()
@@ -43,7 +50,7 @@ public class RequestMetadataManager {
             .getInputs()
             .getTargetDate()
             .toInstant()
-            .atZone(ZONE_OF_PARIS)
+            .atZone(ZoneId.of("Europe/Paris"))
             .toOffsetDateTime()
             .getOffset();
     }
@@ -59,11 +66,9 @@ public class RequestMetadataManager {
                 checkIfAvailable(igm.getIgmQualityReportFile(), tmpInputPath, missingFiles);
             });
 
-        checkIfAvailable(inputs.getGenerationLoadShiftKeys(), tmpInputPath, missingFiles);
-        checkIfAvailable(inputs.getExternalConstraints(), tmpInputPath, missingFiles);
-        checkIfAvailable(inputs.getFeasibilityRanges(), tmpInputPath, missingFiles);
-        checkIfAvailable(inputs.getDcLinks(), tmpInputPath, missingFiles);
-        checkIfAvailable(inputs.getNetPositionForecast(), tmpInputPath, missingFiles);
+        INPUT_GETTERS_BY_LOCATION
+            .values()
+            .forEach(getter -> checkIfAvailable(getter.apply(inputs), tmpInputPath, missingFiles));
 
         if (!missingFiles.isEmpty()) {
             FileSystemUtils.deleteRecursively(tmpInputPath);
@@ -100,12 +105,9 @@ public class RequestMetadataManager {
             igm.getIgmQualityReportFile().setLocation(inputsLocation + "areas/" + igm.getCountry() + "/quality-report");
         });
 
-        Map.of("generation-load-shift-keys", inputs.getGenerationLoadShiftKeys(),
-               "external-constraints", inputs.getExternalConstraints(),
-               "feasibility-ranges", inputs.getFeasibilityRanges(),
-               "dc-links", inputs.getDcLinks(),
-               "net-position-forecast", inputs.getNetPositionForecast())
-            .forEach((fileLocation, inputFile) -> {
+       INPUT_GETTERS_BY_LOCATION
+            .forEach((fileLocation, inputFileGetter) -> {
+                final SavedFile inputFile = inputFileGetter.apply(inputs);
                 makePathAbsolute(inputFile);
                 inputFile.setLocation(inputsLocation + fileLocation);
             });
