@@ -35,12 +35,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.merging.entities.enums.TaskStatus.CREATED;
 import static com.farao_community.farao.ce_merging.merging.entities.enums.TaskStatus.ERROR;
 import static com.farao_community.farao.ce_merging.merging.entities.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.entities.enums.TaskStatus.SUCCESS;
+import static java.util.Optional.ofNullable;
 
 @Slf4j
 @AllArgsConstructor
@@ -196,14 +196,12 @@ public class MergingTaskManagementService {
         // necessary treatment for the case of DST:
         // the changed hour (second 02:30 AM) will have an offset= +2 but really should be + 1
         final Inputs inputs = task.getInputs();
-        Optional.ofNullable(inputs.getTargetDate())
+        ofNullable(inputs.getTargetDate())
             .ifPresent(targetDate ->
-                           Optional.ofNullable(inputs.getRealOffset())
+                           ofNullable(inputs.getRealOffset())
                                .filter(targetDate.getOffset()::equals)
                                .ifPresent(offset ->
                                               inputs.setTargetDate(OffsetDateTime.of(targetDate.toLocalDateTime(),
                                                                                      offset))));
-
-
     }
 }

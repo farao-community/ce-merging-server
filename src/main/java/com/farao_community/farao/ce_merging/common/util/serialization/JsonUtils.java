@@ -62,7 +62,6 @@ public final class JsonUtils {
                                        final T object,
                                        final Path filePath) throws IOException {
         writeInStream(clazz, object, Files.newOutputStream(filePath));
-
     }
 
     public static <T> void writeInStream(final Class<T> clazz,

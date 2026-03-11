@@ -27,6 +27,14 @@ public class SavedFile implements Serializable {
     private String path;
     private String location;
 
+    public SavedFile(final String originalName,
+                     final String path,
+                     final String location) {
+        this.originalName = originalName;
+        this.path = path;
+        this.location = location;
+    }
+
     public void feedPathAndName(final String fullFilePath) {
         this.path = fullFilePath;
         this.originalName = Paths.get(fullFilePath).getFileName().toString();

@@ -26,7 +26,6 @@ import java.util.Optional;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 
-
 @Embeddable
 @Data
 public class Inputs implements Serializable {

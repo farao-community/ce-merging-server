@@ -17,7 +17,6 @@ import java.util.Map;
 
 import static jakarta.persistence.CascadeType.ALL;
 
-
 @Embeddable
 @Data
 public class Outputs implements Serializable {
@@ -33,6 +32,5 @@ public class Outputs implements Serializable {
     private Map<String, SavedFile> igmQualityChecks = new HashMap<>();
     @OneToOne(cascade = ALL)
     private SavedFile mergingLogs = new SavedFile();
-
 }
 

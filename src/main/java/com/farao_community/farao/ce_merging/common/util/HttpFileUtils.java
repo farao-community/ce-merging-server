@@ -23,7 +23,7 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class FileUtils {
+public class HttpFileUtils {
     private static final String ATTACHMENT_ERROR = "Cannot return attachment file";
     private static final String RETRIEVE_ERROR = "Cannot retrieve content of ";
 

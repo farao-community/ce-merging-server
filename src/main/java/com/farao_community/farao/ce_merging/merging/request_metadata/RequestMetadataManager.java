@@ -105,7 +105,7 @@ public class RequestMetadataManager {
             igm.getIgmQualityReportFile().setLocation(inputsLocation + "areas/" + igm.getCountry() + "/quality-report");
         });
 
-       INPUT_GETTERS_BY_LOCATION
+        INPUT_GETTERS_BY_LOCATION
             .forEach((fileLocation, inputFileGetter) -> {
                 final SavedFile inputFile = inputFileGetter.apply(inputs);
                 makePathAbsolute(inputFile);

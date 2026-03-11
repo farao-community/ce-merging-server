@@ -1,0 +1,4 @@
+<?xml version="1.0"?>
+<xnodes xmlns="http://www.rte-france.com/gsr" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <xnode name="TEST_NODE" area1="FR" area2="DE" subarea2="D2"/>
+</xnodes>

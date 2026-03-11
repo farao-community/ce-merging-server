@@ -18,7 +18,6 @@ import java.io.Serializable;
 
 import static jakarta.persistence.GenerationType.AUTO;
 
-
 @Entity
 @Data
 public class MergingTask implements Serializable {
