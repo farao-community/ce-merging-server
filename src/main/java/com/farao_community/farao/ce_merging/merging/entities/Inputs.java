@@ -51,7 +51,7 @@ public class Inputs implements Serializable {
      */
     private Boolean mergingWithInternalHvdc;
     /**
-     * alegroThreshold = 2000 MW by default
+     * alegroThreshold = 2 GW by default
      * This threshold is used to compare loads between the two xnodes of Alegro
      */
     private Integer alegroThreshold;
