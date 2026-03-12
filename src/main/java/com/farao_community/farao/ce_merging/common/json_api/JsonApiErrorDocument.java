@@ -12,6 +12,7 @@ import lombok.Data;
 
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.common.util.ListUtils.deNulledList;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.Collections.singletonList;
 
@@ -22,15 +23,15 @@ public class JsonApiErrorDocument {
     List<JsonApiError> errors;
 
     public static JsonApiErrorDocument fromErrors(final List<JsonApiError> errors) {
-        return new JsonApiErrorDocument(errors);
+        return new JsonApiErrorDocument(deNulledList(errors));
     }
 
     public static JsonApiErrorDocument fromError(final Exception e,
                                                  final String status,
                                                  final String title) {
         return new JsonApiErrorDocument(singletonList(new JsonApiError(status,
-                                                                                   e.getLocalizedMessage(),
-                                                                                   title,
-                                                                                   e.getMessage())));
+                                                                       e.getLocalizedMessage(),
+                                                                       title,
+                                                                       e.getMessage())));
     }
 }

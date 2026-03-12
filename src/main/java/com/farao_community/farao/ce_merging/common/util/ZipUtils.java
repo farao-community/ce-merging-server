@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -58,6 +59,7 @@ public class ZipUtils {
                                                     destDirectory).toString();
                 if (!entry.isDirectory()) {
                     // if the entry is a file, extracts it
+                    Files.createDirectories(Paths.get(filePath).getParent());
                     extractFile(zipIn, filePath);
                 } else {
                     // if the entry is a directory, make the directory
@@ -94,14 +96,19 @@ public class ZipUtils {
         final Path archiveTmpPath = Files.createTempDirectory(TMP_DIR); // NOSONAR directories are used safely here
         final Path inputsArchivePath = storeInputFileInPath(archives, archiveTmpPath);
         unzipFile(inputsArchivePath, archiveTmpPath);
-        FileSystemUtils.deleteRecursively(inputsArchivePath); // NOSONAR File location does not come from user input
+        FileSystemUtils.deleteRecursively(inputsArchivePath);
         return archiveTmpPath;
     }
 
     private static Path storeInputFileInPath(final MultipartFile multipartFile,
                                              final Path path) throws IOException {
-        final Path inputPath = Paths.get(path.toString(), multipartFile.getOriginalFilename());
-        multipartFile.transferTo(inputPath); // NOSONAR File location does not come from user input
+        // Use only the filename part, stripping any path components
+        final String safeFilename = Paths.get(Optional.ofNullable(multipartFile.getOriginalFilename())
+                                                  .orElseThrow(() -> new ServiceIOException("empty filename")))
+            .getFileName()
+            .toString();
+        final Path inputPath = getIfInside(safeFilename, path);
+        multipartFile.transferTo(inputPath);
         return inputPath;
     }
 

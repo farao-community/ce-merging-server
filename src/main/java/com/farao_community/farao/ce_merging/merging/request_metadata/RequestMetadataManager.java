@@ -101,8 +101,9 @@ public class RequestMetadataManager {
         final String inputsLocation = TASKS + taskId + "/inputs/";
         // update paths to make them absolute & location for GET output
         inputs.getIgms().forEach(igm -> {
-            igm.setIgmFilePath(Paths.get(inputsPath, igm.getIgmFile().getPath()).toString());
-            igm.setIgmQualityReportFilePath(Paths.get(inputsPath, igm.getIgmQualityReportFile().getPath()).toString());
+            igm.setIgmFilePath(getIfInside(igm.getIgmFile().getPath(), inputPath()).toString());
+            igm.setIgmQualityReportFilePath(getIfInside(igm.getIgmQualityReportFile().getPath(),
+                                                        inputPath()).toString());
             igm.getIgmFile().setLocation(inputsLocation + "areas/" + igm.getCountry() + "/igm");
             igm.getIgmQualityReportFile().setLocation(inputsLocation + "areas/" + igm.getCountry() + "/quality-report");
         });
@@ -136,7 +137,7 @@ public class RequestMetadataManager {
 
     private void makePathAbsolute(final SavedFile savedFile) {
         savedFile.feedPathAndName(getIfInside(savedFile.getPath(),
-                                              Paths.get(inputsPath))
+                                              inputPath())
                                       .toString());
     }
 
@@ -151,5 +152,9 @@ public class RequestMetadataManager {
             log.info("No recessivity parameters file could be found on the input directory, Default recessivity configuration will be used");
             paramFile.feedPathAndName(Paths.get(RECESSIVITY_DEFAULT_CONFIGURATION).toString());
         }
+    }
+
+    private Path inputPath() {
+        return Paths.get(inputsPath);
     }
 }

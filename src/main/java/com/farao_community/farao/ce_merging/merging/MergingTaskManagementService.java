@@ -41,6 +41,7 @@ import static com.farao_community.farao.ce_merging.merging.entities.enums.TaskSt
 import static com.farao_community.farao.ce_merging.merging.entities.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.entities.enums.TaskStatus.SUCCESS;
 import static java.util.Optional.ofNullable;
+import static java.util.function.Predicate.not;
 
 @Slf4j
 @AllArgsConstructor
@@ -202,7 +203,7 @@ public class MergingTaskManagementService {
         ofNullable(inputs.getTargetDate())
             .ifPresent(targetDate ->
                            ofNullable(inputs.getRealOffset())
-                               .filter(targetDate.getOffset()::equals)
+                               .filter(not(targetDate.getOffset()::equals))
                                .ifPresent(offset ->
                                               inputs.setTargetDate(OffsetDateTime.of(targetDate.toLocalDateTime(),
                                                                                      offset))));

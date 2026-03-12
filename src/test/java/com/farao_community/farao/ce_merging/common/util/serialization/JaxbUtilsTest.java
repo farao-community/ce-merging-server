@@ -32,16 +32,18 @@ class JaxbUtilsTest {
         </xnodes>
         """.getBytes(UTF_8);
 
+    private static final Class<Xnodes> XNODES = Xnodes.class;
+
     @Test
     void shouldUnmarshallDummyXml() {
         assertEquals("TEST_NODE",
-                     JaxbUtils.readFromPath(Xnodes.class, stringPathOfTestFile("testXnode.xml"))
+                     JaxbUtils.readFromPath(XNODES, stringPathOfTestFile("testXnode.xml"))
                          .getXnode()
                          .getFirst()
                          .getName());
 
         assertEquals("TEST_NODE_AS_BYTES",
-                     JaxbUtils.readFromBytes(Xnodes.class, XML_CONTENT)
+                     JaxbUtils.readFromBytes(XNODES, XML_CONTENT)
                          .getXnode()
                          .getFirst()
                          .getName());
@@ -60,14 +62,14 @@ class JaxbUtilsTest {
         /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
                       BYTES
          -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-        assertThat(new String(JaxbUtils.writeToBytes(Xnodes.class, xnodes)))
+        assertThat(new String(JaxbUtils.writeToBytes(XNODES, xnodes)))
             .contains("name=\"TEST_NODE\"",
                       "area1=\"FR\"",
                       "area2=\"DE\"",
                       "subarea2=\"D2\"");
 
         //specifying root
-        assertThat(new String(JaxbUtils.writeToBytes(Xnodes.class,
+        assertThat(new String(JaxbUtils.writeToBytes(XNODES,
                                                      xnodes,
                                                      "\"http://www.rte-france.com/gsr\"",
                                                      "xnodes")))
@@ -83,18 +85,18 @@ class JaxbUtilsTest {
         final Path newFile = Files.createFile(Files.createTempDirectory("jaxb-test")
                                                   .resolve("xnodes.xml"));
 
-        JaxbUtils.writeToPath(Xnodes.class, xnodes, newFile);
+        JaxbUtils.writeToPath(XNODES, xnodes, newFile);
         assertEquals("TEST_NODE",
-                     JaxbUtils.readFromPath(Xnodes.class, newFile.toString())
+                     JaxbUtils.readFromPath(XNODES, newFile.toString())
                          .getXnode()
                          .getFirst()
                          .getName());
 
         //specifying root
-        JaxbUtils.writeToPath(Xnodes.class, xnodes, "\"http://www.rte-france.com/gsr\"",
+        JaxbUtils.writeToPath(XNODES, xnodes, "\"http://www.rte-france.com/gsr\"",
                               "xnodes", newFile);
         assertEquals("TEST_NODE",
-                     JaxbUtils.readFromPath(Xnodes.class, newFile.toString())
+                     JaxbUtils.readFromPath(XNODES, newFile.toString())
                          .getXnode()
                          .getFirst()
                          .getName());
@@ -104,8 +106,12 @@ class JaxbUtilsTest {
     @ParameterizedTest
     @ValueSource(strings = {"dummy.csv", "dummy.json"})
     void shouldFailOnIncorrectData(final String fileName) {
-        assertThrows(ServiceIOException.class, () -> JaxbUtils.readFromPath(Xnodes.class, stringPathOfTestFile(fileName)));
-        assertThrows(ServiceIOException.class, () -> JaxbUtils.readFromBytes(Xnodes.class, fileName.getBytes(UTF_8)));
+        final String strInput = stringPathOfTestFile(fileName);
+        final byte[] byteInput = fileName.getBytes(UTF_8);
+        assertThrows(ServiceIOException.class,
+                     () -> JaxbUtils.readFromPath(XNODES, strInput));
+        assertThrows(ServiceIOException.class,
+                     () -> JaxbUtils.readFromBytes(XNODES, byteInput));
     }
 
 }
