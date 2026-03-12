@@ -102,8 +102,7 @@ public class ZipUtils {
             unzipFile(inputsArchivePath, extractionPath);
             deleteRecursively(inputsArchivePath);
             return extractionPath;
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             deleteRecursively(inputsArchivePath);
             deleteRecursively(extractionPath);
             deleteRecursively(archiveTmpPath);
