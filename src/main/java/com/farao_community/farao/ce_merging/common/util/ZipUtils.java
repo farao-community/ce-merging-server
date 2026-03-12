@@ -52,7 +52,7 @@ public class ZipUtils {
             throw new ServiceIOException(String.format("Cannot create destination directory '%s'", destDirectory));
         }
         try (final ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath.toFile()))) { // NOSONAR File location does not come from user input
-            ZipEntry entry = zipIn.getNextEntry();
+            ZipEntry entry = zipIn.getNextEntry(); // NOSONAR File location does not come from user input
             // iterates over entries in the zip file
             while (entry != null) {
                 final String filePath = getIfInside(entry.getName(),

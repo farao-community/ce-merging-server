@@ -26,6 +26,7 @@
         <powsybl.open-loadflow.version>1.16.0</powsybl.open-loadflow.version>
         <powsybl.open-rao.version>6.6.0</powsybl.open-rao.version>
         <powsybl.rte.core.version>4.11.1</powsybl.rte.core.version>
+        <sonar.exclusions>**/resources/**</sonar.exclusions>
     </properties>
 
     <build>
