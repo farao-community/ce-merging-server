@@ -94,10 +94,18 @@ public class ZipUtils {
 
     public static Path unzipInputFileInTmp(final MultipartFile archives) throws IOException {
         final Path archiveTmpPath = Files.createTempDirectory(TMP_DIR); // NOSONAR directories are used safely here
+        final Path extractionPath = Files.createDirectories(archiveTmpPath.resolve("content"));
         final Path inputsArchivePath = storeInputFileInPath(archives, archiveTmpPath);
-        unzipFile(inputsArchivePath, archiveTmpPath);
-        FileSystemUtils.deleteRecursively(inputsArchivePath);
-        return archiveTmpPath;
+        try {
+            unzipFile(inputsArchivePath, extractionPath);
+            FileSystemUtils.deleteRecursively(inputsArchivePath);
+            return extractionPath;
+        }
+        catch (final Exception e) {
+            FileSystemUtils.deleteRecursively(inputsArchivePath);
+            throw e;
+        }
+
     }
 
     private static Path storeInputFileInPath(final MultipartFile multipartFile,
