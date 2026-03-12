@@ -11,7 +11,6 @@ import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
@@ -30,6 +29,9 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.createTempDirectory;
+import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.NONE)
@@ -59,7 +61,7 @@ public class ZipUtils {
                                                     destDirectory).toString();
                 if (!entry.isDirectory()) {
                     // if the entry is a file, extracts it
-                    Files.createDirectories(Paths.get(filePath).getParent());
+                    createDirectories(Paths.get(filePath).getParent());
                     extractFile(zipIn, filePath);
                 } else {
                     // if the entry is a directory, make the directory
@@ -93,16 +95,18 @@ public class ZipUtils {
     }
 
     public static Path unzipInputFileInTmp(final MultipartFile archives) throws IOException {
-        final Path archiveTmpPath = Files.createTempDirectory(TMP_DIR); // NOSONAR directories are used safely here
-        final Path extractionPath = Files.createDirectories(archiveTmpPath.resolve("content"));
+        final Path archiveTmpPath = createTempDirectory(TMP_DIR); // NOSONAR directories are used safely here
+        final Path extractionPath = createDirectories(archiveTmpPath.resolve("content"));
         final Path inputsArchivePath = storeInputFileInPath(archives, archiveTmpPath);
         try {
             unzipFile(inputsArchivePath, extractionPath);
-            FileSystemUtils.deleteRecursively(inputsArchivePath);
+            deleteRecursively(inputsArchivePath);
             return extractionPath;
         }
         catch (final Exception e) {
-            FileSystemUtils.deleteRecursively(inputsArchivePath);
+            deleteRecursively(inputsArchivePath);
+            deleteRecursively(extractionPath);
+            deleteRecursively(archiveTmpPath);
             throw e;
         }
 
@@ -138,17 +142,17 @@ public class ZipUtils {
 
     private static void addFileToZip(final String filePath,
                                      final String rootDir,
-                                     final ZipOutputStream os) {
+                                     final ZipOutputStream zos) {
 
         final byte[] readBuffer = new byte[2156];
         int bytesIn;
         final String fileRelativePath = Paths.get(rootDir).relativize(Paths.get(filePath)).toString();
         try (final FileInputStream fileStream = new FileInputStream(filePath)) {
-            os.putNextEntry(new ZipEntry(fileRelativePath));
+            zos.putNextEntry(new ZipEntry(fileRelativePath));
             while ((bytesIn = fileStream.read(readBuffer)) != -1) {
-                os.write(readBuffer, 0, bytesIn);
+                zos.write(readBuffer, 0, bytesIn);
             }
-
+            zos.closeEntry();
         } catch (final IOException e) {
             throw new CeMergingException("Error during output ZIP creation", e);
         }
