@@ -34,7 +34,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NOT
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OK;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ORIGIN_ANY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_NOT_RUN;
-import static com.farao_community.farao.ce_merging.common.util.HttpFileUtils.toAttachmentFileResponse;
+import static com.farao_community.farao.ce_merging.common.util.FileUtils.toAttachmentFileResponse;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 

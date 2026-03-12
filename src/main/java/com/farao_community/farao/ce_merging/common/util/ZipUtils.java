@@ -28,7 +28,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import static java.io.File.separator;
+import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.NONE)
@@ -51,10 +51,11 @@ public class ZipUtils {
             throw new ServiceIOException(String.format("Cannot create destination directory '%s'", destDirectory));
         }
         try (final ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath.toFile()))) { // NOSONAR File location does not come from user input
-            ZipEntry entry = zipIn.getNextEntry(); // NOSONAR it is safe to unzip here
+            ZipEntry entry = zipIn.getNextEntry();
             // iterates over entries in the zip file
             while (entry != null) {
-                final String filePath = destDirectory + separator + entry.getName();
+                final String filePath = getIfInside(entry.getName(),
+                                                    destDirectory).toString();
                 if (!entry.isDirectory()) {
                     // if the entry is a file, extracts it
                     extractFile(zipIn, filePath);

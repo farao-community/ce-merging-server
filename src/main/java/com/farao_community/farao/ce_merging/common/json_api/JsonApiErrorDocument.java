@@ -8,6 +8,7 @@ package com.farao_community.farao.ce_merging.common.json_api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.Collections.singletonList;
 
 @AllArgsConstructor
+@Data
 public class JsonApiErrorDocument {
     @JsonInclude(NON_NULL)
     List<JsonApiError> errors;

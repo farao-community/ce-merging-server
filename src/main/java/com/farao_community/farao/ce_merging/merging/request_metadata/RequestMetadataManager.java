@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
+
 @AllArgsConstructor
 @Slf4j
 public class RequestMetadataManager {
@@ -82,7 +84,7 @@ public class RequestMetadataManager {
                                   final Path parent,
                                   final List<String> missingFiles) {
         final String expectedPath = savedFile.getPath();
-        if (!parent.resolve(expectedPath).toFile().exists()) {
+        if (!getIfInside(expectedPath, parent).toFile().exists()) {
             missingFiles.add(expectedPath);
         }
     }
@@ -133,7 +135,9 @@ public class RequestMetadataManager {
     }
 
     private void makePathAbsolute(final SavedFile savedFile) {
-        savedFile.feedPathAndName(Paths.get(inputsPath, savedFile.getPath()).toString());
+        savedFile.feedPathAndName(getIfInside(savedFile.getPath(),
+                                              Paths.get(inputsPath))
+                                      .toString());
     }
 
     private void setRecessivityConfiguration(final Configurations configurations,

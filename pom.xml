@@ -174,11 +174,6 @@
             <artifactId>open-rao-virtual-hubs-json</artifactId>
             <version>${powsybl.open-rao.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.rte-france.powsybl</groupId>
-            <artifactId>powsybl-rte-loadflow-default-parameters</artifactId>
-            <version>${powsybl.rte.core.version}</version>
-        </dependency>
 
         <!-- RUNTIME DEPENDENCIES -->
         <dependency>

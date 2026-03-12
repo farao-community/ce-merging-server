@@ -18,12 +18,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class HttpFileUtilsTest {
+class FileUtilsTest {
 
     @Test
     void shouldCreateAttachments() {
-        final ResponseEntity<byte[]> response = HttpFileUtils.toAttachmentFileResponse("hello".getBytes(UTF_8),
-                                                                                       "hello.txt");
+        final ResponseEntity<byte[]> response = FileUtils.toAttachmentFileResponse("hello".getBytes(UTF_8),
+                                                                                   "hello.txt");
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("hello", new String(response.getBody()));
@@ -34,7 +34,7 @@ class HttpFileUtilsTest {
         file.setPath(stringPathOfTestFile("testXnode.xml"));
         file.setFileId(1);
 
-        final ResponseEntity<byte[]> responseXml = HttpFileUtils.toAttachmentFileResponse(file);
+        final ResponseEntity<byte[]> responseXml = FileUtils.toAttachmentFileResponse(file);
 
         assertEquals(HttpStatus.OK, responseXml.getStatusCode());
         assertNotNull(responseXml.getBody());
@@ -45,7 +45,7 @@ class HttpFileUtilsTest {
         final SavedFile savedFile = new SavedFile("filename.txt",
                                                   "/path/to/non/existing/file.txt",
                                                   "/dumb/file/location");
-        assertThrows(ServiceIOException.class, () -> HttpFileUtils.toAttachmentFileResponse(savedFile));
+        assertThrows(ServiceIOException.class, () -> FileUtils.toAttachmentFileResponse(savedFile));
     }
 
 }

@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import com.farao_community.farao.ce_merging.merging.entities.SavedFile;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.merging.entities.SavedFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,18 +17,20 @@ import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class HttpFileUtils {
+public class FileUtils {
     private static final String ATTACHMENT_ERROR = "Cannot return attachment file";
     private static final String RETRIEVE_ERROR = "Cannot retrieve content of ";
 
     public static ResponseEntity<byte[]> toAttachmentFileResponse(final byte[] fileContent,
-                                                          final String fileName) {
+                                                                  final String fileName) {
         try {
             final HttpHeaders headers = new HttpHeaders();
             headers.setContentDisposition(ContentDisposition
@@ -55,5 +57,18 @@ public class HttpFileUtils {
             log.error(RETRIEVE_ERROR + "'{}'", savedFile.getPath());
             throw new ServiceIOException(String.format(RETRIEVE_ERROR + "%s", savedFile.getPath()), e);
         }
+    }
+
+    public static Path getIfInside(final String pathToGet,
+                            final Path parentFolder) {
+        if (isEmpty(pathToGet)) {
+            throw new ServiceIOException("Missing file path");
+        }
+        final Path parent = parentFolder.normalize();
+        final Path resolved = parent.resolve(pathToGet).normalize();
+        if (!resolved.startsWith(parent)) {
+            throw new ServiceIOException("Invalid file path %s".formatted(pathToGet));
+        }
+        return resolved;
     }
 }

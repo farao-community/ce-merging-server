@@ -78,6 +78,8 @@ public class MergingTaskManagementService {
         }
 
         final MergingTask task = new MergingTask();
+        // empty at this stage, but done to init id
+        taskRepository.save(task);
 
         try {
             final Path tmpInputPath = ZipUtils.unzipInputFileInTmp(inputZip);
@@ -157,6 +159,7 @@ public class MergingTaskManagementService {
             log.info("Running merging task: '{}' ", task.getTaskId());
             mergingService.run(task);
             task.setTaskStatus(SUCCESS);
+            taskRepository.save(task);
             log.info("Merging task: '{}' is finished with success", task.getTaskId());
             return task;
 
