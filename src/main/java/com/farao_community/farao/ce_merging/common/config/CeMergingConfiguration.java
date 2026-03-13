@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.config;
 
-import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 

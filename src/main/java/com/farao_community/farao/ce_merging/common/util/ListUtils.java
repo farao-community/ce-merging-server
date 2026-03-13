@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class ListUtils {
+public final class ListUtils {
 
     public static <T> List<T> deNulledList(final List<T> nullable) {
         return Optional.ofNullable(nullable).orElse(new ArrayList<>());

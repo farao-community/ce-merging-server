@@ -35,7 +35,7 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class ZipUtils {
+public final class ZipUtils {
 
     private static final int BUFFER_SIZE = 4096;
     private static final String TMP_DIR = "CeMerging";
@@ -53,8 +53,9 @@ public class ZipUtils {
             log.error("Cannot create destination directory '{}'", destDirectory);
             throw new ServiceIOException(String.format("Cannot create destination directory '%s'", destDirectory));
         }
-        try (final ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath.toFile()))) { // NOSONAR File location does not come from user input
-            ZipEntry entry = zipIn.getNextEntry(); // NOSONAR File location does not come from user input
+
+        try (final ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath.normalize().toFile()))) {
+            ZipEntry entry = zipIn.getNextEntry();
             // iterates over entries in the zip file
             while (entry != null) {
                 final String filePath = getIfInside(entry.getName(),
@@ -66,10 +67,12 @@ public class ZipUtils {
                 } else {
                     // if the entry is a directory, make the directory
                     File dir = new File(filePath);
-                    dir.mkdir(); // NOSONAR File location does not come from user input
+                    if (!dir.mkdir()) {
+                        throw new IOException("could note create folder %s".formatted(filePath));
+                    }
                 }
                 zipIn.closeEntry();
-                entry = zipIn.getNextEntry(); // NOSONAR it is safe to unzip here
+                entry = zipIn.getNextEntry();
             }
         } catch (final IOException e) {
             log.error("Error while extracting file '{}'", zipFilePath.getFileName(), e);

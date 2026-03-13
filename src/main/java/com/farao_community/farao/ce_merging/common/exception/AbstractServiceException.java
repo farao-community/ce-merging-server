@@ -6,11 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.common.exception;
 
-import lombok.Getter;
-import lombok.Setter;
-
-@Getter
-@Setter
 public abstract class AbstractServiceException extends RuntimeException {
     private final String status;
     private final String code;
@@ -37,4 +32,15 @@ public abstract class AbstractServiceException extends RuntimeException {
         this.title = title;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public String getTitle() {
+        return title;
+    }
 }

@@ -7,12 +7,12 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import com.farao_community.farao.ce_merging.merging.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingTestUtils.stringPathOfTestFile;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOfTestFile;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

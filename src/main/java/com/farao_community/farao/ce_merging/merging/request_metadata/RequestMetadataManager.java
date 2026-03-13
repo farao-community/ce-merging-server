@@ -7,11 +7,14 @@
 package com.farao_community.farao.ce_merging.merging.request_metadata;
 
 import com.farao_community.farao.ce_merging.common.exception.InvalidTaskException;
-import com.farao_community.farao.ce_merging.merging.entities.Configurations;
-import com.farao_community.farao.ce_merging.merging.entities.Inputs;
-import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.entities.SavedFile;
+import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.request_metadata.model.RequestMetadata;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.FileSystemUtils;
@@ -44,6 +47,17 @@ public class RequestMetadataManager {
         "feasibility-ranges", Inputs::getFeasibilityRanges,
         "dc-links", Inputs::getDcLinks,
         "net-position-forecast", Inputs::getNetPositionForecast);
+
+    public RequestMetadataManager(final String inputsPath, final String requestJsonContent) {
+        this.inputsPath = inputsPath;
+        try {
+            final ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            requestMetadata = mapper.readValue(requestJsonContent, RequestMetadata.class);
+        } catch (final IOException e) {
+            throw new ServiceIOException("Invalid request metadata", e);
+        }
+    }
 
     public ZoneOffset getRealRequestOffset() {
         return requestMetadata
@@ -124,7 +138,7 @@ public class RequestMetadataManager {
 
         Map.of("dc-load-flow-parameters", configs.getDcLoadFlowParameters(),
                "ac-load-flow-parameters", configs.getAcLoadFlowParameters(),
-               "basecase-improvement-parameters", configs.getBaseCaseImprovementParameters(),
+               "basecase-improvement-parameters", configs.getBasecaseImprovementParameters(),
                "balances-adjustment-parameters", configs.getBalancesAdjustmentParameters())
             .forEach((fileLocation, paramFile) -> {
                 makePathAbsolute(paramFile);

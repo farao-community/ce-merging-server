@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import com.farao_community.farao.ce_merging.merging.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +25,7 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class FileUtils {
+public final class FileUtils {
     private static final String ATTACHMENT_ERROR = "Cannot return attachment file";
     private static final String RETRIEVE_ERROR = "Cannot retrieve content of ";
 

@@ -10,8 +10,9 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.NONE)
-public class CeMergingConstants {
-    public static final String CE_MERGING_URL = "/ce-merging/v1";
+public final class CeMergingConstants {
+    public static final String CE_MERGING_URL = "/ce-merging/";
+    public static final String API_VERSION = "v1";
     public static final String JSON_API_MIME_TYPE = "application/vnd.api+json";
     public static final String ORIGIN_ANY = "*";
     public static final String MERGING_TASK_ID = "Merging task ID";

@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingTestUtils.testServiceEx;
-import static com.farao_community.farao.ce_merging.common.CeMergingTestUtils.stringify;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.testServiceEx;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringify;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JsonApiDocumentTest {

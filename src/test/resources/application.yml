@@ -19,5 +19,5 @@ logging:
 
 ce-merging-server:
   filesystem:
-    root: /test/ce-merging-server/filesystem
-    root-daily: /test/ce-merging-server/filesystem-daily-merging
+    root: /testFiles
+    root-daily: /testFiles/daily

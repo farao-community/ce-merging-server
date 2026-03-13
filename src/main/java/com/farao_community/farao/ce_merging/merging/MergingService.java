@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging;
 
-import com.farao_community.farao.ce_merging.merging.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.springframework.stereotype.Service;
 
 @Service

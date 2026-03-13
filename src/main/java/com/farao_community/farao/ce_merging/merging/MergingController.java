@@ -7,7 +7,8 @@
 package com.farao_community.farao.ce_merging.merging;
 
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
-import com.farao_community.farao.ce_merging.merging.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.task.MergingTaskManagementService;
+import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -25,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.API_VERSION;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BAD_REQUEST;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_MERGING_URL;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CREATED;
@@ -40,7 +42,7 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RestController
 @CrossOrigin(origins = ORIGIN_ANY) // NOSONAR enabling CORS is safe here
-@RequestMapping(value = CE_MERGING_URL)
+@RequestMapping(value = CE_MERGING_URL + API_VERSION)
 @AllArgsConstructor
 public class MergingController {
 

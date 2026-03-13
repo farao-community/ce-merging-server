@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingTestUtils.pathOfTestFile;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.pathOfTestFile;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.unzipFile;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;

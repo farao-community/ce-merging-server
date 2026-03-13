@@ -6,10 +6,14 @@
  */
 package com.farao_community.farao.ce_merging.merging.request_metadata.model;
 
-import com.farao_community.farao.ce_merging.merging.entities.Inputs;
-import lombok.Data;
+import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 public class AttributesMetadata {
     private String name;
     private Inputs inputs;
