@@ -19,10 +19,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
+import static java.nio.file.Files.newOutputStream;
 
 public final class JsonUtils {
 
@@ -64,7 +64,7 @@ public final class JsonUtils {
     public static <T> void writeInPath(final Class<T> clazz,
                                        final T object,
                                        final Path filePath) throws IOException {
-        writeInStream(clazz, object, Files.newOutputStream(filePath));
+        writeInStream(clazz, object, newOutputStream(filePath));
     }
 
     public static <T> void writeInStream(final Class<T> clazz,

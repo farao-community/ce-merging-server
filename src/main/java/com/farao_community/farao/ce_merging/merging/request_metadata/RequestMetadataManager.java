@@ -8,8 +8,10 @@ package com.farao_community.farao.ce_merging.merging.request_metadata;
 
 import com.farao_community.farao.ce_merging.common.exception.InvalidTaskException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.merging.request_metadata.model.Data;
 import com.farao_community.farao.ce_merging.merging.request_metadata.model.RequestMetadata;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -46,7 +48,8 @@ public class RequestMetadataManager {
         "feasibility-ranges", Inputs::getFeasibilityRanges,
         "net-position-forecast", Inputs::getNetPositionForecast);
 
-    public RequestMetadataManager(final String inputsPath, final String requestJsonContent) {
+    public RequestMetadataManager(final String inputsPath,
+                                  final String requestJsonContent) {
         this.inputsPath = inputsPath;
         try {
             final ObjectMapper mapper = new ObjectMapper();
@@ -63,11 +66,14 @@ public class RequestMetadataManager {
         this.requestMetadata = requestMetadata;
     }
 
+    public void feedTaskData(final MergingTask task) {
+        task.setName(getRequestData().getAttributes().getName());
+        setTaskInputs(task, getRequestInputs());
+        setTaskConfigurations(task, getRequestData().getConfigurations());
+    }
+
     public ZoneOffset getRealRequestOffset() {
-        return requestMetadata
-            .getData()
-            .getAttributes()
-            .getInputs()
+        return getRequestInputs()
             .getTargetDate()
             .toInstant()
             .atZone(ZoneId.of("Europe/Paris"))
@@ -78,39 +84,23 @@ public class RequestMetadataManager {
     public void checkIfAllInputsAvailable(final Path tmpInputPath) throws IOException {
         final List<String> missingFiles = new ArrayList<>();
 
-        final Inputs inputs = requestMetadata.getData().getAttributes().getInputs();
-
-        inputs.getIgms()
-            .forEach(igm -> {
-                checkIfAvailable(igm.getIgmFile(), tmpInputPath, missingFiles);
-                checkIfAvailable(igm.getIgmQualityReportFile(), tmpInputPath, missingFiles);
-            });
+        getRequestInputs()
+            .getIgms()
+            .forEach(igm -> checkIfAvailable(igm, tmpInputPath, missingFiles));
 
         INPUT_GETTERS_BY_LOCATION
             .values()
-            .forEach(getter -> checkIfAvailable(getter.apply(inputs), tmpInputPath, missingFiles));
+            .forEach(getter ->
+                         checkIfAvailable(getter.apply(getRequestInputs()),
+                                          tmpInputPath,
+                                          missingFiles));
 
         if (!missingFiles.isEmpty()) {
             FileSystemUtils.deleteRecursively(tmpInputPath);
-            final String message = String.format(MISSING_FILES_ERROR, String.join(" - ", missingFiles));
+            final String message = String.format(MISSING_FILES_ERROR, String.join(", ", missingFiles));
             LOGGER.error(message);
             throw new InvalidTaskException(message);
         }
-    }
-
-    private void checkIfAvailable(final SavedFile savedFile,
-                                  final Path parent,
-                                  final List<String> missingFiles) {
-        final String expectedPath = savedFile.getPath();
-        if (!getIfInside(expectedPath, parent).toFile().exists()) {
-            missingFiles.add(expectedPath);
-        }
-    }
-
-    public void feedTaskData(final MergingTask task) {
-        task.setName(requestMetadata.getData().getAttributes().getName());
-        setTaskInputs(task, requestMetadata.getData().getAttributes().getInputs());
-        setTaskConfigurations(task, requestMetadata.getData().getConfigurations());
     }
 
     private void setTaskInputs(final MergingTask task,
@@ -119,11 +109,13 @@ public class RequestMetadataManager {
         final String inputsLocation = TASKS + taskId + "/inputs/";
         // update paths to make them absolute & location for GET output
         inputs.getIgms().forEach(igm -> {
-            igm.setIgmFilePath(getIfInside(igm.getIgmFile().getPath(), inputPath()).toString());
-            igm.setIgmQualityReportFilePath(getIfInside(igm.getIgmQualityReportFile().getPath(),
-                                                        inputPath()).toString());
-            igm.getIgmFile().setLocation(inputsLocation + "areas/" + igm.getCountry() + "/igm");
-            igm.getIgmQualityReportFile().setLocation(inputsLocation + "areas/" + igm.getCountry() + "/quality-report");
+            final String parentPath = inputsLocation + "areas/" + igm.getCountry();
+            igm.setIgmFilePath(getInputPath(igm.getIgmFile()));
+            igm.setIgmQualityReportFilePath(getInputPath(igm.getIgmQualityReportFile()));
+            igm.getIgmFile()
+                .setLocation(parentPath + "/igm");
+            igm.getIgmQualityReportFile()
+                .setLocation(parentPath + "/quality-report");
         });
 
         INPUT_GETTERS_BY_LOCATION
@@ -153,26 +145,51 @@ public class RequestMetadataManager {
         task.setConfigurations(configs);
     }
 
-    private void makePathAbsolute(final SavedFile savedFile) {
-        savedFile.feedPathAndName(getIfInside(savedFile.getPath(),
-                                              inputPath())
-                                      .toString());
-    }
-
     private void setRecessivityConfiguration(final Configurations configurations,
                                              final String configLocation) {
         final SavedFile paramFile = configurations.getRecessivityParameters();
         paramFile.setLocation(configLocation + "recessivity-parameters");
 
         if (paramFile.getPath() != null) {
-            paramFile.feedPathAndName(Paths.get(inputsPath, configurations.getRecessivityParameters().getPath()).toString());
+            paramFile.feedPathAndName(Paths.get(inputsPath, paramFile.getPath()));
         } else {
             LOGGER.info("No recessivity parameters file could be found on the input directory, Default recessivity configuration will be used");
-            paramFile.feedPathAndName(Paths.get(RECESSIVITY_DEFAULT_CONFIGURATION).toString());
+            paramFile.feedPathAndName(Paths.get(RECESSIVITY_DEFAULT_CONFIGURATION));
         }
     }
 
-    private Path inputPath() {
-        return Paths.get(inputsPath);
+    private void checkIfAvailable(final SavedFile savedFile,
+                                  final Path parent,
+                                  final List<String> missingFiles) {
+        final String expectedPath = savedFile.getPath();
+        if (!getIfInside(expectedPath, parent).toFile().exists()) {
+            missingFiles.add(expectedPath);
+        }
     }
+
+    private void checkIfAvailable(final IgmData igmData,
+                                  final Path parent,
+                                  final List<String> missingFiles) {
+        checkIfAvailable(igmData.getIgmFile(), parent, missingFiles);
+        checkIfAvailable(igmData.getIgmQualityReportFile(), parent, missingFiles);
+    }
+
+    private Data getRequestData() {
+        return requestMetadata.getData();
+    }
+
+    private Inputs getRequestInputs() {
+        return getRequestData().getAttributes().getInputs();
+    }
+
+    private void makePathAbsolute(final SavedFile savedFile) {
+        savedFile.feedPathAndName(getInputPath(savedFile));
+    }
+
+    private String getInputPath(final SavedFile file) {
+        return getIfInside(file.getPath(),
+                           Paths.get(inputsPath))
+            .toString();
+    }
+
 }

@@ -15,10 +15,10 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static java.nio.file.Files.readAllBytes;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
@@ -52,25 +52,25 @@ public final class FileUtils {
     }
 
     public static ResponseEntity<byte[]> toAttachmentFileResponse(final SavedFile savedFile) {
+        final String path = savedFile.getPath();
         try {
-            final byte[] fileContent = Files.readAllBytes(Paths.get(savedFile.getPath()));
-            final String fileName = savedFile.getOriginalName();
-            return toAttachmentFileResponse(fileContent, fileName);
+            return toAttachmentFileResponse(readAllBytes(Paths.get(path)),
+                                            savedFile.getOriginalName());
         } catch (final IOException | ServiceIOException e) {
-            LOGGER.error(RETRIEVE_ERROR + "'{}'", savedFile.getPath());
-            throw new ServiceIOException(String.format(RETRIEVE_ERROR + "%s", savedFile.getPath()), e);
+            LOGGER.error(RETRIEVE_ERROR + "'{}'", path);
+            throw new ServiceIOException(String.format(RETRIEVE_ERROR + "%s", path), e);
         }
     }
 
     public static Path getIfInside(final String pathToGet,
-                            final Path parentFolder) {
+                                   final Path parentFolder) {
         if (isEmpty(pathToGet)) {
             throw new ServiceIOException("Missing file path");
         }
         final Path parent = parentFolder.normalize();
         final Path resolved = parent.resolve(pathToGet).normalize();
         if (!resolved.startsWith(parent)) {
-            throw new ServiceIOException("Invalid file path %s".formatted(pathToGet));
+            throw new ServiceIOException("Invalid file path : %s".formatted(pathToGet));
         }
         return resolved;
     }

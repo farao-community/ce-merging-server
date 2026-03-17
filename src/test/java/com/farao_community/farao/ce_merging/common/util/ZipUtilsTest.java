@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.pathOfTestFile;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.pathOf;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.unzipFile;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -23,7 +23,7 @@ class ZipUtilsTest {
     @Test
     void shouldUnzipThenZipAgain() throws IOException {
         final Path tmp = Files.createTempDirectory("zip-test");
-        unzipFile(pathOfTestFile("testZip.zip"), tmp);
+        unzipFile(pathOf("testZip.zip"), tmp);
 
         assertTrue(pathInZip("file1.txt", tmp)
                        .toFile().exists());
@@ -43,7 +43,7 @@ class ZipUtilsTest {
     void shouldFailWhenUnzippingToReadOnlyDirectory() throws IOException {
         final Path tmp = Files.createTempDirectory("zip-test");
         assertTrue(tmp.toFile().setReadOnly());
-        final Path zipInput = pathOfTestFile("testZip.zip");
+        final Path zipInput = pathOf("testZip.zip");
         assertThrows(ServiceIOException.class, () -> unzipFile(zipInput, tmp));
     }
 }

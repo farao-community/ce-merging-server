@@ -11,6 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 import java.io.Serializable;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 
 @Entity
@@ -36,6 +37,11 @@ public class SavedFile implements Serializable {
     public void feedPathAndName(final String fullFilePath) {
         this.path = fullFilePath;
         this.originalName = Paths.get(fullFilePath).getFileName().toString();
+    }
+
+    public void feedPathAndName(final Path filePath) {
+        this.path = filePath.toString();
+        this.originalName = filePath.getFileName().toString();
     }
 
     public String getLocation() {

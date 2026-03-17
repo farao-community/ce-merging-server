@@ -8,6 +8,7 @@ package com.farao_community.farao.ce_merging;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -29,6 +30,7 @@ public final class CeMergingTestUtils {
 
     private static final Class<CeMergingTestUtils> THIS = CeMergingTestUtils.class;
     private static final String DEFAULT_FILE = "blank.file";
+    private static final String ZIP_NAME = "inputs.zip";
 
     public static ServiceIOException testServiceEx = new ServiceIOException("Test");
 
@@ -37,14 +39,14 @@ public final class CeMergingTestUtils {
      * @param fileName under resources
      * @return its path
      */
-    public static Path pathOfTestFile(final String fileName) {
+    public static Path pathOf(final String fileName) {
         return Paths.get(Optional.ofNullable(THIS.getResource("/" + fileName))
                              .orElse(THIS.getResource("/" + DEFAULT_FILE))
                              .getPath());
     }
 
-    public static String stringPathOfTestFile(final String fileName) {
-        return pathOfTestFile(fileName).toString();
+    public static String stringPathOf(final String fileName) {
+        return pathOf(fileName).toString();
     }
 
     /**
@@ -58,17 +60,17 @@ public final class CeMergingTestUtils {
         return new ObjectMapper().writeValueAsString(object);
     }
 
-    public static byte[] byteContentOfTestFile(final String fileName) {
+    public static byte[] byteContentOf(final String fileName) {
         try {
-            return readFileToByteArray(new File(stringPathOfTestFile(fileName)));
+            return readFileToByteArray(new File(stringPathOf(fileName)));
         } catch (final Exception e) {
             return new byte[0];
         }
     }
 
-    public static String stringContentOfTestFile(final String fileName) {
+    public static String stringContentOf(final String fileName) {
         try {
-            return readFileToString(new File(stringPathOfTestFile(fileName)), UTF_8);
+            return readFileToString(new File(stringPathOf(fileName)), UTF_8);
         } catch (final Exception e) {
             return "";
         }
@@ -76,5 +78,14 @@ public final class CeMergingTestUtils {
 
     public static MergingTask anyTask() {
         return any(MergingTask.class);
+    }
+
+    public static MergingTask withIdAndStatus(final long id, final TaskStatus status) {
+        final MergingTask task = new MergingTask();
+        task.setTaskId(id);
+        task.setArchiveFileOriginalName(ZIP_NAME);
+        task.setTaskStatus(status);
+
+        return task;
     }
 }

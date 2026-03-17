@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOfTestFile;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +37,7 @@ class JaxbUtilsTest {
     @Test
     void shouldUnmarshallDummyXml() {
         assertEquals("TEST_NODE",
-                     JaxbUtils.readFromPath(XNODES, stringPathOfTestFile("testXnode.xml"))
+                     JaxbUtils.readFromPath(XNODES, stringPathOf("testXnode.xml"))
                          .getXnode()
                          .getFirst()
                          .getName());
@@ -106,7 +106,7 @@ class JaxbUtilsTest {
     @ParameterizedTest
     @ValueSource(strings = {"dummy.csv", "dummy.json"})
     void shouldFailOnIncorrectData(final String fileName) {
-        final String strInput = stringPathOfTestFile(fileName);
+        final String strInput = stringPathOf(fileName);
         final byte[] byteInput = fileName.getBytes(UTF_8);
         assertThrows(ServiceIOException.class,
                      () -> JaxbUtils.readFromPath(XNODES, strInput));

@@ -123,7 +123,7 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getRefProgOutput(@Parameter(description = MERGING_TASK_ID)
                                                    @PathVariable final long taskId) {
-        return toAttachmentFileResponse(taskManager.getRefProgOutput(taskId));
+        return toAttachmentFileResponse(taskManager.getRefProg(taskId));
     }
 
     @GetMapping(value = "/tasks/{taskId}/outputs/cgm",
@@ -137,7 +137,7 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getCgmOutput(@Parameter(description = MERGING_TASK_ID)
                                                @PathVariable final long taskId) {
-        return toAttachmentFileResponse(taskManager.getCgmOutput(taskId));
+        return toAttachmentFileResponse(taskManager.getCgm(taskId));
     }
 
     @GetMapping(value = "/tasks/{taskId}/outputs",
@@ -151,7 +151,7 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getOutputsByTaskId(@Parameter(description = MERGING_TASK_ID)
                                                      @PathVariable final long taskId) {
-        return toAttachmentFileResponse(taskManager.getOutputs(taskId), "outputs_%s.zip".formatted(taskId));
+        return toAttachmentFileResponse(taskManager.getOutputZip(taskId), "outputs_%s.zip".formatted(taskId));
     }
 
     @GetMapping(value = "/tasks/{taskId}/artifacts/cgm-net-positions",

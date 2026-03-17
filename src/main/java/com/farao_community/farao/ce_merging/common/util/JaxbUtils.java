@@ -21,12 +21,12 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static java.lang.Boolean.TRUE;
+import static java.nio.file.Files.newInputStream;
 
 public final class JaxbUtils {
 
@@ -38,11 +38,10 @@ public final class JaxbUtils {
 
     public static <T> T readFromPath(final Class<T> clazz,
                                      final String path) {
-        try (final InputStream fileContent = Files.newInputStream(Paths.get(path))) {
+        try (final InputStream fileContent = newInputStream(Paths.get(path))) {
             return genericUnmarshaller(clazz)
                 .unmarshal(new StreamSource(fileContent), clazz)
                 .getValue();
-
         } catch (final JAXBException | IOException e) {
             final String errorMessage = String.format("Error occurred when converting xml file %s to object of type %s",
                                                       path, clazz.getName());
@@ -51,6 +50,7 @@ public final class JaxbUtils {
         }
     }
 
+    @SuppressWarnings("unchecked") // because giving Class<T> to genericUnmarshaller necessarily produces a T
     public static <T> T readFromBytes(final Class<T> clazz,
                                       final byte[] fileContent) {
         try {
@@ -81,7 +81,7 @@ public final class JaxbUtils {
                                        final Path filePath) {
         try {
             marshallerFormatOutput(objectsClass).marshal(object, filePath.toFile());
-        } catch (JAXBException e) {
+        } catch (final JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to path %s", objectsClass.getName(), filePath.toString());
             LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
@@ -94,12 +94,12 @@ public final class JaxbUtils {
                                           final String nameSpaceURI,
                                           final String rootElement) {
         try {
-            final JAXBElement<T> jaxbElement =
-                new JAXBElement<>(new QName(nameSpaceURI, rootElement),
-                                   objectsClass,
-                                   object);
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            marshallerFormatOutput(objectsClass).marshal(jaxbElement, outputStream);
+            marshallerFormatOutput(objectsClass).marshal(getElementFromRoot(objectsClass,
+                                                                            object,
+                                                                            nameSpaceURI,
+                                                                            rootElement),
+                                                         outputStream);
             return outputStream.toByteArray();
         } catch (final JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes",
@@ -116,17 +116,26 @@ public final class JaxbUtils {
                                        final String rootElement,
                                        final Path filePath) {
         try {
-            final JAXBElement<T> jaxbElement =
-                new JAXBElement<>(new QName(nameSpaceURI, rootElement),
-                                   objectsClass,
-                                   object);
-            marshallerFormatOutput(objectsClass).marshal(jaxbElement, filePath.toFile());
+            marshallerFormatOutput(objectsClass).marshal(getElementFromRoot(objectsClass,
+                                                                            object,
+                                                                            nameSpaceURI,
+                                                                            rootElement),
+                                                         filePath.toFile());
         } catch (final JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to path %s",
                                                       objectsClass.getName(), filePath.toString());
             LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
+    }
+
+    private static <T> JAXBElement<T> getElementFromRoot(final Class<T> objectsClass,
+                                                     final T object,
+                                                     final String nameSpaceURI,
+                                                     final String rootElement) {
+        return new JAXBElement<>(new QName(nameSpaceURI, rootElement),
+                                 objectsClass,
+                                 object);
     }
 
     private static <T> Marshaller marshallerFormatOutput(final Class<T> clazz) throws JAXBException {

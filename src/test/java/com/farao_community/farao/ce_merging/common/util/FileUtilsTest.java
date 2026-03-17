@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOfTestFile;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -31,7 +31,7 @@ class FileUtilsTest {
         final SavedFile file = new SavedFile();
         file.setLocation("testFiles");
         file.setOriginalName("testXnode.xml");
-        file.setPath(stringPathOfTestFile("testXnode.xml"));
+        file.setPath(stringPathOf("testXnode.xml"));
         file.setFileId(1);
 
         final ResponseEntity<byte[]> responseXml = FileUtils.toAttachmentFileResponse(file);

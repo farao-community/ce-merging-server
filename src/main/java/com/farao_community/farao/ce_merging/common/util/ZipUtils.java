@@ -16,6 +16,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -34,7 +35,8 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 public final class ZipUtils {
 
-    private static final int BUFFER_SIZE = 4096;
+    private static final int WRITE_BUFFER_SIZE = 4096;
+    private static final int READ_BUFFER_SIZE = 2156;
     private static final String TMP_DIR = "CeMerging";
     private static final Logger LOGGER = LoggerFactory.getLogger(ZipUtils.class);
 
@@ -47,39 +49,44 @@ public final class ZipUtils {
      * destDirectory (will be created if it does not exist)
      *
      * @param zipFilePath   path to the zip file to be extracted
-     * @param destDirectory extraction destination diectory
+     * @param destDirectory extraction destination directory
      */
     public static void unzipFile(final Path zipFilePath,
                                  final Path destDirectory) {
-        if (!destDirectory.toFile().exists() && !destDirectory.toFile().mkdir()) {
+        final File destination = destDirectory.toFile();
+        if (!destination.exists() && !destination.mkdir()) {
             LOGGER.error("Cannot create destination directory '{}'", destDirectory);
             throw new ServiceIOException(String.format("Cannot create destination directory '%s'", destDirectory));
         }
 
-        try (final ZipInputStream zipIn = new ZipInputStream(new FileInputStream(zipFilePath.normalize().toFile()))) {
-            ZipEntry entry = zipIn.getNextEntry();
+        try (final ZipInputStream zipIn = getZipStream(zipFilePath)) {
+            ZipEntry zipEntry;
             // iterates over entries in the zip file
-            while (entry != null) {
-                final String filePath = getIfInside(entry.getName(),
-                                                    destDirectory).toString();
-                if (!entry.isDirectory()) {
-                    // if the entry is a file, extracts it
-                    createDirectories(Paths.get(filePath).getParent());
-                    extractFile(zipIn, filePath);
-                } else {
+            while ((zipEntry = zipIn.getNextEntry()) != null) {
+                final Path filePath = getIfInside(zipEntry.getName(), destDirectory);
+                final String fileDir = filePath.toString();
+                if (zipEntry.isDirectory()) {
                     // if the entry is a directory, make the directory
-                    File dir = new File(filePath);
-                    if (!dir.mkdir()) {
-                        throw new IOException("could note create folder %s".formatted(filePath));
+                    final boolean created = new File(fileDir).mkdir();
+                    if (!created) {
+                        throw new IOException("Could not create folder %s".formatted(fileDir));
                     }
+                } else {
+                    // if the entry is a file, extracts it
+                    createDirectories(filePath.getParent());
+                    extractFile(zipIn, fileDir);
                 }
-                zipIn.closeEntry();
-                entry = zipIn.getNextEntry();
             }
+            zipIn.closeEntry();
         } catch (final IOException e) {
-            LOGGER.error("Error while extracting file '{}'", zipFilePath.getFileName(), e);
-            throw new ServiceIOException(String.format("Error while extracting file '%s'", zipFilePath.getFileName()), e);
+            final String message = String.format("Error while extracting file '%s'", zipFilePath.getFileName());
+            LOGGER.error(message, e);
+            throw new ServiceIOException(message, e);
         }
+    }
+
+    private static ZipInputStream getZipStream(final Path zipFilePath) throws FileNotFoundException {
+        return new ZipInputStream(new FileInputStream(zipFilePath.normalize().toFile()));
     }
 
     /**
@@ -90,40 +97,31 @@ public final class ZipUtils {
      */
     private static void extractFile(final ZipInputStream zipIn,
                                     final String filePath) throws IOException {
-        try (final BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(filePath))) { // NOSONAR File location does not come from user input
-            final byte[] bytesIn = new byte[BUFFER_SIZE];
+        try (final BufferedOutputStream outFile = new BufferedOutputStream(new FileOutputStream(filePath))) { // NOSONAR File location does not come from user input
+            final byte[] bytesIn = new byte[WRITE_BUFFER_SIZE];
             int read;
             while ((read = zipIn.read(bytesIn)) != -1) {
-                bos.write(bytesIn, 0, read);
+                outFile.write(bytesIn, 0, read);
             }
         }
     }
 
-    public static Path unzipInputFileInTmp(final MultipartFile archives) throws IOException {
+    public static Path unzipInputFileInTmp(final MultipartFile zipFile) throws IOException {
         final Path archiveTmpPath = createTempDirectory(TMP_DIR); // NOSONAR directories are used safely here
-        final Path extractionPath = createDirectories(archiveTmpPath.resolve("content"));
-        final Path inputsArchivePath = storeInputFileInPath(archives, archiveTmpPath);
-        try {
-            unzipFile(inputsArchivePath, extractionPath);
-            deleteRecursively(inputsArchivePath);
-            return extractionPath;
-        } catch (final Exception e) {
-            deleteRecursively(inputsArchivePath);
-            deleteRecursively(extractionPath);
-            deleteRecursively(archiveTmpPath);
-            throw e;
-        }
-
+        final Path inputsArchivePath = storeInputFileInPath(zipFile, archiveTmpPath);
+        unzipFile(inputsArchivePath, archiveTmpPath);
+        deleteRecursively(inputsArchivePath);
+        return archiveTmpPath;
     }
 
     private static Path storeInputFileInPath(final MultipartFile multipartFile,
-                                             final Path path) throws IOException {
+                                             final Path inputsPath) throws IOException {
         // Use only the filename part, stripping any path components
         final String safeFilename = Paths.get(Optional.ofNullable(multipartFile.getOriginalFilename())
                                                   .orElseThrow(() -> new ServiceIOException("empty filename")))
             .getFileName()
             .toString();
-        final Path inputPath = getIfInside(safeFilename, path);
+        final Path inputPath = getIfInside(safeFilename, inputsPath);
         multipartFile.transferTo(inputPath);
         return inputPath;
     }
@@ -134,7 +132,6 @@ public final class ZipUtils {
              final Stream<Path> allFiles = Files.walk(Paths.get(directory))) {
 
             allFiles.filter(Files::isRegularFile)
-                .map(Path::toString)
                 .forEach(filePath -> addFileToZip(filePath, directory, zipOutputStream));
 
         } catch (final IOException e) {
@@ -144,19 +141,21 @@ public final class ZipUtils {
         return zipBytesStream.toByteArray();
     }
 
-    private static void addFileToZip(final String filePath,
+    private static void addFileToZip(final Path filePath,
                                      final String rootDir,
-                                     final ZipOutputStream zos) {
+                                     final ZipOutputStream outFile) {
 
-        final byte[] readBuffer = new byte[2156];
+        final byte[] readBuffer = new byte[READ_BUFFER_SIZE];
         int bytesIn;
-        final String fileRelativePath = Paths.get(rootDir).relativize(Paths.get(filePath)).toString();
-        try (final FileInputStream fileStream = new FileInputStream(filePath)) {
-            zos.putNextEntry(new ZipEntry(fileRelativePath));
-            while ((bytesIn = fileStream.read(readBuffer)) != -1) {
-                zos.write(readBuffer, 0, bytesIn);
+        final String fileRelativePath = Paths.get(rootDir).relativize(filePath).toString();
+
+        try (final FileInputStream inStream = new FileInputStream(filePath.toFile())) {
+            outFile.putNextEntry(new ZipEntry(fileRelativePath));
+            // write while there are still bytes left
+            while ((bytesIn = inStream.read(readBuffer)) != -1) {
+                outFile.write(readBuffer, 0, bytesIn);
             }
-            zos.closeEntry();
+            outFile.closeEntry();
         } catch (final IOException e) {
             throw new CeMergingException("Error during output ZIP creation", e);
         }

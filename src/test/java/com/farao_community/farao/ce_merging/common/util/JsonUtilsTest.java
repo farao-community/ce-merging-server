@@ -14,7 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOfTestFile;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,7 +42,7 @@ class JsonUtilsTest {
     @Test
     void shouldReadObjectFromJson() throws IOException {
         assertEquals(TEST_JSON,
-                     JsonUtils.read(DummyJson.class, stringPathOfTestFile("dummy.json")));
+                     JsonUtils.read(DummyJson.class, stringPathOf("dummy.json")));
         final MockMultipartFile multipartFile = new MockMultipartFile("dummy.json", JSON_CONTENT);
         assertEquals(TEST_JSON_FROM_BYTES,
                      JsonUtils.read(DummyJson.class, multipartFile));

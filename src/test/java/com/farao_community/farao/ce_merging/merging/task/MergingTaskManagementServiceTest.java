@@ -25,16 +25,17 @@ import org.springframework.mock.web.MockMultipartFile;
 import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.CeMergingTestUtils.anyTask;
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.byteContentOfTestFile;
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringContentOfTestFile;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.byteContentOf;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringContentOf;
+import static com.farao_community.farao.ce_merging.CeMergingTestUtils.withIdAndStatus;
 import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.CREATED;
 import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @TestConfiguration
@@ -42,7 +43,7 @@ class MergingTaskManagementServiceTest {
 
     private static final String INPUTS = "request-metadata/inputs/";
     private static final String METADATA = "request-metadata/metadata.json";
-    private static final String ZIP_NAME = "inputs.zip";
+    private static final String INPUTS_ZIP_NAME = "inputs.zip";
     private static final long ID = 1L;
 
     @Autowired
@@ -57,12 +58,21 @@ class MergingTaskManagementServiceTest {
 
     @BeforeEach
     void setUp() {
-        tracer = Tracing.newBuilder().build().tracer();
-        final TraceContext ctx = TraceContext.newBuilder().traceId(ID).spanId(ID).build();
+        tracer = Tracing
+            .newBuilder()
+            .build()
+            .tracer();
+
+        final TraceContext ctx = TraceContext
+            .newBuilder()
+            .traceId(10L)
+            .spanId(10L)
+            .build();
+
         final Span span = tracer.toSpan(ctx);
         tracer.withSpanInScope(span);
 
-        // to obtain configuration from autowire
+        // to obtain configuration from autowire, and instantiate tracer
         service = new MergingTaskManagementService(ceMergingConfiguration,
                                                    mergingService,
                                                    taskRepository,
@@ -72,16 +82,16 @@ class MergingTaskManagementServiceTest {
 
     @Test
     void shouldCreateTask() {
-        final MergingTask task = new MergingTask();
-        task.setTaskId(ID);
-        task.setArchiveFileOriginalName(ZIP_NAME);
-        Mockito.when(taskRepository.save(any(MergingTask.class))).thenReturn(task);
+        when(taskRepository.save(anyTask()))
+            .thenReturn(withIdAndStatus(1L, CREATED));
 
-        final MockMultipartFile zipFile = new MockMultipartFile(ZIP_NAME,
-                                                                ZIP_NAME,
+        final MockMultipartFile zipFile = new MockMultipartFile(INPUTS_ZIP_NAME,
+                                                                INPUTS + INPUTS_ZIP_NAME,
                                                                 "application/zip",
-                                                                byteContentOfTestFile(INPUTS + ZIP_NAME));
-        service.createNewTask(zipFile, stringContentOfTestFile(METADATA));
+                                                                byteContentOf(INPUTS + INPUTS_ZIP_NAME));
+
+        service.createNewTask(zipFile, stringContentOf(METADATA));
+
         verify(taskRepository, times(2))
             .save(anyTask());
         verify(taskMapper)
@@ -90,29 +100,30 @@ class MergingTaskManagementServiceTest {
 
     @Test
     void shouldRunTask() {
-        final MergingTask task = new MergingTask();
-        task.setTaskId(ID);
-        task.setArchiveFileOriginalName(ZIP_NAME);
-        task.setTaskStatus(CREATED);
-        Mockito.when(taskRepository.findById(ID)).thenReturn(Optional.of(task));
+
+        final MergingTask task = withIdAndStatus(ID, CREATED);
+
+        when(taskRepository.findById(ID))
+            .thenReturn(Optional.of(task));
 
         service.runTask(ID);
 
-        verify(mergingService).run(anyTask());
-        verify(taskMapper).mergingTaskToMergingTaskDto(anyTask());
-        verify(taskRepository, times(2)).save(anyTask());
+        verify(mergingService)
+            .run(anyTask());
+        verify(taskMapper)
+            .mergingTaskToMergingTaskDto(anyTask());
+        verify(taskRepository, times(2))
+            .save(anyTask());
 
-        assertThat(task.getTaskStatus()).isEqualTo(SUCCESS);
+        assertThat(task.getTaskStatus())
+            .isEqualTo(SUCCESS);
 
     }
 
     @Test
     void shouldThrowIfTaskAlreadyRunning() {
-        final MergingTask task = new MergingTask();
-        task.setTaskId(ID);
-        task.setArchiveFileOriginalName(ZIP_NAME);
-        task.setTaskStatus(RUNNING);
-        Mockito.when(taskRepository.findById(ID)).thenReturn(Optional.of(task));
+        when(taskRepository.findById(ID))
+            .thenReturn(Optional.of(withIdAndStatus(ID, RUNNING)));
 
         assertThatThrownBy(() -> service.runTask(ID))
             .hasMessage("Task '1' already running, could not be run again");
