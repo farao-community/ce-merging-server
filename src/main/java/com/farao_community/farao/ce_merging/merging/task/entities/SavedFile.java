@@ -9,18 +9,13 @@ package com.farao_community.farao.ce_merging.merging.task.entities;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.nio.file.Paths;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 public class SavedFile implements Serializable {
+
     @Id
     @GeneratedValue
     private long fileId;
@@ -29,9 +24,10 @@ public class SavedFile implements Serializable {
     private String path;
     private String location;
 
-    public SavedFile(final String originalName,
-                     final String path,
-                     final String location) {
+    public SavedFile() {
+    }
+
+    public SavedFile(String originalName, String path, String location) {
         this.originalName = originalName;
         this.path = path;
         this.location = location;
@@ -40,5 +36,37 @@ public class SavedFile implements Serializable {
     public void feedPathAndName(final String fullFilePath) {
         this.path = fullFilePath;
         this.originalName = Paths.get(fullFilePath).getFileName().toString();
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(final String location) {
+        this.location = location;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(final String path) {
+        this.path = path;
+    }
+
+    public String getOriginalName() {
+        return originalName;
+    }
+
+    public void setOriginalName(final String originalName) {
+        this.originalName = originalName;
+    }
+
+    public long getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(final long fileId) {
+        this.fileId = fileId;
     }
 }

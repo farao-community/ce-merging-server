@@ -10,8 +10,6 @@ import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -23,8 +21,11 @@ import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mockito.ArgumentMatchers.any;
 
-@NoArgsConstructor(access = AccessLevel.NONE)
-public class CeMergingTestUtils {
+public final class CeMergingTestUtils {
+
+    private CeMergingTestUtils() {
+        // utility class
+    }
 
     public static ServiceIOException testServiceEx = new ServiceIOException("Test");
 

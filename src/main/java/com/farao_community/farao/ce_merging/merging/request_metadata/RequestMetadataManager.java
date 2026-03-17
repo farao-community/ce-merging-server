@@ -8,15 +8,15 @@ package com.farao_community.farao.ce_merging.merging.request_metadata;
 
 import com.farao_community.farao.ce_merging.common.exception.InvalidTaskException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.merging.request_metadata.model.RequestMetadata;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.request_metadata.model.RequestMetadata;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.FileSystemUtils;
 
 import java.io.IOException;
@@ -31,12 +31,11 @@ import java.util.function.Function;
 
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
 
-@AllArgsConstructor
-@Slf4j
 public class RequestMetadataManager {
     private final String inputsPath;
     private final RequestMetadata requestMetadata;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(RequestMetadataManager.class);
     private static final String TASKS = "/tasks/";
     private static final String RECESSIVITY_DEFAULT_CONFIGURATION = "gridDefaultConfigurations/default-recessivity-parameters.json";
     private static final String MISSING_FILES_ERROR = "Some input files are declared in request metadata but missing in provided archive: %s. Please ensure that files are present within archive and have the same name as request metadata.";
@@ -45,7 +44,6 @@ public class RequestMetadataManager {
         "generation-load-shift-keys", Inputs::getGenerationLoadShiftKeys,
         "external-constraints", Inputs::getExternalConstraints,
         "feasibility-ranges", Inputs::getFeasibilityRanges,
-        "dc-links", Inputs::getDcLinks,
         "net-position-forecast", Inputs::getNetPositionForecast);
 
     public RequestMetadataManager(final String inputsPath, final String requestJsonContent) {
@@ -57,6 +55,12 @@ public class RequestMetadataManager {
         } catch (final IOException e) {
             throw new ServiceIOException("Invalid request metadata", e);
         }
+    }
+
+    public RequestMetadataManager(final String inputsPath,
+                                  final RequestMetadata requestMetadata) {
+        this.inputsPath = inputsPath;
+        this.requestMetadata = requestMetadata;
     }
 
     public ZoneOffset getRealRequestOffset() {
@@ -89,7 +93,7 @@ public class RequestMetadataManager {
         if (!missingFiles.isEmpty()) {
             FileSystemUtils.deleteRecursively(tmpInputPath);
             final String message = String.format(MISSING_FILES_ERROR, String.join(" - ", missingFiles));
-            log.error(message);
+            LOGGER.error(message);
             throw new InvalidTaskException(message);
         }
     }
@@ -163,7 +167,7 @@ public class RequestMetadataManager {
         if (paramFile.getPath() != null) {
             paramFile.feedPathAndName(Paths.get(inputsPath, configurations.getRecessivityParameters().getPath()).toString());
         } else {
-            log.info("No recessivity parameters file could be found on the input directory, Default recessivity configuration will be used");
+            LOGGER.info("No recessivity parameters file could be found on the input directory, Default recessivity configuration will be used");
             paramFile.feedPathAndName(Paths.get(RECESSIVITY_DEFAULT_CONFIGURATION).toString());
         }
     }

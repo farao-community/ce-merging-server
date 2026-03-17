@@ -8,13 +8,7 @@ package com.farao_community.farao.ce_merging.merging.task.dto;
 
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiData;
 import com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class MergingTaskDto implements JsonApiData {
 
     private long taskId;
@@ -55,5 +49,61 @@ public class MergingTaskDto implements JsonApiData {
     @Override
     public String getType() {
         return this.name;
+    }
+
+    public TaskStatus getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(final TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
+    }
+
+    public long getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(final long taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public InputsDto getInputs() {
+        return inputs;
+    }
+
+    public void setInputs(final InputsDto inputs) {
+        this.inputs = inputs;
+    }
+
+    public ConfigurationsDto getConfigurations() {
+        return configurations;
+    }
+
+    public void setConfigurations(final ConfigurationsDto configurations) {
+        this.configurations = configurations;
+    }
+
+    public OutputsDto getOutputs() {
+        return outputs;
+    }
+
+    public void setOutputs(final OutputsDto outputs) {
+        this.outputs = outputs;
+    }
+
+    public ArtifactsDto getArtifacts() {
+        return artifacts;
+    }
+
+    public void setArtifacts(final ArtifactsDto artifacts) {
+        this.artifacts = artifacts;
     }
 }

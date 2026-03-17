@@ -7,21 +7,14 @@
 package com.farao_community.farao.ce_merging.common.json_api;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.util.ListUtils.deNulledList;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.Collections.singletonList;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 public class JsonApiErrorDocument {
     @JsonInclude(NON_NULL)
     List<JsonApiError> errors;
@@ -37,5 +30,21 @@ public class JsonApiErrorDocument {
                                                                        e.getLocalizedMessage(),
                                                                        title,
                                                                        e.getMessage())));
+    }
+
+    public List<JsonApiError> getErrors() {
+        return errors;
+    }
+
+    public void setErrors(final List<JsonApiError> errors) {
+        this.errors = errors;
+    }
+
+    public JsonApiErrorDocument(final List<JsonApiError> errors) {
+        this.errors = errors;
+    }
+
+    public JsonApiErrorDocument() {
+        this.errors = new ArrayList<>();
     }
 }

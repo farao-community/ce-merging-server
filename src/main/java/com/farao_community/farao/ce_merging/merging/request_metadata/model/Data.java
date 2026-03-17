@@ -8,9 +8,32 @@ package com.farao_community.farao.ce_merging.merging.request_metadata.model;
 
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 
-@lombok.Data
 public class Data {
     private String type;
     private AttributesMetadata attributes;
     private Configurations configurations;
+
+    public AttributesMetadata getAttributes() {
+        return attributes;
+    }
+
+    public void setAttributes(final AttributesMetadata attributes) {
+        this.attributes = attributes;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    public Configurations getConfigurations() {
+        return configurations;
+    }
+
+    public void setConfigurations(final Configurations configurations) {
+        this.configurations = configurations;
+    }
 }

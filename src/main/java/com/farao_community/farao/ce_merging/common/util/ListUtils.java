@@ -6,15 +6,15 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@NoArgsConstructor(access = AccessLevel.NONE)
 public final class ListUtils {
+
+    private ListUtils() {
+        // utility class
+    }
 
     public static <T> List<T> deNulledList(final List<T> nullable) {
         return Optional.ofNullable(nullable).orElse(new ArrayList<>());

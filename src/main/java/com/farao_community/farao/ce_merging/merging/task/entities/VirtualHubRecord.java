@@ -7,20 +7,54 @@
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 
 @Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
 public class VirtualHubRecord implements Serializable {
     private String code;
     private String eic;
     private String nodeName;
     private String relatedMaCode;
     private String relatedMaEic;
+
+    public String getEic() {
+        return eic;
+    }
+
+    public void setEic(final String eic) {
+        this.eic = eic;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(final String code) {
+        this.code = code;
+    }
+
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(final String nodeName) {
+        this.nodeName = nodeName;
+    }
+
+    public String getRelatedMaCode() {
+        return relatedMaCode;
+    }
+
+    public void setRelatedMaCode(final String relatedMaCode) {
+        this.relatedMaCode = relatedMaCode;
+    }
+
+    public String getRelatedMaEic() {
+        return relatedMaEic;
+    }
+
+    public void setRelatedMaEic(final String relatedMaEic) {
+        this.relatedMaEic = relatedMaEic;
+    }
 }

@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class RequestMetadataManagerTest {
 
     private static final String INPUTS = "request-metadata/inputs/";
-    private static final String INCOMPLETE_INPUTS = "request-metadata/inputs_missing_ec/";
     private static final String METADATA = "request-metadata/metadata.json";
     private static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+02:00");
 
@@ -50,10 +49,11 @@ class RequestMetadataManagerTest {
     void shouldThrowIfAnyInputMissing() throws FileNotFoundException {
         final RequestMetadata reqMd = JsonUtils.read(RequestMetadata.class,
                                                      stringPathOfTestFile(METADATA));
-        final RequestMetadataManager mgr = new RequestMetadataManager(stringPathOfTestFile(INCOMPLETE_INPUTS),
+        reqMd.getData().getAttributes().getInputs().setExternalConstraintsFilePath("not/existing");
+        final RequestMetadataManager mgr = new RequestMetadataManager(stringPathOfTestFile(INPUTS),
                                                                       reqMd);
 
-        final Path incomplete = pathOfTestFile(INCOMPLETE_INPUTS);
+        final Path incomplete = pathOfTestFile(INPUTS);
         assertThrows(InvalidTaskException.class, () -> mgr.checkIfAllInputsAvailable(incomplete));
     }
 }

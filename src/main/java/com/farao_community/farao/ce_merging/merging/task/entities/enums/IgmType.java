@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities.enums;
 
-import java.util.Arrays;
+import static java.util.Arrays.stream;
 
 public enum IgmType {
 
@@ -21,7 +21,7 @@ public enum IgmType {
     }
 
     public static IgmType fromTypeCode(final String typeCode) {
-        return Arrays.stream(IgmType.values())
+        return stream(values())
             .filter(type -> type.typeCode.equals(typeCode))
             .findAny()
             .orElseThrow(() -> new IllegalArgumentException(String.format("Type code '%s' not recognized",

@@ -6,18 +6,11 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class InputsDto implements Serializable {
 
     private static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
@@ -52,10 +45,7 @@ public class InputsDto implements Serializable {
      * The location of the feasibility ranges
      */
     private String feasibilityRangesLocation;
-    /**
-     * The location of the dc links
-     */
-    private String dcLinksLocation;
+
     /**
      * The location of merging request
      */
@@ -69,4 +59,71 @@ public class InputsDto implements Serializable {
         return Optional.ofNullable(alegroThreshold).orElse(DEFAULT_ALEGRO_THRESHOLD);
     }
 
+    public String getFeasibilityRangesLocation() {
+        return feasibilityRangesLocation;
+    }
+
+    public void setFeasibilityRangesLocation(final String feasibilityRangesLocation) {
+        this.feasibilityRangesLocation = feasibilityRangesLocation;
+    }
+
+    public OffsetDateTime getTargetDate() {
+        return targetDate;
+    }
+
+    public void setTargetDate(final OffsetDateTime targetDate) {
+        this.targetDate = targetDate;
+    }
+
+    public Boolean getMergingWithInternalHvdc() {
+        return mergingWithInternalHvdc;
+    }
+
+    public void setMergingWithInternalHvdc(final Boolean mergingWithInternalHvdc) {
+        this.mergingWithInternalHvdc = mergingWithInternalHvdc;
+    }
+
+    public void setAlegroThreshold(final Integer alegroThreshold) {
+        this.alegroThreshold = alegroThreshold;
+    }
+
+    public List<IgmDto> getIgms() {
+        return igms;
+    }
+
+    public void setIgms(final List<IgmDto> igms) {
+        this.igms = igms;
+    }
+
+    public String getGenerationLoadShiftKeysLocation() {
+        return generationLoadShiftKeysLocation;
+    }
+
+    public void setGenerationLoadShiftKeysLocation(final String generationLoadShiftKeysLocation) {
+        this.generationLoadShiftKeysLocation = generationLoadShiftKeysLocation;
+    }
+
+    public String getExternalConstraintsLocation() {
+        return externalConstraintsLocation;
+    }
+
+    public void setExternalConstraintsLocation(final String externalConstraintsLocation) {
+        this.externalConstraintsLocation = externalConstraintsLocation;
+    }
+
+    public String getMergingRequestLocation() {
+        return mergingRequestLocation;
+    }
+
+    public void setMergingRequestLocation(final String mergingRequestLocation) {
+        this.mergingRequestLocation = mergingRequestLocation;
+    }
+
+    public String getNetPositionForecastLocation() {
+        return netPositionForecastLocation;
+    }
+
+    public void setNetPositionForecastLocation(final String netPositionForecastLocation) {
+        this.netPositionForecastLocation = netPositionForecastLocation;
+    }
 }

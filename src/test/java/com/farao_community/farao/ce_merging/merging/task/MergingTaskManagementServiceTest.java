@@ -16,8 +16,8 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.mock.web.MockMultipartFile;
@@ -45,7 +45,7 @@ class MergingTaskManagementServiceTest {
     private static final String ZIP_NAME = "inputs.zip";
     private static final long ID = 1L;
 
-    @InjectMocks
+    @Autowired
     CeMergingConfiguration ceMergingConfiguration;
 
     private final MergingService mergingService = Mockito.mock(MergingService.class);
@@ -73,7 +73,7 @@ class MergingTaskManagementServiceTest {
     @Test
     void shouldCreateTask() {
         final MergingTask task = new MergingTask();
-        task.setTaskId(1);
+        task.setTaskId(ID);
         task.setArchiveFileOriginalName(ZIP_NAME);
         Mockito.when(taskRepository.save(any(MergingTask.class))).thenReturn(task);
 

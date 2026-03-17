@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -43,7 +42,6 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @RestController
 @CrossOrigin(origins = ORIGIN_ANY) // NOSONAR enabling CORS is safe here
 @RequestMapping(value = CE_MERGING_URL + API_VERSION)
-@AllArgsConstructor
 public class MergingController {
 
     private static final String ARTIFACTS = "Artifacts";
@@ -52,14 +50,13 @@ public class MergingController {
 
     private final MergingTaskManagementService taskManager;
 
-    /*
-     * WARNING: these methods are used by the merging supervisor.
-     * Please contact them if any modification is needed, to check compatibility.
-     */
+    public MergingController(final MergingTaskManagementService taskManager) {
+        this.taskManager = taskManager;
+    }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                    POST
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+                        POST
+         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
     @PostMapping(value = "/tasks",
         consumes = {MULTIPART_FORM_DATA_VALUE},
         produces = JSON_API_MIME_TYPE)

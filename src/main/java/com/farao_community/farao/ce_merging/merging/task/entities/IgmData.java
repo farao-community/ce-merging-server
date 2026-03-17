@@ -9,9 +9,6 @@ package com.farao_community.farao.ce_merging.merging.task.entities;
 import com.farao_community.farao.ce_merging.merging.task.entities.enums.IgmType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToOne;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.nio.file.Paths;
@@ -22,9 +19,6 @@ import java.util.regex.Pattern;
 import static jakarta.persistence.CascadeType.ALL;
 
 @Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
 public class IgmData implements Serializable {
 
     // UCTE filename convention <yyyymmdd>_<HHMM>_<TY><w>_<cc><v>.uct
@@ -71,5 +65,37 @@ public class IgmData implements Serializable {
 
     public void setIgmQualityReportFilePath(final String igmQualityReportFilePath) {
         igmQualityReportFile.feedPathAndName(igmQualityReportFilePath);
+    }
+
+    public SavedFile getIgmQualityReportFile() {
+        return igmQualityReportFile;
+    }
+
+    public void setIgmQualityReportFile(final SavedFile igmQualityReportFile) {
+        this.igmQualityReportFile = igmQualityReportFile;
+    }
+
+    public SavedFile getIgmFile() {
+        return igmFile;
+    }
+
+    public void setIgmFile(final SavedFile igmFile) {
+        this.igmFile = igmFile;
+    }
+
+    public IgmType getType() {
+        return type;
+    }
+
+    public void setType(final IgmType type) {
+        this.type = type;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(final String country) {
+        this.country = country;
     }
 }

@@ -6,11 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
 
@@ -25,27 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JsonUtilsTest {
-
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @EqualsAndHashCode
-    static class DummyJson {
-        String stringValue;
-        Boolean boolValue;
-        Integer numValue;
-        List<String> listValue;
-
-        public DummyJson(@JsonProperty("stringValue") final String stringValue,
-                         @JsonProperty("boolValue") final Boolean boolValue,
-                         @JsonProperty("numValue") final Integer numValue,
-                         @JsonProperty("listValue") final List<String> listValue) {
-            this.stringValue = stringValue;
-            this.boolValue = boolValue;
-            this.numValue = numValue;
-            this.listValue = listValue;
-        }
-    }
 
     private static final byte[] JSON_CONTENT = """
         {

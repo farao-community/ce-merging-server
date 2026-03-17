@@ -22,8 +22,8 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -43,16 +43,28 @@ import static java.util.function.Predicate.not;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
-@Slf4j
-@AllArgsConstructor
 @Service
 public class MergingTaskManagementService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MergingTaskManagementService.class);
 
     private final CeMergingConfiguration configuration;
     private final MergingService mergingService;
     private final MergingTaskRepository taskRepository;
     private final MergingTaskMapper taskMapper;
     private final Tracer tracer;
+
+    public MergingTaskManagementService(final CeMergingConfiguration configuration,
+                                        final MergingService mergingService,
+                                        final MergingTaskRepository taskRepository,
+                                        final MergingTaskMapper taskMapper,
+                                        final Tracer tracer) {
+        this.configuration = configuration;
+        this.mergingService = mergingService;
+        this.taskRepository = taskRepository;
+        this.taskMapper = taskMapper;
+        this.tracer = tracer;
+    }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
                         TASKS
@@ -94,10 +106,10 @@ public class MergingTaskManagementService {
             task.getInputs().setRealOffset(mgr.getRealRequestOffset());
 
             taskRepository.save(task);
-            log.info("Merging task created with id: {}", task.getTaskId());
+            LOGGER.info("Merging task created with id: {}", task.getTaskId());
             return taskMapper.mergingTaskToMergingTaskDto(task);
         } catch (final IOException e) {
-            log.error("Error during merging task creation.");
+            LOGGER.error("Error during merging task creation.");
             taskRepository.delete(task);
             throw new ServiceIOException("Error during merging task creation", e);
         }
@@ -146,14 +158,14 @@ public class MergingTaskManagementService {
             }
             task.setTaskStatus(RUNNING);
 
-            log.info("Merging task {} is running.", task.getTaskId());
+            LOGGER.info("Merging task {} is running.", task.getTaskId());
             taskRepository.save(task);
 
-            log.info("Running merging task: '{}' ", task.getTaskId());
+            LOGGER.info("Running merging task: '{}' ", task.getTaskId());
             mergingService.run(task);
             task.setTaskStatus(SUCCESS);
             taskRepository.save(task);
-            log.info("Merging task: '{}' is finished with success", task.getTaskId());
+            LOGGER.info("Merging task: '{}' is finished with success", task.getTaskId());
             return task;
 
         } catch (final TaskAlreadyRunningException e) {

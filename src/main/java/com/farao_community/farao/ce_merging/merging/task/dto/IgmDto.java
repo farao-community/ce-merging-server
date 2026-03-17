@@ -7,15 +7,9 @@
 package com.farao_community.farao.ce_merging.merging.task.dto;
 
 import com.farao_community.farao.ce_merging.merging.task.entities.enums.IgmType;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class IgmDto implements Serializable {
     /**
      * The country of the IGM
@@ -33,4 +27,36 @@ public class IgmDto implements Serializable {
      * The location  of the IGM quality check file
      */
     private String igmQualityReportLocation;
+
+    public String getIgmQualityReportLocation() {
+        return igmQualityReportLocation;
+    }
+
+    public void setIgmQualityReportLocation(final String igmQualityReportLocation) {
+        this.igmQualityReportLocation = igmQualityReportLocation;
+    }
+
+    public String getIgmFileLocation() {
+        return igmFileLocation;
+    }
+
+    public void setIgmFileLocation(final String igmFileLocation) {
+        this.igmFileLocation = igmFileLocation;
+    }
+
+    public IgmType getType() {
+        return type;
+    }
+
+    public void setType(final IgmType type) {
+        this.type = type;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(final String country) {
+        this.country = country;
+    }
 }

@@ -8,15 +8,7 @@ package com.farao_community.farao.ce_merging.common.json_api;
 
 import com.farao_community.farao.ce_merging.common.exception.AbstractServiceException;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public final class JsonApiError {
     @JsonProperty
     private String status;
@@ -32,6 +24,16 @@ public final class JsonApiError {
         this.code = exception.getCode();
         this.title = exception.getTitle();
         this.detail = exception.getMessage();
+    }
+
+    public JsonApiError(final String status,
+                        final String code,
+                        final String title,
+                        final String detail) {
+        this.status = status;
+        this.code = code;
+        this.title = title;
+        this.detail = detail;
     }
 
     public static JsonApiError fromServiceException(final AbstractServiceException exception) {

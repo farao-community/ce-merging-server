@@ -7,21 +7,40 @@
 package com.farao_community.farao.ce_merging.merging.task.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
 @JsonInclude(NON_NULL)
-@Getter
-@Setter
-@NoArgsConstructor
+
 public class OutputsDto implements Serializable {
     private String refProgLocation;
     private String cgmLocation;
     private String bciReportLocation;
+
+    public String getBciReportLocation() {
+        return bciReportLocation;
+    }
+
+    public void setBciReportLocation(final String bciReportLocation) {
+        this.bciReportLocation = bciReportLocation;
+    }
+
+    public String getCgmLocation() {
+        return cgmLocation;
+    }
+
+    public void setCgmLocation(final String cgmLocation) {
+        this.cgmLocation = cgmLocation;
+    }
+
+    public String getRefProgLocation() {
+        return refProgLocation;
+    }
+
+    public void setRefProgLocation(final String refProgLocation) {
+        this.refProgLocation = refProgLocation;
+    }
 }
 

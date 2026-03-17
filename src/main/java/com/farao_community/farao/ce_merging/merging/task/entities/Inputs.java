@@ -14,9 +14,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToOne;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -29,9 +26,6 @@ import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 
 @Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
 public class Inputs implements Serializable {
 
     @JsonIgnore
@@ -78,11 +72,7 @@ public class Inputs implements Serializable {
      */
     @OneToOne(cascade = ALL)
     private SavedFile feasibilityRanges = new SavedFile();
-    /**
-     * The SavedFile of the dc links file
-     */
-    @OneToOne(cascade = ALL)
-    private SavedFile dcLinks = new SavedFile();
+
     /**
      * The SavedFile of the net position forecast file
      */
@@ -126,12 +116,71 @@ public class Inputs implements Serializable {
         externalConstraints.feedPathAndName(filePath);
     }
 
-    public void setDcLinksFilePath(final String filePath) {
-        dcLinks.feedPathAndName(filePath);
-    }
-
     public void setNetPositionForecastFilePath(final String filePath) {
         netPositionForecast.feedPathAndName(filePath);
     }
 
+    public List<IgmData> getIgms() {
+        return igms;
+    }
+
+    public void setIgms(final List<IgmData> igms) {
+        this.igms = igms;
+    }
+
+    public OffsetDateTime getTargetDate() {
+        return targetDate;
+    }
+
+    public void setTargetDate(final OffsetDateTime targetDate) {
+        this.targetDate = targetDate;
+    }
+
+    public void setRealOffset(final ZoneOffset realOffset) {
+        this.realOffset = realOffset;
+    }
+
+    public Boolean getMergingWithInternalHvdc() {
+        return mergingWithInternalHvdc;
+    }
+
+    public void setMergingWithInternalHvdc(final Boolean mergingWithInternalHvdc) {
+        this.mergingWithInternalHvdc = mergingWithInternalHvdc;
+    }
+
+    public void setAlegroThreshold(final Integer alegroThreshold) {
+        this.alegroThreshold = alegroThreshold;
+    }
+
+    public SavedFile getGenerationLoadShiftKeys() {
+        return generationLoadShiftKeys;
+    }
+
+    public void setGenerationLoadShiftKeys(final SavedFile generationLoadShiftKeys) {
+        this.generationLoadShiftKeys = generationLoadShiftKeys;
+    }
+
+    public SavedFile getExternalConstraints() {
+        return externalConstraints;
+    }
+
+    public void setExternalConstraints(final SavedFile externalConstraints) {
+        this.externalConstraints = externalConstraints;
+    }
+
+    public SavedFile getFeasibilityRanges() {
+        return feasibilityRanges;
+    }
+
+    public void setFeasibilityRanges(final SavedFile feasibilityRanges) {
+        this.feasibilityRanges = feasibilityRanges;
+    }
+
+    public SavedFile getNetPositionForecast() {
+        return netPositionForecast;
+    }
+
+    public void setNetPositionForecast(final SavedFile netPositionForecast) {
+        this.netPositionForecast = netPositionForecast;
+    }
 }

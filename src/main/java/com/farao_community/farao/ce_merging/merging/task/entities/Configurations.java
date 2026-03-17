@@ -10,9 +10,6 @@ import com.powsybl.loadflow.LoadFlowParameters;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToOne;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -21,9 +18,6 @@ import java.util.List;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Embeddable
 public class Configurations implements Serializable {
 
@@ -99,4 +93,91 @@ public class Configurations implements Serializable {
         dcLoadFlowParameters.feedPathAndName(filePath);
     }
 
+    public List<VirtualHubRecord> getVirtualHubList() {
+        return virtualHubList;
+    }
+
+    public void setVirtualHubList(final List<VirtualHubRecord> virtualHubList) {
+        this.virtualHubList = virtualHubList;
+    }
+
+    public List<BorderDirectionRecord> getBorderDirectionRecords() {
+        return borderDirectionRecords;
+    }
+
+    public void setBorderDirectionRecords(final List<BorderDirectionRecord> borderDirectionRecords) {
+        this.borderDirectionRecords = borderDirectionRecords;
+    }
+
+    public SavedFile getDcLoadFlowParameters() {
+        return dcLoadFlowParameters;
+    }
+
+    public void setDcLoadFlowParameters(final SavedFile dcLoadFlowParameters) {
+        this.dcLoadFlowParameters = dcLoadFlowParameters;
+    }
+
+    public SavedFile getAcLoadFlowParameters() {
+        return acLoadFlowParameters;
+    }
+
+    public void setAcLoadFlowParameters(final SavedFile acLoadFlowParameters) {
+        this.acLoadFlowParameters = acLoadFlowParameters;
+    }
+
+    public SavedFile getBasecaseImprovementParameters() {
+        return basecaseImprovementParameters;
+    }
+
+    public void setBasecaseImprovementParameters(final SavedFile basecaseImprovementParameters) {
+        this.basecaseImprovementParameters = basecaseImprovementParameters;
+    }
+
+    public SavedFile getBalancesAdjustmentParameters() {
+        return balancesAdjustmentParameters;
+    }
+
+    public void setBalancesAdjustmentParameters(final SavedFile balancesAdjustmentParameters) {
+        this.balancesAdjustmentParameters = balancesAdjustmentParameters;
+    }
+
+    public List<Xnode> getXnodeList() {
+        return xnodeList;
+    }
+
+    public void setXnodeList(final List<Xnode> xnodeList) {
+        this.xnodeList = xnodeList;
+    }
+
+    public SavedFile getRecessivityParameters() {
+        return recessivityParameters;
+    }
+
+    public void setRecessivityParameters(final SavedFile recessivityParameters) {
+        this.recessivityParameters = recessivityParameters;
+    }
+
+    public List<String> getDkHvdcXnodes() {
+        return dkHvdcXnodes;
+    }
+
+    public void setDkHvdcXnodes(final List<String> dkHvdcXnodes) {
+        this.dkHvdcXnodes = dkHvdcXnodes;
+    }
+
+    public String getDefaultSlackNode() {
+        return defaultSlackNode;
+    }
+
+    public void setDefaultSlackNode(final String defaultSlackNode) {
+        this.defaultSlackNode = defaultSlackNode;
+    }
+
+    public LoadFlowParameters getLoadFlowParameters() {
+        return loadFlowParameters;
+    }
+
+    public void setLoadFlowParameters(final LoadFlowParameters loadFlowParameters) {
+        this.loadFlowParameters = loadFlowParameters;
+    }
 }

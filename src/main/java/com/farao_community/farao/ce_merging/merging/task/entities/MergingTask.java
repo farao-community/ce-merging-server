@@ -12,18 +12,12 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 
 import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
-@Getter
-@Setter
-@NoArgsConstructor
 public class MergingTask implements Serializable {
     @Id
     @GeneratedValue(strategy = AUTO)
@@ -78,4 +72,85 @@ public class MergingTask implements Serializable {
      */
     @Embedded
     private Outputs outputs = new Outputs();
+
+    public TaskStatus getTaskStatus() {
+        return taskStatus;
+    }
+
+    public void setTaskStatus(final TaskStatus taskStatus) {
+        this.taskStatus = taskStatus;
+    }
+
+    public long getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(final long taskId) {
+        this.taskId = taskId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getStatusDetail() {
+        return statusDetail;
+    }
+
+    public void setStatusDetail(final String statusDetail) {
+        this.statusDetail = statusDetail;
+    }
+
+    public String getRunTraceId() {
+        return runTraceId;
+    }
+
+    public void setRunTraceId(final String runTraceId) {
+        this.runTraceId = runTraceId;
+    }
+
+    public String getArchiveFileOriginalName() {
+        return archiveFileOriginalName;
+    }
+
+    public void setArchiveFileOriginalName(final String archiveFileOriginalName) {
+        this.archiveFileOriginalName = archiveFileOriginalName;
+    }
+
+    public Inputs getInputs() {
+        return inputs;
+    }
+
+    public void setInputs(final Inputs inputs) {
+        this.inputs = inputs;
+    }
+
+    public Artifacts getArtifacts() {
+        return artifacts;
+    }
+
+    public void setArtifacts(final Artifacts artifacts) {
+        this.artifacts = artifacts;
+    }
+
+    public Configurations getConfigurations() {
+        return configurations;
+    }
+
+    public void setConfigurations(final Configurations configurations) {
+        this.configurations = configurations;
+    }
+
+    public Outputs getOutputs() {
+        return outputs;
+    }
+
+    public void setOutputs(final Outputs outputs) {
+        this.outputs = outputs;
+    }
+
 }

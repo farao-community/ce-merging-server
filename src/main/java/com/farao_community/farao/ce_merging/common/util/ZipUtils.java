@@ -8,9 +8,8 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
@@ -33,12 +32,15 @@ import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createTempDirectory;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
-@Slf4j
-@NoArgsConstructor(access = AccessLevel.NONE)
 public final class ZipUtils {
 
     private static final int BUFFER_SIZE = 4096;
     private static final String TMP_DIR = "CeMerging";
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipUtils.class);
+
+    private ZipUtils() {
+        // utility class
+    }
 
     /**
      * Extracts a zip file specified by the zipFilePath to a directory specified by
@@ -50,7 +52,7 @@ public final class ZipUtils {
     public static void unzipFile(final Path zipFilePath,
                                  final Path destDirectory) {
         if (!destDirectory.toFile().exists() && !destDirectory.toFile().mkdir()) {
-            log.error("Cannot create destination directory '{}'", destDirectory);
+            LOGGER.error("Cannot create destination directory '{}'", destDirectory);
             throw new ServiceIOException(String.format("Cannot create destination directory '%s'", destDirectory));
         }
 
@@ -75,7 +77,7 @@ public final class ZipUtils {
                 entry = zipIn.getNextEntry();
             }
         } catch (final IOException e) {
-            log.error("Error while extracting file '{}'", zipFilePath.getFileName(), e);
+            LOGGER.error("Error while extracting file '{}'", zipFilePath.getFileName(), e);
             throw new ServiceIOException(String.format("Error while extracting file '%s'", zipFilePath.getFileName()), e);
         }
     }
@@ -136,7 +138,7 @@ public final class ZipUtils {
                 .forEach(filePath -> addFileToZip(filePath, directory, zipOutputStream));
 
         } catch (final IOException e) {
-            log.error("Error while compressing directory '{}'", directory, e);
+            LOGGER.error("Error while compressing directory '{}'", directory, e);
             throw new ServiceIOException(String.format("Error while compressing directory '%s'", directory), e);
         }
         return zipBytesStream.toByteArray();

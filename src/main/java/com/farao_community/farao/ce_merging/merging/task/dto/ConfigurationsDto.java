@@ -6,15 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.dto;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.io.Serializable;
 
-@Getter
-@Setter
-@NoArgsConstructor
 public class ConfigurationsDto implements Serializable {
     /**
      * The location of the dc load flow parameters
@@ -43,4 +36,51 @@ public class ConfigurationsDto implements Serializable {
      */
     private String becConfig;
 
+    public String getBalancesAdjustmentParametersLocation() {
+        return balancesAdjustmentParametersLocation;
+    }
+
+    public void setBalancesAdjustmentParametersLocation(final String balancesAdjustmentParametersLocation) {
+        this.balancesAdjustmentParametersLocation = balancesAdjustmentParametersLocation;
+    }
+
+    public String getDcLoadFlowParametersLocation() {
+        return dcLoadFlowParametersLocation;
+    }
+
+    public void setDcLoadFlowParametersLocation(final String dcLoadFlowParametersLocation) {
+        this.dcLoadFlowParametersLocation = dcLoadFlowParametersLocation;
+    }
+
+    public String getAcLoadFlowParametersLocation() {
+        return acLoadFlowParametersLocation;
+    }
+
+    public void setAcLoadFlowParametersLocation(final String acLoadFlowParametersLocation) {
+        this.acLoadFlowParametersLocation = acLoadFlowParametersLocation;
+    }
+
+    public String getBasecaseImprovementParametersLocation() {
+        return basecaseImprovementParametersLocation;
+    }
+
+    public void setBasecaseImprovementParametersLocation(final String basecaseImprovementParametersLocation) {
+        this.basecaseImprovementParametersLocation = basecaseImprovementParametersLocation;
+    }
+
+    public String getRecessivityParametersLocation() {
+        return recessivityParametersLocation;
+    }
+
+    public void setRecessivityParametersLocation(final String recessivityParametersLocation) {
+        this.recessivityParametersLocation = recessivityParametersLocation;
+    }
+
+    public String getBecConfig() {
+        return becConfig;
+    }
+
+    public void setBecConfig(final String becConfig) {
+        this.becConfig = becConfig;
+    }
 }

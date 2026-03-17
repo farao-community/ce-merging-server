@@ -7,17 +7,27 @@
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 
-@Getter
-@Setter
-@NoArgsConstructor
 @Embeddable
 public class BorderDirectionRecord implements Serializable {
     private String borderFrom;
     private String borderTo;
+
+    public String getBorderFrom() {
+        return borderFrom;
+    }
+
+    public void setBorderFrom(final String borderFrom) {
+        this.borderFrom = borderFrom;
+    }
+
+    public String getBorderTo() {
+        return borderTo;
+    }
+
+    public void setBorderTo(final String borderTo) {
+        this.borderTo = borderTo;
+    }
 }

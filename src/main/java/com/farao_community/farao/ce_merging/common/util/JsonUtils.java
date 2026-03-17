@@ -8,9 +8,8 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
@@ -25,9 +24,13 @@ import java.nio.file.Path;
 
 import static com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT;
 
-@Slf4j
-@NoArgsConstructor(access = AccessLevel.NONE)
 public final class JsonUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtils.class);
+
+    private JsonUtils() {
+        // utility class
+    }
 
     public static <T> T read(final Class<T> clazz,
                              final String path) throws FileNotFoundException {
@@ -41,7 +44,7 @@ public final class JsonUtils {
         } catch (final IOException e) {
             final String errorMessage = String.format("Error occurred when converting Json file to object of type %s",
                                                       clazz.getName());
-            log.error(errorMessage);
+            LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }
@@ -72,7 +75,7 @@ public final class JsonUtils {
         } catch (final IOException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s",
                                                       clazz.getName());
-            log.error(errorMessage);
+            LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }

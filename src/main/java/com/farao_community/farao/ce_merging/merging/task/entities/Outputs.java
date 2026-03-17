@@ -9,9 +9,6 @@ package com.farao_community.farao.ce_merging.merging.task.entities;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -20,9 +17,6 @@ import java.util.Map;
 import static jakarta.persistence.CascadeType.ALL;
 
 @Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
 public class Outputs implements Serializable {
     @OneToOne(cascade = ALL)
     private SavedFile refProg = new SavedFile();
@@ -36,5 +30,53 @@ public class Outputs implements Serializable {
     private Map<String, SavedFile> igmQualityChecks = new HashMap<>();
     @OneToOne(cascade = ALL)
     private SavedFile mergingLogs = new SavedFile();
+
+    public SavedFile getRealGlsk() {
+        return realGlsk;
+    }
+
+    public void setRealGlsk(final SavedFile realGlsk) {
+        this.realGlsk = realGlsk;
+    }
+
+    public SavedFile getRefProg() {
+        return refProg;
+    }
+
+    public void setRefProg(final SavedFile refProg) {
+        this.refProg = refProg;
+    }
+
+    public SavedFile getCgm() {
+        return cgm;
+    }
+
+    public void setCgm(final SavedFile cgm) {
+        this.cgm = cgm;
+    }
+
+    public SavedFile getBciReport() {
+        return bciReport;
+    }
+
+    public void setBciReport(final SavedFile bciReport) {
+        this.bciReport = bciReport;
+    }
+
+    public Map<String, SavedFile> getIgmQualityChecks() {
+        return igmQualityChecks;
+    }
+
+    public void setIgmQualityChecks(final Map<String, SavedFile> igmQualityChecks) {
+        this.igmQualityChecks = igmQualityChecks;
+    }
+
+    public SavedFile getMergingLogs() {
+        return mergingLogs;
+    }
+
+    public void setMergingLogs(final SavedFile mergingLogs) {
+        this.mergingLogs = mergingLogs;
+    }
 }
 

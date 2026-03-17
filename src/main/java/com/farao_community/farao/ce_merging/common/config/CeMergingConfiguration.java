@@ -43,4 +43,20 @@ public class CeMergingConfiguration {
     public String getArtifactsDirectoryPath(final MergingTask task) {
         return getDirectoryPath(task).resolve(ARTIFACTS_DIRECTORY).toString();
     }
+
+    public String getCeMergingRoot() {
+        return ceMergingRoot;
+    }
+
+    public void setCeMergingRoot(final String ceMergingRoot) {
+        this.ceMergingRoot = ceMergingRoot;
+    }
+
+    public String getDailyMergingRoot() {
+        return dailyMergingRoot;
+    }
+
+    public void setDailyMergingRoot(final String dailyMergingRoot) {
+        this.dailyMergingRoot = dailyMergingRoot;
+    }
 }

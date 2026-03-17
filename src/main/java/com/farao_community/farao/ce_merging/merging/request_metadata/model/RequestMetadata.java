@@ -6,7 +6,14 @@
  */
 package com.farao_community.farao.ce_merging.merging.request_metadata.model;
 
-@lombok.Data
 public class RequestMetadata {
     private Data data;
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(final Data data) {
+        this.data = data;
+    }
 }

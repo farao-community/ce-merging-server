@@ -13,9 +13,8 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
@@ -29,9 +28,14 @@ import java.nio.file.Paths;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static java.lang.Boolean.TRUE;
 
-@NoArgsConstructor(access = AccessLevel.NONE)
-@Slf4j
 public final class JaxbUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JaxbUtils.class);
+
+    private JaxbUtils() {
+        // utility class
+    }
+
     public static <T> T readFromPath(final Class<T> clazz,
                                      final String path) {
         try (final InputStream fileContent = Files.newInputStream(Paths.get(path))) {
@@ -42,7 +46,7 @@ public final class JaxbUtils {
         } catch (final JAXBException | IOException e) {
             final String errorMessage = String.format("Error occurred when converting xml file %s to object of type %s",
                                                       path, clazz.getName());
-            log.error(errorMessage);
+            LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }
@@ -54,7 +58,7 @@ public final class JaxbUtils {
                 .unmarshal(ByteSource.wrap(fileContent).openStream());
         } catch (final JAXBException | IOException e) {
             final String errorMessage = String.format("Error occurred when converting bytes to object of type %s", clazz.getName());
-            log.error(errorMessage);
+            LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }
@@ -67,7 +71,7 @@ public final class JaxbUtils {
             return bos.toByteArray();
         } catch (final JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes", objectsClass.getName());
-            log.error(errorMessage);
+            LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }
@@ -79,7 +83,7 @@ public final class JaxbUtils {
             marshallerFormatOutput(objectsClass).marshal(object, filePath.toFile());
         } catch (JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to path %s", objectsClass.getName(), filePath.toString());
-            log.error(errorMessage);
+            LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }
@@ -100,7 +104,7 @@ public final class JaxbUtils {
         } catch (final JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes",
                                                       objectsClass.getName());
-            log.error(errorMessage);
+            LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }
@@ -120,7 +124,7 @@ public final class JaxbUtils {
         } catch (final JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to path %s",
                                                       objectsClass.getName(), filePath.toString());
-            log.error(errorMessage);
+            LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
     }

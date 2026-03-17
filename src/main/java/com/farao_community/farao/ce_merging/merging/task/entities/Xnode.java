@@ -7,16 +7,10 @@
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import jakarta.persistence.Embeddable;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.io.Serializable;
 
 @Embeddable
-@Getter
-@Setter
-@NoArgsConstructor
 public class Xnode implements Serializable {
 
     private String name;
@@ -24,4 +18,44 @@ public class Xnode implements Serializable {
     private String area2;
     private String subarea1;
     private String subarea2;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getArea1() {
+        return area1;
+    }
+
+    public void setArea1(final String area1) {
+        this.area1 = area1;
+    }
+
+    public String getArea2() {
+        return area2;
+    }
+
+    public void setArea2(final String area2) {
+        this.area2 = area2;
+    }
+
+    public String getSubarea1() {
+        return subarea1;
+    }
+
+    public void setSubarea1(final String subarea1) {
+        this.subarea1 = subarea1;
+    }
+
+    public String getSubarea2() {
+        return subarea2;
+    }
+
+    public void setSubarea2(final String subarea2) {
+        this.subarea2 = subarea2;
+    }
 }

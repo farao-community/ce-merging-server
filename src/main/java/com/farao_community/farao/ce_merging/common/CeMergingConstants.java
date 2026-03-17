@@ -6,11 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.common;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor(access = AccessLevel.NONE)
 public final class CeMergingConstants {
+
+    private CeMergingConstants() {
+        // constants class
+    }
+
     public static final String CE_MERGING_URL = "/ce-merging/";
     public static final String API_VERSION = "v1";
     public static final String JSON_API_MIME_TYPE = "application/vnd.api+json";
