@@ -26,13 +26,13 @@ class CeMergingConfigurationTest {
         final MergingTask task = new MergingTask();
         task.setTaskId(1);
 
-        assertEquals("/testFiles/1/artifacts",
+        assertEquals("/tmp/testFiles/1/artifacts",
                                 ceMergingConfiguration.getArtifactsDirectoryPath(task));
 
-        assertEquals("/testFiles/1/outputs",
+        assertEquals("/tmp/testFiles/1/outputs",
                      ceMergingConfiguration.getOutputsDirectoryPath(task));
 
-        assertEquals("/testFiles/1/inputs",
+        assertEquals("/tmp/testFiles/1/inputs",
                      ceMergingConfiguration.getInputsDirectoryPath(task));
     }
 }

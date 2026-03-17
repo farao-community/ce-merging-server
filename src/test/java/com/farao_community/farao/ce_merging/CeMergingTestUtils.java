@@ -27,18 +27,19 @@ public final class CeMergingTestUtils {
         // utility class
     }
 
+    private static final Class<CeMergingTestUtils> THIS = CeMergingTestUtils.class;
+    private static final String DEFAULT_FILE = "blank.file";
+
     public static ServiceIOException testServiceEx = new ServiceIOException("Test");
 
     /**
      *
-     * @param fileName must be in testFiles (or children if specified in fileName) in order for this to work
-     * @return ...../testFiles/fileName
+     * @param fileName under resources
+     * @return its path
      */
     public static Path pathOfTestFile(final String fileName) {
-        return Paths.get(Optional.ofNullable(CeMergingTestUtils.class
-                                                 .getResource("/testFiles/%s".formatted(fileName)))
-                             .orElse(CeMergingTestUtils.class
-                                         .getResource("/testFiles/blank.file"))
+        return Paths.get(Optional.ofNullable(THIS.getResource("/" + fileName))
+                             .orElse(THIS.getResource("/" + DEFAULT_FILE))
                              .getPath());
     }
 

@@ -19,5 +19,5 @@ logging:
 
 ce-merging-server:
   filesystem:
-    root: /testFiles
-    root-daily: /testFiles/daily
+    root: ${java.io.tmpdir}/testFiles
+    root-daily: ${java.io.tmpdir}/testFiles/daily
