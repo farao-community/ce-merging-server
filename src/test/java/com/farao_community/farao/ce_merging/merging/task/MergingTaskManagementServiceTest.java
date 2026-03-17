@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 @TestConfiguration
 class MergingTaskManagementServiceTest {
 
-    private static final String INPUTS = "request-metadata/inputs/";
+    private static final String INPUTS = "request-metadata/inputs.zip";
     private static final String METADATA = "request-metadata/metadata.json";
     private static final String INPUTS_ZIP_NAME = "inputs.zip";
     private static final long ID = 1L;
@@ -86,9 +86,9 @@ class MergingTaskManagementServiceTest {
             .thenReturn(withIdAndStatus(1L, CREATED));
 
         final MockMultipartFile zipFile = new MockMultipartFile(INPUTS_ZIP_NAME,
-                                                                INPUTS + INPUTS_ZIP_NAME,
+                                                                INPUTS_ZIP_NAME,
                                                                 "application/zip",
-                                                                byteContentOf(INPUTS + INPUTS_ZIP_NAME));
+                                                                byteContentOf(INPUTS));
 
         service.createNewTask(zipFile, stringContentOf(METADATA));
 
