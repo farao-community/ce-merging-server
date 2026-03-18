@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities.enums;
 
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+
 import static java.util.Arrays.stream;
 
 public enum IgmType {
@@ -24,8 +26,8 @@ public enum IgmType {
         return stream(values())
             .filter(type -> type.typeCode.equals(typeCode))
             .findAny()
-            .orElseThrow(() -> new IllegalArgumentException(String.format("Type code '%s' not recognized",
-                                                                          typeCode)));
+            .orElseThrow(() -> new CeMergingException(String.format("Type code '%s' not recognized",
+                                                                    typeCode)));
     }
 
 }
