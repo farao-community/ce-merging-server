@@ -23,9 +23,9 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
  * Automates JUnit testing of simple getter / setter methods.
  * see <a href="https://gist.github.com/amiyasahu/c76aa2c9ace7ef1bc01496ae2487488d">...</a>
  */
-public class GetterSetterVerifier<T> {
+public final class GetterSetterVerifier<T> {
 
-    private Class<T> type;
+    private final Class<T> type;
     private Set<String> excludes;
     private Set<String> includes;
 
@@ -100,13 +100,11 @@ public class GetterSetterVerifier<T> {
      * @return True if we should test the property.  False if we shouldn't.
      */
     private boolean shouldTestProperty(@Nonnull final PropertyDescriptor property) {
-        if (property.getWriteMethod() == null || property.getReadMethod() == null) {
-            return false;
-        } else if (excludes != null && excludes.contains(property.getDisplayName())) {
-            return false;
-        }
+        final boolean hasReadAndWriteMethod = property.getWriteMethod() != null && property.getReadMethod() != null;
+        final boolean isNotExcluded = excludes == null || !excludes.contains(property.getDisplayName());
+        final boolean isIncluded = includes == null || includes.contains(property.getDisplayName());
 
-        return includes == null || includes.contains(property.getDisplayName());
+        return hasReadAndWriteMethod && isNotExcluded && isIncluded;
     }
 
     /**
@@ -122,8 +120,9 @@ public class GetterSetterVerifier<T> {
      */
     private void testProperty(@Nonnull final PropertyDescriptor property) throws IllegalAccessException,
         InstantiationException,
-        InvocationTargetException {
-        final Object target = type.newInstance();
+        InvocationTargetException,
+        NoSuchMethodException {
+        final Object target = type.getConstructor().newInstance();
         final Object setValue = Defaults.defaultValue(property.getPropertyType());
 
         final Method getter = property.getReadMethod();
@@ -146,6 +145,6 @@ public class GetterSetterVerifier<T> {
      * of a class.
      */
     public static <T> GetterSetterVerifier<T> forClass(@Nonnull final Class<T> type) {
-        return new GetterSetterVerifier<T>(type);
+        return new GetterSetterVerifier<>(type);
     }
 }

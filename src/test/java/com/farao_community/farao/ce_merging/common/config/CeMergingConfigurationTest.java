@@ -7,12 +7,14 @@
 package com.farao_community.farao.ce_merging.common.config;
 
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.withIdAndStatus;
 
 @SpringBootTest
 @TestConfiguration
@@ -23,32 +25,34 @@ class CeMergingConfigurationTest {
 
     @Test
     void shouldObtainCorrectPaths() {
-        final MergingTask task = new MergingTask();
-        task.setTaskId(1);
+        final CeMergingConfiguration copy = new CeMergingConfiguration();
+        copy.setCeMergingRoot(cfg.getCeMergingRoot());
+        copy.setDailyMergingRoot(cfg.getDailyMergingRoot());
+        final MergingTask task = withIdAndStatus(1, TaskStatus.CREATED);
 
         assertEquals("/tmp/testFiles",
-                     cfg.getCeMergingRoot());
+                     copy.getCeMergingRoot());
 
         assertEquals("/tmp/testFiles/daily",
-                     cfg.getDailyMergingRoot());
+                     copy.getDailyMergingRoot());
 
         assertEquals("/tmp/testFiles/1/artifacts",
-                     cfg.getArtifactsDirectoryPath(task));
+                     copy.getArtifactsDirectoryPath(task));
 
-        cfg.setCeMergingRoot("/another/root");
+        copy.setCeMergingRoot("/another/root");
 
         assertEquals("/another/root/1/outputs",
-                     cfg.getOutputsDirectoryPath(task));
+                     copy.getOutputsDirectoryPath(task));
 
         assertEquals("/another/root/1/inputs",
-                     cfg.getInputsDirectoryPath(task));
+                     copy.getInputsDirectoryPath(task));
 
         assertEquals("/tmp/testFiles/daily/1/daily-outputs",
-                     cfg.getDailyOutputsDirectoryPath(task));
+                     copy.getDailyOutputsDirectoryPath(task));
 
-        cfg.setDailyMergingRoot("/a/new/path");
+        copy.setDailyMergingRoot("/a/new/path");
 
         assertEquals("/a/new/path/1/daily-inputs",
-                     cfg.getDailyInputsDirectoryPath(task));
+                     copy.getDailyInputsDirectoryPath(task));
     }
 }
