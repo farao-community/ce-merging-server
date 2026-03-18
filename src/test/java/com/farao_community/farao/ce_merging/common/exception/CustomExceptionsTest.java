@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.common.exception;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
@@ -27,7 +28,7 @@ class CustomExceptionsTest {
 
     @ParameterizedTest
     @FieldSource("exceptionClasses")
-    void shouldInstantiateExceptionsFromMessage(Class<? extends AbstractServiceException> exceptionClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    void shouldInstantiateExceptionsFromMessage(final Class<? extends AbstractServiceException> exceptionClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
         final AbstractServiceException e = exceptionClass
             .getConstructor(String.class)
                 .newInstance("testing exceptions");
@@ -37,6 +38,23 @@ class CustomExceptionsTest {
         assertNotNull(e.getStatus());
         assertEquals("testing exceptions", e.getMessage());
         assertThat(e).isServiceException();
+    }
+
+    @ParameterizedTest
+    @FieldSource("exceptionClasses")
+    void shouldInstantiateExceptionsFromMessageAndCause(final Class<? extends AbstractServiceException> exceptionClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        final IOException cause = new IOException("testing cause");
+
+        final AbstractServiceException e = exceptionClass
+            .getConstructor(String.class, Throwable.class)
+            .newInstance("testing exceptions", cause);
+
+        assertNotNull(e.getTitle());
+        assertNotNull(e.getCode());
+        assertNotNull(e.getStatus());
+        assertEquals("testing exceptions", e.getMessage());
+        assertThat(e).isServiceException();
+        assertEquals("testing cause", e.getCause().getMessage());
     }
 
 }

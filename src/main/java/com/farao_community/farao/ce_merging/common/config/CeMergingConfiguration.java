@@ -40,16 +40,28 @@ public class CeMergingConfiguration {
             .toString();
     }
 
+    /**
+     *
+     * @param task : each task has it own directory
+     * @param directory : each type of file (in, out, ...) has its subdirectory inside
+     * @return /path/to/root/task_id/directory
+     */
+    private String getDailyDirectoryPath(final MergingTask task, final String directory) {
+        return Path.of(dailyMergingRoot + separator + task.getTaskId())
+            .resolve(directory)
+            .toString();
+    }
+
     public String getInputsDirectoryPath(final MergingTask task) {
         return getDirectoryPath(task, INPUTS);
     }
 
     public String getDailyInputsDirectoryPath(final MergingTask task) {
-        return getDirectoryPath(task, DAILY_INPUTS);
+        return getDailyDirectoryPath(task, DAILY_INPUTS);
     }
 
     public String getDailyOutputsDirectoryPath(final MergingTask task) {
-        return getDirectoryPath(task, DAILY_OUTPUTS);
+        return getDailyDirectoryPath(task, DAILY_OUTPUTS);
     }
 
     public String getOutputsDirectoryPath(final MergingTask task) {

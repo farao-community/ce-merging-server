@@ -19,20 +19,36 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class CeMergingConfigurationTest {
 
     @Autowired
-    CeMergingConfiguration ceMergingConfiguration;
+    CeMergingConfiguration cfg;
 
     @Test
     void shouldObtainCorrectPaths() {
         final MergingTask task = new MergingTask();
         task.setTaskId(1);
 
+        assertEquals("/tmp/testFiles",
+                     cfg.getCeMergingRoot());
+
+        assertEquals("/tmp/testFiles/daily",
+                     cfg.getDailyMergingRoot());
+
         assertEquals("/tmp/testFiles/1/artifacts",
-                                ceMergingConfiguration.getArtifactsDirectoryPath(task));
+                     cfg.getArtifactsDirectoryPath(task));
 
-        assertEquals("/tmp/testFiles/1/outputs",
-                     ceMergingConfiguration.getOutputsDirectoryPath(task));
+        cfg.setCeMergingRoot("/another/root");
 
-        assertEquals("/tmp/testFiles/1/inputs",
-                     ceMergingConfiguration.getInputsDirectoryPath(task));
+        assertEquals("/another/root/1/outputs",
+                     cfg.getOutputsDirectoryPath(task));
+
+        assertEquals("/another/root/1/inputs",
+                     cfg.getInputsDirectoryPath(task));
+
+        assertEquals("/tmp/testFiles/daily/1/daily-outputs",
+                     cfg.getDailyOutputsDirectoryPath(task));
+
+        cfg.setDailyMergingRoot("/a/new/path");
+
+        assertEquals("/a/new/path/1/daily-inputs",
+                     cfg.getDailyInputsDirectoryPath(task));
     }
 }
