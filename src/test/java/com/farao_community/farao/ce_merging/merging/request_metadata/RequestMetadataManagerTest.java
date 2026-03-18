@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.merging.request_metadata;
 
-import com.farao_community.farao.ce_merging.common.exception.InvalidTaskException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.request_metadata.model.RequestMetadata;
 import org.junit.jupiter.api.Test;
@@ -15,12 +14,12 @@ import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.time.ZoneOffset;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.pathOf;
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringContentOf;
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOf;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static test_utils.CeTestUtils.pathOf;
+import static test_utils.CeTestUtils.stringContentOf;
+import static test_utils.CeTestUtils.stringPathOf;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class RequestMetadataManagerTest {
 
@@ -30,11 +29,9 @@ class RequestMetadataManagerTest {
 
     @Test
     void shouldCalculateRealOffset() throws FileNotFoundException {
-        final RequestMetadata reqMd = JsonUtils.read(RequestMetadata.class,
-                                                     stringPathOf(METADATA));
         final RequestMetadataManager mgr = new RequestMetadataManager(stringPathOf(INPUTS),
-                                                                      reqMd);
-        assertEquals(PARIS_WINTER_OFFSET, mgr.getRealRequestOffset());
+                                                                      getMetadata());
+        assertEquals(PARIS_WINTER_OFFSET, mgr.getParisRequestOffset());
     }
 
     @Test
@@ -47,13 +44,19 @@ class RequestMetadataManagerTest {
 
     @Test
     void shouldThrowIfAnyInputMissing() throws FileNotFoundException {
-        final RequestMetadata reqMd = JsonUtils.read(RequestMetadata.class,
-                                                     stringPathOf(METADATA));
+        final RequestMetadata reqMd = getMetadata();
         reqMd.getData().getAttributes().getInputs().setExternalConstraintsFilePath("not/existing");
         final RequestMetadataManager mgr = new RequestMetadataManager(stringPathOf(INPUTS),
                                                                       reqMd);
 
         final Path incomplete = pathOf(INPUTS);
-        assertThrows(InvalidTaskException.class, () -> mgr.checkIfAllInputsAvailable(incomplete));
+        assertThatThrownBy(() -> mgr.checkIfAllInputsAvailable(incomplete))
+            .isTaskException()
+            .hasMessageContaining("not/existing");
+    }
+
+    private RequestMetadata getMetadata() throws FileNotFoundException {
+        return JsonUtils.read(RequestMetadata.class,
+                              stringPathOf(METADATA));
     }
 }

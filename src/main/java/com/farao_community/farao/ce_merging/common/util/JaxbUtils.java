@@ -6,15 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.google.common.io.ByteSource;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
@@ -24,128 +21,186 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.farao_community.farao.ce_merging.common.util.ExceptionUtils.logAndThrow;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static java.lang.Boolean.TRUE;
 import static java.nio.file.Files.newInputStream;
 
 public final class JaxbUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JaxbUtils.class);
-
     private JaxbUtils() {
         // utility class
     }
 
+    /**
+     *
+     * @param clazz the Class object representing T
+     * @param <T>   the class of the object
+     * @param path  the path of the file to read from
+     * @return an object from an XML file path
+     */
     public static <T> T readFromPath(final Class<T> clazz,
                                      final String path) {
         try (final InputStream fileContent = newInputStream(Paths.get(path))) {
-            return genericUnmarshaller(clazz)
+            return unmarshaller(clazz)
                 .unmarshal(new StreamSource(fileContent), clazz)
                 .getValue();
         } catch (final JAXBException | IOException e) {
-            final String errorMessage = String.format("Error occurred when converting xml file %s to object of type %s",
-                                                      path, clazz.getName());
-            LOGGER.error(errorMessage);
-            throw new ServiceIOException(errorMessage, e);
+            return logAndThrow(e, "converting XML file %s to a %s object", path, clazz.getName());
         }
     }
 
-    @SuppressWarnings("unchecked") // because giving Class<T> to genericUnmarshaller necessarily produces a T
+    /**
+     *
+     * @param clazz       the Class object representing T
+     * @param <T>         the class of the object
+     * @param fileContent the byte array to read from
+     * @return an object from XML byte content
+     */
+    @SuppressWarnings("unchecked") // NOSONAR because giving Class<T> to genericUnmarshaller necessarily produces a T
     public static <T> T readFromBytes(final Class<T> clazz,
                                       final byte[] fileContent) {
         try {
-            return (T) genericUnmarshaller(clazz)
-                .unmarshal(ByteSource.wrap(fileContent).openStream());
+            return (T) unmarshaller(clazz).unmarshal(bytesToStream(fileContent));
         } catch (final JAXBException | IOException e) {
-            final String errorMessage = String.format("Error occurred when converting bytes to object of type %s", clazz.getName());
-            LOGGER.error(errorMessage);
-            throw new ServiceIOException(errorMessage, e);
+            return logAndThrow(e, "converting bytes to a %s object", clazz.getName());
         }
     }
 
-    public static <T> byte[] writeToBytes(final Class<T> objectsClass,
+    /**
+     *
+     * @param clazz  the Class object representing T
+     * @param <T>    the class of the object
+     * @param object object to read
+     * @return a byte array of the file content
+     */
+    public static <T> byte[] writeToBytes(final Class<T> clazz,
                                           final T object) {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            marshallerFormatOutput(objectsClass).marshal(object, bos);
+            marshaller(clazz).marshal(object, bos);
             return bos.toByteArray();
         } catch (final JAXBException e) {
-            final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes", objectsClass.getName());
-            LOGGER.error(errorMessage);
-            throw new ServiceIOException(errorMessage, e);
+            return logAndThrow(e, "writing a %s object to bytes", clazz.getName());
         }
     }
 
-    public static <T> void writeToPath(final Class<T> objectsClass,
+    /**
+     *
+     * @param clazz    the Class object representing T
+     * @param object   object to write
+     * @param filePath path to write to
+     * @param <T>      the class of the object
+     */
+    public static <T> void writeToPath(final Class<T> clazz,
                                        final T object,
                                        final Path filePath) {
         try {
-            marshallerFormatOutput(objectsClass).marshal(object, filePath.toFile());
+            marshaller(clazz).marshal(object, filePath.toFile());
         } catch (final JAXBException e) {
-            final String errorMessage = String.format("Error occurred when writing content of object of type %s to path %s", objectsClass.getName(), filePath.toString());
-            LOGGER.error(errorMessage);
-            throw new ServiceIOException(errorMessage, e);
+            logAndThrow(e, "writing a %s object to path %s", clazz.getName(), filePath);
         }
     }
 
-    // Solution to marshal an object without @XmlRootElement annotation
-    public static <T> byte[] writeToBytes(final Class<T> objectsClass,
+    /**
+     * Solution to marshal an object without @XmlRootElement annotation
+     *
+     * @param clazz        the Class object representing T
+     * @param <T>          the class of the object
+     * @param object       object to read
+     * @param nameSpaceURI given so that JAXB is able to marshal
+     * @param rootElement  given so that JAXB is able to marshal
+     * @return a byte array of the file content
+     */
+    public static <T> byte[] writeToBytes(final Class<T> clazz,
                                           final T object,
                                           final String nameSpaceURI,
                                           final String rootElement) {
         try {
             final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            marshallerFormatOutput(objectsClass).marshal(getElementFromRoot(objectsClass,
-                                                                            object,
-                                                                            nameSpaceURI,
-                                                                            rootElement),
-                                                         outputStream);
+            marshaller(clazz).marshal(withSpecifiedRoot(clazz,
+                                                        object,
+                                                        nameSpaceURI,
+                                                        rootElement),
+                                      outputStream);
             return outputStream.toByteArray();
         } catch (final JAXBException e) {
-            final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes",
-                                                      objectsClass.getName());
-            LOGGER.error(errorMessage);
-            throw new ServiceIOException(errorMessage, e);
+            return logAndThrow(e, "writing a %s object to bytes", clazz.getName());
         }
     }
 
-    // Solution to marshal an object without @XmlRootElement annotation
-    public static <T> void writeToPath(final Class<T> objectsClass,
+    /**
+     * Solution to marshal an object without @XmlRootElement annotation
+     *
+     * @param filePath     the path to write to
+     * @param clazz        the Class object representing T
+     * @param <T>          the class of the object
+     * @param object       object to write
+     * @param nameSpaceURI given so that JAXB is able to marshal
+     * @param rootElement  given so that JAXB is able to marshal
+     */
+    public static <T> void writeToPath(final Class<T> clazz,
                                        final T object,
                                        final String nameSpaceURI,
                                        final String rootElement,
                                        final Path filePath) {
         try {
-            marshallerFormatOutput(objectsClass).marshal(getElementFromRoot(objectsClass,
-                                                                            object,
-                                                                            nameSpaceURI,
-                                                                            rootElement),
-                                                         filePath.toFile());
+            marshaller(clazz).marshal(withSpecifiedRoot(clazz,
+                                                        object,
+                                                        nameSpaceURI,
+                                                        rootElement),
+                                      filePath.toFile());
         } catch (final JAXBException e) {
-            final String errorMessage = String.format("Error occurred when writing content of object of type %s to path %s",
-                                                      objectsClass.getName(), filePath.toString());
-            LOGGER.error(errorMessage);
-            throw new ServiceIOException(errorMessage, e);
+            logAndThrow(e, "writing a %s object to path %s", clazz.getName(), filePath.toString());
         }
     }
 
-    private static <T> JAXBElement<T> getElementFromRoot(final Class<T> objectsClass,
-                                                     final T object,
-                                                     final String nameSpaceURI,
-                                                     final String rootElement) {
+    /**
+     *
+     * @param clazz        the Class object representing T
+     * @param <T>          the class of the object to read
+     * @param nameSpaceURI given so that JAXB is able to marshal
+     * @param rootElement  given so that JAXB is able to marshal
+     * @return the root element as a JAXB element
+     */
+    private static <T> JAXBElement<T> withSpecifiedRoot(final Class<T> clazz,
+                                                        final T object,
+                                                        final String nameSpaceURI,
+                                                        final String rootElement) {
         return new JAXBElement<>(new QName(nameSpaceURI, rootElement),
-                                 objectsClass,
+                                 clazz,
                                  object);
     }
 
-    private static <T> Marshaller marshallerFormatOutput(final Class<T> clazz) throws JAXBException {
+    /**
+     * @param clazz the Class object representing T
+     * @param <T>   the class of the object to write
+     * @return a marshaller with JAXB_FORMATTED_OUTPUT enabled
+     * @throws JAXBException if there's a problem with the JAXB context
+     */
+    private static <T> Marshaller marshaller(final Class<T> clazz) throws JAXBException {
         final Marshaller jaxbMarshaller = JAXBContext.newInstance(clazz).createMarshaller();
         jaxbMarshaller.setProperty(JAXB_FORMATTED_OUTPUT, TRUE);
         return jaxbMarshaller;
     }
 
-    private static <T> Unmarshaller genericUnmarshaller(final Class<T> clazz) throws JAXBException {
+    /**
+     * @param clazz the Class object representing T
+     * @param <T>   the class of the object to read
+     * @return a standard unmarshaller
+     * @throws JAXBException if there's a problem with the JAXB context
+     */
+    private static <T> Unmarshaller unmarshaller(final Class<T> clazz) throws JAXBException {
         return JAXBContext.newInstance(clazz).createUnmarshaller();
+    }
+
+    /**
+     * @param bytes byte array to be converted
+     * @return bytes as a stream
+     * @throws IOException if stream won't open
+     */
+    private static InputStream bytesToStream(final byte[] bytes) throws IOException {
+        return ByteSource.wrap(bytes).openStream();
     }
 
 }

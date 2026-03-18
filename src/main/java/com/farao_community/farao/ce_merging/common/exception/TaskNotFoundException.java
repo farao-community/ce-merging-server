@@ -8,15 +8,15 @@ package com.farao_community.farao.ce_merging.common.exception;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NOT_FOUND;
 
-public class ResourceNotFoundException extends AbstractServiceException {
+public class TaskNotFoundException extends AbstractServiceException {
     private static final String EXCEPTION_ERROR_CODE = "404-RESOURCE-NOT-FOUND";
     private static final String EXCEPTION_TITLE = "Resource not found";
 
-    public ResourceNotFoundException(final String message) {
+    public TaskNotFoundException(final String message) {
         super(NOT_FOUND, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
     }
 
-    public ResourceNotFoundException(final String message, final Throwable cause) {
+    public TaskNotFoundException(final String message, final Throwable cause) {
         super(NOT_FOUND, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, cause);
     }
 }

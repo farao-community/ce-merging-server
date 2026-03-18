@@ -8,13 +8,14 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
+import test_utils.DummyJson;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOf;
+import static test_utils.CeTestUtils.stringPathOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;

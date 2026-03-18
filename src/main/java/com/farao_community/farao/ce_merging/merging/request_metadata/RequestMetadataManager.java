@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.request_metadata;
 
-import com.farao_community.farao.ce_merging.common.exception.InvalidTaskException;
+import com.farao_community.farao.ce_merging.common.exception.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.request_metadata.model.Data;
 import com.farao_community.farao.ce_merging.merging.request_metadata.model.RequestMetadata;
@@ -66,13 +66,17 @@ public class RequestMetadataManager {
         this.requestMetadata = requestMetadata;
     }
 
+    /**
+     * fetches the task inputs and configuration from files specified in the request metadata
+     * @param task the task to add the information to
+     */
     public void feedTaskData(final MergingTask task) {
         task.setName(getRequestData().getAttributes().getName());
-        setTaskInputs(task, getRequestInputs());
-        setTaskConfigurations(task, getRequestData().getConfigurations());
+        task.setInputs(getTaskInputs(task.getTaskId()));
+        task.setConfigurations(getTaskConfigurations(task.getTaskId()));
     }
 
-    public ZoneOffset getRealRequestOffset() {
+    public ZoneOffset getParisRequestOffset() {
         return getRequestInputs()
             .getTargetDate()
             .toInstant()
@@ -81,31 +85,35 @@ public class RequestMetadataManager {
             .getOffset();
     }
 
-    public void checkIfAllInputsAvailable(final Path tmpInputPath) throws IOException {
+    /**
+     *
+     * @param inputPath the path to search inputs in
+     * @throws IOException if any mandatory file is not provided
+     */
+    public void checkIfAllInputsAvailable(final Path inputPath) throws IOException {
         final List<String> missingFiles = new ArrayList<>();
 
         getRequestInputs()
             .getIgms()
-            .forEach(igm -> checkIfAvailable(igm, tmpInputPath, missingFiles));
+            .forEach(igm -> checkIfAvailable(igm, inputPath, missingFiles));
 
         INPUT_GETTERS_BY_LOCATION
             .values()
             .forEach(getter ->
                          checkIfAvailable(getter.apply(getRequestInputs()),
-                                          tmpInputPath,
+                                          inputPath,
                                           missingFiles));
 
         if (!missingFiles.isEmpty()) {
-            FileSystemUtils.deleteRecursively(tmpInputPath);
+            FileSystemUtils.deleteRecursively(inputPath);
             final String message = String.format(MISSING_FILES_ERROR, String.join(", ", missingFiles));
             LOGGER.error(message);
-            throw new InvalidTaskException(message);
+            throw new TaskNotValidException(message);
         }
     }
 
-    private void setTaskInputs(final MergingTask task,
-                               final Inputs inputs) {
-        final long taskId = task.getTaskId();
+    private Inputs getTaskInputs(final long taskId) {
+        final Inputs inputs = getRequestInputs();
         final String inputsLocation = TASKS + taskId + "/inputs/";
         // update paths to make them absolute & location for GET output
         inputs.getIgms().forEach(igm -> {
@@ -124,13 +132,12 @@ public class RequestMetadataManager {
                 makePathAbsolute(inputFile);
                 inputFile.setLocation(inputsLocation + fileLocation);
             });
-
-        task.setInputs(inputs);
+        return inputs;
     }
 
-    private void setTaskConfigurations(final MergingTask task,
-                                       final Configurations configs) {
-        final String configLocation = TASKS + task.getTaskId() + "/configurations/";
+    private Configurations getTaskConfigurations(final long taskId) {
+        final Configurations configs = getRequestData().getConfigurations();
+        final String configLocation = TASKS + taskId + "/configurations/";
 
         Map.of("dc-load-flow-parameters", configs.getDcLoadFlowParameters(),
                "ac-load-flow-parameters", configs.getAcLoadFlowParameters(),
@@ -142,7 +149,7 @@ public class RequestMetadataManager {
             });
 
         setRecessivityConfiguration(configs, configLocation);
-        task.setConfigurations(configs);
+        return configs;
     }
 
     private void setRecessivityConfiguration(final Configurations configurations,

@@ -8,15 +8,15 @@ package com.farao_community.farao.ce_merging.common.exception;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INTERNAL_ERROR;
 
-public class ResourceNotRunException extends AbstractServiceException {
+public class TaskNotRunException extends AbstractServiceException {
     private static final String EXCEPTION_ERROR_CODE = "500-RESOURCE-NOT-RUN";
     private static final String EXCEPTION_TITLE = "Resource not run";
 
-    public ResourceNotRunException(final String message) {
+    public TaskNotRunException(final String message) {
         super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
     }
 
-    public ResourceNotRunException(final String message, final Throwable cause) {
+    public TaskNotRunException(final String message, final Throwable cause) {
         super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, cause);
     }
 }

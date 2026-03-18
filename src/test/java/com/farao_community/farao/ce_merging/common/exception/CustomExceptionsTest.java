@@ -14,13 +14,14 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static test_utils.assertions.CeThrowableAssert.assertThat;
 
 class CustomExceptionsTest {
 
     static List<Class<? extends AbstractServiceException>> exceptionClasses = List.of(CeMergingException.class,
-                                                                                      InvalidTaskException.class,
-                                                                                      ResourceNotFoundException.class,
-                                                                                      ResourceNotRunException.class,
+                                                                                      TaskNotValidException.class,
+                                                                                      TaskNotFoundException.class,
+                                                                                      TaskNotRunException.class,
                                                                                       ServiceIOException.class,
                                                                                       TaskAlreadyRunningException.class);
 
@@ -35,6 +36,7 @@ class CustomExceptionsTest {
         assertNotNull(e.getCode());
         assertNotNull(e.getStatus());
         assertEquals("testing exceptions", e.getMessage());
+        assertThat(e).isServiceException();
     }
 
 }

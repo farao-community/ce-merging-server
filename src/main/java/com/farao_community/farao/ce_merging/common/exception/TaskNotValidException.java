@@ -8,15 +8,15 @@ package com.farao_community.farao.ce_merging.common.exception;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BAD_REQUEST;
 
-public class InvalidTaskException extends AbstractServiceException {
+public class TaskNotValidException extends AbstractServiceException {
     private static final String EXCEPTION_ERROR_CODE = "400-INVALID-TASK";
     private static final String EXCEPTION_TITLE = "Invalid task";
 
-    public InvalidTaskException(final String message) {
+    public TaskNotValidException(final String message) {
         super(BAD_REQUEST, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
     }
 
-    public InvalidTaskException(final String message, final Throwable cause) {
+    public TaskNotValidException(final String message, final Throwable cause) {
         super(BAD_REQUEST, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, cause);
     }
 }

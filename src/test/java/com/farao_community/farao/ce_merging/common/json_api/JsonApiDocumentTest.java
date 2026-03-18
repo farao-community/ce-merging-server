@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.testServiceEx;
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringify;
+import static test_utils.CeTestUtils.S_IO_EXCEPTION;
+import static test_utils.CeTestUtils.stringify;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JsonApiDocumentTest {
     @Test
     void shouldBuildJsonDocumentFromException() throws IOException {
-        final String jsonError = stringify(JsonApiDocument.fromServiceException(testServiceEx));
+        final String jsonError = stringify(JsonApiDocument.fromServiceException(S_IO_EXCEPTION));
         assertEquals("{\"errors\":[{\"status\":\"500\",\"code\":\"500-IO-EXCEPTION\"," +
                      "\"title\":\"IO exception\",\"detail\":\"Test\"}]}", jsonError);
     }

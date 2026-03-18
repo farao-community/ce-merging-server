@@ -32,11 +32,26 @@ public final class JsonUtils {
         // utility class
     }
 
+    /**
+     *
+     * @param clazz the Class object representing T
+     * @param <T>   the class of the object
+     * @param path  the path of the file to read from
+     * @return an object from a JSON file path
+     * @throws FileNotFoundException if the file does not exist
+     */
     public static <T> T read(final Class<T> clazz,
                              final String path) throws FileNotFoundException {
         return read(clazz, new FileInputStream(path));
     }
 
+    /**
+     *
+     * @param clazz the Class object representing T
+     * @param <T>   the class of the object
+     * @param inputStream the stream to read the object from
+     * @return an object from a JSON stream
+     */
     public static <T> T read(final Class<T> clazz,
                              final InputStream inputStream) {
         try (inputStream) {
@@ -49,11 +64,26 @@ public final class JsonUtils {
         }
     }
 
+    /**
+     *
+     * @param clazz the Class object representing T
+     * @param <T>   the class of the object
+     * @param file  the  file to read from
+     * @return an object from a JSON file
+     * @throws IOException if the file does not exist or is invalid
+     */
     public static <T> T read(final Class<T> clazz,
                              final MultipartFile file) throws IOException {
         return read(clazz, new ByteArrayInputStream(file.getBytes()));
     }
 
+    /**
+     *
+     * @param clazz the Class object representing T
+     * @param <T>   the class of the object
+     * @param object the object to serialize
+     * @return the object as a (JSON text) byte array
+     */
     public static <T> byte[] writeToBytes(final Class<T> clazz,
                                           final T object) {
         final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -61,12 +91,27 @@ public final class JsonUtils {
         return outputStream.toByteArray();
     }
 
+    /**
+     *
+     * @param clazz the Class object representing T
+     * @param <T>   the class of the object
+     * @param object the object to serialize
+     * @param filePath the path of the file to serialize object to
+     * @throws IOException if there's a problem with the streams
+     */
     public static <T> void writeInPath(final Class<T> clazz,
                                        final T object,
                                        final Path filePath) throws IOException {
         writeInStream(clazz, object, newOutputStream(filePath));
     }
 
+    /**
+     *
+     * @param clazz the Class object representing T
+     * @param <T>   the class of the object
+     * @param object the object to serialize
+     * @param outputStream the output stream to serialize object to
+     */
     public static <T> void writeInStream(final Class<T> clazz,
                                          final T object,
                                          final OutputStream outputStream) {
@@ -80,6 +125,10 @@ public final class JsonUtils {
         }
     }
 
+    /**
+     *
+     * @return the mapper used everywhere in the class
+     */
     private static ObjectMapper mapperWithIndent() {
         return new ObjectMapper().enable(INDENT_OUTPUT);
     }

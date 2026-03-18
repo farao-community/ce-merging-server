@@ -9,9 +9,9 @@ package com.farao_community.farao.ce_merging.merging.task;
 import brave.Tracer;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.exception.InvalidTaskException;
-import com.farao_community.farao.ce_merging.common.exception.ResourceNotFoundException;
-import com.farao_community.farao.ce_merging.common.exception.ResourceNotRunException;
+import com.farao_community.farao.ce_merging.common.exception.TaskNotValidException;
+import com.farao_community.farao.ce_merging.common.exception.TaskNotFoundException;
+import com.farao_community.farao.ce_merging.common.exception.TaskNotRunException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.common.exception.TaskAlreadyRunningException;
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
@@ -93,7 +93,8 @@ public class MergingTaskManagementService {
         taskRepository.save(task);
 
         final String inputsDir = configuration.getInputsDirectoryPath(task);
-        final RequestMetadataManager requestMgr = new RequestMetadataManager(inputsDir, inputRequestMetadata);
+        final RequestMetadataManager requestMgr = new RequestMetadataManager(inputsDir,
+                                                                             inputRequestMetadata);
 
         try {
             final Path tmpInputPath = unzipInputFileInTmp(inputZip);
@@ -110,7 +111,7 @@ public class MergingTaskManagementService {
 
             task.setArchiveFileOriginalName(inputZip.getOriginalFilename());
             requestMgr.feedTaskData(task);
-            task.getInputs().setRealOffset(requestMgr.getRealRequestOffset());
+            task.getInputs().setRealOffset(requestMgr.getParisRequestOffset());
 
             taskRepository.save(task);
             LOGGER.info("Merging task created with id: {}", task.getTaskId());
@@ -199,29 +200,32 @@ public class MergingTaskManagementService {
 
     private MergingTask getTaskById(final long taskId) {
         final MergingTask task = taskRepository.findById(taskId)
-            .orElseThrow(() -> new ResourceNotFoundException(String.format("Task %d not available",
-                                                                           taskId)));
+            .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available",
+                                                                       taskId)));
         handleDaylightSavingTime(task);
         return task;
     }
 
-    private MergingTask getFinishedTaskById(final long taskId) throws ResourceNotRunException {
+    private MergingTask getFinishedTaskById(final long taskId) throws TaskNotRunException {
         final MergingTask task = getTaskById(taskId);
 
         return switch (task.getTaskStatus()) {
-            case CREATED -> throw new ResourceNotRunException(String.format("Task %d has not been run",
-                                                                            taskId));
-            case RUNNING -> throw new ResourceNotRunException(String.format("Task %d currently running",
-                                                                            taskId));
-            case null -> throw new InvalidTaskException(String.format("Task %d has no status",
-                                                                      taskId));
+            case CREATED -> throw new TaskNotRunException(String.format("Task %d has not been run",
+                                                                        taskId));
+            case RUNNING -> throw new TaskNotRunException(String.format("Task %d currently running",
+                                                                        taskId));
+            case null -> throw new TaskNotValidException(String.format("Task %d has no status",
+                                                                       taskId));
             case SUCCESS, ERROR -> task;
         };
     }
 
+    /**
+     * Necessary in case of DST:
+     * the second 02:30 AM (Paris time) will be UTC+2, but actually should be UTC+1
+     * @param task for which to adjust date if applicable
+     */
     private void handleDaylightSavingTime(final MergingTask task) {
-        // necessary treatment in case of DST:
-        // the changed hour (second 02:30 AM) will be UTC+2, but actually should be + 1
         final Inputs inputs = task.getInputs();
         final Optional<OffsetDateTime> taskDateOpt = Optional.ofNullable(inputs.getTargetDate());
         final Optional<ZoneOffset> realOffset = Optional.ofNullable(inputs.getRealOffset());

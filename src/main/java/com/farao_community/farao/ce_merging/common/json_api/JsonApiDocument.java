@@ -10,11 +10,11 @@ import com.farao_community.farao.ce_merging.common.exception.AbstractServiceExce
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
+import static java.util.Collections.singletonList;
 
 public final class JsonApiDocument<T extends JsonApiData> {
     @JsonInclude(NON_EMPTY)
@@ -32,11 +32,11 @@ public final class JsonApiDocument<T extends JsonApiData> {
     }
 
     public static <T extends JsonApiData> JsonApiDocument<T> fromData(final T data) {
-        return new JsonApiDocument<>(Collections.singletonList(data));
+        return new JsonApiDocument<>(singletonList(data));
     }
 
     private JsonApiDocument(final AbstractServiceException exception) {
-        this.errors = Collections.singletonList(JsonApiError.fromServiceException(exception));
+        this.errors = singletonList(JsonApiError.fromServiceException(exception));
         this.data = null;
     }
 

@@ -6,17 +6,16 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static test_utils.CeTestUtils.stringPathOf;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class FileUtilsTest {
 
@@ -45,7 +44,9 @@ class FileUtilsTest {
         final SavedFile savedFile = new SavedFile("filename.txt",
                                                   "/path/to/non/existing/file.txt",
                                                   "/dumb/file/location");
-        assertThrows(ServiceIOException.class, () -> FileUtils.toAttachmentFileResponse(savedFile));
+        assertThatThrownBy(() -> FileUtils.toAttachmentFileResponse(savedFile))
+            .isServiceException()
+            .hasMessageContaining("/path/to/non/existing/file.txt");
     }
 
 }

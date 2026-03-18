@@ -8,8 +8,6 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
@@ -28,6 +26,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
+import static com.farao_community.farao.ce_merging.common.util.ExceptionUtils.logAndThrow;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createTempDirectory;
@@ -38,7 +37,6 @@ public final class ZipUtils {
     private static final int WRITE_BUFFER_SIZE = 4096;
     private static final int READ_BUFFER_SIZE = 2156;
     private static final String TMP_DIR = "CeMerging";
-    private static final Logger LOGGER = LoggerFactory.getLogger(ZipUtils.class);
 
     private ZipUtils() {
         // utility class
@@ -55,8 +53,7 @@ public final class ZipUtils {
                                  final Path destDirectory) {
         final File destination = destDirectory.toFile();
         if (!destination.exists() && !destination.mkdir()) {
-            LOGGER.error("Cannot create destination directory '{}'", destDirectory);
-            throw new ServiceIOException(String.format("Cannot create destination directory '%s'", destDirectory));
+            logAndThrow(null, "Cannot create destination directory '%s'", destDirectory);
         }
 
         try (final ZipInputStream zipIn = getZipStream(zipFilePath)) {
@@ -79,9 +76,7 @@ public final class ZipUtils {
             }
             zipIn.closeEntry();
         } catch (final IOException e) {
-            final String message = String.format("Error while extracting file '%s'", zipFilePath.getFileName());
-            LOGGER.error(message, e);
-            throw new ServiceIOException(message, e);
+            logAndThrow(e, "extracting file '%s'", zipFilePath.getFileName());
         }
     }
 
@@ -135,8 +130,7 @@ public final class ZipUtils {
                 .forEach(filePath -> addFileToZip(filePath, directory, zipOutputStream));
 
         } catch (final IOException e) {
-            LOGGER.error("Error while compressing directory '{}'", directory, e);
-            throw new ServiceIOException(String.format("Error while compressing directory '%s'", directory), e);
+            logAndThrow(e, "compressing directory %s", directory);
         }
         return zipBytesStream.toByteArray();
     }

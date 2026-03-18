@@ -16,11 +16,11 @@ import static java.io.File.separator;
 
 @Configuration
 public class CeMergingConfiguration {
-    private static final String INPUTS_DIRECTORY = "inputs";
-    private static final String OUTPUTS_DIRECTORY = "outputs";
-    private static final String DAILY_OUTPUTS_DIRECTORY = "daily-outputs";
-    private static final String DAILY_INPUTS_DIRECTORY = "daily-inputs";
-    private static final String ARTIFACTS_DIRECTORY = "artifacts";
+    private static final String INPUTS = "inputs";
+    private static final String OUTPUTS = "outputs";
+    private static final String DAILY_OUTPUTS = "daily-outputs";
+    private static final String DAILY_INPUTS = "daily-inputs";
+    private static final String ARTIFACTS = "artifacts";
 
     @Value("${ce-merging-server.filesystem.root}")
     private String ceMergingRoot;
@@ -28,20 +28,36 @@ public class CeMergingConfiguration {
     @Value("${ce-merging-server.filesystem.root-daily}")
     private String dailyMergingRoot;
 
-    public Path getDirectoryPath(final MergingTask task) {
-        return Path.of(ceMergingRoot + separator + task.getTaskId());
-    }
-
-    public String getOutputsDirectoryPath(final MergingTask task) {
-        return getDirectoryPath(task).resolve(OUTPUTS_DIRECTORY).toString();
+    /**
+     *
+     * @param task : each task has it own directory
+     * @param directory : each type of file (in, out, ...) has its subdirectory inside
+     * @return /path/to/root/task_id/directory
+     */
+    private String getDirectoryPath(final MergingTask task, final String directory) {
+        return Path.of(ceMergingRoot + separator + task.getTaskId())
+            .resolve(directory)
+            .toString();
     }
 
     public String getInputsDirectoryPath(final MergingTask task) {
-        return getDirectoryPath(task).resolve(INPUTS_DIRECTORY).toString();
+        return getDirectoryPath(task, INPUTS);
+    }
+
+    public String getDailyInputsDirectoryPath(final MergingTask task) {
+        return getDirectoryPath(task, DAILY_INPUTS);
+    }
+
+    public String getDailyOutputsDirectoryPath(final MergingTask task) {
+        return getDirectoryPath(task, DAILY_OUTPUTS);
+    }
+
+    public String getOutputsDirectoryPath(final MergingTask task) {
+        return getDirectoryPath(task, OUTPUTS);
     }
 
     public String getArtifactsDirectoryPath(final MergingTask task) {
-        return getDirectoryPath(task).resolve(ARTIFACTS_DIRECTORY).toString();
+        return getDirectoryPath(task, ARTIFACTS);
     }
 
     public String getCeMergingRoot() {

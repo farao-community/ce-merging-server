@@ -24,7 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 public final class FileUtils {
     private static final String ATTACHMENT_ERROR = "Cannot return attachment file";
-    private static final String RETRIEVE_ERROR = "Cannot retrieve content of ";
+    private static final String RETRIEVE_ERROR = "Cannot retrieve content of %s";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
 
@@ -32,6 +32,11 @@ public final class FileUtils {
         // utility class
     }
 
+    /**
+     *
+     * @param fileContent the content of a file as a byte array
+     * @return the file wrapped in an HTTP response entity
+     */
     public static ResponseEntity<byte[]> toAttachmentFileResponse(final byte[] fileContent,
                                                                   final String fileName) {
         try {
@@ -51,27 +56,44 @@ public final class FileUtils {
         }
     }
 
+    /**
+     *
+     * @param savedFile a file of the merging process
+     * @return the file wrapped in an HTTP response entity
+     */
+
     public static ResponseEntity<byte[]> toAttachmentFileResponse(final SavedFile savedFile) {
         final String path = savedFile.getPath();
         try {
             return toAttachmentFileResponse(readAllBytes(Paths.get(path)),
                                             savedFile.getOriginalName());
         } catch (final IOException | ServiceIOException e) {
-            LOGGER.error(RETRIEVE_ERROR + "'{}'", path);
-            throw new ServiceIOException(String.format(RETRIEVE_ERROR + "%s", path), e);
+            final String error = RETRIEVE_ERROR.formatted(path);
+            LOGGER.error(error);
+            throw new ServiceIOException(error, e);
         }
     }
 
+    /**
+     * Used to prevent path injection attacks
+     * @param pathToGet should be located in parent
+     * @param parentFolder should contain path
+     * @return the path to get as a Path object
+     * @throws ServiceIOException if not the case, or if paths are invalid
+     */
     public static Path getIfInside(final String pathToGet,
-                                   final Path parentFolder) {
+                                   final Path parentFolder) throws ServiceIOException {
         if (isEmpty(pathToGet)) {
             throw new ServiceIOException("Missing file path");
         }
+
         final Path parent = parentFolder.normalize();
         final Path resolved = parent.resolve(pathToGet).normalize();
+
         if (!resolved.startsWith(parent)) {
             throw new ServiceIOException("Invalid file path : %s".formatted(pathToGet));
         }
+
         return resolved;
     }
 }

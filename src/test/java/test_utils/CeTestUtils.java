@@ -4,41 +4,38 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging;
+package test_utils;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.assertj.core.api.ThrowableAssert;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mockito.ArgumentMatchers.any;
 
-public final class CeMergingTestUtils {
+public final class CeTestUtils {
 
-    private CeMergingTestUtils() {
+    private CeTestUtils() {
         // utility class
     }
 
-    private static final Class<CeMergingTestUtils> THIS = CeMergingTestUtils.class;
+    private static final Class<CeTestUtils> THIS = CeTestUtils.class;
     private static final String DEFAULT_FILE = "blank.file";
     private static final String ZIP_NAME = "inputs.zip";
 
-    public static ServiceIOException testServiceEx = new ServiceIOException("Test");
+    public static final ServiceIOException S_IO_EXCEPTION = new ServiceIOException("Test");
 
-    /**
-     *
-     * @param fileName under resources
-     * @return its path
-     */
     public static Path pathOf(final String fileName) {
         return Paths.get(Optional.ofNullable(THIS.getResource("/" + fileName))
                              .orElse(THIS.getResource("/" + DEFAULT_FILE))
@@ -49,13 +46,6 @@ public final class CeMergingTestUtils {
         return pathOf(fileName).toString();
     }
 
-    /**
-     * for the sake of readability
-     *
-     * @param object to serialize
-     * @return serialized json object
-     * @throws JsonProcessingException should never happen
-     */
     public static String stringify(final Object object) throws JsonProcessingException {
         return new ObjectMapper().writeValueAsString(object);
     }
@@ -87,5 +77,9 @@ public final class CeMergingTestUtils {
         task.setTaskStatus(status);
 
         return task;
+    }
+
+    public static Stream<ThrowableAssert.ThrowingCallable> calls(final ThrowableAssert.ThrowingCallable... calls) {
+        return Stream.of(calls);
     }
 }

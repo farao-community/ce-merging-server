@@ -24,18 +24,18 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.anyTask;
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.byteContentOf;
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringContentOf;
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.withIdAndStatus;
 import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.CREATED;
 import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.SUCCESS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static test_utils.CeTestUtils.anyTask;
+import static test_utils.CeTestUtils.byteContentOf;
+import static test_utils.CeTestUtils.stringContentOf;
+import static test_utils.CeTestUtils.withIdAndStatus;
+import static test_utils.assertions.CeTaskAssert.assertThat;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 @SpringBootTest
 @TestConfiguration
@@ -115,9 +115,7 @@ class MergingTaskManagementServiceTest {
         verify(taskRepository, times(2))
             .save(anyTask());
 
-        assertThat(task.getTaskStatus())
-            .isEqualTo(SUCCESS);
-
+        assertThat(task).hasStatus(SUCCESS);
     }
 
     @Test
@@ -126,6 +124,7 @@ class MergingTaskManagementServiceTest {
             .thenReturn(Optional.of(withIdAndStatus(ID, RUNNING)));
 
         assertThatThrownBy(() -> service.runTask(ID))
+            .isTaskException()
             .hasMessage("Task '1' already running, could not be run again");
 
     }

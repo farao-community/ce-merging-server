@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -14,10 +13,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.pathOf;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.unzipFile;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static test_utils.CeTestUtils.pathOf;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class ZipUtilsTest {
     @Test
@@ -44,6 +43,7 @@ class ZipUtilsTest {
         final Path tmp = Files.createTempDirectory("zip-test");
         assertTrue(tmp.toFile().setReadOnly());
         final Path zipInput = pathOf("testZip.zip");
-        assertThrows(ServiceIOException.class, () -> unzipFile(zipInput, tmp));
+        assertThatThrownBy(() -> unzipFile(zipInput, tmp))
+            .isServiceException();
     }
 }

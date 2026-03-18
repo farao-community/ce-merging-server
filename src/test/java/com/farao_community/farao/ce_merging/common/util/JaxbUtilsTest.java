@@ -6,22 +6,21 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.xsd.Xnode;
 import com.farao_community.farao.ce_merging.xsd.Xnodes;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import test_utils.assertions.CeThrowableAssert;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static com.farao_community.farao.ce_merging.CeMergingTestUtils.stringPathOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static test_utils.CeTestUtils.stringPathOf;
 
 class JaxbUtilsTest {
 
@@ -108,10 +107,14 @@ class JaxbUtilsTest {
     void shouldFailOnIncorrectData(final String fileName) {
         final String strInput = stringPathOf(fileName);
         final byte[] byteInput = fileName.getBytes(UTF_8);
-        assertThrows(ServiceIOException.class,
-                     () -> JaxbUtils.readFromPath(XNODES, strInput));
-        assertThrows(ServiceIOException.class,
-                     () -> JaxbUtils.readFromBytes(XNODES, byteInput));
+
+        CeThrowableAssert.assertThatThrownBy(() -> JaxbUtils.readFromPath(XNODES, strInput))
+            .isServiceException()
+            .hasMessageContaining("Xnode");
+
+        CeThrowableAssert.assertThatThrownBy(() -> JaxbUtils.readFromBytes(XNODES, byteInput))
+            .isServiceException()
+            .hasMessageContaining("Xnode");
     }
 
 }
