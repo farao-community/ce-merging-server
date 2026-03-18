@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
+import com.farao_community.farao.ce_merging.common.exception.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeDeserializer;
 import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -83,8 +84,8 @@ public class Inputs implements Serializable {
         return igms.stream()
             .filter(igmData -> igmData.getCountry().equals(country))
             .findAny()
-            .orElseThrow(() -> new IllegalArgumentException(String.format("Task does not contain country '%s' IGM",
-                                                                          country)));
+            .orElseThrow(() -> new TaskNotValidException(String.format("Task does not contain country '%s' IGM",
+                                                                       country)));
     }
 
     public ZoneOffset getRealOffset() {
