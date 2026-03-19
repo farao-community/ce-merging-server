@@ -1,0 +1,28 @@
+{
+  "data" : {
+    "type" : "tasks",
+    "attributes" : {
+      "name" : "Merging task for business date 2024-05-02T22:30Z",
+      "inputs" : {
+        "targetDate" : "2024-05-02T22:30Z",
+        "mergingWithInternalHvdc" : "true",
+        "alegroThreshold" : "2000",
+        "igms" : [ {
+          "igmFilePath" : "20240503_0030_2D5_FR0.UCT",
+          "igmQualityReportFilePath" : "IGM_QC.xml"
+        } ],
+        "generationLoadShiftKeysFilePath" : "GLSK.CWE_GSK",
+        "externalConstraintsFilePath" : "EC.EC",
+        "feasibilityRangesFilePath" : "FR.xml",
+        "netPositionForecastFilePath" : "NPF.PEVF"
+      }
+    },
+    "configurations" : {
+      "dcLoadFlowParametersFilePath" : "dc-load-flow-parameters.json",
+      "acLoadFlowParametersFilePath" : "ac-load-flow-parameters.json",
+      "basecaseImprovementParametersFilePath" : "basecase-improvement-parameters.json",
+      "balancesAdjustmentParametersFilePath" : "balances-adjustment-parameters.json",
+      "recessivityParametersFilePath" : "recessivity-parameters.json"
+    }
+  }
+}

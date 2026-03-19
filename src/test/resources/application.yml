@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: ce-merging-server
+  servlet:
+    multipart:
+      max-file-size: 100MB # NOSONAR no DoS risk because it is to be deployed internally
+      max-request-size: 100MB # NOSONAR no DoS risk because it is to be deployed internally
+  jpa:
+    properties:
+      hibernate:
+        timezone:
+          default_storage: NORMALIZE
+    hibernate:
+      ddl-auto: update
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+
+ce-merging-server:
+  filesystem:
+    root: ${java.io.tmpdir}/testFiles
+    root-daily: ${java.io.tmpdir}/testFiles/daily
