@@ -6,10 +6,13 @@
  */
 package test_utils.assertions;
 
+import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.util.CanIgnoreReturnValue;
+
+import java.util.Objects;
 
 public class CeTaskAssert extends AbstractAssert<CeTaskAssert, MergingTask> {
 
@@ -28,4 +31,26 @@ public class CeTaskAssert extends AbstractAssert<CeTaskAssert, MergingTask> {
         }
         return this;
     }
+
+    @CanIgnoreReturnValue
+    public CeTaskAssert isSameTaskAs(final MergingTask other) {
+        if (actual.getTaskId() != other.getTaskId()
+            || actual.getTaskStatus() != other.getTaskStatus()
+            || !Objects.equals(actual.getName(), other.getName())
+            || !Objects.equals(actual.getArchiveFileOriginalName(), other.getArchiveFileOriginalName())) {
+            failWithMessage("These are not the same tasks");
+        }
+        return this;
+    }
+
+    @CanIgnoreReturnValue
+    public CeTaskAssert isSameTaskAs(final MergingTaskDto dto) {
+        if (actual.getTaskId() != dto.getTaskId()
+            || actual.getTaskStatus() != dto.getTaskStatus()
+            || !Objects.equals(actual.getName(), dto.getName())) {
+            failWithMessage("These are not the same tasks");
+        }
+        return this;
+    }
+
 }

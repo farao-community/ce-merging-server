@@ -27,6 +27,7 @@ import static java.nio.file.Files.newOutputStream;
 public final class JsonUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtils.class);
+    private static final ObjectMapper MAPPER = new ObjectMapper().enable(INDENT_OUTPUT);
 
     private JsonUtils() {
         // utility class
@@ -47,15 +48,15 @@ public final class JsonUtils {
 
     /**
      *
-     * @param clazz the Class object representing T
-     * @param <T>   the class of the object
+     * @param clazz       the Class object representing T
+     * @param <T>         the class of the object
      * @param inputStream the stream to read the object from
      * @return an object from a JSON stream
      */
     public static <T> T read(final Class<T> clazz,
                              final InputStream inputStream) {
         try (inputStream) {
-            return mapperWithIndent().readValue(inputStream, clazz);
+            return MAPPER.readValue(inputStream, clazz);
         } catch (final IOException e) {
             final String errorMessage = String.format("Error occurred when converting Json file to object of type %s",
                                                       clazz.getName());
@@ -79,8 +80,8 @@ public final class JsonUtils {
 
     /**
      *
-     * @param clazz the Class object representing T
-     * @param <T>   the class of the object
+     * @param clazz  the Class object representing T
+     * @param <T>    the class of the object
      * @param object the object to serialize
      * @return the object as a (JSON text) byte array
      */
@@ -93,9 +94,9 @@ public final class JsonUtils {
 
     /**
      *
-     * @param clazz the Class object representing T
-     * @param <T>   the class of the object
-     * @param object the object to serialize
+     * @param clazz    the Class object representing T
+     * @param <T>      the class of the object
+     * @param object   the object to serialize
      * @param filePath the path of the file to serialize object to
      * @throws IOException if there's a problem with the streams
      */
@@ -107,30 +108,22 @@ public final class JsonUtils {
 
     /**
      *
-     * @param clazz the Class object representing T
-     * @param <T>   the class of the object
-     * @param object the object to serialize
+     * @param clazz        the Class object representing T
+     * @param <T>          the class of the object
+     * @param object       the object to serialize
      * @param outputStream the output stream to serialize object to
      */
     public static <T> void writeInStream(final Class<T> clazz,
                                          final T object,
                                          final OutputStream outputStream) {
         try (outputStream) {
-            mapperWithIndent().writeValue(outputStream, object);
+            MAPPER.writeValue(outputStream, object);
         } catch (final IOException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s",
                                                       clazz.getName());
             LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
-    }
-
-    /**
-     *
-     * @return the mapper used everywhere in the class
-     */
-    private static ObjectMapper mapperWithIndent() {
-        return new ObjectMapper().enable(INDENT_OUTPUT);
     }
 
 }

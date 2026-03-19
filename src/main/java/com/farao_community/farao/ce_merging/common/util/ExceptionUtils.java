@@ -31,7 +31,7 @@ public final class ExceptionUtils {
                                     final String circumstance,
                                     final Object... args) {
         final String errorMessage = ERROR_OCCURRED_WHILE + circumstance.formatted(args);
-        LOGGER.error(errorMessage);
+        LOGGER.error(errorMessage, cause);
         throw new ServiceIOException(errorMessage, cause);
     }
 }

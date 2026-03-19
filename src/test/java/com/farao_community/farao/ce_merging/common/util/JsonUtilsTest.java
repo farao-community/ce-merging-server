@@ -62,4 +62,9 @@ class JsonUtilsTest {
         assertEquals(TEST_JSON,
                      JsonUtils.read(DummyJson.class, newFile.toString()));
     }
+
+    @Test
+    void shouldFailWithInvalidContent() {
+
+    }
 }

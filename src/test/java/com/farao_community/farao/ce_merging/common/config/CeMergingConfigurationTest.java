@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static test_utils.CeTestUtils.withIdAndStatus;
+import static test_utils.CeTestUtils.taskWithIdAndStatus;
 
 @SpringBootTest
 @TestConfiguration
@@ -28,7 +28,7 @@ class CeMergingConfigurationTest {
         final CeMergingConfiguration copy = new CeMergingConfiguration();
         copy.setCeMergingRoot(cfg.getCeMergingRoot());
         copy.setDailyMergingRoot(cfg.getDailyMergingRoot());
-        final MergingTask task = withIdAndStatus(1, TaskStatus.CREATED);
+        final MergingTask task = taskWithIdAndStatus(1, TaskStatus.CREATED);
 
         assertEquals("/tmp/testFiles",
                      copy.getCeMergingRoot());

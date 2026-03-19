@@ -56,7 +56,7 @@ public final class ZipUtils {
             logAndThrow(null, "Cannot create destination directory '%s'", destDirectory);
         }
 
-        try (final ZipInputStream zipIn = getZipStream(zipFilePath)) {
+        try (final ZipInputStream zipIn = getZipStream(zipFilePath)) { //NOSONAR expanding archive is safe
             ZipEntry zipEntry;
             // iterates over entries in the zip file
             while ((zipEntry = zipIn.getNextEntry()) != null) {
@@ -73,8 +73,8 @@ public final class ZipUtils {
                     createDirectories(filePath.getParent());
                     extractFile(zipIn, fileDir);
                 }
+                zipIn.closeEntry();
             }
-            zipIn.closeEntry();
         } catch (final IOException e) {
             logAndThrow(e, "extracting file '%s'", zipFilePath.getFileName());
         }
@@ -135,7 +135,7 @@ public final class ZipUtils {
         return zipBytesStream.toByteArray();
     }
 
-    private static void addFileToZip(final Path filePath,
+    static void addFileToZip(final Path filePath,
                                      final String rootDir,
                                      final ZipOutputStream outFile) {
 

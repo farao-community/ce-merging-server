@@ -13,7 +13,7 @@ public class CeMergingException extends AbstractServiceException {
     private static final String EXCEPTION_TITLE = "Runtime exception encountered in ce-merging server";
 
     public CeMergingException(final String message) {
-        super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
+        this(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
     }
 
     public CeMergingException(final String status,

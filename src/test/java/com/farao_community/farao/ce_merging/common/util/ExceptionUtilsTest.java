@@ -6,29 +6,34 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import org.junit.jupiter.api.Test;
-import test_utils.assertions.CeThrowableAssert;
+import org.assertj.core.api.ThrowableAssert;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.IOException;
+import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.util.ExceptionUtils.logAndThrow;
-import static test_utils.CeTestUtils.calls;
+import static test_utils.CeTestUtils.throwers;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class ExceptionUtilsTest {
 
     private static final String TEST = "test";
 
-    @Test
-    void shouldThrowServiceIOException() {
-        final IOException cause = new IOException(TEST);
+    static Stream<ThrowableAssert.ThrowingCallable> throwersRunnables() {
+        return throwers(() -> logAndThrow(null, TEST),
+                        () -> logAndThrow(new IOException(TEST), TEST),
+                        () -> logAndThrow(new IOException(TEST), "test %s", "hello"),
+                        () -> logAndThrow(null, "test %s %s", "hello", "goodbye"));
+    }
 
-        calls(() -> logAndThrow(null, TEST),
-              () -> logAndThrow(cause, TEST),
-              () -> logAndThrow(cause, "test %s", "hello"),
-              () -> logAndThrow(null, "test %s %s", "hello", "goodbye"))
-            .map(CeThrowableAssert::assertThatThrownBy)
-            .map(CeThrowableAssert::isServiceException)
-            .forEach(t -> t.hasMessageContaining(TEST));
+    @ParameterizedTest
+    @MethodSource("throwersRunnables")
+    void shouldThrowServiceIOException(final ThrowableAssert.ThrowingCallable thrower) {
+       assertThatThrownBy(thrower)
+           .isServiceException()
+           .hasMessageContaining(TEST);
     }
 
 }

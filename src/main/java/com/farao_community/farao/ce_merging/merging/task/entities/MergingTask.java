@@ -105,14 +105,6 @@ public class MergingTask implements Serializable {
         this.statusDetail = statusDetail;
     }
 
-    public String getRunTraceId() {
-        return runTraceId;
-    }
-
-    public void setRunTraceId(final String runTraceId) {
-        this.runTraceId = runTraceId;
-    }
-
     public String getArchiveFileOriginalName() {
         return archiveFileOriginalName;
     }

@@ -18,6 +18,10 @@ public final class OffsetDateTimeSerializer extends JsonSerializer<OffsetDateTim
     public void serialize(final OffsetDateTime dateTime,
                           final JsonGenerator generator,
                           final SerializerProvider provider) throws IOException {
-        generator.writeString(dateTime.toString());
+        if (dateTime == null) {
+            generator.writeNull();
+        } else {
+            generator.writeString(dateTime.toString());
+        }
     }
 }

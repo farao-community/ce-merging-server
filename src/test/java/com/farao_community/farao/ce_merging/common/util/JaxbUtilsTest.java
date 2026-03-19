@@ -6,21 +6,26 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
+import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.xsd.Xnode;
 import com.farao_community.farao.ce_merging.xsd.Xnodes;
+import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import test_utils.assertions.CeThrowableAssert;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.stringPathOf;
+import static test_utils.CeTestUtils.throwers;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class JaxbUtilsTest {
 
@@ -31,18 +36,18 @@ class JaxbUtilsTest {
         </xnodes>
         """.getBytes(UTF_8);
 
-    private static final Class<Xnodes> XNODES = Xnodes.class;
+    private static final Class<Xnodes> XNODES_CLASS = Xnodes.class;
 
     @Test
     void shouldUnmarshallDummyXml() {
         assertEquals("TEST_NODE",
-                     JaxbUtils.readFromPath(XNODES, stringPathOf("testXnode.xml"))
+                     JaxbUtils.readFromPath(XNODES_CLASS, stringPathOf("testXnode.xml"))
                          .getXnode()
                          .getFirst()
                          .getName());
 
         assertEquals("TEST_NODE_AS_BYTES",
-                     JaxbUtils.readFromBytes(XNODES, XML_CONTENT)
+                     JaxbUtils.readFromBytes(XNODES_CLASS, XML_CONTENT)
                          .getXnode()
                          .getFirst()
                          .getName());
@@ -61,16 +66,16 @@ class JaxbUtilsTest {
         /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
                       BYTES
          -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-        assertThat(new String(JaxbUtils.writeToBytes(XNODES, xnodes)))
+        assertThat(new String(JaxbUtils.writeToBytes(XNODES_CLASS, xnodes)))
             .contains("name=\"TEST_NODE\"",
                       "area1=\"FR\"",
                       "area2=\"DE\"",
                       "subarea2=\"D2\"");
 
         //specifying root
-        assertThat(new String(JaxbUtils.writeToBytes(XNODES,
+        assertThat(new String(JaxbUtils.writeToBytes(XNODES_CLASS,
                                                      xnodes,
-                                                     "\"http://www.rte-france.com/gsr\"",
+                                                     "http://www.rte-france.com/gsr",
                                                      "xnodes")))
             .contains("name=\"TEST_NODE\"",
                       "area1=\"FR\"",
@@ -84,18 +89,18 @@ class JaxbUtilsTest {
         final Path newFile = Files.createFile(Files.createTempDirectory("jaxb-test")
                                                   .resolve("xnodes.xml"));
 
-        JaxbUtils.writeToPath(XNODES, xnodes, newFile);
+        JaxbUtils.writeToPath(XNODES_CLASS, xnodes, newFile);
         assertEquals("TEST_NODE",
-                     JaxbUtils.readFromPath(XNODES, newFile.toString())
+                     JaxbUtils.readFromPath(XNODES_CLASS, newFile.toString())
                          .getXnode()
                          .getFirst()
                          .getName());
 
         //specifying root
-        JaxbUtils.writeToPath(XNODES, xnodes, "\"http://www.rte-france.com/gsr\"",
+        JaxbUtils.writeToPath(XNODES_CLASS, xnodes, "http://www.rte-france.com/gsr",
                               "xnodes", newFile);
         assertEquals("TEST_NODE",
-                     JaxbUtils.readFromPath(XNODES, newFile.toString())
+                     JaxbUtils.readFromPath(XNODES_CLASS, newFile.toString())
                          .getXnode()
                          .getFirst()
                          .getName());
@@ -103,18 +108,34 @@ class JaxbUtilsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"dummy.csv", "dummy.json"})
-    void shouldFailOnIncorrectData(final String fileName) {
+    @ValueSource(strings = {"dummy.csv", "dummy.json", "not.existing"})
+    void shouldFailOnReadInvalidData(final String fileName) {
         final String strInput = stringPathOf(fileName);
         final byte[] byteInput = fileName.getBytes(UTF_8);
 
-        CeThrowableAssert.assertThatThrownBy(() -> JaxbUtils.readFromPath(XNODES, strInput))
+        assertThatThrownBy(() -> JaxbUtils.readFromPath(XNODES_CLASS, strInput))
             .isServiceException()
             .hasMessageContaining("Xnode");
 
-        CeThrowableAssert.assertThatThrownBy(() -> JaxbUtils.readFromBytes(XNODES, byteInput))
+        assertThatThrownBy(() -> JaxbUtils.readFromBytes(XNODES_CLASS, byteInput))
             .isServiceException()
             .hasMessageContaining("Xnode");
+    }
+
+    static Stream<ThrowableAssert.ThrowingCallable> throwersRunnables() {
+        return throwers(() -> JaxbUtils.writeToBytes(MergingTaskDto.class,
+                                                     new MergingTaskDto()),
+                        () -> JaxbUtils.writeToPath(MergingTaskDto.class,
+                                                    new MergingTaskDto(),
+                                                    Path.of("nothing")));
+    }
+
+    @ParameterizedTest
+    @MethodSource("throwersRunnables")
+    void shouldFailOnWriteInvalidClass(final ThrowableAssert.ThrowingCallable thrower) {
+        assertThatThrownBy(thrower)
+            .isServiceException();
+
     }
 
 }

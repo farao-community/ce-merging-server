@@ -6,14 +6,13 @@
  */
 package com.farao_community.farao.ce_merging.merging.task;
 
-import brave.Tracer;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.exception.TaskNotValidException;
-import com.farao_community.farao.ce_merging.common.exception.TaskNotFoundException;
-import com.farao_community.farao.ce_merging.common.exception.TaskNotRunException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.common.exception.TaskAlreadyRunningException;
+import com.farao_community.farao.ce_merging.common.exception.TaskNotFoundException;
+import com.farao_community.farao.ce_merging.common.exception.TaskNotRunException;
+import com.farao_community.farao.ce_merging.common.exception.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
 import com.farao_community.farao.ce_merging.merging.MergingService;
 import com.farao_community.farao.ce_merging.merging.request_metadata.RequestMetadataManager;
@@ -29,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
@@ -55,18 +53,15 @@ public class MergingTaskManagementService {
     private final MergingService mergingService;
     private final MergingTaskRepository taskRepository;
     private final MergingTaskMapper taskMapper;
-    private final Tracer tracer;
 
     public MergingTaskManagementService(final CeMergingConfiguration configuration,
                                         final MergingService mergingService,
                                         final MergingTaskRepository taskRepository,
-                                        final MergingTaskMapper taskMapper,
-                                        final Tracer tracer) {
+                                        final MergingTaskMapper taskMapper) {
         this.configuration = configuration;
         this.mergingService = mergingService;
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
-        this.tracer = tracer;
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -116,7 +111,7 @@ public class MergingTaskManagementService {
             taskRepository.save(task);
             LOGGER.info("Merging task created with id: {}", task.getTaskId());
             return taskMapper.mergingTaskToMergingTaskDto(task);
-        } catch (final IOException e) {
+        } catch (final Exception e) {
             LOGGER.error("Error during merging task creation.");
             taskRepository.delete(task);
             throw new ServiceIOException("Error during merging task creation", e);
@@ -161,10 +156,8 @@ public class MergingTaskManagementService {
 
     private MergingTask run(final MergingTask task) {
         try {
-            task.setRunTraceId(tracer.currentSpan().context().traceIdString());
-
             if (task.getTaskStatus() == RUNNING) {
-                throw new TaskAlreadyRunningException(String.format("Task '%d' already running, could not be run again",
+                throw new TaskAlreadyRunningException(String.format("Task %d already running, could not be run again",
                                                                     task.getTaskId()));
             }
             task.setTaskStatus(RUNNING);
@@ -172,11 +165,11 @@ public class MergingTaskManagementService {
             LOGGER.info("Merging task {} is running.", task.getTaskId());
             taskRepository.save(task);
 
-            LOGGER.info("Running merging task: '{}' ", task.getTaskId());
+            LOGGER.info("Running merging task {}' ", task.getTaskId());
             mergingService.run(task);
             task.setTaskStatus(SUCCESS);
             taskRepository.save(task);
-            LOGGER.info("Merging task: '{}' is finished with success", task.getTaskId());
+            LOGGER.info("Merging task {} succeeded", task.getTaskId());
             return task;
 
         } catch (final TaskAlreadyRunningException alreadyRunningException) {

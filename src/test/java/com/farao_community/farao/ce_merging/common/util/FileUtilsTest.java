@@ -11,9 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static test_utils.CeTestUtils.pathOf;
 import static test_utils.CeTestUtils.stringPathOf;
 import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
@@ -47,6 +49,17 @@ class FileUtilsTest {
         assertThatThrownBy(() -> FileUtils.toAttachmentFileResponse(savedFile))
             .isServiceException()
             .hasMessageContaining("/path/to/non/existing/file.txt");
+    }
+
+    @Test
+    void shouldFailResolvingIncorrectPaths() {
+        assertThatThrownBy(() -> getIfInside("", pathOf("request-metadata")))
+            .isServiceException()
+            .hasMessage("Missing file path");
+
+        assertThatThrownBy(() -> getIfInside("../../../", pathOf("blank.file")))
+            .isServiceException()
+            .hasMessageContaining("Invalid file path");
     }
 
 }

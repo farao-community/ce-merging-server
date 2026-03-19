@@ -35,5 +35,6 @@ class ListUtilsTest {
         assertEquals(list.getFirst(), clone.getFirst());
         list.add("goodbye");
         assertEquals(1, clone.size());
+        assertEquals(new ArrayList<>(), clonedList(null));
     }
 }

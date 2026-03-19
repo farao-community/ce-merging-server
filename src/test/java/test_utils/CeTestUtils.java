@@ -7,6 +7,8 @@
 package test_utils;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -16,6 +18,8 @@ import org.assertj.core.api.ThrowableAssert;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -70,16 +74,29 @@ public final class CeTestUtils {
         return any(MergingTask.class);
     }
 
-    public static MergingTask withIdAndStatus(final long id, final TaskStatus status) {
+    public static MergingTask taskWithIdAndStatus(final long id, final TaskStatus status) {
         final MergingTask task = new MergingTask();
         task.setTaskId(id);
         task.setArchiveFileOriginalName(ZIP_NAME);
+        task.setTaskStatus(status);
+        final Inputs inputs = new Inputs();
+        inputs.setTargetDate(OffsetDateTime.now(ZoneId.of("UTC")));
+        task.setInputs(inputs);
+
+        return task;
+    }
+
+    public static MergingTaskDto taskDtoWithIdAndStatus(final long id, final TaskStatus status) {
+        final MergingTaskDto task = new MergingTaskDto();
+        task.setTaskId(id);
         task.setTaskStatus(status);
 
         return task;
     }
 
-    public static Stream<ThrowableAssert.ThrowingCallable> calls(final ThrowableAssert.ThrowingCallable... calls) {
+    // If just using Stream.of, you'd have to specify the type
+    // so we use this to write more concisely
+    public static Stream<ThrowableAssert.ThrowingCallable> throwers(final ThrowableAssert.ThrowingCallable... calls) {
         return Stream.of(calls);
     }
 }

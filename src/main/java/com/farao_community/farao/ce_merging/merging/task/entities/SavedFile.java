@@ -6,9 +6,11 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
+import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.nio.file.Path;
@@ -35,11 +37,17 @@ public class SavedFile implements Serializable {
     }
 
     public void feedPathAndName(final String fullFilePath) {
+        if (StringUtils.isEmpty(fullFilePath)) {
+            throw new ServiceIOException("null or empty is not a path");
+        }
         this.path = fullFilePath;
         this.originalName = Paths.get(fullFilePath).getFileName().toString();
     }
 
     public void feedPathAndName(final Path filePath) {
+        if (filePath == null) {
+            throw new ServiceIOException("null is not a path");
+        }
         this.path = filePath.toString();
         this.originalName = filePath.getFileName().toString();
     }

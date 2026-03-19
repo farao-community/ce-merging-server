@@ -7,8 +7,10 @@
 package com.farao_community.farao.ce_merging.merging.request_metadata;
 
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.merging.request_metadata.model.Data;
 import com.farao_community.farao.ce_merging.merging.request_metadata.model.RequestMetadata;
 import org.junit.jupiter.api.Test;
+import test_utils.GetterSetterVerifier;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;
@@ -53,6 +55,20 @@ class RequestMetadataManagerTest {
         assertThatThrownBy(() -> mgr.checkIfAllInputsAvailable(incomplete))
             .isTaskException()
             .hasMessageContaining("not/existing");
+    }
+
+    @Test
+    void shouldThrowIfWrongMetadata() {
+        assertThatThrownBy(() -> new RequestMetadataManager(stringPathOf(INPUTS), stringContentOf(INPUTS)))
+            .isServiceException()
+            .hasMessage("Invalid request metadata");
+    }
+
+    @Test
+    void dataShouldHaveAccessors() {
+        GetterSetterVerifier
+            .forClass(Data.class)
+            .verify();
     }
 
     private RequestMetadata getMetadata() throws FileNotFoundException {

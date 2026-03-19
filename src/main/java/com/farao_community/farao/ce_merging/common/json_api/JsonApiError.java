@@ -20,10 +20,10 @@ public final class JsonApiError {
     private String detail;
 
     private JsonApiError(final AbstractServiceException exception) {
-        this.status = exception.getStatus();
-        this.code = exception.getCode();
-        this.title = exception.getTitle();
-        this.detail = exception.getMessage();
+        this(exception.getStatus(),
+             exception.getCode(),
+             exception.getTitle(),
+             exception.getMessage());
     }
 
     public JsonApiError(final String status,
