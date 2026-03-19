@@ -31,9 +31,9 @@ class ExceptionUtilsTest {
     @ParameterizedTest
     @MethodSource("throwersRunnables")
     void shouldThrowServiceIOException(final ThrowableAssert.ThrowingCallable thrower) {
-       assertThatThrownBy(thrower)
-           .isServiceException()
-           .hasMessageContaining(TEST);
+        assertThatThrownBy(thrower)
+            .isServiceException()
+            .hasMessageContaining(TEST);
     }
 
 }
