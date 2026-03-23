@@ -11,7 +11,6 @@ import com.farao_community.farao.ce_merging.common.util.FileUtils;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskManagementService;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.http.HttpStatus;
@@ -47,17 +46,6 @@ class MergingControllerTest {
 
     private final MergingTaskManagementService taskManager = mock(MergingTaskManagementService.class);
     private final MergingController controller = new MergingController(taskManager);
-    private static MockHttpServletRequest mockRequest;
-
-    @BeforeAll
-    static void setup() {
-        mockRequest = new MockHttpServletRequest();
-        mockRequest.setContextPath("/test");
-
-        final ServletRequestAttributes attrs = new ServletRequestAttributes(mockRequest);
-
-        RequestContextHolder.setRequestAttributes(attrs);
-    }
 
     @Test
     void shouldGetOutputsAsAttachments() {
@@ -87,6 +75,13 @@ class MergingControllerTest {
 
     @Test
     void shouldCreateTask() {
+        // necessary for MvcUriComponentsBuilder
+        final MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+        mockRequest.setContextPath("/test");
+        final ServletRequestAttributes attrs = new ServletRequestAttributes(mockRequest);
+        RequestContextHolder.setRequestAttributes(attrs);
+        //
+
         final MergingTaskDto task = taskDtoWithIdAndStatus(1, CREATED);
         when(taskManager.createNewTask(any(MultipartFile.class), anyString()))
             .thenReturn(task);
