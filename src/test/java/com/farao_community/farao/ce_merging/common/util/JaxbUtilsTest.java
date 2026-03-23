@@ -127,14 +127,23 @@ class JaxbUtilsTest {
                                                      new MergingTaskDto()),
                         () -> JaxbUtils.writeToPath(MergingTaskDto.class,
                                                     new MergingTaskDto(),
-                                                    Path.of("nothing")));
+                                                    Path.of("/nothing")),
+                        () -> JaxbUtils.writeToPath(MergingTaskDto.class,
+                                                    new MergingTaskDto(),
+                                                    null,
+                                                    null,
+                                                    Path.of("/nothing")),
+                        () -> JaxbUtils.writeToBytes(MergingTaskDto.class,
+                                                     new MergingTaskDto(),
+                                                     null,
+                                                     null));
     }
 
     @ParameterizedTest
     @MethodSource("throwersRunnables")
     void shouldFailOnWriteInvalidClass(final ThrowableAssert.ThrowingCallable thrower) {
         assertThatThrownBy(thrower)
-            .isServiceException();
+            .isServiceException().hasMessageContaining("MergingTaskDto");
 
     }
 

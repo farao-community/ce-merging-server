@@ -13,20 +13,23 @@ import org.junit.jupiter.api.Test;
 import test_utils.GetterSetterVerifier;
 
 import java.io.FileNotFoundException;
-import java.nio.file.Path;
 import java.time.ZoneOffset;
+import java.util.InputMismatchException;
 
+import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.CREATED;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.pathOf;
 import static test_utils.CeTestUtils.stringContentOf;
 import static test_utils.CeTestUtils.stringPathOf;
+import static test_utils.CeTestUtils.taskWithIdAndStatus;
 import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class RequestMetadataManagerTest {
 
     private static final String INPUTS = "request-metadata/inputs/";
     private static final String METADATA = "request-metadata/metadata.json";
+    private static final String METADATA_WITHOUT_RECESSIVITY_PARAMETERS = "request-metadata/metadata_no_rp.json";
     private static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+02:00");
 
     @Test
@@ -42,6 +45,10 @@ class RequestMetadataManagerTest {
         final RequestMetadataManager mgr = new RequestMetadataManager(stringPathOf(INPUTS),
                                                                       stringContentOf(METADATA));
         assertDoesNotThrow(() -> mgr.checkIfAllInputsAvailable(pathOf(INPUTS)));
+
+        final RequestMetadataManager mgrNoRp = new RequestMetadataManager(stringPathOf(INPUTS),
+                                                                          stringContentOf(METADATA_WITHOUT_RECESSIVITY_PARAMETERS));
+        assertDoesNotThrow(() -> mgrNoRp.checkIfAllInputsAvailable(pathOf(INPUTS)));
     }
 
     @Test
@@ -51,10 +58,25 @@ class RequestMetadataManagerTest {
         final RequestMetadataManager mgr = new RequestMetadataManager(stringPathOf(INPUTS),
                                                                       reqMd);
 
-        final Path incomplete = pathOf(INPUTS);
-        assertThatThrownBy(() -> mgr.checkIfAllInputsAvailable(incomplete))
+        assertThatThrownBy(() -> mgr.checkIfAllInputsAvailable(pathOf(INPUTS)))
             .isTaskException()
             .hasMessageContaining("not/existing");
+    }
+
+    @Test
+    void shouldThrowIfIgmHasInvalidName() throws FileNotFoundException {
+        final RequestMetadata reqMd = getMetadata();
+        reqMd.getData()
+            .getAttributes()
+            .getInputs()
+            .getIgms()
+            .forEach(igm -> igm.getIgmFile().setPath("inputs/EC.EC"));
+
+        final RequestMetadataManager mgr = new RequestMetadataManager(stringPathOf(INPUTS),
+                                                                      reqMd);
+
+        assertThatThrownBy(() -> mgr.feedTaskData(taskWithIdAndStatus(1, CREATED)))
+            .isInstanceOf(InputMismatchException.class);
     }
 
     @Test

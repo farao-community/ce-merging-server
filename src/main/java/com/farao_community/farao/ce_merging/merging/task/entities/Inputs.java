@@ -141,10 +141,6 @@ public class Inputs implements Serializable {
         this.realOffset = realOffset;
     }
 
-    public Boolean getMergingWithInternalHvdc() {
-        return mergingWithInternalHvdc;
-    }
-
     public void setMergingWithInternalHvdc(final Boolean mergingWithInternalHvdc) {
         this.mergingWithInternalHvdc = mergingWithInternalHvdc;
     }

@@ -9,13 +9,13 @@ package com.farao_community.farao.ce_merging.merging.task;
 import com.farao_community.farao.ce_merging.merging.task.dto.InputsDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
-import com.farao_community.farao.ce_merging.merging.task.entities.enums.IgmType;
 import org.junit.jupiter.api.Test;
 import test_utils.GetterSetterVerifier;
 
 import java.time.ZoneOffset;
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.merging.task.entities.enums.IgmType.SNAPSHOT;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -47,6 +47,7 @@ class InputsAndInputsDtoTest {
         assertEquals(2000, inputsDto.getAlegroThreshold());
         assertEquals(ZoneOffset.of("+01:00"), inputs.getRealOffset());
         assertTrue(inputs.isMergingWithInternalHvdc());
+        assertTrue(inputs.isMergingWithInternalHvdc());
 
         // but the setters still work as intended
         inputs.setAlegroThreshold(1234);
@@ -60,16 +61,19 @@ class InputsAndInputsDtoTest {
 
         inputs.setMergingWithInternalHvdc(false);
         assertFalse(inputs.isMergingWithInternalHvdc());
+
+        inputsDto.setMergingWithInternalHvdc(false);
+        assertFalse(inputsDto.isMergingWithInternalHvdc());
     }
 
     @Test
     void shouldGetOneIgmInInputs() {
         final IgmData france = new IgmData();
         france.setCountry("FR");
-        france.setType(IgmType.SNAPSHOT);
+        france.setType(SNAPSHOT);
         final IgmData spain = new IgmData();
         spain.setCountry("ES");
-        spain.setType(IgmType.SNAPSHOT);
+        spain.setType(SNAPSHOT);
 
         final Inputs inputs = new Inputs();
         inputs.setIgms(List.of(france, spain));

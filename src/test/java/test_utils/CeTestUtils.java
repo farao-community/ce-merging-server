@@ -10,12 +10,16 @@ import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.ThrowableAssert;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
@@ -36,7 +40,10 @@ public final class CeTestUtils {
 
     private static final Class<CeTestUtils> THIS = CeTestUtils.class;
     private static final String DEFAULT_FILE = "blank.file";
-    private static final String ZIP_NAME = "inputs.zip";
+    public static final String INPUTS_ZIP_NAME = "inputs.zip";
+    public static final String INPUTS = "request-metadata/inputs.zip";
+    public static final String METADATA = "request-metadata/metadata.json";
+    public static final String MIME_ZIP = "application/zip";
 
     public static final ServiceIOException S_IO_EXCEPTION = new ServiceIOException("Test");
 
@@ -74,10 +81,14 @@ public final class CeTestUtils {
         return any(MergingTask.class);
     }
 
+    public static SavedFile anyFile() {
+        return any(SavedFile.class);
+    }
+
     public static MergingTask taskWithIdAndStatus(final long id, final TaskStatus status) {
         final MergingTask task = new MergingTask();
         task.setTaskId(id);
-        task.setArchiveFileOriginalName(ZIP_NAME);
+        task.setArchiveFileOriginalName(INPUTS_ZIP_NAME);
         task.setTaskStatus(status);
         final Inputs inputs = new Inputs();
         inputs.setTargetDate(OffsetDateTime.now(ZoneId.of("UTC")));
@@ -98,5 +109,34 @@ public final class CeTestUtils {
     // so we use this to write more concisely
     public static Stream<ThrowableAssert.ThrowingCallable> throwers(final ThrowableAssert.ThrowingCallable... calls) {
         return Stream.of(calls);
+    }
+
+    public static OutputStream getFailingOutputStream() {
+        return new OutputStream() {
+            @Override
+            public void write(byte[] b) throws IOException {
+                throw new IOException();
+            }
+
+            @Override
+            public void write(int b) throws IOException {
+                throw new IOException();
+            }
+
+            @Override
+            public void write(final byte[] b,
+                              final int off,
+                              final int len) throws IOException {
+                throw new IOException();
+            }
+        };
+    }
+
+    public static InputStream getFailingInputStream() {
+        return new InputStream() {
+            public int read() throws IOException {
+                throw new IOException();
+            }
+        };
     }
 }

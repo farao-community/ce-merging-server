@@ -8,13 +8,13 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.junit.jupiter.api.Test;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.http.HttpStatus.OK;
 import static test_utils.CeTestUtils.pathOf;
 import static test_utils.CeTestUtils.stringPathOf;
 import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
@@ -25,7 +25,7 @@ class FileUtilsTest {
     void shouldCreateAttachments() {
         final ResponseEntity<byte[]> response = FileUtils.toAttachmentFileResponse("hello".getBytes(UTF_8),
                                                                                    "hello.txt");
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(OK, response.getStatusCode());
         assertNotNull(response.getBody());
         assertEquals("hello", new String(response.getBody()));
 
@@ -37,7 +37,7 @@ class FileUtilsTest {
 
         final ResponseEntity<byte[]> responseXml = FileUtils.toAttachmentFileResponse(file);
 
-        assertEquals(HttpStatus.OK, responseXml.getStatusCode());
+        assertEquals(OK, responseXml.getStatusCode());
         assertNotNull(responseXml.getBody());
     }
 

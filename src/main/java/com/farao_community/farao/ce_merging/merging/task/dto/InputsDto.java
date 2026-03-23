@@ -75,7 +75,7 @@ public class InputsDto implements Serializable {
         this.targetDate = targetDate;
     }
 
-    public Boolean getMergingWithInternalHvdc() {
+    public Boolean isMergingWithInternalHvdc() {
         return mergingWithInternalHvdc;
     }
 

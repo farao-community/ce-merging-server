@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class OffsetDateTimeSerializerTest {
 
     @Test
-    void shouldSerialize() throws IOException {
+    void shouldSerializeOffsetDatetime() throws IOException {
         final OffsetDateTime timestamp = OffsetDateTime.parse("2025-12-08T14:00Z");
 
         final Writer jsonWriter = new StringWriter();
@@ -34,6 +34,19 @@ class OffsetDateTimeSerializerTest {
 
         assertThat(jsonWriter)
             .hasToString("\"2025-12-08T14:00Z\"");
+    }
+
+    @Test
+    void shouldSerializeNull() throws IOException {
+        final Writer jsonWriter = new StringWriter();
+        final JsonGenerator jsonGenerator = new JsonFactory().createGenerator(jsonWriter);
+        final SerializerProvider serializerProvider = new ObjectMapper().getSerializerProvider();
+
+        new OffsetDateTimeSerializer().serialize(null, jsonGenerator, serializerProvider);
+        jsonGenerator.flush();
+
+        assertThat(jsonWriter)
+            .hasToString("null");
     }
 
 }

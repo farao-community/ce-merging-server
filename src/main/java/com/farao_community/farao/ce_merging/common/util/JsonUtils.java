@@ -58,8 +58,8 @@ public final class JsonUtils {
         try (inputStream) {
             return MAPPER.readValue(inputStream, clazz);
         } catch (final IOException e) {
-            final String errorMessage = String.format("Error occurred when converting Json file to object of type %s",
-                                                      clazz.getName());
+            final String errorMessage = String.format("Error occurred when converting JSON file to object of type %s",
+                                                      clazz.getSimpleName());
             LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }
@@ -120,7 +120,7 @@ public final class JsonUtils {
             MAPPER.writeValue(outputStream, object);
         } catch (final IOException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s",
-                                                      clazz.getName());
+                                                      clazz.getSimpleName());
             LOGGER.error(errorMessage);
             throw new ServiceIOException(errorMessage, e);
         }

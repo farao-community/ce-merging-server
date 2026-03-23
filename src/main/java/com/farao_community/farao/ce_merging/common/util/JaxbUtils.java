@@ -124,7 +124,7 @@ public final class JaxbUtils {
                                                         rootElement),
                                       outputStream);
             return outputStream.toByteArray();
-        } catch (final JAXBException e) {
+        } catch (final Exception e) {
             return logAndThrow(e, "writing a %s object to bytes", clazz.getName());
         }
     }
@@ -150,7 +150,7 @@ public final class JaxbUtils {
                                                         nameSpaceURI,
                                                         rootElement),
                                       filePath.toFile());
-        } catch (final JAXBException e) {
+        } catch (final Exception e) {
             logAndThrow(e, "writing a %s object to path %s", clazz.getName(), filePath.toString());
         }
     }

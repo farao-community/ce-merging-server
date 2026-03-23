@@ -59,7 +59,7 @@ public final class ZipUtils {
         try (final ZipInputStream zipIn = getZipStream(zipFilePath)) { //NOSONAR expanding archive is safe
             ZipEntry zipEntry;
             // iterates over entries in the zip file
-            while ((zipEntry = zipIn.getNextEntry()) != null) {
+            while ((zipEntry = zipIn.getNextEntry()) != null) { // NOSONAR expanding archive is safe
                 final Path filePath = getIfInside(zipEntry.getName(), destDirectory);
                 final String fileDir = filePath.toString();
                 if (zipEntry.isDirectory()) {
@@ -136,8 +136,8 @@ public final class ZipUtils {
     }
 
     static void addFileToZip(final Path filePath,
-                                     final String rootDir,
-                                     final ZipOutputStream outFile) {
+                             final String rootDir,
+                             final ZipOutputStream outFile) {
 
         final byte[] readBuffer = new byte[READ_BUFFER_SIZE];
         int bytesIn;

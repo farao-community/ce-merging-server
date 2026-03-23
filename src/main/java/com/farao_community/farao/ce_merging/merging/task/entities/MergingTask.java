@@ -40,11 +40,6 @@ public class MergingTask implements Serializable {
     private String statusDetail;
 
     /**
-     * Http unique traceId filled when a merging request is run used to track logs
-     */
-    private String runTraceId;
-
-    /**
      * The original name of the .zip input file
      */
     private String archiveFileOriginalName;

@@ -23,7 +23,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 public final class FileUtils {
-    private static final String ATTACHMENT_ERROR = "Cannot return attachment file";
     private static final String RETRIEVE_ERROR = "Cannot retrieve content of %s";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
@@ -39,21 +38,17 @@ public final class FileUtils {
      */
     public static ResponseEntity<byte[]> toAttachmentFileResponse(final byte[] fileContent,
                                                                   final String fileName) {
-        try {
-            final HttpHeaders headers = new HttpHeaders();
-            headers.setContentDisposition(ContentDisposition
-                                              .builder("attachment")
-                                              .filename(fileName)
-                                              .build());
-            return ResponseEntity.ok()
-                .contentType(APPLICATION_OCTET_STREAM)
-                .headers(headers)
-                .body(fileContent);
+        // no try/catch here because nothing can ever throw
+        final HttpHeaders headers = new HttpHeaders();
+        headers.setContentDisposition(ContentDisposition
+                                          .builder("attachment")
+                                          .filename(fileName)
+                                          .build());
+        return ResponseEntity.ok()
+            .contentType(APPLICATION_OCTET_STREAM)
+            .headers(headers)
+            .body(fileContent);
 
-        } catch (final Exception e) {
-            LOGGER.error(ATTACHMENT_ERROR);
-            throw new ServiceIOException(ATTACHMENT_ERROR, e);
-        }
     }
 
     /**
@@ -76,7 +71,8 @@ public final class FileUtils {
 
     /**
      * Used to prevent path injection attacks
-     * @param pathToGet should be located in parent
+     *
+     * @param pathToGet    should be located in parent
      * @param parentFolder should contain path
      * @return the path to get as a Path object
      * @throws ServiceIOException if not the case, or if paths are invalid

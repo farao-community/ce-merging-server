@@ -15,10 +15,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import static test_utils.CeTestUtils.stringPathOf;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.getFailingInputStream;
+import static test_utils.CeTestUtils.getFailingOutputStream;
+import static test_utils.CeTestUtils.stringPathOf;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class JsonUtilsTest {
 
@@ -29,6 +32,8 @@ class JsonUtilsTest {
           "numValue" : 0,
           "listValue" : [ "1", "2", "3" ]
         }""".getBytes(UTF_8);
+
+    private static Class<DummyJson> DUMMY_CLASS = DummyJson.class;
 
     private static final DummyJson TEST_JSON = new DummyJson("test",
                                                              true,
@@ -43,28 +48,34 @@ class JsonUtilsTest {
     @Test
     void shouldReadObjectFromJson() throws IOException {
         assertEquals(TEST_JSON,
-                     JsonUtils.read(DummyJson.class, stringPathOf("dummy.json")));
+                     JsonUtils.read(DUMMY_CLASS, stringPathOf("dummy.json")));
         final MockMultipartFile multipartFile = new MockMultipartFile("dummy.json", JSON_CONTENT);
         assertEquals(TEST_JSON_FROM_BYTES,
-                     JsonUtils.read(DummyJson.class, multipartFile));
+                     JsonUtils.read(DUMMY_CLASS, multipartFile));
     }
 
     @Test
     void shouldWriteObjectToJson() throws IOException {
         assertArrayEquals(JSON_CONTENT,
-                          JsonUtils.writeToBytes(DummyJson.class, TEST_JSON_FROM_BYTES));
+                          JsonUtils.writeToBytes(DUMMY_CLASS, TEST_JSON_FROM_BYTES));
 
         final Path newFile = Files.createFile(Files.createTempDirectory("json-test")
                                                   .resolve("dummy.json"));
 
-        JsonUtils.writeInPath(DummyJson.class, TEST_JSON, newFile);
+        JsonUtils.writeInPath(DUMMY_CLASS, TEST_JSON, newFile);
 
         assertEquals(TEST_JSON,
-                     JsonUtils.read(DummyJson.class, newFile.toString()));
+                     JsonUtils.read(DUMMY_CLASS, newFile.toString()));
     }
 
     @Test
-    void shouldFailWithInvalidContent() {
+    void shouldFailWithInvalidStreams() {
+        assertThatThrownBy(() -> JsonUtils.read(DUMMY_CLASS, getFailingInputStream()))
+            .isServiceException()
+            .hasMessage("Error occurred when converting JSON file to object of type DummyJson");
 
+        assertThatThrownBy(() -> JsonUtils.writeInStream(DUMMY_CLASS, TEST_JSON, getFailingOutputStream()))
+            .isServiceException()
+            .hasMessage("Error occurred when writing content of object of type DummyJson");
     }
 }
