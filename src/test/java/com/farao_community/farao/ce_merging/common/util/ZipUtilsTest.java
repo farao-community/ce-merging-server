@@ -61,7 +61,7 @@ class ZipUtilsTest {
     void shouldFailWhenUnzippingToInvalidDirectory() {
         assertThatThrownBy(() -> unzipFile(pathOf(TEST_ZIP), Path.of("/not/existing")))
             .isServiceException()
-            .hasMessageContaining("Cannot create destination directory");
+            .hasMessage("Error occurred while extracting file testZip.zip");
     }
 
     @Test

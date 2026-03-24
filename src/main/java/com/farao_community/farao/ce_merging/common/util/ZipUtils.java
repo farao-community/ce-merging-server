@@ -51,23 +51,15 @@ public final class ZipUtils {
      */
     public static void unzipFile(final Path zipFilePath,
                                  final Path destDirectory) {
-        final File destination = destDirectory.toFile();
-        if (!destination.exists() && !destination.mkdirs()) {
-            throw new ServiceIOException("Cannot create destination directory '%s'".formatted(destDirectory));
-        }
-
         try (final ZipInputStream zipIn = getZipStream(zipFilePath)) { //NOSONAR expanding archive is safe
+            createOrThrow(destDirectory.toFile());
             ZipEntry zipEntry;
             // iterates over entries in the zip file
             while ((zipEntry = zipIn.getNextEntry()) != null) { // NOSONAR expanding archive is safe
                 final Path filePath = getIfInside(zipEntry.getName(), destDirectory);
                 final String fileDir = filePath.toString();
                 if (zipEntry.isDirectory()) {
-                    // if the entry is a directory, create it if it doesn't already exist
-                    final File dir = new File(fileDir);
-                    if (!dir.exists() && !dir.mkdirs()) {
-                        throw new IOException("Could not create folder %s".formatted(fileDir));
-                    }
+                    createOrThrow(new File(fileDir));
                 } else {
                     // if the entry is a file, extracts it
                     createDirectories(filePath.getParent());
@@ -76,7 +68,13 @@ public final class ZipUtils {
                 zipIn.closeEntry();
             }
         } catch (final IOException e) {
-            throw errorWhile(e, "extracting file '%s'", zipFilePath.getFileName());
+            throw errorWhile(e, "extracting file %s", zipFilePath.getFileName());
+        }
+    }
+
+    private static void createOrThrow(final File dir) throws IOException {
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw new IOException("Cannot create directory %s".formatted(dir));
         }
     }
 

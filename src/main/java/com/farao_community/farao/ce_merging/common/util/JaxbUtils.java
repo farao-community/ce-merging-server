@@ -100,7 +100,9 @@ public final class JaxbUtils {
         try {
             marshaller(clazz).marshal(object, filePath.toFile());
         } catch (final JAXBException e) {
-            throw errorWhile(e, "writing a %s object to %s", toStringWithDefault(filePath), clazz.getSimpleName());
+            throw errorWhile(e, "writing a %s object to %s",
+                             clazz.getSimpleName(),
+                             toStringWithDefault(filePath));
         }
     }
 
@@ -153,7 +155,9 @@ public final class JaxbUtils {
                                                         rootElement),
                                       filePath.toFile());
         } catch (final Exception e) {
-            throw errorWhile(e, "writing a %s object to %s", toStringWithDefault(filePath), clazz.getSimpleName());
+            throw errorWhile(e, "writing a %s object to %s",
+                             clazz.getSimpleName(),
+                             toStringWithDefault(filePath));
         }
     }
 
