@@ -6,15 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.google.common.io.ByteSource;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
@@ -24,14 +21,12 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ERROR_OCCURRED_WHILE;
+import static com.farao_community.farao.ce_merging.common.exception.ServiceIOException.errorWhile;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static java.lang.Boolean.TRUE;
 import static java.nio.file.Files.newInputStream;
 
 public final class JaxbUtils {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(JaxbUtils.class);
 
     private JaxbUtils() {
         // utility class
@@ -51,9 +46,7 @@ public final class JaxbUtils {
                 .unmarshal(new StreamSource(fileContent), clazz)
                 .getValue();
         } catch (final JAXBException | IOException e) {
-            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("converting XML file %s to a %s object".formatted(path, clazz.getName()));
-            LOGGER.error(errorMessage, e);
-            throw new ServiceIOException(errorMessage, e);
+            throw errorWhile(e, "converting XML file %s to a %s object", path, clazz.getSimpleName());
         }
     }
 
@@ -72,9 +65,7 @@ public final class JaxbUtils {
                 .getValue();
 
         } catch (final JAXBException | IOException e) {
-            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("converting bytes to a %s object".formatted(clazz.getName()));
-            LOGGER.error(errorMessage, e);
-            throw new ServiceIOException(errorMessage, e);
+            throw errorWhile(e, "converting bytes to a %s object", clazz.getSimpleName());
         }
     }
 
@@ -92,9 +83,7 @@ public final class JaxbUtils {
             marshaller(clazz).marshal(object, bos);
             return bos.toByteArray();
         } catch (final JAXBException e) {
-            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("writing a %s object to bytes".formatted(clazz.getName()));
-            LOGGER.error(errorMessage, e);
-            throw new ServiceIOException(errorMessage, e);
+            throw errorWhile(e, "writing a %s object to bytes", clazz.getSimpleName());
         }
     }
 
@@ -111,11 +100,7 @@ public final class JaxbUtils {
         try {
             marshaller(clazz).marshal(object, filePath.toFile());
         } catch (final JAXBException e) {
-            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("writing a %s object to %s"
-                                                                           .formatted(toStringWithDefault(filePath),
-                                                                                      clazz.getName()));
-            LOGGER.error(errorMessage, e);
-            throw new ServiceIOException(errorMessage, e);
+            throw errorWhile(e, "writing a %s object to %s", toStringWithDefault(filePath), clazz.getSimpleName());
         }
     }
 
@@ -142,10 +127,7 @@ public final class JaxbUtils {
                                       outputStream);
             return outputStream.toByteArray();
         } catch (final Exception e) {
-            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("writing a %s object to bytes"
-                                                                           .formatted(clazz.getName()));
-            LOGGER.error(errorMessage, e);
-            throw new ServiceIOException(errorMessage, e);
+            throw errorWhile(e, "writing a %s object to bytes", clazz.getSimpleName());
         }
     }
 
@@ -171,11 +153,7 @@ public final class JaxbUtils {
                                                         rootElement),
                                       filePath.toFile());
         } catch (final Exception e) {
-            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("writing a %s object to %s"
-                                                                           .formatted(toStringWithDefault(filePath),
-                                                                                      clazz.getName()));
-            LOGGER.error(errorMessage, e);
-            throw new ServiceIOException(errorMessage, e);
+            throw errorWhile(e, "writing a %s object to %s", toStringWithDefault(filePath), clazz.getSimpleName());
         }
     }
 
@@ -229,6 +207,7 @@ public final class JaxbUtils {
 
     /**
      * to not throw again in catch clause
+     *
      * @param path can be null
      * @return path toString if not null, else a default value
      */

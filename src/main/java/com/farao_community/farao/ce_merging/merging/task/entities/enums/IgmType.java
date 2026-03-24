@@ -14,7 +14,9 @@ public enum IgmType {
 
     SNAPSHOT("SN"),
     DACF("FO"),
-    D2CF("2D");
+    D2CF("2D"),
+    REFERENCE("RE"),
+    LONG_TERM_REFERENCE("LR");
 
     private final String typeCode;
 

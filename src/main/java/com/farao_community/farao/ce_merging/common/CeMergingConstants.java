@@ -23,5 +23,4 @@ public final class CeMergingConstants {
     public static final String BAD_REQUEST = "400";
     public static final String NOT_FOUND = "404";
     public static final String INTERNAL_ERROR = "500";
-    public static final String ERROR_OCCURRED_WHILE = "Error occurred while %s";
 }

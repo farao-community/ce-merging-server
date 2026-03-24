@@ -8,8 +8,6 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
@@ -28,7 +26,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import static com.farao_community.farao.ce_merging.common.util.ExceptionUtils.logAndThrow;
+import static com.farao_community.farao.ce_merging.common.exception.ServiceIOException.errorWhile;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createTempDirectory;
@@ -36,7 +34,6 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 public final class ZipUtils {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ZipUtils.class);
     private static final int WRITE_BUFFER_SIZE = 4096;
     private static final int READ_BUFFER_SIZE = 2156;
     private static final String TMP_DIR = "CeMerging";
@@ -55,8 +52,8 @@ public final class ZipUtils {
     public static void unzipFile(final Path zipFilePath,
                                  final Path destDirectory) {
         final File destination = destDirectory.toFile();
-        if (!destination.exists() && !destination.mkdir()) {
-            logAndThrow(null, "Cannot create destination directory '%s'", destDirectory);
+        if (!destination.exists() && !destination.mkdirs()) {
+            throw new ServiceIOException("Cannot create destination directory '%s'".formatted(destDirectory));
         }
 
         try (final ZipInputStream zipIn = getZipStream(zipFilePath)) { //NOSONAR expanding archive is safe
@@ -68,7 +65,7 @@ public final class ZipUtils {
                 if (zipEntry.isDirectory()) {
                     // if the entry is a directory, create it if it doesn't already exist
                     final File dir = new File(fileDir);
-                    if (!dir.exists() && !dir.mkdir()) {
+                    if (!dir.exists() && !dir.mkdirs()) {
                         throw new IOException("Could not create folder %s".formatted(fileDir));
                     }
                 } else {
@@ -79,7 +76,7 @@ public final class ZipUtils {
                 zipIn.closeEntry();
             }
         } catch (final IOException e) {
-            logAndThrow(e, "extracting file '%s'", zipFilePath.getFileName());
+            throw errorWhile(e, "extracting file '%s'", zipFilePath.getFileName());
         }
     }
 
@@ -133,7 +130,7 @@ public final class ZipUtils {
                 .forEach(filePath -> addFileToZip(filePath, directory, zipOutputStream));
 
         } catch (final IOException e) {
-            logAndThrow(e, "compressing directory %s", directory);
+            throw errorWhile(e, "compressing directory %s", directory);
         }
         return zipBytesStream.toByteArray();
     }

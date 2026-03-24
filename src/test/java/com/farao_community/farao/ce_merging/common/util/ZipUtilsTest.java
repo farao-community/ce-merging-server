@@ -37,6 +37,9 @@ class ZipUtilsTest {
         assertTrue(pathInZip("directory/file3.txt", tmp)
                        .toFile().exists());
 
+        assertTrue(pathInZip("existing-dir/file4.txt", tmp)
+                       .toFile().exists());
+
         assertTrue(zipDirectory(tmp.toString()).length > 0);
     }
 

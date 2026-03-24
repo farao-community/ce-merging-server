@@ -11,6 +11,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INT
 public class ServiceIOException extends AbstractServiceException {
     private static final String EXCEPTION_ERROR_CODE = "500-IO-EXCEPTION";
     private static final String EXCEPTION_TITLE = "IO exception";
+    private static final String ERROR_OCCURRED_WHILE = "Error occurred while ";
 
     public ServiceIOException(final String message) {
         super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message);
@@ -19,5 +20,12 @@ public class ServiceIOException extends AbstractServiceException {
     public ServiceIOException(final String message,
                               final Throwable cause) {
         super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, cause);
+    }
+
+    public static ServiceIOException errorWhile(final Throwable cause,
+                                                final String circumstance,
+                                                final Object... args) {
+        final String errorMessage = ERROR_OCCURRED_WHILE + circumstance.formatted(args);
+        return new ServiceIOException(errorMessage, cause);
     }
 }

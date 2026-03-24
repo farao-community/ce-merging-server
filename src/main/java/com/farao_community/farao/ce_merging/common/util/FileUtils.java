@@ -56,7 +56,6 @@ public final class FileUtils {
      * @param savedFile a file of the merging process
      * @return the file wrapped in an HTTP response entity
      */
-
     public static ResponseEntity<byte[]> toAttachmentFileResponse(final SavedFile savedFile) {
         final String path = savedFile.getPath();
         try {
