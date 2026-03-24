@@ -135,15 +135,16 @@ class JaxbUtilsTest {
             .hasMessageContaining("Xnode");
     }
 
-    static Stream<ThrowableAssert.ThrowingCallable> throwersRunnables() {
+    static Stream<ThrowableAssert.ThrowingCallable> failingWriters() {
         return throwers(() -> JaxbUtils.writeToBytes(TASK_CLASS, NEW_TASK),
                         () -> JaxbUtils.writeToPath(TASK_CLASS, NEW_TASK, Path.of("/nothing")),
+                        () -> JaxbUtils.writeToPath(TASK_CLASS, NEW_TASK, null),
                         () -> JaxbUtils.writeToPath(TASK_CLASS, NEW_TASK, null, null, Path.of("/nothing")),
                         () -> JaxbUtils.writeToBytes(TASK_CLASS, NEW_TASK, null, null));
     }
 
     @ParameterizedTest
-    @MethodSource("throwersRunnables")
+    @MethodSource("failingWriters")
     void shouldFailOnWriteInvalidClass(final ThrowableAssert.ThrowingCallable thrower) {
         assertThatThrownBy(thrower)
             .isServiceException()

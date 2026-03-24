@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -24,6 +25,9 @@ import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class ZipUtilsTest {
     private static final String TEST_ZIP = "testZip.zip";
+
+    @TempDir
+    Path tempDir;
 
     @Test
     void shouldUnzipThenZipAgain() throws IOException {
@@ -48,8 +52,8 @@ class ZipUtilsTest {
     }
 
     @Test
-    void shouldFailWhenUnzippingToReadOnlyDirectory() throws IOException {
-        final Path tmp = Files.createTempDirectory("zip-test");
+    void shouldFailWhenUnzippingToReadOnlyDirectory() {
+        final Path tmp = tempDir;
         assertTrue(tmp.toFile().setReadOnly());
         final Path zipInput = pathOf(TEST_ZIP);
         assertThatThrownBy(() -> unzipFile(zipInput, tmp))

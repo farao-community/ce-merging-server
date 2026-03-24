@@ -102,7 +102,7 @@ public final class JaxbUtils {
         } catch (final Exception e) {
             throw errorWhile(e, "writing a %s object to %s",
                              clazz.getSimpleName(),
-                             toStringWithDefault(filePath));
+                             filePath);
         }
     }
 
@@ -157,7 +157,7 @@ public final class JaxbUtils {
         } catch (final Exception e) {
             throw errorWhile(e, "writing a %s object to %s",
                              clazz.getSimpleName(),
-                             toStringWithDefault(filePath));
+                             filePath);
         }
     }
 
@@ -207,16 +207,6 @@ public final class JaxbUtils {
      */
     private static InputStream bytesToStream(final byte[] bytes) throws IOException {
         return ByteSource.wrap(bytes).openStream();
-    }
-
-    /**
-     * to not throw again in catch clause
-     *
-     * @param path can be null
-     * @return path toString if not null, else a default value
-     */
-    private static String toStringWithDefault(final Path path) {
-        return path == null ? "unexisting path" : path.toString();
     }
 
 }
