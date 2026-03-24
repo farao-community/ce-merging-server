@@ -33,7 +33,7 @@ class JsonUtilsTest {
           "listValue" : [ "1", "2", "3" ]
         }""".getBytes(UTF_8);
 
-    private static Class<DummyJson> DUMMY_CLASS = DummyJson.class;
+    private static final Class<DummyJson> DUMMY_CLASS = DummyJson.class;
 
     private static final DummyJson TEST_JSON = new DummyJson("test",
                                                              true,

@@ -129,6 +129,10 @@ class JaxbUtilsTest {
         assertThatThrownBy(() -> JaxbUtils.readFromPath(XNODES_CLASS, "/non/existent/path.xml"))
             .isServiceException()
             .hasMessageContaining("Xnode");
+
+        assertThatThrownBy(() -> JaxbUtils.readFromPath(XNODES_CLASS, null))
+            .isServiceException()
+            .hasMessageContaining("Xnode");
     }
 
     static Stream<ThrowableAssert.ThrowingCallable> throwersRunnables() {

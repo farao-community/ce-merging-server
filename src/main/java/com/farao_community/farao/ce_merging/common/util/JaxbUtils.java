@@ -45,7 +45,7 @@ public final class JaxbUtils {
             return unmarshaller(clazz)
                 .unmarshal(new StreamSource(fileContent), clazz)
                 .getValue();
-        } catch (final JAXBException | IOException e) {
+        } catch (final Exception e) {
             throw errorWhile(e, "converting XML file %s to a %s object", path, clazz.getSimpleName());
         }
     }
@@ -64,7 +64,7 @@ public final class JaxbUtils {
                 .unmarshal(new StreamSource(inputStream), clazz)
                 .getValue();
 
-        } catch (final JAXBException | IOException e) {
+        } catch (final Exception e) {
             throw errorWhile(e, "converting bytes to a %s object", clazz.getSimpleName());
         }
     }
@@ -82,7 +82,7 @@ public final class JaxbUtils {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
             marshaller(clazz).marshal(object, bos);
             return bos.toByteArray();
-        } catch (final JAXBException e) {
+        } catch (final Exception e) {
             throw errorWhile(e, "writing a %s object to bytes", clazz.getSimpleName());
         }
     }
@@ -99,7 +99,7 @@ public final class JaxbUtils {
                                        final Path filePath) {
         try {
             marshaller(clazz).marshal(object, filePath.toFile());
-        } catch (final JAXBException e) {
+        } catch (final Exception e) {
             throw errorWhile(e, "writing a %s object to %s",
                              clazz.getSimpleName(),
                              toStringWithDefault(filePath));
