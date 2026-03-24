@@ -59,10 +59,6 @@ public class IgmData implements Serializable {
         type = IgmType.fromTypeCode(ucteNaming.group("type"));
     }
 
-    public String getIgmQualityReportFileLocation() {
-        return igmQualityReportFile.getLocation();
-    }
-
     public void setIgmQualityReportFilePath(final String igmQualityReportFilePath) {
         igmQualityReportFile.feedPathAndName(igmQualityReportFilePath);
     }

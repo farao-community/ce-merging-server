@@ -44,8 +44,7 @@ public class Inputs implements Serializable {
      */
     private ZoneOffset realOffset;
     /**
-     * mergingWithInternalHvdc = True if there is an internal HVDC line in CE
-     * else mergingWithInternalHvdc = true
+     * is there an internal HVDC line in CE
      */
     private Boolean mergingWithInternalHvdc;
     /**
@@ -64,18 +63,18 @@ public class Inputs implements Serializable {
     @OneToOne(cascade = ALL)
     private SavedFile generationLoadShiftKeys = new SavedFile();
     /**
-     * The SavedFile of the external constraints file
+     * The external constraints file
      */
     @OneToOne(cascade = ALL)
     private SavedFile externalConstraints = new SavedFile();
     /**
-     * The SavedFile of the feasibility range file
+     * The feasibility range file
      */
     @OneToOne(cascade = ALL)
     private SavedFile feasibilityRanges = new SavedFile();
 
     /**
-     * The SavedFile of the net position forecast file
+     * The net position forecast file
      */
     @OneToOne(cascade = ALL)
     private SavedFile netPositionForecast = new SavedFile();
@@ -93,7 +92,7 @@ public class Inputs implements Serializable {
             .orElse(DEFAULT_OFFSET);
     }
 
-    public Boolean isMergingWithInternalHvdc() {
+    public Boolean getMergingWithInternalHvdc() {
         return Optional.ofNullable(mergingWithInternalHvdc)
             .orElse(true);
     }

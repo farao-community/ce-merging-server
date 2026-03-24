@@ -66,7 +66,7 @@ public class MergingController {
         @ApiResponse(responseCode = CREATED, description = "The merging task has been created successfully."),
         @ApiResponse(responseCode = BAD_REQUEST, description = "Invalid merging task.")
     })
-    public ResponseEntity<MergingTaskDto> createTask(@Parameter(description = "Input files ZIP archive")
+    public ResponseEntity<JsonApiDocument<MergingTaskDto>> createTask(@Parameter(description = "Input files ZIP archive")
                                                      @RequestPart final MultipartFile inputFilesArchive,
                                                      @Parameter(description = "JSON representation of the task")
                                                      @RequestPart final String inputRequestMetadata) {
@@ -78,7 +78,7 @@ public class MergingController {
 
         return ResponseEntity
             .created(taskLocation.toUri())
-            .body(createdTask);
+            .body(JsonApiDocument.fromData(createdTask));
     }
 
     @PostMapping(value = "/tasks/{taskId}",

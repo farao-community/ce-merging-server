@@ -75,30 +75,34 @@ class MergingControllerTest {
 
     @Test
     void shouldCreateTask() {
-        // necessary for MvcUriComponentsBuilder
-        final MockHttpServletRequest mockRequest = new MockHttpServletRequest();
-        mockRequest.setContextPath("/test");
-        final ServletRequestAttributes attrs = new ServletRequestAttributes(mockRequest);
-        RequestContextHolder.setRequestAttributes(attrs);
-        //
+        try {
+            // necessary for MvcUriComponentsBuilder
+            final MockHttpServletRequest mockRequest = new MockHttpServletRequest();
+            mockRequest.setContextPath("/test");
+            final ServletRequestAttributes attrs = new ServletRequestAttributes(mockRequest);
+            RequestContextHolder.setRequestAttributes(attrs);
+            //
 
-        final MergingTaskDto task = taskDtoWithIdAndStatus(1, CREATED);
-        when(taskManager.createNewTask(any(MultipartFile.class), anyString()))
-            .thenReturn(task);
+            final MergingTaskDto task = taskDtoWithIdAndStatus(1, CREATED);
+            when(taskManager.createNewTask(any(MultipartFile.class), anyString()))
+                .thenReturn(task);
 
-        final MockMultipartFile inputZip = new MockMultipartFile(INPUTS_ZIP_NAME,
-                                                                 INPUTS_ZIP_NAME,
-                                                                 MIME_ZIP,
-                                                                 byteContentOf(INPUTS));
+            final MockMultipartFile inputZip = new MockMultipartFile(INPUTS_ZIP_NAME,
+                                                                     INPUTS_ZIP_NAME,
+                                                                     MIME_ZIP,
+                                                                     byteContentOf(INPUTS));
 
-        final ResponseEntity<MergingTaskDto> response = controller.createTask(inputZip,
-                                                                              stringContentOf(METADATA));
+            final ResponseEntity<JsonApiDocument<MergingTaskDto>> response = controller.createTask(inputZip,
+                                                                                                   stringContentOf(METADATA));
 
-        assertEquals(HttpStatus.CREATED,
-                     response.getStatusCode());
+            assertEquals(HttpStatus.CREATED,
+                         response.getStatusCode());
 
-        assertThat(response.getHeaders().getLocation())
-            .hasPath("/test/ce-merging/v1/tasks/1");
+            assertThat(response.getHeaders().getLocation())
+                .hasPath("/test/ce-merging/v1/tasks/1");
+        } finally {
+            RequestContextHolder.resetRequestAttributes();
+        }
 
     }
 

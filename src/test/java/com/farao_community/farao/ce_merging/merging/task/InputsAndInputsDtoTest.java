@@ -46,8 +46,8 @@ class InputsAndInputsDtoTest {
         assertEquals(2000, inputs.getAlegroThreshold());
         assertEquals(2000, inputsDto.getAlegroThreshold());
         assertEquals(ZoneOffset.of("+01:00"), inputs.getRealOffset());
-        assertTrue(inputs.isMergingWithInternalHvdc());
-        assertTrue(inputs.isMergingWithInternalHvdc());
+        assertTrue(inputs.getMergingWithInternalHvdc());
+        assertTrue(inputs.getMergingWithInternalHvdc());
 
         // but the setters still work as intended
         inputs.setAlegroThreshold(1234);
@@ -60,10 +60,10 @@ class InputsAndInputsDtoTest {
         assertEquals(UTC, inputs.getRealOffset());
 
         inputs.setMergingWithInternalHvdc(false);
-        assertFalse(inputs.isMergingWithInternalHvdc());
+        assertFalse(inputs.getMergingWithInternalHvdc());
 
         inputsDto.setMergingWithInternalHvdc(false);
-        assertFalse(inputsDto.isMergingWithInternalHvdc());
+        assertFalse(inputsDto.getMergingWithInternalHvdc());
     }
 
     @Test

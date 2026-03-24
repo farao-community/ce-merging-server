@@ -8,6 +8,8 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedOutputStream;
@@ -34,6 +36,7 @@ import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
 public final class ZipUtils {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ZipUtils.class);
     private static final int WRITE_BUFFER_SIZE = 4096;
     private static final int READ_BUFFER_SIZE = 2156;
     private static final String TMP_DIR = "CeMerging";
@@ -63,9 +66,9 @@ public final class ZipUtils {
                 final Path filePath = getIfInside(zipEntry.getName(), destDirectory);
                 final String fileDir = filePath.toString();
                 if (zipEntry.isDirectory()) {
-                    // if the entry is a directory, make the directory
-                    final boolean created = new File(fileDir).mkdir();
-                    if (!created) {
+                    // if the entry is a directory, create it if it doesn't already exist
+                    final File dir = new File(fileDir);
+                    if (!dir.exists() && !dir.mkdir()) {
                         throw new IOException("Could not create folder %s".formatted(fileDir));
                     }
                 } else {

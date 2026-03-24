@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 
+import java.nio.file.Path;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.taskWithIdAndStatus;
 
@@ -30,29 +32,29 @@ class CeMergingConfigurationTest {
         copy.setDailyMergingRoot(cfg.getDailyMergingRoot());
         final MergingTask task = taskWithIdAndStatus(1, TaskStatus.CREATED);
 
-        assertEquals("/tmp/testFiles",
-                     copy.getCeMergingRoot());
+        assertEquals(Path.of("/tmp/testFiles"),
+                     Path.of(copy.getCeMergingRoot()));
 
-        assertEquals("/tmp/testFiles/daily",
-                     copy.getDailyMergingRoot());
+        assertEquals(Path.of("/tmp/testFiles/daily"),
+                     Path.of(copy.getDailyMergingRoot()));
 
-        assertEquals("/tmp/testFiles/1/artifacts",
-                     copy.getArtifactsDirectoryPath(task));
+        assertEquals(Path.of("/tmp/testFiles/1/artifacts"),
+                     Path.of(copy.getArtifactsDirectoryPath(task)));
 
         copy.setCeMergingRoot("/another/root");
 
-        assertEquals("/another/root/1/outputs",
-                     copy.getOutputsDirectoryPath(task));
+        assertEquals(Path.of("/another/root/1/outputs"),
+                     Path.of(copy.getOutputsDirectoryPath(task)));
 
-        assertEquals("/another/root/1/inputs",
-                     copy.getInputsDirectoryPath(task));
+        assertEquals(Path.of("/another/root/1/inputs"),
+                     Path.of(copy.getInputsDirectoryPath(task)));
 
-        assertEquals("/tmp/testFiles/daily/1/daily-outputs",
-                     copy.getDailyOutputsDirectoryPath(task));
+        assertEquals(Path.of("/tmp/testFiles/daily/1/daily-outputs"),
+                     Path.of(copy.getDailyOutputsDirectoryPath(task)));
 
         copy.setDailyMergingRoot("/a/new/path");
 
-        assertEquals("/a/new/path/1/daily-inputs",
-                     copy.getDailyInputsDirectoryPath(task));
+        assertEquals(Path.of("/a/new/path/1/daily-inputs"),
+                     Path.of(copy.getDailyInputsDirectoryPath(task)));
     }
 }

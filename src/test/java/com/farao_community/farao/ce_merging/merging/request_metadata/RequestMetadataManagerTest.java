@@ -17,6 +17,7 @@ import java.time.ZoneOffset;
 import java.util.InputMismatchException;
 
 import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.CREATED;
+import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.pathOf;
@@ -49,6 +50,7 @@ class RequestMetadataManagerTest {
         final RequestMetadataManager mgrNoRp = new RequestMetadataManager(stringPathOf(INPUTS),
                                                                           stringContentOf(METADATA_WITHOUT_RECESSIVITY_PARAMETERS));
         assertDoesNotThrow(() -> mgrNoRp.checkIfAllInputsAvailable(pathOf(INPUTS)));
+        assertDoesNotThrow(() -> mgrNoRp.feedTaskData(taskWithIdAndStatus(1L, SUCCESS)));
     }
 
     @Test

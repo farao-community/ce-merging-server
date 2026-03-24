@@ -23,8 +23,5 @@ public final class CeMergingConstants {
     public static final String BAD_REQUEST = "400";
     public static final String NOT_FOUND = "404";
     public static final String INTERNAL_ERROR = "500";
-    public static final String CSV_SEPARATOR = ";";
-    public static final String ID = "id";
-    public static final String NAME = "name";
-    public static final String FILE_IS_EMPTY = "file is empty";
+    public static final String ERROR_OCCURRED_WHILE = "Error occurred while %s";
 }

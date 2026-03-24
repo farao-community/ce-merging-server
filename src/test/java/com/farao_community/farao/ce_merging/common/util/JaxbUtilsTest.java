@@ -37,6 +37,8 @@ class JaxbUtilsTest {
         """.getBytes(UTF_8);
 
     private static final Class<Xnodes> XNODES_CLASS = Xnodes.class;
+    private static final Class<MergingTaskDto> TASK_CLASS = MergingTaskDto.class;
+    private static final MergingTaskDto NEW_TASK = new MergingTaskDto();
 
     @Test
     void shouldUnmarshallDummyXml() {
@@ -108,7 +110,7 @@ class JaxbUtilsTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"dummy.csv", "dummy.json", "not.existing"})
+    @ValueSource(strings = {"dummy.csv", "dummy.json"})
     void shouldFailOnReadInvalidData(final String fileName) {
         final String strInput = stringPathOf(fileName);
         final byte[] byteInput = fileName.getBytes(UTF_8);
@@ -122,28 +124,26 @@ class JaxbUtilsTest {
             .hasMessageContaining("Xnode");
     }
 
+    @Test
+    void shouldFailOnReadMissingFile() {
+        assertThatThrownBy(() -> JaxbUtils.readFromPath(XNODES_CLASS, "/non/existent/path.xml"))
+            .isServiceException()
+            .hasMessageContaining("Xnode");
+    }
+
     static Stream<ThrowableAssert.ThrowingCallable> throwersRunnables() {
-        return throwers(() -> JaxbUtils.writeToBytes(MergingTaskDto.class,
-                                                     new MergingTaskDto()),
-                        () -> JaxbUtils.writeToPath(MergingTaskDto.class,
-                                                    new MergingTaskDto(),
-                                                    Path.of("/nothing")),
-                        () -> JaxbUtils.writeToPath(MergingTaskDto.class,
-                                                    new MergingTaskDto(),
-                                                    null,
-                                                    null,
-                                                    Path.of("/nothing")),
-                        () -> JaxbUtils.writeToBytes(MergingTaskDto.class,
-                                                     new MergingTaskDto(),
-                                                     null,
-                                                     null));
+        return throwers(() -> JaxbUtils.writeToBytes(TASK_CLASS, NEW_TASK),
+                        () -> JaxbUtils.writeToPath(TASK_CLASS, NEW_TASK, Path.of("/nothing")),
+                        () -> JaxbUtils.writeToPath(TASK_CLASS, NEW_TASK, null, null, Path.of("/nothing")),
+                        () -> JaxbUtils.writeToBytes(TASK_CLASS, NEW_TASK, null, null));
     }
 
     @ParameterizedTest
     @MethodSource("throwersRunnables")
     void shouldFailOnWriteInvalidClass(final ThrowableAssert.ThrowingCallable thrower) {
         assertThatThrownBy(thrower)
-            .isServiceException().hasMessageContaining("MergingTaskDto");
+            .isServiceException()
+            .hasMessageContaining("MergingTaskDto");
 
     }
 

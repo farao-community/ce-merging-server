@@ -6,12 +6,15 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
+import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.google.common.io.ByteSource;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
@@ -21,12 +24,14 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static com.farao_community.farao.ce_merging.common.util.ExceptionUtils.logAndThrow;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ERROR_OCCURRED_WHILE;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static java.lang.Boolean.TRUE;
 import static java.nio.file.Files.newInputStream;
 
 public final class JaxbUtils {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JaxbUtils.class);
 
     private JaxbUtils() {
         // utility class
@@ -46,7 +51,9 @@ public final class JaxbUtils {
                 .unmarshal(new StreamSource(fileContent), clazz)
                 .getValue();
         } catch (final JAXBException | IOException e) {
-            return logAndThrow(e, "converting XML file %s to a %s object", path, clazz.getName());
+            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("converting XML file %s to a %s object".formatted(path, clazz.getName()));
+            LOGGER.error(errorMessage, e);
+            throw new ServiceIOException(errorMessage, e);
         }
     }
 
@@ -57,13 +64,17 @@ public final class JaxbUtils {
      * @param fileContent the byte array to read from
      * @return an object from XML byte content
      */
-    @SuppressWarnings("unchecked") // NOSONAR because giving Class<T> to genericUnmarshaller necessarily produces a T
     public static <T> T readFromBytes(final Class<T> clazz,
                                       final byte[] fileContent) {
-        try {
-            return (T) unmarshaller(clazz).unmarshal(bytesToStream(fileContent));
+        try (InputStream inputStream = bytesToStream(fileContent)) {
+            return unmarshaller(clazz)
+                .unmarshal(new StreamSource(inputStream), clazz)
+                .getValue();
+
         } catch (final JAXBException | IOException e) {
-            return logAndThrow(e, "converting bytes to a %s object", clazz.getName());
+            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("converting bytes to a %s object".formatted(clazz.getName()));
+            LOGGER.error(errorMessage, e);
+            throw new ServiceIOException(errorMessage, e);
         }
     }
 
@@ -81,7 +92,9 @@ public final class JaxbUtils {
             marshaller(clazz).marshal(object, bos);
             return bos.toByteArray();
         } catch (final JAXBException e) {
-            return logAndThrow(e, "writing a %s object to bytes", clazz.getName());
+            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("writing a %s object to bytes".formatted(clazz.getName()));
+            LOGGER.error(errorMessage, e);
+            throw new ServiceIOException(errorMessage, e);
         }
     }
 
@@ -98,7 +111,11 @@ public final class JaxbUtils {
         try {
             marshaller(clazz).marshal(object, filePath.toFile());
         } catch (final JAXBException e) {
-            logAndThrow(e, "writing a %s object to path %s", clazz.getName(), filePath);
+            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("writing a %s object to %s"
+                                                                           .formatted(toStringWithDefault(filePath),
+                                                                                      clazz.getName()));
+            LOGGER.error(errorMessage, e);
+            throw new ServiceIOException(errorMessage, e);
         }
     }
 
@@ -125,7 +142,10 @@ public final class JaxbUtils {
                                       outputStream);
             return outputStream.toByteArray();
         } catch (final Exception e) {
-            return logAndThrow(e, "writing a %s object to bytes", clazz.getName());
+            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("writing a %s object to bytes"
+                                                                           .formatted(clazz.getName()));
+            LOGGER.error(errorMessage, e);
+            throw new ServiceIOException(errorMessage, e);
         }
     }
 
@@ -151,7 +171,11 @@ public final class JaxbUtils {
                                                         rootElement),
                                       filePath.toFile());
         } catch (final Exception e) {
-            logAndThrow(e, "writing a %s object to path %s", clazz.getName(), filePath.toString());
+            final String errorMessage = ERROR_OCCURRED_WHILE.formatted("writing a %s object to %s"
+                                                                           .formatted(toStringWithDefault(filePath),
+                                                                                      clazz.getName()));
+            LOGGER.error(errorMessage, e);
+            throw new ServiceIOException(errorMessage, e);
         }
     }
 
@@ -201,6 +225,15 @@ public final class JaxbUtils {
      */
     private static InputStream bytesToStream(final byte[] bytes) throws IOException {
         return ByteSource.wrap(bytes).openStream();
+    }
+
+    /**
+     * to not throw again in catch clause
+     * @param path can be null
+     * @return path toString if not null, else a default value
+     */
+    private static String toStringWithDefault(final Path path) {
+        return path == null ? "unexisting path" : path.toString();
     }
 
 }

@@ -11,6 +11,8 @@ import com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStat
 
 public class MergingTaskDto implements JsonApiData {
 
+    private static final String TYPE = "merging-task";
+
     private long taskId;
     /**
      * The name of the merging Task
@@ -48,7 +50,7 @@ public class MergingTaskDto implements JsonApiData {
 
     @Override
     public String getType() {
-        return this.name;
+        return TYPE;
     }
 
     public TaskStatus getTaskStatus() {

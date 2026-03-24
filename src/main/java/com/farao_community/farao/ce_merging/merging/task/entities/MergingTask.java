@@ -10,11 +10,13 @@ import com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStat
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 import java.io.Serializable;
 
+import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
@@ -31,6 +33,7 @@ public class MergingTask implements Serializable {
     /**
      * The Status of the merging Task
      */
+    @Enumerated(STRING)
     private TaskStatus taskStatus = TaskStatus.CREATED;
 
     /**

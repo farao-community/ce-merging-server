@@ -7,31 +7,32 @@
 package com.farao_community.farao.ce_merging.common.json_api;
 
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.FieldSource;
+import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JsonApiDataImplementorsTest {
-    static List<JsonApiData> withId1AndTypeTest = new ArrayList<>();
+    static Map<String, JsonApiData> withId1ByType = new HashMap<>();
 
     static {
         final MergingTaskDto mergingTaskDto = new MergingTaskDto();
         mergingTaskDto.setTaskId(1);
         mergingTaskDto.setName("Test");
-        withId1AndTypeTest.add(mergingTaskDto);
+        withId1ByType.put("merging-task", mergingTaskDto);
     }
 
-    @ParameterizedTest
-    @FieldSource("withId1AndTypeTest")
-    void implementorsShouldHaveTwoGetters(final JsonApiData data) {
-        assertThat(data.getId())
-            .isEqualTo(1);
-        assertThat(data.getType())
-            .isEqualTo("Test");
+    @Test
+    void implementorsShouldHaveTwoGetters() {
+        withId1ByType.forEach((expectedType, instance) -> {
+            assertThat(instance.getId())
+                .isEqualTo(1);
+            assertThat(instance.getType())
+                .isEqualTo(expectedType);
+        });
+
     }
 
 }
