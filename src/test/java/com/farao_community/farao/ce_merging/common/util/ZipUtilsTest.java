@@ -13,7 +13,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.stream.Stream;
 import java.util.zip.ZipOutputStream;
 
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.addFileToZip;
@@ -31,24 +31,17 @@ class ZipUtilsTest {
 
     @Test
     void shouldUnzipThenZipAgain() throws IOException {
-        final Path tmp = Files.createTempDirectory("zip-test");
-        unzipFile(pathOf(TEST_ZIP), tmp);
+        final Path parent = Files.createTempDirectory("zip-test");
+        unzipFile(pathOf(TEST_ZIP), parent);
 
-        assertTrue(pathInZip("file1.txt", tmp)
-                       .toFile().exists());
-        assertTrue(pathInZip("file2.txt", tmp)
-                       .toFile().exists());
-        assertTrue(pathInZip("directory/file3.txt", tmp)
-                       .toFile().exists());
+        Stream.of("file1.txt",
+                  "file2.txt",
+                  "directory/file3.txt",
+                  "existing-dir/file4.txt")
+            .map(parent::resolve)
+            .forEach(path -> assertTrue(Files.exists(path)));
 
-        assertTrue(pathInZip("existing-dir/file4.txt", tmp)
-                       .toFile().exists());
-
-        assertTrue(zipDirectory(tmp.toString()).length > 0);
-    }
-
-    static Path pathInZip(final String fileName, final Path tmp) {
-        return Paths.get(tmp.toString(), fileName);
+        assertTrue(zipDirectory(parent.toString()).length > 0);
     }
 
     @Test

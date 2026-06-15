@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.request_metadata;
 
-import com.farao_community.farao.ce_merging.common.exception.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.merging.request_metadata.model.Data;
 import com.farao_community.farao.ce_merging.merging.request_metadata.model.RequestMetadata;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
@@ -24,13 +24,13 @@ import org.springframework.util.FileSystemUtils;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
 
 public class RequestMetadataManager {
@@ -47,6 +47,12 @@ public class RequestMetadataManager {
         "external-constraints", Inputs::getExternalConstraints,
         "feasibility-ranges", Inputs::getFeasibilityRanges,
         "net-position-forecast", Inputs::getNetPositionForecast);
+
+    private static final Map<String, Function<Configurations, SavedFile>> PARAMETER_GETTERS_BY_LOCATION = Map.of(
+        "dc-load-flow-parameters", Configurations::getDcLoadFlowParameters,
+        "ac-load-flow-parameters", Configurations::getAcLoadFlowParameters,
+        "basecase-improvement-parameters", Configurations::getBasecaseImprovementParameters,
+        "balances-adjustment-parameters", Configurations::getBalancesAdjustmentParameters);
 
     public RequestMetadataManager(final String inputsPath,
                                   final String requestJsonContent) {
@@ -68,6 +74,7 @@ public class RequestMetadataManager {
 
     /**
      * fetches the task inputs and configuration from files specified in the request metadata
+     *
      * @param task the task to add the information to
      */
     public void feedTaskData(final MergingTask task) {
@@ -80,7 +87,7 @@ public class RequestMetadataManager {
         return getRequestInputs()
             .getTargetDate()
             .toInstant()
-            .atZone(ZoneId.of("Europe/Paris"))
+            .atZone(PARIS_ZONE_ID)
             .toOffsetDateTime()
             .getOffset();
     }
@@ -100,9 +107,7 @@ public class RequestMetadataManager {
         INPUT_GETTERS_BY_LOCATION
             .values()
             .forEach(getter ->
-                         checkIfAvailable(getter.apply(getRequestInputs()),
-                                          inputPath,
-                                          missingFiles));
+                         checkIfAvailable(getter.apply(getRequestInputs()), inputPath, missingFiles));
 
         if (!missingFiles.isEmpty()) {
             FileSystemUtils.deleteRecursively(inputPath);
@@ -116,22 +121,12 @@ public class RequestMetadataManager {
         final Inputs inputs = getRequestInputs();
         final String inputsLocation = TASKS + taskId + "/inputs/";
         // update paths to make them absolute & location for GET output
-        inputs.getIgms().forEach(igm -> {
-            final String parentPath = inputsLocation + "areas/" + igm.getCountry();
-            igm.setIgmFilePath(getInputPath(igm.getIgmFile()));
-            igm.setIgmQualityReportFilePath(getInputPath(igm.getIgmQualityReportFile()));
-            igm.getIgmFile()
-                .setLocation(parentPath + "/igm");
-            igm.getIgmQualityReportFile()
-                .setLocation(parentPath + "/quality-report");
-        });
+        inputs.getIgms().forEach(igm -> updateIgmLocations(igm, inputsLocation));
 
         INPUT_GETTERS_BY_LOCATION
-            .forEach((fileLocation, inputFileGetter) -> {
-                final SavedFile inputFile = inputFileGetter.apply(inputs);
-                makePathAbsolute(inputFile);
-                inputFile.setLocation(inputsLocation + fileLocation);
-            });
+            .forEach((fileLocation, inputFileGetter) ->
+                         updateSavedFileLocation(fileLocation, inputsLocation, inputFileGetter, inputs));
+
         return inputs;
     }
 
@@ -139,17 +134,31 @@ public class RequestMetadataManager {
         final Configurations configs = getRequestData().getConfigurations();
         final String configLocation = TASKS + taskId + "/configurations/";
 
-        Map.of("dc-load-flow-parameters", configs.getDcLoadFlowParameters(),
-               "ac-load-flow-parameters", configs.getAcLoadFlowParameters(),
-               "basecase-improvement-parameters", configs.getBasecaseImprovementParameters(),
-               "balances-adjustment-parameters", configs.getBalancesAdjustmentParameters())
-            .forEach((fileLocation, paramFile) -> {
-                makePathAbsolute(paramFile);
-                paramFile.setLocation(configLocation + fileLocation);
-            });
+        PARAMETER_GETTERS_BY_LOCATION
+            .forEach((fileLocation, paramGetter) ->
+                         updateSavedFileLocation(fileLocation, configLocation, paramGetter, configs));
 
         setRecessivityConfiguration(configs, configLocation);
         return configs;
+    }
+
+    private void updateIgmLocations(final IgmData igm, final String inputsLocation) {
+        final String parentPath = inputsLocation + "areas/" + igm.getCountry();
+        igm.setIgmFilePath(getInputPath(igm.getIgmFile()));
+        igm.setIgmQualityReportFilePath(getInputPath(igm.getIgmQualityReportFile()));
+        igm.getIgmFile()
+            .setLocation(parentPath + "/igm");
+        igm.getIgmQualityReportFile()
+            .setLocation(parentPath + "/quality-report");
+    }
+
+    private <T> void updateSavedFileLocation(final String fileLocation,
+                                             final String parentLocation,
+                                             final Function<T, SavedFile> getter,
+                                             final T source) {
+        final SavedFile paramFile = getter.apply(source);
+        makePathAbsolute(paramFile);
+        paramFile.setLocation(parentLocation + fileLocation);
     }
 
     private void setRecessivityConfiguration(final Configurations configurations,

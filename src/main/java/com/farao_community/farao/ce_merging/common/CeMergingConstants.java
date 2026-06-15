@@ -6,12 +6,15 @@
  */
 package com.farao_community.farao.ce_merging.common;
 
+import java.time.ZoneId;
+
 public final class CeMergingConstants {
 
     private CeMergingConstants() {
         // constants class
     }
 
+    // Strings
     public static final String CE_MERGING_URL = "/ce-merging/";
     public static final String API_VERSION = "v1";
     public static final String JSON_API_MIME_TYPE = "application/vnd.api+json";
@@ -23,4 +26,15 @@ public final class CeMergingConstants {
     public static final String BAD_REQUEST = "400";
     public static final String NOT_FOUND = "404";
     public static final String INTERNAL_ERROR = "500";
+    public static final String INPUTS_DIR = "inputs";
+    public static final String OUTPUTS_DIR = "outputs";
+    public static final String DAILY_OUTPUTS_DIR = "daily-outputs";
+    public static final String DAILY_INPUTS_DIR = "daily-inputs";
+    public static final String ARTIFACTS_DIR = "artifacts";
+    public static final String ARTIFACTS_TAG = "Artifacts";
+    public static final String OUTPUTS_TAG = "Outputs";
+    public static final String TASK_MANAGEMENT_TAG = "Tasks management";
+
+    // Date management
+    public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
 }

@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.task;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.exception.TaskNotValidException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
 import com.farao_community.farao.ce_merging.merging.MergingService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;

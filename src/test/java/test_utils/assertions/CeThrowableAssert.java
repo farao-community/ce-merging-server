@@ -7,10 +7,10 @@
 package test_utils.assertions;
 
 import com.farao_community.farao.ce_merging.common.exception.AbstractServiceException;
-import com.farao_community.farao.ce_merging.common.exception.TaskAlreadyRunningException;
-import com.farao_community.farao.ce_merging.common.exception.TaskNotFoundException;
-import com.farao_community.farao.ce_merging.common.exception.TaskNotRunException;
-import com.farao_community.farao.ce_merging.common.exception.TaskNotValidException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskAlreadyRunningException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotFoundException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotRunException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert;
 

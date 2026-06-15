@@ -26,6 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import org.springframework.web.util.UriComponents;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.API_VERSION;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ARTIFACTS_TAG;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BAD_REQUEST;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_MERGING_URL;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CREATED;
@@ -34,6 +35,8 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MER
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NOT_FOUND;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OK;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ORIGIN_ANY;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OUTPUTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_MANAGEMENT_TAG;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_NOT_RUN;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.toAttachmentFileResponse;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
@@ -43,10 +46,6 @@ import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 @CrossOrigin(origins = ORIGIN_ANY) // NOSONAR enabling CORS is safe here
 @RequestMapping(value = CE_MERGING_URL + API_VERSION)
 public class MergingController {
-
-    private static final String ARTIFACTS = "Artifacts";
-    private static final String OUTPUTS = "Outputs";
-    private static final String TASK_MGT = "Tasks management";
 
     private final MergingTaskManagementService taskManager;
 
@@ -60,7 +59,7 @@ public class MergingController {
     @PostMapping(value = "/tasks",
         consumes = {MULTIPART_FORM_DATA_VALUE},
         produces = JSON_API_MIME_TYPE)
-    @Operation(tags = TASK_MGT,
+    @Operation(tags = TASK_MANAGEMENT_TAG,
         summary = "Create a new merging task and returns its data.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = CREATED, description = "The merging task has been created successfully."),
@@ -83,7 +82,7 @@ public class MergingController {
 
     @PostMapping(value = "/tasks/{taskId}",
         produces = JSON_API_MIME_TYPE)
-    @Operation(tags = TASK_MGT,
+    @Operation(tags = TASK_MANAGEMENT_TAG,
         summary = "Run merging task with ID {taskId}.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "The merging task has been run successfully."),
@@ -101,10 +100,10 @@ public class MergingController {
 
     @GetMapping(value = "/tasks/{taskId}",
         produces = JSON_API_MIME_TYPE)
-    @Operation(tags = TASK_MGT,
+    @Operation(tags = TASK_MANAGEMENT_TAG,
         summary = "Get the data of merging task with ID {taskId}.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "The merging task data have been returned successfully."),
+        @ApiResponse(responseCode = OK, description = "The merging task data has been returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or not reachable.")
     })
     public ResponseEntity<JsonApiDocument<MergingTaskDto>> getTask(@Parameter(description = MERGING_TASK_ID)
@@ -114,10 +113,10 @@ public class MergingController {
 
     @GetMapping(value = "/tasks/{taskId}/outputs/ref-prog",
         produces = {APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
-    @Operation(tags = OUTPUTS,
+    @Operation(tags = OUTPUTS_TAG,
         summary = "Return the RefProg output of merging task with ID {taskId}.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "The RefProg output have been returned successfully"),
+        @ApiResponse(responseCode = OK, description = "The RefProg output has been returned successfully"),
         @ApiResponse(responseCode = BAD_REQUEST, description = TASK_NOT_RUN),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or RefProg output of merging task not available")
     })
@@ -128,10 +127,10 @@ public class MergingController {
 
     @GetMapping(value = "/tasks/{taskId}/outputs/cgm",
         produces = {APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
-    @Operation(tags = OUTPUTS,
+    @Operation(tags = OUTPUTS_TAG,
         summary = "Return the CGM output of merging task with ID {taskId}.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "The CGM output have been returned successfully"),
+        @ApiResponse(responseCode = OK, description = "The CGM output has been returned successfully"),
         @ApiResponse(responseCode = BAD_REQUEST, description = TASK_NOT_RUN),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or CGM output of merging task not available")
     })
@@ -142,7 +141,7 @@ public class MergingController {
 
     @GetMapping(value = "/tasks/{taskId}/outputs",
         produces = {APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
-    @Operation(tags = OUTPUTS,
+    @Operation(tags = OUTPUTS_TAG,
         summary = "Get all the outputs of the merging task with ID {taskId} as a zip archive.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "The outputs archive has been returned successfully."),
@@ -156,7 +155,7 @@ public class MergingController {
 
     @GetMapping(value = "/tasks/{taskId}/artifacts/cgm-net-positions",
         produces = {APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
-    @Operation(tags = ARTIFACTS,
+    @Operation(tags = ARTIFACTS_TAG,
         summary = "Get the CGM net positions artifact of the merging task {taskId}")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "The CGM net positions have been returned successfully"),
@@ -170,10 +169,10 @@ public class MergingController {
 
     @GetMapping(value = "/tasks/{taskId}/artifacts/xnodes-information",
         produces = {APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
-    @Operation(tags = ARTIFACTS,
+    @Operation(tags = ARTIFACTS_TAG,
         summary = "Get the xnodes information file of the merging task {taskId} ")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "xnodes information have been returned successfully"),
+        @ApiResponse(responseCode = OK, description = "xnodes information has been returned successfully"),
         @ApiResponse(responseCode = BAD_REQUEST, description = TASK_NOT_RUN),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or xnodes information file not available")
     })

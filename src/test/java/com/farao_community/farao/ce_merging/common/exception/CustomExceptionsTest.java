@@ -6,6 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.common.exception;
 
+import com.farao_community.farao.ce_merging.common.exception.task.TaskAlreadyRunningException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotFoundException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotRunException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 

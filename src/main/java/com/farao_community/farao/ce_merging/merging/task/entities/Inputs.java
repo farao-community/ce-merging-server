@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
-import com.farao_community.farao.ce_merging.common.exception.TaskNotValidException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeDeserializer;
 import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonIgnore;

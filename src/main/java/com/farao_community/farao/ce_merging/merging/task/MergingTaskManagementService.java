@@ -9,10 +9,10 @@ package com.farao_community.farao.ce_merging.merging.task;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import com.farao_community.farao.ce_merging.common.exception.TaskAlreadyRunningException;
-import com.farao_community.farao.ce_merging.common.exception.TaskNotFoundException;
-import com.farao_community.farao.ce_merging.common.exception.TaskNotRunException;
-import com.farao_community.farao.ce_merging.common.exception.TaskNotValidException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskAlreadyRunningException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotFoundException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotRunException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
 import com.farao_community.farao.ce_merging.merging.MergingService;
 import com.farao_community.farao.ce_merging.merging.request_metadata.RequestMetadataManager;
@@ -112,15 +112,16 @@ public class MergingTaskManagementService {
             LOGGER.info("Merging task created with id: {}", task.getTaskId());
             return taskMapper.mergingTaskToMergingTaskDto(task);
         } catch (final Exception e) {
-            LOGGER.error("Error during merging task creation.");
+            final String error = "Error during merging task creation";
+            LOGGER.error(error, e);
             taskRepository.delete(task);
-            throw new ServiceIOException("Error during merging task creation", e);
+            throw new ServiceIOException(error, e);
         }
 
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                        ARTIFACTS
+                        ARTIFACTS_DIR
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
     public SavedFile getXnodesInformation(final long taskId) {
         return getArtifacts(taskId).getXnodesInformationFile();
@@ -131,7 +132,7 @@ public class MergingTaskManagementService {
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                        OUTPUTS
+                        OUTPUTS_DIR
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     public SavedFile getCgm(final long taskId) {
