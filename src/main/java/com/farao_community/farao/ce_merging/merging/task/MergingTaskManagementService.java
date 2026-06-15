@@ -121,7 +121,7 @@ public class MergingTaskManagementService {
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                        ARTIFACTS_DIR
+                        ARTIFACTS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
     public SavedFile getXnodesInformation(final long taskId) {
         return getArtifacts(taskId).getXnodesInformationFile();
@@ -132,7 +132,7 @@ public class MergingTaskManagementService {
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                        OUTPUTS_DIR
+                        OUTPUTS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     public SavedFile getCgm(final long taskId) {
@@ -217,6 +217,7 @@ public class MergingTaskManagementService {
     /**
      * Necessary in case of DST:
      * the second 02:30 AM (Paris time) will be UTC+2, but actually should be UTC+1
+     *
      * @param task for which to adjust date if applicable
      */
     private void handleDaylightSavingTime(final MergingTask task) {
