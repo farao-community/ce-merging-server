@@ -23,11 +23,11 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.Optional;
 import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.time.ZoneOffset.UTC;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mockito.ArgumentMatchers.any;
@@ -91,7 +91,9 @@ public final class CeTestUtils {
         task.setArchiveFileOriginalName(INPUTS_ZIP_NAME);
         task.setTaskStatus(status);
         final Inputs inputs = new Inputs();
-        inputs.setTargetDate(OffsetDateTime.now(ZoneId.of("UTC")));
+        inputs.setTargetDate(OffsetDateTime.of(2000, 1, 1,
+                                               12, 0, 0, 0,
+                                               UTC));
         task.setInputs(inputs);
 
         return task;
