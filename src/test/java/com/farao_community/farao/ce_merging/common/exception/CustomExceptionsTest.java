@@ -23,6 +23,8 @@ import static test_utils.assertions.CeThrowableAssert.assertThat;
 
 class CustomExceptionsTest {
 
+    private static final String MESSAGE = "testing exceptions";
+
     static List<Class<? extends AbstractServiceException>> exceptionClasses = List.of(CeMergingException.class,
                                                                                       TaskNotValidException.class,
                                                                                       TaskNotFoundException.class,
@@ -32,31 +34,35 @@ class CustomExceptionsTest {
 
     @ParameterizedTest
     @FieldSource("exceptionClasses")
-    void shouldInstantiateExceptionsFromMessage(final Class<? extends AbstractServiceException> exceptionClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    void shouldInstantiateExceptionsFromMessage(final Class<? extends AbstractServiceException> exceptionClass)
+        throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+
         final AbstractServiceException e = exceptionClass
             .getConstructor(String.class)
-                .newInstance("testing exceptions");
+            .newInstance(MESSAGE);
 
         assertNotNull(e.getTitle());
         assertNotNull(e.getCode());
         assertNotNull(e.getStatus());
-        assertEquals("testing exceptions", e.getMessage());
+        assertEquals(MESSAGE, e.getMessage());
         assertThat(e).isServiceException();
     }
 
     @ParameterizedTest
     @FieldSource("exceptionClasses")
-    void shouldInstantiateExceptionsFromMessageAndCause(final Class<? extends AbstractServiceException> exceptionClass) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    void shouldInstantiateExceptionsFromMessageAndCause(final Class<? extends AbstractServiceException> exceptionClass)
+        throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+
         final IOException cause = new IOException("testing cause");
 
         final AbstractServiceException e = exceptionClass
             .getConstructor(String.class, Throwable.class)
-            .newInstance("testing exceptions", cause);
+            .newInstance(MESSAGE, cause);
 
         assertNotNull(e.getTitle());
         assertNotNull(e.getCode());
         assertNotNull(e.getStatus());
-        assertEquals("testing exceptions", e.getMessage());
+        assertEquals(MESSAGE, e.getMessage());
         assertThat(e).isServiceException();
         assertEquals("testing cause", e.getCause().getMessage());
     }

@@ -54,8 +54,8 @@ public class MergingController {
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                        POST
-         +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+                    POST
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
     @PostMapping(value = "/tasks",
         consumes = {MULTIPART_FORM_DATA_VALUE},
         produces = JSON_API_MIME_TYPE)

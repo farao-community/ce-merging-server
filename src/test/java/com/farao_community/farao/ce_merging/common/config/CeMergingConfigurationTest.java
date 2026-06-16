@@ -23,13 +23,13 @@ import static test_utils.CeTestUtils.taskWithIdAndStatus;
 class CeMergingConfigurationTest {
 
     @Autowired
-    CeMergingConfiguration cfg;
+    CeMergingConfiguration configuration;
 
     @Test
     void shouldObtainCorrectPaths() {
         final CeMergingConfiguration copy = new CeMergingConfiguration();
-        copy.setCeMergingRoot(cfg.getCeMergingRoot());
-        copy.setDailyMergingRoot(cfg.getDailyMergingRoot());
+        copy.setCeMergingRoot(configuration.getCeMergingRoot());
+        copy.setDailyMergingRoot(configuration.getDailyMergingRoot());
         final MergingTask task = taskWithIdAndStatus(1, TaskStatus.CREATED);
 
         assertEquals(Path.of("/tmp/testFiles"),

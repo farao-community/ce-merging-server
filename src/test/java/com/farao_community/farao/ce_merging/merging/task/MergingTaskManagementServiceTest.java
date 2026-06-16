@@ -62,8 +62,8 @@ class MergingTaskManagementServiceTest {
     CeMergingConfiguration ceMergingConfiguration;
 
     private final MergingService mergingService = mock(MergingService.class);
-    private final MergingTaskRepository taskRepository = mock(MergingTaskRepository.class);
-    private final MergingTaskMapper taskMapper = mock(MergingTaskMapper.class);
+    private final MergingTaskRepository repository = mock(MergingTaskRepository.class);
+    private final MergingTaskMapper mapper = mock(MergingTaskMapper.class);
 
     MergingTaskManagementService service;
 
@@ -72,13 +72,13 @@ class MergingTaskManagementServiceTest {
         // to obtain configuration from autowire
         service = new MergingTaskManagementService(ceMergingConfiguration,
                                                    mergingService,
-                                                   taskRepository,
-                                                   taskMapper);
+                                                   repository,
+                                                   mapper);
     }
 
     @Test
     void shouldCreateTask() {
-        when(taskRepository.save(anyTask()))
+        when(repository.save(anyTask()))
             .thenReturn(taskWithIdAndStatus(1L, CREATED));
 
         final MockMultipartFile zipFile = new MockMultipartFile(INPUTS_ZIP_NAME,
@@ -88,15 +88,15 @@ class MergingTaskManagementServiceTest {
 
         service.createNewTask(zipFile, stringContentOf(METADATA));
 
-        verify(taskRepository, times(2))
+        verify(repository, times(2))
             .save(anyTask());
-        verify(taskMapper)
+        verify(mapper)
             .mergingTaskToMergingTaskDto(anyTask());
     }
 
     @Test
     void shouldCatchExceptionInCreation() {
-        when(taskRepository.save(anyTask()))
+        when(repository.save(anyTask()))
             .thenReturn(taskWithIdAndStatus(1L, CREATED));
 
         final MockMultipartFile zipFile = new MockMultipartFile(INPUTS_ZIP_NAME,
@@ -107,7 +107,7 @@ class MergingTaskManagementServiceTest {
         assertThatThrownBy(() -> service.createNewTask(zipFile, stringContentOf(METADATA)))
             .isServiceException();
 
-        verify(taskRepository)
+        verify(repository)
             .delete(anyTask());
     }
 
@@ -116,16 +116,16 @@ class MergingTaskManagementServiceTest {
 
         final MergingTask task = taskWithIdAndStatus(ONE, CREATED);
 
-        when(taskRepository.findById(ONE))
+        when(repository.findById(ONE))
             .thenReturn(Optional.of(task));
 
         service.runTask(ONE);
 
         verify(mergingService)
             .run(anyTask());
-        verify(taskMapper)
+        verify(mapper)
             .mergingTaskToMergingTaskDto(anyTask());
-        verify(taskRepository, times(2))
+        verify(repository, times(2))
             .save(anyTask());
 
         assertThat(task).hasStatus(SUCCESS);
@@ -134,7 +134,7 @@ class MergingTaskManagementServiceTest {
     @Test
     void shouldThrowIfTaskAlreadyRunning() {
         final MergingTask runningTask = taskWithIdAndStatus(ONE, RUNNING);
-        when(taskRepository.findById(ONE))
+        when(repository.findById(ONE))
             .thenReturn(Optional.of(runningTask));
 
         assertThatThrownBy(() -> service.runTask(ONE))
@@ -146,7 +146,7 @@ class MergingTaskManagementServiceTest {
 
     @Test
     void shouldThrowIfTaskNotFound() {
-        when(taskRepository.findById(ONE))
+        when(repository.findById(ONE))
             .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.runTask(ONE))
@@ -157,7 +157,7 @@ class MergingTaskManagementServiceTest {
     @Test
     void shouldChangeStatusToErrorIfExceptionThrown() {
         final MergingTask failingTask = taskWithIdAndStatus(ONE, CREATED);
-        when(taskRepository.findById(ONE))
+        when(repository.findById(ONE))
             .thenReturn(Optional.of(failingTask));
 
         doThrow(new TaskNotValidException("test"))
@@ -173,14 +173,12 @@ class MergingTaskManagementServiceTest {
     @Test
     void shouldGetTaskJsonDoc() {
         final MergingTask task = taskWithIdAndStatus(ONE, CREATED);
-        when(taskRepository.findById(ONE))
+        when(repository.findById(ONE))
             .thenReturn(Optional.of(task));
-        when(taskMapper.mergingTaskToMergingTaskDto(anyTask())).thenReturn(taskDtoWithIdAndStatus(ONE, CREATED));
+        when(mapper.mergingTaskToMergingTaskDto(anyTask())).thenReturn(taskDtoWithIdAndStatus(ONE, CREATED));
 
         assertThat(task)
-            .isSameTaskAs(service.getTaskJsonDoc(ONE)
-                              .data
-                              .getFirst());
+            .isSameTaskAs(service.getTaskJsonDoc(ONE).data.getFirst());
     }
 
     private static final List<TaskStatus> FINISHED_STATUSES = List.of(SUCCESS, ERROR);
@@ -197,7 +195,7 @@ class MergingTaskManagementServiceTest {
     @FieldSource("FINISHED_STATUSES")
     void shouldGetTaskFilesIfTaskFinished(final TaskStatus status) {
         final MergingTask task = taskWithIdAndStatus(ONE, status);
-        when(taskRepository.findById(ONE))
+        when(repository.findById(ONE))
             .thenReturn(Optional.of(task));
 
         service.getCgm(ONE);
@@ -205,7 +203,7 @@ class MergingTaskManagementServiceTest {
         service.getRefProg(ONE);
         service.getXnodesInformation(ONE);
 
-        verify(taskRepository, times(4))
+        verify(repository, times(4))
             .findById(ONE);
     }
 
@@ -213,7 +211,7 @@ class MergingTaskManagementServiceTest {
     @FieldSource("NOT_FINISHED_STATUSES")
     void shouldNotGetTaskFilesIfTaskNotFinished(final TaskStatus status) {
         final MergingTask task = taskWithIdAndStatus(ONE, status);
-        when(taskRepository.findById(ONE))
+        when(repository.findById(ONE))
             .thenReturn(Optional.of(task));
 
         assertThatThrownBy(() -> service.getCgm(ONE))
@@ -226,7 +224,7 @@ class MergingTaskManagementServiceTest {
         try (final MockedStatic<ZipUtils> zipUtils = mockStatic(ZipUtils.class)) {
 
             final MergingTask task = taskWithIdAndStatus(ONE, SUCCESS);
-            when(taskRepository.findById(ONE))
+            when(repository.findById(ONE))
                 .thenReturn(Optional.of(task));
 
             zipUtils.when(() -> ZipUtils.zipDirectory(anyString()))

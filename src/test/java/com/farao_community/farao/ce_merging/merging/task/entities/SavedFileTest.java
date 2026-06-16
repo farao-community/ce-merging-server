@@ -21,8 +21,7 @@ class SavedFileTest {
             .isServiceException()
             .hasMessage("null or empty is not a path");
 
-        final Path path = null;
-        assertThatThrownBy(() -> file.feedPathAndName(path))
+        assertThatThrownBy(() -> file.feedPathAndName((Path) null))
             .isServiceException()
             .hasMessage("null is not a path");
     }

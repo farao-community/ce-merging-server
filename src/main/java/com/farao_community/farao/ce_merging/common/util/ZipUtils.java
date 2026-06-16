@@ -42,81 +42,12 @@ public final class ZipUtils {
         // utility class
     }
 
-    /**
-     * Extracts a zip file specified by the zipFilePath to a directory specified by
-     * destDirectory (will be created if it does not exist)
-     *
-     * @param zipFilePath   path to the zip file to be extracted
-     * @param destDirectory extraction destination directory
-     */
-    public static void unzipFile(final Path zipFilePath,
-                                 final Path destDirectory) {
-        try (final ZipInputStream zipIn = getZipStream(zipFilePath)) { //NOSONAR expanding archive is safe
-            createOrThrow(destDirectory.toFile());
-            ZipEntry zipEntry;
-            // iterates over entries in the zip file
-            while ((zipEntry = zipIn.getNextEntry()) != null) { // NOSONAR expanding archive is safe
-                final Path filePath = getIfInside(zipEntry.getName(), destDirectory);
-                final String fileDir = filePath.toString();
-                if (zipEntry.isDirectory()) {
-                    createOrThrow(new File(fileDir));
-                } else {
-                    // if the entry is a file, extracts it
-                    createDirectories(filePath.getParent());
-                    extractFile(zipIn, fileDir);
-                }
-                zipIn.closeEntry();
-            }
-        } catch (final IOException e) {
-            throw errorWhile(e, "extracting file %s", zipFilePath.getFileName());
-        }
-    }
-
-    private static void createOrThrow(final File dir) throws IOException {
-        if (!dir.exists() && !dir.mkdirs()) {
-            throw new IOException("Cannot create directory %s".formatted(dir));
-        }
-    }
-
-    private static ZipInputStream getZipStream(final Path zipFilePath) throws FileNotFoundException {
-        return new ZipInputStream(new FileInputStream(zipFilePath.normalize().toFile()));
-    }
-
-    /**
-     * Extracts a zip entry (file entry)
-     *
-     * @param zipIn    zipped input stream
-     * @param filePath file to extract
-     */
-    private static void extractFile(final ZipInputStream zipIn,
-                                    final String filePath) throws IOException {
-        try (final BufferedOutputStream outFile = new BufferedOutputStream(new FileOutputStream(filePath))) { // NOSONAR File location does not come from user input
-            final byte[] bytesIn = new byte[WRITE_BUFFER_SIZE];
-            int read;
-            while ((read = zipIn.read(bytesIn)) != -1) {
-                outFile.write(bytesIn, 0, read);
-            }
-        }
-    }
-
     public static Path unzipInputFileInTmp(final MultipartFile zipFile) throws IOException {
         final Path archiveTmpPath = createTempDirectory(TMP_DIR); // NOSONAR directories are used safely here
         final Path inputsArchivePath = storeInputFileInPath(zipFile, archiveTmpPath);
         unzipFile(inputsArchivePath, archiveTmpPath);
         deleteRecursively(inputsArchivePath);
         return archiveTmpPath;
-    }
-
-    private static Path storeInputFileInPath(final MultipartFile multipartFile,
-                                             final Path inputsPath) throws IOException {
-        // Use only the filename part, stripping any path components
-        final String safeFilename = Paths.get(Optional.ofNullable(multipartFile.getOriginalFilename())
-                                                  .orElseThrow(() -> new ServiceIOException("empty filename")))
-            .getFileName()
-            .toString();
-        final Path inputPath = getIfInside(safeFilename, inputsPath);
-        multipartFile.transferTo(inputPath);
-        return inputPath;
     }
 
     public static byte[] zipDirectory(final String directory) {
@@ -133,16 +64,82 @@ public final class ZipUtils {
         return zipBytesStream.toByteArray();
     }
 
-    static void addFileToZip(final Path filePath,
-                             final String rootDir,
-                             final ZipOutputStream outFile) {
+    /**
+     * Extracts a zip file specified by the zipFilePath to a directory specified by
+     * destination (will be created if it does not exist)
+     *
+     * @param zipFilePath   path to the zip file to be extracted
+     * @param destination extraction destination directory
+     */
+    static void unzipFile(final Path zipFilePath, final Path destination) {
+        try (final ZipInputStream zipIn = getZipStream(zipFilePath)) { //NOSONAR expanding archive is safe
+            createOrThrow(destination.toFile());
+            ZipEntry zipEntry;
+            // iterates over entries in the zip file
+            while ((zipEntry = zipIn.getNextEntry()) != null) { // NOSONAR expanding archive is safe
+                final Path filePath = getIfInside(zipEntry.getName(), destination);
+                final String fileDir = filePath.toString();
+                if (zipEntry.isDirectory()) {
+                    createOrThrow(new File(fileDir));
+                } else {
+                    // if the entry is a file, extract it
+                    createDirectories(filePath.getParent());
+                    extractFile(zipIn, fileDir);
+                }
+                zipIn.closeEntry();
+            }
+        } catch (final IOException e) {
+            throw errorWhile(e, "extracting file %s", zipFilePath.getFileName());
+        }
+    }
+
+    private static void createOrThrow(final File directoryToCreate) throws IOException {
+        if (!directoryToCreate.exists() && !directoryToCreate.mkdirs()) {
+            throw new IOException("Cannot create directory %s".formatted(directoryToCreate));
+        }
+    }
+
+    private static ZipInputStream getZipStream(final Path zipFilePath) throws FileNotFoundException {
+        return new ZipInputStream(new FileInputStream(zipFilePath.normalize().toFile()));
+    }
+
+    /**
+     * Extracts a zip entry (file entry)
+     *
+     * @param zipIn    zipped input stream
+     * @param filePath file to extract
+     */
+    private static void extractFile(final ZipInputStream zipIn, final String filePath) throws IOException {
+        try (final BufferedOutputStream outFile = new BufferedOutputStream(new FileOutputStream(filePath))) { // NOSONAR File location does not come from user input
+            final byte[] bytesIn = new byte[WRITE_BUFFER_SIZE];
+            int read;
+            // if read = -1, it is EOF
+            while ((read = zipIn.read(bytesIn)) != -1) {
+                outFile.write(bytesIn, 0, read);
+            }
+        }
+    }
+
+    private static Path storeInputFileInPath(final MultipartFile multipartFile, final Path inputsPath) throws IOException {
+        // Use only the filename part, stripping any path components
+        final String fullName = Optional.ofNullable(multipartFile.getOriginalFilename())
+            .orElseThrow(() -> new ServiceIOException("empty filename"));
+        final String safeName = Paths.get(fullName).getFileName().toString();
+        final Path inputPath = getIfInside(safeName, inputsPath);
+
+        multipartFile.transferTo(inputPath);
+
+        return inputPath;
+    }
+
+    static void addFileToZip(final Path filePath, final String rootDir, final ZipOutputStream outFile) {
 
         final byte[] readBuffer = new byte[READ_BUFFER_SIZE];
         int bytesIn;
-        final String fileRelativePath = Paths.get(rootDir).relativize(filePath).toString();
+        final String pathInRoot = Paths.get(rootDir).relativize(filePath).toString();
 
         try (final FileInputStream inStream = new FileInputStream(filePath.toFile())) {
-            outFile.putNextEntry(new ZipEntry(fileRelativePath));
+            outFile.putNextEntry(new ZipEntry(pathInRoot));
             // write while there are still bytes left
             while ((bytesIn = inStream.read(readBuffer)) != -1) {
                 outFile.write(readBuffer, 0, bytesIn);

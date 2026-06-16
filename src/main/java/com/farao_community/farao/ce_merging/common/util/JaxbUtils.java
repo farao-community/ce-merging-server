@@ -41,10 +41,8 @@ public final class JaxbUtils {
      */
     public static <T> T readFromPath(final Class<T> clazz,
                                      final String path) {
-        try (final InputStream fileContent = newInputStream(Paths.get(path))) {
-            return unmarshaller(clazz)
-                .unmarshal(new StreamSource(fileContent), clazz)
-                .getValue();
+        try (final InputStream inputStream = newInputStream(Paths.get(path))) {
+            return unmarshal(inputStream, clazz);
         } catch (final Exception e) {
             throw errorWhile(e, "converting XML file %s to a %s object", path, clazz.getSimpleName());
         }
@@ -60,13 +58,16 @@ public final class JaxbUtils {
     public static <T> T readFromBytes(final Class<T> clazz,
                                       final byte[] fileContent) {
         try (InputStream inputStream = bytesToStream(fileContent)) {
-            return unmarshaller(clazz)
-                .unmarshal(new StreamSource(inputStream), clazz)
-                .getValue();
-
+            return unmarshal(inputStream, clazz);
         } catch (final Exception e) {
             throw errorWhile(e, "converting bytes to a %s object", clazz.getSimpleName());
         }
+    }
+
+    private static <T> T unmarshal(final InputStream inputStream, final Class<T> clazz) throws JAXBException {
+        return unmarshaller(clazz)
+            .unmarshal(new StreamSource(inputStream), clazz)
+            .getValue();
     }
 
     /**

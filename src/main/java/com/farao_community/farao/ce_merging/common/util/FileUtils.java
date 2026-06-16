@@ -23,7 +23,6 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 public final class FileUtils {
-    private static final String RETRIEVE_ERROR = "Cannot retrieve content of %s";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
 
@@ -36,8 +35,7 @@ public final class FileUtils {
      * @param fileContent the content of a file as a byte array
      * @return the file wrapped in an HTTP response entity
      */
-    public static ResponseEntity<byte[]> toAttachmentFileResponse(final byte[] fileContent,
-                                                                  final String fileName) {
+    public static ResponseEntity<byte[]> toAttachmentFileResponse(final byte[] fileContent, final String fileName) {
         // no try/catch here because nothing can ever throw
         final HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(ContentDisposition
@@ -62,7 +60,7 @@ public final class FileUtils {
             return toAttachmentFileResponse(readAllBytes(Paths.get(path)),
                                             savedFile.getOriginalName());
         } catch (final IOException | ServiceIOException e) {
-            final String error = RETRIEVE_ERROR.formatted(path);
+            final String error = "Cannot retrieve the content of %s".formatted(path);
             LOGGER.error(error);
             throw new ServiceIOException(error, e);
         }
@@ -76,8 +74,7 @@ public final class FileUtils {
      * @return the path to get as a Path object
      * @throws ServiceIOException if not the case, or if paths are invalid
      */
-    public static Path getIfInside(final String pathToGet,
-                                   final Path parentFolder) throws ServiceIOException {
+    public static Path getIfInside(final String pathToGet, final Path parentFolder) throws ServiceIOException {
         if (isEmpty(pathToGet)) {
             throw new ServiceIOException("Missing file path");
         }

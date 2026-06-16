@@ -92,11 +92,11 @@ class MergingControllerTest {
                                                                      MIME_ZIP,
                                                                      byteContentOf(INPUTS));
 
-            final ResponseEntity<JsonApiDocument<MergingTaskDto>> response = controller.createTask(inputZip,
-                                                                                                   stringContentOf(METADATA));
+            final ResponseEntity<JsonApiDocument<MergingTaskDto>> response = controller.createTask(
+                inputZip, stringContentOf(METADATA)
+            );
 
-            assertEquals(HttpStatus.CREATED,
-                         response.getStatusCode());
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
 
             assertThat(response.getHeaders().getLocation())
                 .hasPath("/test/ce-merging/v1/tasks/1");
@@ -112,13 +112,7 @@ class MergingControllerTest {
         when(taskManager.getTaskJsonDoc(1))
             .thenReturn(JsonApiDocument.fromData(task));
 
-        final ResponseEntity<JsonApiDocument<MergingTaskDto>> response = controller.getTask(1);
-
-        assertEquals(HttpStatus.OK,
-                     response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertThat(response.getBody().data)
-            .contains(task);
+        assertTaskIsInOkResponse(task, controller.getTask(1));
     }
 
     @Test
@@ -127,7 +121,10 @@ class MergingControllerTest {
         when(taskManager.runTask(1))
             .thenReturn(task);
 
-        final ResponseEntity<JsonApiDocument<MergingTaskDto>> response = controller.runTask(1);
+        assertTaskIsInOkResponse(task, controller.runTask(1));
+    }
+
+    void assertTaskIsInOkResponse(final MergingTaskDto task, final ResponseEntity<JsonApiDocument<MergingTaskDto>> response) {
         assertEquals(HttpStatus.OK,
                      response.getStatusCode());
         assertNotNull(response.getBody());

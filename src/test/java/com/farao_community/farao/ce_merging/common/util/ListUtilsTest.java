@@ -19,22 +19,22 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class ListUtilsTest {
 
+    private static final List<String> TEST_LIST = new ArrayList<>(List.of(new String[]{"hello"}));
+
     @Test
     void shouldTransformNullListToNotNull() {
-        final List<String> list = new ArrayList<>(List.of(new String[]{"hello"}));
         final List<?> fromNull = deNulledList(null);
         assertNotNull(fromNull);
         assertThat(fromNull).isEmpty();
-        assertEquals(list.getFirst(), deNulledList(list).getFirst());
+        assertEquals(TEST_LIST.getFirst(), deNulledList(TEST_LIST).getFirst());
     }
 
     @Test
     void shouldCloneListWithoutReference() {
-        final List<String> list = new ArrayList<>(List.of(new String[]{"hello"}));
-        final List<String> clone = clonedList(list);
-        assertEquals(list.getFirst(), clone.getFirst());
-        list.add("goodbye");
-        assertEquals(1, clone.size());
+        final List<String> clone = clonedList(TEST_LIST);
+        assertEquals(TEST_LIST.getFirst(), clone.getFirst());
+        clone.add("goodbye");
+        assertEquals(1, TEST_LIST.size());
         assertEquals(new ArrayList<>(), clonedList(null));
     }
 }

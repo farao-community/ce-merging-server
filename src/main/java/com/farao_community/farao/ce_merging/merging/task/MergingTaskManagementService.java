@@ -32,7 +32,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.unzipInputFileInTmp;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirectory;
@@ -40,7 +39,6 @@ import static com.farao_community.farao.ce_merging.merging.task.entities.enums.T
 import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.SUCCESS;
 import static java.nio.file.Files.createDirectories;
-import static java.util.function.Predicate.not;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
@@ -51,17 +49,17 @@ public class MergingTaskManagementService {
 
     private final CeMergingConfiguration configuration;
     private final MergingService mergingService;
-    private final MergingTaskRepository taskRepository;
-    private final MergingTaskMapper taskMapper;
+    private final MergingTaskRepository repository;
+    private final MergingTaskMapper mapper;
 
     public MergingTaskManagementService(final CeMergingConfiguration configuration,
                                         final MergingService mergingService,
-                                        final MergingTaskRepository taskRepository,
-                                        final MergingTaskMapper taskMapper) {
+                                        final MergingTaskRepository repository,
+                                        final MergingTaskMapper mapper) {
         this.configuration = configuration;
         this.mergingService = mergingService;
-        this.taskRepository = taskRepository;
-        this.taskMapper = taskMapper;
+        this.repository = repository;
+        this.mapper = mapper;
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -69,12 +67,12 @@ public class MergingTaskManagementService {
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     public MergingTaskDto runTask(final long taskId) {
-        return taskMapper.mergingTaskToMergingTaskDto(run(getTaskById(taskId)));
+        return mapper.mergingTaskToMergingTaskDto(run(getTaskById(taskId)));
     }
 
     public JsonApiDocument<MergingTaskDto> getTaskJsonDoc(final long taskId) {
         return JsonApiDocument.fromData(
-            taskMapper.mergingTaskToMergingTaskDto(
+            mapper.mergingTaskToMergingTaskDto(
                 getTaskById(taskId)
             )
         );
@@ -85,11 +83,10 @@ public class MergingTaskManagementService {
 
         final MergingTask task = new MergingTask();
         // empty at this stage, but done to init id
-        taskRepository.save(task);
+        repository.save(task);
 
         final String inputsDir = configuration.getInputsDirectoryPath(task);
-        final RequestMetadataManager requestMgr = new RequestMetadataManager(inputsDir,
-                                                                             inputRequestMetadata);
+        final RequestMetadataManager requestMgr = new RequestMetadataManager(inputsDir, inputRequestMetadata);
 
         try {
             final Path tmpInputPath = unzipInputFileInTmp(inputZip);
@@ -108,13 +105,13 @@ public class MergingTaskManagementService {
             requestMgr.feedTaskData(task);
             task.getInputs().setRealOffset(requestMgr.getParisRequestOffset());
 
-            taskRepository.save(task);
+            repository.save(task);
             LOGGER.info("Merging task created with id: {}", task.getTaskId());
-            return taskMapper.mergingTaskToMergingTaskDto(task);
+            return mapper.mergingTaskToMergingTaskDto(task);
         } catch (final Exception e) {
             final String error = "Error during merging task creation";
             LOGGER.error(error, e);
-            taskRepository.delete(task);
+            repository.delete(task);
             throw new ServiceIOException(error, e);
         }
 
@@ -164,12 +161,12 @@ public class MergingTaskManagementService {
             task.setTaskStatus(RUNNING);
 
             LOGGER.info("Merging task {} is running.", task.getTaskId());
-            taskRepository.save(task);
+            repository.save(task);
 
             LOGGER.info("Running merging task {}' ", task.getTaskId());
             mergingService.run(task);
             task.setTaskStatus(SUCCESS);
-            taskRepository.save(task);
+            repository.save(task);
             LOGGER.info("Merging task {} succeeded", task.getTaskId());
             return task;
 
@@ -179,7 +176,7 @@ public class MergingTaskManagementService {
             final String error = e.getMessage();
             task.setStatusDetail(error);
             task.setTaskStatus(ERROR);
-            taskRepository.save(task);
+            repository.save(task);
             throw new CeMergingException(error, e);
         }
     }
@@ -193,9 +190,8 @@ public class MergingTaskManagementService {
     }
 
     private MergingTask getTaskById(final long taskId) {
-        final MergingTask task = taskRepository.findById(taskId)
-            .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available",
-                                                                       taskId)));
+        final MergingTask task = repository.findById(taskId)
+            .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available", taskId)));
         handleDaylightSavingTime(task);
         return task;
     }
@@ -204,12 +200,9 @@ public class MergingTaskManagementService {
         final MergingTask task = getTaskById(taskId);
 
         return switch (task.getTaskStatus()) {
-            case CREATED -> throw new TaskNotRunException(String.format("Task %d has not been run",
-                                                                        taskId));
-            case RUNNING -> throw new TaskNotRunException(String.format("Task %d currently running",
-                                                                        taskId));
-            case null -> throw new TaskNotValidException(String.format("Task %d has no status",
-                                                                       taskId));
+            case CREATED -> throw new TaskNotRunException(String.format("Task %d has not been run", taskId));
+            case RUNNING -> throw new TaskNotRunException(String.format("Task %d currently running", taskId));
+            case null -> throw new TaskNotValidException(String.format("Task %d has no status", taskId));
             case SUCCESS, ERROR -> task;
         };
     }
@@ -222,14 +215,19 @@ public class MergingTaskManagementService {
      */
     private void handleDaylightSavingTime(final MergingTask task) {
         final Inputs inputs = task.getInputs();
-        final Optional<OffsetDateTime> taskDateOpt = Optional.ofNullable(inputs.getTargetDate());
-        final Optional<ZoneOffset> realOffset = Optional.ofNullable(inputs.getRealOffset());
 
-        taskDateOpt.ifPresent(taskDate ->
-                                  realOffset.filter(not(taskDate.getOffset()::equals)) // if offsets are different ...
-                                      .ifPresent(offset ->
-                                                     inputs.setTargetDate(
-                                                         OffsetDateTime.of(taskDate.toLocalDateTime(), offset)
-                                                     ))); // ... we change the target date to have it at the real offset
+        final OffsetDateTime taskDate = inputs.getTargetDate();
+        final ZoneOffset realOffset = inputs.getRealOffset();
+
+        if (taskDate == null || realOffset == null) {
+            return;
+        }
+
+        // if offsets are different, we change the target date to have it at the real offset
+        if (!taskDate.getOffset().equals(realOffset)) {
+            inputs.setTargetDate(OffsetDateTime.of(taskDate.toLocalDateTime(), realOffset));
+        }
+
     }
+
 }

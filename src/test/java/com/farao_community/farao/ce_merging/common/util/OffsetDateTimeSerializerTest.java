@@ -10,6 +10,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -21,13 +22,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class OffsetDateTimeSerializerTest {
 
+    private Writer jsonWriter;
+    private JsonGenerator jsonGenerator;
+    private SerializerProvider serializerProvider;
+
+    @BeforeEach
+    void setup() throws IOException {
+        jsonWriter = new StringWriter();
+        jsonGenerator = new JsonFactory().createGenerator(jsonWriter);
+        serializerProvider = new ObjectMapper().getSerializerProvider();
+    }
+
     @Test
     void shouldSerializeOffsetDatetime() throws IOException {
         final OffsetDateTime timestamp = OffsetDateTime.parse("2025-12-08T14:00Z");
-
-        final Writer jsonWriter = new StringWriter();
-        final JsonGenerator jsonGenerator = new JsonFactory().createGenerator(jsonWriter);
-        final SerializerProvider serializerProvider = new ObjectMapper().getSerializerProvider();
 
         new OffsetDateTimeSerializer().serialize(timestamp, jsonGenerator, serializerProvider);
         jsonGenerator.flush();
@@ -38,9 +46,6 @@ class OffsetDateTimeSerializerTest {
 
     @Test
     void shouldSerializeNull() throws IOException {
-        final Writer jsonWriter = new StringWriter();
-        final JsonGenerator jsonGenerator = new JsonFactory().createGenerator(jsonWriter);
-        final SerializerProvider serializerProvider = new ObjectMapper().getSerializerProvider();
 
         new OffsetDateTimeSerializer().serialize(null, jsonGenerator, serializerProvider);
         jsonGenerator.flush();

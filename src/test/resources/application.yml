@@ -21,3 +21,7 @@ ce-merging-server:
   filesystem:
     root: ${java.io.tmpdir}/testFiles
     root-daily: ${java.io.tmpdir}/testFiles/daily
+  zip:
+    write-buffer-size:
+    read-buffer-size:
+    tmp-dir:
