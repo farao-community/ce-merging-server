@@ -79,7 +79,7 @@ public class CeMergingConfiguration {
      * @return /path/to/root/task_id/directory
      */
     private String resolveTaskDirInRoot(final MergingTask task, final String directory, final String root) {
-        return Path.of(root + separator + task.getTaskId())
+        return Path.of(root + separator + task.getId())
             .resolve(directory)
             .toString();
     }

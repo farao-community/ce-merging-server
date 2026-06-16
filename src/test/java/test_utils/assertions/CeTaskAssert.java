@@ -26,16 +26,16 @@ public class CeTaskAssert extends AbstractAssert<CeTaskAssert, MergingTask> {
 
     @CanIgnoreReturnValue
     public CeTaskAssert hasStatus(final TaskStatus expected) {
-        if (actual.getTaskStatus() != expected) {
-            failWithActualExpectedAndMessage(actual.getTaskStatus(), expected, "Unexpected task status");
+        if (actual.getStatus() != expected) {
+            failWithActualExpectedAndMessage(actual.getStatus(), expected, "Unexpected task status");
         }
         return this;
     }
 
     @CanIgnoreReturnValue
     public CeTaskAssert isSameTaskAs(final MergingTask other) {
-        if (actual.getTaskId() != other.getTaskId()
-            || actual.getTaskStatus() != other.getTaskStatus()
+        if (actual.getId() != other.getId()
+            || actual.getStatus() != other.getStatus()
             || !Objects.equals(actual.getName(), other.getName())
             || !Objects.equals(actual.getArchiveFileOriginalName(), other.getArchiveFileOriginalName())) {
             failWithMessage("These are not the same tasks");
@@ -45,9 +45,9 @@ public class CeTaskAssert extends AbstractAssert<CeTaskAssert, MergingTask> {
 
     @CanIgnoreReturnValue
     public CeTaskAssert isSameTaskAs(final MergingTaskDto dto) {
-        if (actual.getTaskId() != dto.getTaskId()
-            || actual.getTaskStatus() != dto.getTaskStatus()
-            || !Objects.equals(actual.getName(), dto.getName())) {
+        if (actual.getId() != dto.getTaskId()
+            || actual.getStatus() != dto.getTaskStatus()
+            || !Objects.equals(actual.getName(), dto.getTaskName())) {
             failWithMessage("These are not the same tasks");
         }
         return this;

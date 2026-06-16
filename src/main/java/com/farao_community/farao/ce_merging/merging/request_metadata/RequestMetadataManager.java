@@ -79,8 +79,8 @@ public class RequestMetadataManager {
      */
     public void feedTaskData(final MergingTask task) {
         task.setName(getRequestData().getAttributes().getName());
-        task.setInputs(getTaskInputs(task.getTaskId()));
-        task.setConfigurations(getTaskConfigurations(task.getTaskId()));
+        task.setInputs(getTaskInputs(task.getId()));
+        task.setConfigurations(getTaskConfigurations(task.getId()));
     }
 
     public ZoneOffset getParisRequestOffset() {

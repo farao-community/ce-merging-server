@@ -20,7 +20,7 @@ class JsonApiDataImplementorsTest {
     static {
         final MergingTaskDto mergingTaskDto = new MergingTaskDto();
         mergingTaskDto.setTaskId(1);
-        mergingTaskDto.setName("Test");
+        mergingTaskDto.setTaskName("Test");
         withId1ByType.put("merging-task", mergingTaskDto);
     }
 

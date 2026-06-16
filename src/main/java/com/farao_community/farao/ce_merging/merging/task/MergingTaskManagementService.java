@@ -106,7 +106,7 @@ public class MergingTaskManagementService {
             task.getInputs().setRealOffset(requestMgr.getParisRequestOffset());
 
             repository.save(task);
-            LOGGER.info("Merging task created with id: {}", task.getTaskId());
+            LOGGER.info("Merging task created with id: {}", task.getId());
             return mapper.mergingTaskToMergingTaskDto(task);
         } catch (final Exception e) {
             final String error = "Error during merging task creation";
@@ -154,20 +154,20 @@ public class MergingTaskManagementService {
 
     private MergingTask run(final MergingTask task) {
         try {
-            if (task.getTaskStatus() == RUNNING) {
+            if (task.getStatus() == RUNNING) {
                 throw new TaskAlreadyRunningException(String.format("Task %d already running, could not be run again",
-                                                                    task.getTaskId()));
+                                                                    task.getId()));
             }
-            task.setTaskStatus(RUNNING);
+            task.setStatus(RUNNING);
 
-            LOGGER.info("Merging task {} is running.", task.getTaskId());
+            LOGGER.info("Merging task {} is running.", task.getId());
             repository.save(task);
 
-            LOGGER.info("Running merging task {}' ", task.getTaskId());
+            LOGGER.info("Running merging task {}' ", task.getId());
             mergingService.run(task);
-            task.setTaskStatus(SUCCESS);
+            task.setStatus(SUCCESS);
             repository.save(task);
-            LOGGER.info("Merging task {} succeeded", task.getTaskId());
+            LOGGER.info("Merging task {} succeeded", task.getId());
             return task;
 
         } catch (final TaskAlreadyRunningException alreadyRunningException) {
@@ -175,7 +175,7 @@ public class MergingTaskManagementService {
         } catch (final Exception e) {
             final String error = e.getMessage();
             task.setStatusDetail(error);
-            task.setTaskStatus(ERROR);
+            task.setStatus(ERROR);
             repository.save(task);
             throw new CeMergingException(error, e);
         }
@@ -199,7 +199,7 @@ public class MergingTaskManagementService {
     private MergingTask getFinishedTaskById(final long taskId) throws TaskNotRunException {
         final MergingTask task = getTaskById(taskId);
 
-        return switch (task.getTaskStatus()) {
+        return switch (task.getStatus()) {
             case CREATED -> throw new TaskNotRunException(String.format("Task %d has not been run", taskId));
             case RUNNING -> throw new TaskNotRunException(String.format("Task %d currently running", taskId));
             case null -> throw new TaskNotValidException(String.format("Task %d has no status", taskId));

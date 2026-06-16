@@ -17,7 +17,7 @@ public class MergingTaskDto implements JsonApiData {
     /**
      * The name of the merging Task
      */
-    private String name;
+    private String taskName;
 
     /**
      * The Status of the merging Task
@@ -69,12 +69,12 @@ public class MergingTaskDto implements JsonApiData {
         this.taskId = taskId;
     }
 
-    public String getName() {
-        return name;
+    public String getTaskName() {
+        return taskName;
     }
 
-    public void setName(final String name) {
-        this.name = name;
+    public void setTaskName(final String taskName) {
+        this.taskName = taskName;
     }
 
     public InputsDto getInputs() {

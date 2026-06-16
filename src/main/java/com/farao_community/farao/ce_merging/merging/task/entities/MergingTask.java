@@ -23,7 +23,7 @@ import static jakarta.persistence.GenerationType.AUTO;
 public class MergingTask implements Serializable {
     @Id
     @GeneratedValue(strategy = AUTO)
-    private long taskId;
+    private long id;
 
     /**
      * The name of the merging Task
@@ -34,7 +34,7 @@ public class MergingTask implements Serializable {
      * The Status of the merging Task
      */
     @Enumerated(STRING)
-    private TaskStatus taskStatus = TaskStatus.CREATED;
+    private TaskStatus status = TaskStatus.CREATED;
 
     /**
      * Details about task status
@@ -71,20 +71,20 @@ public class MergingTask implements Serializable {
     @Embedded
     private Outputs outputs = new Outputs();
 
-    public TaskStatus getTaskStatus() {
-        return taskStatus;
+    public TaskStatus getStatus() {
+        return status;
     }
 
-    public void setTaskStatus(final TaskStatus taskStatus) {
-        this.taskStatus = taskStatus;
+    public void setStatus(final TaskStatus taskStatus) {
+        this.status = taskStatus;
     }
 
-    public long getTaskId() {
-        return taskId;
+    public long getId() {
+        return id;
     }
 
-    public void setTaskId(final long taskId) {
-        this.taskId = taskId;
+    public void setId(final long taskId) {
+        this.id = taskId;
     }
 
     public String getName() {

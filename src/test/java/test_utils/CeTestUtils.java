@@ -87,9 +87,9 @@ public final class CeTestUtils {
 
     public static MergingTask taskWithIdAndStatus(final long id, final TaskStatus status) {
         final MergingTask task = new MergingTask();
-        task.setTaskId(id);
+        task.setId(id);
         task.setArchiveFileOriginalName(INPUTS_ZIP_NAME);
-        task.setTaskStatus(status);
+        task.setStatus(status);
         final Inputs inputs = new Inputs();
         inputs.setTargetDate(OffsetDateTime.of(2000, 1, 1,
                                                12, 0, 0, 0,
