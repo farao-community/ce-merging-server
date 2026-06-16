@@ -219,10 +219,6 @@ public class MergingTaskManagementService {
         final OffsetDateTime taskDate = inputs.getTargetDate();
         final ZoneOffset realOffset = inputs.getRealOffset();
 
-        if (taskDate == null || realOffset == null) {
-            return;
-        }
-
         // if offsets are different, we change the target date to have it at the real offset
         if (!taskDate.getOffset().equals(realOffset)) {
             inputs.setTargetDate(OffsetDateTime.of(taskDate.toLocalDateTime(), realOffset));
