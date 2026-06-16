@@ -35,9 +35,11 @@ import java.time.ZoneOffset;
 
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.unzipInputFileInTmp;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirectory;
-import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.ERROR;
-import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.RUNNING;
-import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.SUCCESS;
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static java.nio.file.Files.createDirectories;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
@@ -121,11 +123,11 @@ public class MergingTaskManagementService {
                         ARTIFACTS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
     public SavedFile getXnodesInformation(final long taskId) {
-        return getArtifacts(taskId).getXnodesInformationFile();
+        return getArtifacts(taskId).getFile(XNODES_INFORMATION_FILE);
     }
 
     public SavedFile getCgmNetPositions(final long taskId) {
-        return getArtifacts(taskId).getCgmNetPositionsFile();
+        return getArtifacts(taskId).getFile(CGM_NET_POSITIONS_FILE);
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-

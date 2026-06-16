@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities.enums;
 
+import com.farao_community.farao.ce_merging.merging.task.enums.IgmType;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
-import com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus;
+import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;

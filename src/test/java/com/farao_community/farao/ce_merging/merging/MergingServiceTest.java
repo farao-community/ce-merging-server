@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.merging;
 
 import org.junit.jupiter.api.Test;
 
-import static com.farao_community.farao.ce_merging.merging.task.entities.enums.TaskStatus.CREATED;
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static test_utils.CeTestUtils.taskWithIdAndStatus;
 
