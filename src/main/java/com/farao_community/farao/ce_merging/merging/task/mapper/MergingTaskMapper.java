@@ -29,6 +29,7 @@ public interface MergingTaskMapper {
                 .map(SavedFile::getLocation)
                 .ifPresent(loc -> mapped.putLocation(type, loc));
         }
+
         return mapped;
     }
 }
