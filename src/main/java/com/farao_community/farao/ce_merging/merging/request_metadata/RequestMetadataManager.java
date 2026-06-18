@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
-import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
+import static com.farao_community.farao.ce_merging.common.util.FileUtils.getPathInParent;
 
 public class RequestMetadataManager {
     private final String inputsPath;
@@ -178,7 +178,7 @@ public class RequestMetadataManager {
                                   final Path parent,
                                   final List<String> missingFiles) {
         final String expectedPath = savedFile.getPath();
-        if (!getIfInside(expectedPath, parent).toFile().exists()) {
+        if (!getPathInParent(expectedPath, parent).toFile().exists()) {
             missingFiles.add(expectedPath);
         }
     }
@@ -203,8 +203,8 @@ public class RequestMetadataManager {
     }
 
     private String getInputPath(final SavedFile file) {
-        return getIfInside(file.getPath(),
-                           Paths.get(inputsPath))
+        return getPathInParent(file.getPath(),
+                               Paths.get(inputsPath))
             .toString();
     }
 

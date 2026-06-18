@@ -27,7 +27,7 @@ import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import static com.farao_community.farao.ce_merging.common.exception.ServiceIOException.errorWhile;
-import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
+import static com.farao_community.farao.ce_merging.common.util.FileUtils.getPathInParent;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.createTempDirectory;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
@@ -77,7 +77,7 @@ public final class ZipUtils {
             ZipEntry zipEntry;
             // iterates over entries in the zip file
             while ((zipEntry = zipIn.getNextEntry()) != null) { // NOSONAR expanding archive is safe
-                final Path filePath = getIfInside(zipEntry.getName(), destination);
+                final Path filePath = getPathInParent(zipEntry.getName(), destination);
                 final String fileDir = filePath.toString();
                 if (zipEntry.isDirectory()) {
                     createOrThrow(new File(fileDir));
@@ -125,7 +125,7 @@ public final class ZipUtils {
         final String fullName = Optional.ofNullable(multipartFile.getOriginalFilename())
             .orElseThrow(() -> new ServiceIOException("empty filename"));
         final String safeName = Paths.get(fullName).getFileName().toString();
-        final Path inputPath = getIfInside(safeName, inputsPath);
+        final Path inputPath = getPathInParent(safeName, inputsPath);
 
         multipartFile.transferTo(inputPath);
 

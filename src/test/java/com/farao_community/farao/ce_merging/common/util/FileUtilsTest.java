@@ -10,7 +10,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 
-import static com.farao_community.farao.ce_merging.common.util.FileUtils.getIfInside;
+import static com.farao_community.farao.ce_merging.common.util.FileUtils.getPathInParent;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -56,11 +56,11 @@ class FileUtilsTest {
 
     @Test
     void shouldFailResolvingIncorrectPaths() {
-        assertThatThrownBy(() -> getIfInside("", pathOf("request-metadata")))
+        assertThatThrownBy(() -> getPathInParent("", pathOf("request-metadata")))
             .isValidServiceException()
             .hasMessage("Missing file path");
 
-        assertThatThrownBy(() -> getIfInside("../../../", pathOf("blank.file")))
+        assertThatThrownBy(() -> getPathInParent("../../../", pathOf("blank.file")))
             .isValidServiceException()
             .hasMessageContaining("Invalid file path");
     }

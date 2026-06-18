@@ -74,7 +74,7 @@ public final class FileUtils {
      * @return the path to get as a Path object
      * @throws ServiceIOException if not the case, or if paths are invalid
      */
-    public static Path getIfInside(final String pathToGet, final Path parentFolder) throws ServiceIOException {
+    public static Path getPathInParent(final String pathToGet, final Path parentFolder) throws ServiceIOException {
         if (isEmpty(pathToGet)) {
             throw new ServiceIOException("Missing file path");
         }
