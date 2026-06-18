@@ -12,8 +12,8 @@ import test_utils.GetterSetterVerifier;
 import java.io.IOException;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.json_api.JsonApiTestResources.JSON_FROM_ERROR;
-import static com.farao_community.farao.ce_merging.common.json_api.JsonApiTestResources.JSON_FROM_EXCEPTION;
+import static com.farao_community.farao.ce_merging.common.json_api.JsonApiTestResources.JSON_DOC_TWO_ERRORS;
+import static com.farao_community.farao.ce_merging.common.json_api.JsonApiTestResources.JSON_DOC_TEST_EXCEPTION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.S_IO_EXCEPTION;
 import static test_utils.CeTestUtils.stringify;
@@ -23,14 +23,14 @@ class JsonApiErrorDocumentTest {
     void shouldBuildJsonErrorDocumentFromException() throws IOException {
         final Exception error = new Exception("Test");
         final String jsonError = stringify(JsonApiErrorDocument.fromError(error, "500", "TEST"));
-        assertEquals(JSON_FROM_EXCEPTION, jsonError);
+        assertEquals(JSON_DOC_TEST_EXCEPTION, jsonError);
     }
 
     @Test
     void shouldBuildJsonErrorDocumentFromJsonErrors() throws IOException {
         final JsonApiError serviceError = JsonApiError.fromServiceException(S_IO_EXCEPTION);
         final String jsonErrors = stringify(JsonApiErrorDocument.fromErrors(List.of(serviceError, serviceError)));
-        assertEquals(JSON_FROM_ERROR, jsonErrors);
+        assertEquals(JSON_DOC_TWO_ERRORS, jsonErrors);
     }
 
     @Test

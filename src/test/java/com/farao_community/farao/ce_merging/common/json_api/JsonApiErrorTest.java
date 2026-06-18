@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
+import static com.farao_community.farao.ce_merging.common.json_api.JsonApiTestResources.JSON_ERROR;
 import static test_utils.CeTestUtils.S_IO_EXCEPTION;
 import static test_utils.CeTestUtils.stringify;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -19,8 +20,6 @@ class JsonApiErrorTest {
     @Test
     void shouldBuildJsonErrorFromException() throws IOException {
         final String jsonError = stringify(JsonApiError.fromServiceException(S_IO_EXCEPTION));
-        assertEquals("{\"status\":\"500\",\"code\":\"500-IO-EXCEPTION\"," +
-                     "\"title\":\"IO exception\",\"detail\":\"Test\"}",
-                     jsonError);
+        assertEquals(JSON_ERROR, jsonError);
     }
 }

@@ -12,28 +12,27 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.common.json_api.JsonApiTestResources.JSON_DOC_IO_EXCEPTION;
+import static com.farao_community.farao.ce_merging.common.json_api.JsonApiTestResources.JSON_DOC_ONE_TASK;
+import static com.farao_community.farao.ce_merging.common.json_api.JsonApiTestResources.JSON_DOC_TWO_TASKS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.S_IO_EXCEPTION;
 import static test_utils.CeTestUtils.stringify;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class JsonApiDocumentTest {
     @Test
     void shouldBuildJsonDocumentFromException() throws IOException {
         final String jsonError = stringify(JsonApiDocument.fromServiceException(S_IO_EXCEPTION));
-        assertEquals("{\"errors\":[{\"status\":\"500\",\"code\":\"500-IO-EXCEPTION\"," +
-                     "\"title\":\"IO exception\",\"detail\":\"Test\"}]}", jsonError);
+        assertEquals(JSON_DOC_IO_EXCEPTION, jsonError);
     }
 
     @Test
     void shouldBuildJsonDocumentFromMergingTaskDto() throws IOException {
-        assertEquals("{\"data\":[{\"taskId\":null,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
-                     "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":null,\"type\":\"merging-task\"}]}",
-                     stringify(JsonApiDocument.fromData(new MergingTaskDto())));
-        assertEquals("{\"data\":[{\"taskId\":null,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
-                     "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":null,\"type\":\"merging-task\"}," +
-                     "{\"taskId\":null,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
-                     "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":null,\"type\":\"merging-task\"}]}",
-                     stringify(JsonApiDocument.fromDataList(List.of(new MergingTaskDto(),
-                                                                    new MergingTaskDto()))));
+        assertEquals(JSON_DOC_ONE_TASK, stringify(JsonApiDocument.fromData(new MergingTaskDto())));
+        assertEquals(JSON_DOC_TWO_TASKS, stringify(
+                         JsonApiDocument.fromDataList(
+                             List.of(new MergingTaskDto(), new MergingTaskDto()))
+                     )
+        );
     }
 }
