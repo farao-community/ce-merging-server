@@ -105,7 +105,7 @@ class MergingTaskManagementServiceTest {
                                                                 byteContentOf(METADATA));
 
         assertThatThrownBy(() -> service.createNewTask(zipFile, stringContentOf(METADATA)))
-            .isServiceException();
+            .isValidServiceException();
 
         verify(repository)
             .delete(anyTask());
@@ -165,7 +165,7 @@ class MergingTaskManagementServiceTest {
             .run(anyTask());
 
         assertThatThrownBy(() -> service.runTask(ONE))
-            .isServiceException();
+            .isValidServiceException();
 
         assertThat(failingTask).hasStatus(ERROR);
     }

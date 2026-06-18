@@ -9,7 +9,6 @@ package com.farao_community.farao.ce_merging.merging.task.entities;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeDeserializer;
 import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeSerializer;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.ElementCollection;
@@ -23,59 +22,35 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_ALEGRO_THRESHOLD;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_REQUEST_OFFSET;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 
+/**
+ * WARNING: this class is used by the merging supervisor (EMERGE).
+ * Please contact them to check compatibility if any modification is needed
+ */
 @Embeddable
 public class Inputs implements Serializable {
-
-    @JsonIgnore
-    private static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
-    @JsonIgnore
-    private static final ZoneOffset DEFAULT_OFFSET = ZoneOffset.of("+01:00");
-    /**
-     * The target Date and Time of the merging process
-     */
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     @JsonDeserialize(using = OffsetDateTimeDeserializer.class)
     private OffsetDateTime targetDate;
-    /**
-     * The real offset of the process target Date
-     */
     private ZoneOffset realOffset;
-    /**
-     * is there an internal HVDC line in CE
-     */
     private Boolean mergingWithInternalHvdc;
     /**
      * alegroThreshold = 2 GW by default
      * This threshold is used to compare loads between the two xnodes of Alegro
      */
     private Integer alegroThreshold;
-    /**
-     * The list of TGM data
-     */
     @ElementCollection(fetch = EAGER)
     private List<IgmData> igms = new ArrayList<>();
-    /**
-     * The original name of the generation load shift key file
-     */
     @OneToOne(cascade = ALL)
     private SavedFile generationLoadShiftKeys = new SavedFile();
-    /**
-     * The external constraints file
-     */
     @OneToOne(cascade = ALL)
     private SavedFile externalConstraints = new SavedFile();
-    /**
-     * The feasibility range file
-     */
     @OneToOne(cascade = ALL)
     private SavedFile feasibilityRanges = new SavedFile();
-
-    /**
-     * The net position forecast file
-     */
     @OneToOne(cascade = ALL)
     private SavedFile netPositionForecast = new SavedFile();
 
@@ -89,7 +64,7 @@ public class Inputs implements Serializable {
 
     public ZoneOffset getRealOffset() {
         return Optional.ofNullable(realOffset)
-            .orElse(DEFAULT_OFFSET);
+            .orElse(DEFAULT_REQUEST_OFFSET);
     }
 
     public Boolean getMergingWithInternalHvdc() {

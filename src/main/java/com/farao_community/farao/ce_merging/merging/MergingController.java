@@ -26,7 +26,6 @@ import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBui
 import org.springframework.web.util.UriComponents;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.API_VERSION;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ARTIFACTS_TAG;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BAD_REQUEST;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_MERGING_URL;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CREATED;
@@ -42,6 +41,10 @@ import static com.farao_community.farao.ce_merging.common.util.FileUtils.toAttac
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
+/**
+ * WARNING: this class is used by the merging supervisor (EMERGE).
+ * Please contact them to check compatibility if any modification is needed
+ */
 @RestController
 @CrossOrigin(origins = ORIGIN_ANY) // NOSONAR enabling CORS is safe here
 @RequestMapping(value = CE_MERGING_URL + API_VERSION)
@@ -70,7 +73,7 @@ public class MergingController {
                                                      @Parameter(description = "JSON representation of the task")
                                                      @RequestPart final String inputRequestMetadata) {
         final MergingTaskDto createdTask = taskManager.createNewTask(inputFilesArchive, inputRequestMetadata);
-        final long taskId = createdTask.getTaskId();
+        final Long taskId = createdTask.getTaskId();
         final UriComponents taskLocation = MvcUriComponentsBuilder.fromController(getClass())
             .path("/tasks/{taskId}")
             .buildAndExpand(taskId);
@@ -83,14 +86,14 @@ public class MergingController {
     @PostMapping(value = "/tasks/{taskId}",
         produces = JSON_API_MIME_TYPE)
     @Operation(tags = TASK_MANAGEMENT_TAG,
-        summary = "Run merging task with ID {taskId}.")
+        summary = "Run merging task with given ID.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "The merging task has been run successfully."),
         @ApiResponse(responseCode = BAD_REQUEST, description = "Merging task with given ID already running."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or not reachable.")
+        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task not found, or not reachable.")
     })
     public ResponseEntity<JsonApiDocument<MergingTaskDto>> runTask(@Parameter(description = MERGING_TASK_ID)
-                                                                   @PathVariable final long taskId) {
+                                                                   @PathVariable final Long taskId) {
         return ResponseEntity.ok().body(JsonApiDocument.fromData(taskManager.runTask(taskId)));
     }
 
@@ -101,83 +104,55 @@ public class MergingController {
     @GetMapping(value = "/tasks/{taskId}",
         produces = JSON_API_MIME_TYPE)
     @Operation(tags = TASK_MANAGEMENT_TAG,
-        summary = "Get the data of merging task with ID {taskId}.")
+        summary = "Get the data of merging task with given ID.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "The merging task data has been returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or not reachable.")
+        @ApiResponse(responseCode = OK, description = "The merging task data returned successfully."),
+        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task not found, or not reachable.")
     })
     public ResponseEntity<JsonApiDocument<MergingTaskDto>> getTask(@Parameter(description = MERGING_TASK_ID)
-                                                                   @PathVariable final long taskId) {
+                                                                   @PathVariable final Long taskId) {
         return ResponseEntity.ok().body(taskManager.getTaskJsonDoc(taskId));
     }
 
     @GetMapping(value = "/tasks/{taskId}/outputs/ref-prog",
         produces = {APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
     @Operation(tags = OUTPUTS_TAG,
-        summary = "Return the RefProg output of merging task with ID {taskId}.")
+        summary = "Return the RefProg output of merging task with given ID.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "The RefProg output has been returned successfully"),
+        @ApiResponse(responseCode = OK, description = "The RefProg output returned successfully"),
         @ApiResponse(responseCode = BAD_REQUEST, description = TASK_NOT_RUN),
-        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or RefProg output of merging task not available")
+        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task not found, or RefProg output of merging task not available")
     })
     public ResponseEntity<byte[]> getRefProgOutput(@Parameter(description = MERGING_TASK_ID)
-                                                   @PathVariable final long taskId) {
+                                                   @PathVariable final Long taskId) {
         return toAttachmentFileResponse(taskManager.getRefProg(taskId));
     }
 
     @GetMapping(value = "/tasks/{taskId}/outputs/cgm",
         produces = {APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
     @Operation(tags = OUTPUTS_TAG,
-        summary = "Return the CGM output of merging task with ID {taskId}.")
+        summary = "Return the CGM output of merging task with given ID.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "The CGM output has been returned successfully"),
+        @ApiResponse(responseCode = OK, description = "The CGM output returned successfully"),
         @ApiResponse(responseCode = BAD_REQUEST, description = TASK_NOT_RUN),
-        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or CGM output of merging task not available")
+        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task not found, or CGM output of merging task not available")
     })
     public ResponseEntity<byte[]> getCgmOutput(@Parameter(description = MERGING_TASK_ID)
-                                               @PathVariable final long taskId) {
+                                               @PathVariable final Long taskId) {
         return toAttachmentFileResponse(taskManager.getCgm(taskId));
     }
 
     @GetMapping(value = "/tasks/{taskId}/outputs",
         produces = {APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
     @Operation(tags = OUTPUTS_TAG,
-        summary = "Get all the outputs of the merging task with ID {taskId} as a zip archive.")
+        summary = "Get all the outputs of the merging task with given ID as a zip archive.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "The outputs archive has been returned successfully."),
+        @ApiResponse(responseCode = OK, description = "The outputs archive returned successfully."),
         @ApiResponse(responseCode = BAD_REQUEST, description = TASK_NOT_RUN),
-        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or BCI Report output of merging process task not available")
+        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task not found in the server, or BCI Report output of merging process task not available")
     })
     public ResponseEntity<byte[]> getOutputsByTaskId(@Parameter(description = MERGING_TASK_ID)
-                                                     @PathVariable final long taskId) {
+                                                     @PathVariable final Long taskId) {
         return toAttachmentFileResponse(taskManager.getOutputZip(taskId), "outputs_%s.zip".formatted(taskId));
-    }
-
-    @GetMapping(value = "/tasks/{taskId}/artifacts/cgm-net-positions",
-        produces = {APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
-    @Operation(tags = ARTIFACTS_TAG,
-        summary = "Get the CGM net positions artifact of the merging task {taskId}")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "The CGM net positions have been returned successfully"),
-        @ApiResponse(responseCode = BAD_REQUEST, description = TASK_NOT_RUN),
-        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or CGM net positions not available")
-    })
-    public ResponseEntity<byte[]> getCgmNetPositions(@Parameter(description = MERGING_TASK_ID)
-                                                     @PathVariable final long taskId) {
-        return toAttachmentFileResponse(taskManager.getCgmNetPositions(taskId));
-    }
-
-    @GetMapping(value = "/tasks/{taskId}/artifacts/xnodes-information",
-        produces = {APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
-    @Operation(tags = ARTIFACTS_TAG,
-        summary = "Get the xnodes information file of the merging task {taskId} ")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "xnodes information has been returned successfully"),
-        @ApiResponse(responseCode = BAD_REQUEST, description = TASK_NOT_RUN),
-        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or xnodes information file not available")
-    })
-    public ResponseEntity<byte[]> getXnodesInformation(@Parameter(description = MERGING_TASK_ID)
-                                                       @PathVariable final long taskId) {
-        return toAttachmentFileResponse(taskManager.getXnodesInformation(taskId));
     }
 }

@@ -9,28 +9,12 @@ package com.farao_community.farao.ce_merging.merging.task.dto;
 import java.io.Serializable;
 
 public class ConfigurationsDto implements Serializable {
-    /**
-     * The location of the dc load flow parameters
-     */
+
     private String dcLoadFlowParametersLocation;
-    /**
-     * The location of the ac load flow parameters
-     */
     private String acLoadFlowParametersLocation;
-    /**
-     * The location of the base cas improvement parameters
-     */
     private String basecaseImprovementParametersLocation;
-    /**
-     * The location of the balances adjustment parameters
-     */
     private String balancesAdjustmentParametersLocation;
-
-    /**
-     * The location of the recessivity parameters
-     */
     private String recessivityParametersLocation;
-
     /**
      * The BEC keys configuration
      */

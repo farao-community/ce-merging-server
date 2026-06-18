@@ -49,26 +49,24 @@ class MergingControllerTest {
 
     @Test
     void shouldGetOutputsAsAttachments() {
-        when(taskManager.getCgm(1))
+        when(taskManager.getCgm(1L))
             .thenReturn(new SavedFile());
-        when(taskManager.getCgmNetPositions(1))
+        when(taskManager.getCgmNetPositions(1L))
             .thenReturn(new SavedFile());
-        when(taskManager.getOutputZip(1))
+        when(taskManager.getOutputZip(1L))
             .thenReturn(new byte[0]);
-        when(taskManager.getRefProg(1))
+        when(taskManager.getRefProg(1L))
             .thenReturn(new SavedFile());
-        when(taskManager.getXnodesInformation(1))
+        when(taskManager.getXnodesInformation(1L))
             .thenReturn(new SavedFile());
 
         try (final MockedStatic<FileUtils> fileUtils = mockStatic(FileUtils.class)) {
-            controller.getCgmNetPositions(1);
-            controller.getCgmOutput(1);
-            controller.getOutputsByTaskId(1);
-            controller.getRefProgOutput(1);
-            controller.getXnodesInformation(1);
+            controller.getCgmOutput(1L);
+            controller.getOutputsByTaskId(1L);
+            controller.getRefProgOutput(1L);
 
             fileUtils.verify(() -> FileUtils.toAttachmentFileResponse(anyFile()),
-                             times(4));
+                             times(2));
             fileUtils.verify(() -> FileUtils.toAttachmentFileResponse(any(), anyString()));
         }
     }
@@ -108,20 +106,20 @@ class MergingControllerTest {
 
     @Test
     void shouldGetTask() {
-        final MergingTaskDto task = taskDtoWithIdAndStatus(1, ERROR);
-        when(taskManager.getTaskJsonDoc(1))
+        final MergingTaskDto task = taskDtoWithIdAndStatus(1L, ERROR);
+        when(taskManager.getTaskJsonDoc(1L))
             .thenReturn(JsonApiDocument.fromData(task));
 
-        assertTaskIsInOkResponse(task, controller.getTask(1));
+        assertTaskIsInOkResponse(task, controller.getTask(1L));
     }
 
     @Test
     void shouldRunTask() {
-        final MergingTaskDto task = taskDtoWithIdAndStatus(1, SUCCESS);
-        when(taskManager.runTask(1))
+        final MergingTaskDto task = taskDtoWithIdAndStatus(1L, SUCCESS);
+        when(taskManager.runTask(1L))
             .thenReturn(task);
 
-        assertTaskIsInOkResponse(task, controller.runTask(1));
+        assertTaskIsInOkResponse(task, controller.runTask(1L));
     }
 
     void assertTaskIsInOkResponse(final MergingTaskDto task, final ResponseEntity<JsonApiDocument<MergingTaskDto>> response) {

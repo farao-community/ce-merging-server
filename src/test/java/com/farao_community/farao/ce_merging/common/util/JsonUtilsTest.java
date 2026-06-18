@@ -71,11 +71,11 @@ class JsonUtilsTest {
     @Test
     void shouldFailWithInvalidStreams() {
         assertThatThrownBy(() -> JsonUtils.read(DUMMY_CLASS, getFailingInputStream()))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessage("Error occurred when converting JSON file to object of type DummyJson");
 
         assertThatThrownBy(() -> JsonUtils.writeInStream(DUMMY_CLASS, TEST_JSON, getFailingOutputStream()))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessage("Error occurred when writing content of object of type DummyJson");
     }
 }

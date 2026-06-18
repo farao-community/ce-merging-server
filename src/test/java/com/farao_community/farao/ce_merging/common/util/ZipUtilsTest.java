@@ -50,21 +50,21 @@ class ZipUtilsTest {
         assertTrue(tmp.toFile().setReadOnly());
         final Path zipInput = pathOf(TEST_ZIP);
         assertThatThrownBy(() -> unzipFile(zipInput, tmp))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessageContaining(TEST_ZIP);
     }
 
     @Test
     void shouldFailWhenUnzippingToInvalidDirectory() {
         assertThatThrownBy(() -> unzipFile(pathOf(TEST_ZIP), Path.of("/not/existing")))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessage("Error occurred while extracting file testZip.zip");
     }
 
     @Test
     void shouldFailWhenZippingToInvalidPath() {
         assertThatThrownBy(() -> zipDirectory("not/existing"))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessageContaining("Error occurred while compressing directory not/existing");
 
         assertThatThrownBy(() -> zipDirectory("@%$*!:;"))

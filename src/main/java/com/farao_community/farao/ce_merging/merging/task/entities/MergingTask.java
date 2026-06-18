@@ -19,55 +19,27 @@ import java.io.Serializable;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.AUTO;
 
+/**
+ * WARNING: this class is used by the merging supervisor (EMERGE).
+ * Please contact them to check compatibility if any modification is needed
+ */
 @Entity
 public class MergingTask implements Serializable {
     @Id
     @GeneratedValue(strategy = AUTO)
-    private long id;
-
-    /**
-     * The name of the merging Task
-     */
+    private Long id;
     private String name;
-
-    /**
-     * The Status of the merging Task
-     */
     @Enumerated(STRING)
     private TaskStatus status = TaskStatus.CREATED;
-
-    /**
-     * Details about task status
-     */
     @Column(columnDefinition = "LONGTEXT")
     private String statusDetail;
-
-    /**
-     * The original name of the .zip input file
-     */
     private String archiveFileOriginalName;
-
-    /**
-     * The inputs of the merging Task
-     */
     @Embedded
     private Inputs inputs = new Inputs();
-
-    /**
-     * The artefacts of the merging Task computation
-     */
     @Embedded
     private Artifacts artifacts = new Artifacts();
-
-    /**
-     * The configurations of the merging Task
-     */
     @Embedded
     private Configurations configurations = new Configurations();
-
-    /**
-     * the Outputs of the merging task
-     */
     @Embedded
     private Outputs outputs = new Outputs();
 
@@ -79,12 +51,12 @@ public class MergingTask implements Serializable {
         this.status = taskStatus;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(final long taskId) {
-        this.id = taskId;
+    public void setId(final Long id) {
+        this.id = id;
     }
 
     public String getName() {

@@ -17,8 +17,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static test_utils.assertions.CeThrowableAssert.assertThat;
 
 class CustomExceptionsTest {
@@ -41,11 +39,9 @@ class CustomExceptionsTest {
             .getConstructor(String.class)
             .newInstance(MESSAGE);
 
-        assertNotNull(e.getTitle());
-        assertNotNull(e.getCode());
-        assertNotNull(e.getStatus());
-        assertEquals(MESSAGE, e.getMessage());
-        assertThat(e).isServiceException();
+        assertThat(e)
+            .isValidServiceException()
+            .hasMessage(MESSAGE);
     }
 
     @ParameterizedTest
@@ -59,12 +55,13 @@ class CustomExceptionsTest {
             .getConstructor(String.class, Throwable.class)
             .newInstance(MESSAGE, cause);
 
-        assertNotNull(e.getTitle());
-        assertNotNull(e.getCode());
-        assertNotNull(e.getStatus());
-        assertEquals(MESSAGE, e.getMessage());
-        assertThat(e).isServiceException();
-        assertEquals("testing cause", e.getCause().getMessage());
+        assertThat(e)
+            .isValidServiceException()
+            .hasMessage(MESSAGE);
+
+        assertThat(e.getCause())
+            .isInstanceOf(IOException.class)
+            .hasMessage("testing cause");
     }
 
 }

@@ -84,7 +84,7 @@ class RequestMetadataManagerTest {
     @Test
     void shouldThrowIfWrongMetadata() {
         assertThatThrownBy(() -> new RequestMetadataManager(stringPathOf(INPUTS), stringContentOf(INPUTS)))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessage("Invalid request metadata");
     }
 

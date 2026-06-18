@@ -18,11 +18,11 @@ class SavedFileTest {
     void shouldNotFeedInvalidPath() {
         final SavedFile file = new SavedFile();
         assertThatThrownBy(() -> file.feedPathAndName(""))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessage("null or empty is not a path");
 
         assertThatThrownBy(() -> file.feedPathAndName((Path) null))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessage("null is not a path");
     }
 

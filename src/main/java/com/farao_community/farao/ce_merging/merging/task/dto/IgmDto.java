@@ -9,23 +9,15 @@ package com.farao_community.farao.ce_merging.merging.task.dto;
 import com.farao_community.farao.ce_merging.merging.task.enums.IgmType;
 
 import java.io.Serializable;
+/**
+ * WARNING: this class is used by the merging supervisor (EMERGE).
+ * Please contact them to check compatibility if any modification is needed
+ */
 
 public class IgmDto implements Serializable {
-    /**
-     * The country of the IGM
-     */
     private String country;
-    /**
-     * The type of the IGM
-     */
     private IgmType type;
-    /**
-     * The location  of the IGM file
-     */
     private String igmFileLocation;
-    /**
-     * The location  of the IGM quality check file
-     */
     private String igmQualityReportLocation;
 
     public String getIgmQualityReportLocation() {

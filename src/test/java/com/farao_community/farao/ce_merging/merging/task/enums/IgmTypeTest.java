@@ -23,7 +23,7 @@ class IgmTypeTest {
     @Test
     void shouldFailWithInvalidCode() {
         assertThatThrownBy(() -> IgmType.fromTypeCode("i am not valid"))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessage("Type code 'i am not valid' not recognized");
     }
 

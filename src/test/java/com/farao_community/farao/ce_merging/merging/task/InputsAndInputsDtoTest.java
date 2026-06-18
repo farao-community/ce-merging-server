@@ -12,9 +12,10 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import org.junit.jupiter.api.Test;
 import test_utils.GetterSetterVerifier;
 
-import java.time.ZoneOffset;
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_ALEGRO_THRESHOLD;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_REQUEST_OFFSET;
 import static com.farao_community.farao.ce_merging.merging.task.enums.IgmType.SNAPSHOT;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -22,6 +23,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InputsAndInputsDtoTest {
+
+    private static final int NEW_ALEGRO_THRESHOLD = 1234;
+
+
 
     @Test
     void shouldHaveStandardGettersAndSetters() {
@@ -43,18 +48,23 @@ class InputsAndInputsDtoTest {
         final Inputs inputs = new Inputs();
         final InputsDto inputsDto = new InputsDto();
 
-        assertEquals(2000, inputs.getAlegroThreshold());
-        assertEquals(2000, inputsDto.getAlegroThreshold());
-        assertEquals(ZoneOffset.of("+01:00"), inputs.getRealOffset());
+        assertEquals(DEFAULT_ALEGRO_THRESHOLD, inputs.getAlegroThreshold());
+        assertEquals(DEFAULT_ALEGRO_THRESHOLD, inputsDto.getAlegroThreshold());
+        assertEquals(DEFAULT_REQUEST_OFFSET, inputs.getRealOffset());
         assertTrue(inputs.getMergingWithInternalHvdc());
         assertTrue(inputs.getMergingWithInternalHvdc());
+    }
 
-        // but the setters still work as intended
-        inputs.setAlegroThreshold(1234);
-        assertEquals(1234, inputs.getAlegroThreshold());
+    @Test
+    void shouldHaveSettersForDefaultingGetters() {
+        final Inputs inputs = new Inputs();
+        final InputsDto inputsDto = new InputsDto();
 
-        inputsDto.setAlegroThreshold(1234);
-        assertEquals(1234, inputsDto.getAlegroThreshold());
+        inputs.setAlegroThreshold(NEW_ALEGRO_THRESHOLD);
+        assertEquals(NEW_ALEGRO_THRESHOLD, inputs.getAlegroThreshold());
+
+        inputsDto.setAlegroThreshold(NEW_ALEGRO_THRESHOLD);
+        assertEquals(NEW_ALEGRO_THRESHOLD, inputsDto.getAlegroThreshold());
 
         inputs.setRealOffset(UTC);
         assertEquals(UTC, inputs.getRealOffset());

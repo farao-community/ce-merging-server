@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public interface JsonApiData {
     @JsonProperty
-    long getId();
+    Long getId();
 
     @JsonProperty
     String getType();

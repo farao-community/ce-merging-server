@@ -15,6 +15,7 @@ import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert;
 
 import static org.assertj.core.api.ThrowableAssert.catchThrowable;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class CeThrowableAssert<T extends Throwable> extends AbstractThrowableAssert<CeThrowableAssert<T>, T> {
 
@@ -31,12 +32,19 @@ public class CeThrowableAssert<T extends Throwable> extends AbstractThrowableAss
         super(actual, CeThrowableAssert.class);
     }
 
-    public CeThrowableAssert<T> isServiceException() {
+    public CeThrowableAssert<T> isValidServiceException() {
 
-        if (!(actual instanceof AbstractServiceException)) {
+        if (actual instanceof AbstractServiceException abstractServiceException) {
+            assertNotNull(abstractServiceException.getTitle());
+            assertNotNull(abstractServiceException.getCode());
+            assertNotNull(abstractServiceException.getStatus());
+        }
+        else {
             failWithMessage("%s is not a service exception",
                             actual.getClass().getName());
         }
+
+
         return this;
 
     }

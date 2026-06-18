@@ -9,42 +9,24 @@ package com.farao_community.farao.ce_merging.merging.task.dto;
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiData;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 
+/**
+ * WARNING: this class is used by the merging supervisor (EMERGE).
+ * Please contact them to check compatibility if any modification is needed
+ */
 public class MergingTaskDto implements JsonApiData {
 
     private static final String TYPE = "merging-task";
 
-    private long taskId;
-    /**
-     * The name of the merging Task
-     */
+    private Long taskId;
     private String taskName;
-
-    /**
-     * The Status of the merging Task
-     */
     private TaskStatus taskStatus;
-
-    /**
-     * The inputs of the merging Task
-     */
     private InputsDto inputs;
-    /**
-     * The configurations of the merging Task
-     */
     private ConfigurationsDto configurations;
-
-    /**
-     * the Outputs of the merging task
-     */
     private OutputsDto outputs;
-
-    /**
-     * the Artifacts of the merging task
-     */
     private ArtifactsDto artifacts;
 
     @Override
-    public long getId() {
+    public Long getId() {
         return this.taskId;
     }
 
@@ -61,11 +43,11 @@ public class MergingTaskDto implements JsonApiData {
         this.taskStatus = taskStatus;
     }
 
-    public long getTaskId() {
+    public Long getTaskId() {
         return taskId;
     }
 
-    public void setTaskId(final long taskId) {
+    public void setTaskId(final Long taskId) {
         this.taskId = taskId;
     }
 

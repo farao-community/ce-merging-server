@@ -116,22 +116,22 @@ class JaxbUtilsTest {
         final byte[] byteInput = fileName.getBytes(UTF_8);
 
         assertThatThrownBy(() -> JaxbUtils.readFromPath(XNODES_CLASS, strInput))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessageContaining("Xnode");
 
         assertThatThrownBy(() -> JaxbUtils.readFromBytes(XNODES_CLASS, byteInput))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessageContaining("Xnode");
     }
 
     @Test
     void shouldFailOnReadMissingFile() {
         assertThatThrownBy(() -> JaxbUtils.readFromPath(XNODES_CLASS, "/non/existent/path.xml"))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessageContaining("Xnode");
 
         assertThatThrownBy(() -> JaxbUtils.readFromPath(XNODES_CLASS, null))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessageContaining("Xnode");
     }
 
@@ -147,7 +147,7 @@ class JaxbUtilsTest {
     @MethodSource("failingWriters")
     void shouldFailOnWriteInvalidClass(final ThrowableAssert.ThrowingCallable thrower) {
         assertThatThrownBy(thrower)
-            .isServiceException()
+            .isValidServiceException()
             .hasMessageContaining("MergingTaskDto");
 
     }

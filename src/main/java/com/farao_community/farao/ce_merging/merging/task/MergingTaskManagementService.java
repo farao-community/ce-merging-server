@@ -68,11 +68,11 @@ public class MergingTaskManagementService {
                         TASKS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-    public MergingTaskDto runTask(final long taskId) {
+    public MergingTaskDto runTask(final Long taskId) {
         return mapper.mergingTaskToMergingTaskDto(run(getTaskById(taskId)));
     }
 
-    public JsonApiDocument<MergingTaskDto> getTaskJsonDoc(final long taskId) {
+    public JsonApiDocument<MergingTaskDto> getTaskJsonDoc(final Long taskId) {
         return JsonApiDocument.fromData(
             mapper.mergingTaskToMergingTaskDto(
                 getTaskById(taskId)
@@ -122,11 +122,11 @@ public class MergingTaskManagementService {
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
                         ARTIFACTS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-    public SavedFile getXnodesInformation(final long taskId) {
+    public SavedFile getXnodesInformation(final Long taskId) {
         return getArtifacts(taskId).getFile(XNODES_INFORMATION_FILE);
     }
 
-    public SavedFile getCgmNetPositions(final long taskId) {
+    public SavedFile getCgmNetPositions(final Long taskId) {
         return getArtifacts(taskId).getFile(CGM_NET_POSITIONS_FILE);
     }
 
@@ -134,15 +134,15 @@ public class MergingTaskManagementService {
                         OUTPUTS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-    public SavedFile getCgm(final long taskId) {
+    public SavedFile getCgm(final Long taskId) {
         return getOutputs(taskId).getCgm();
     }
 
-    public SavedFile getRefProg(final long taskId) {
+    public SavedFile getRefProg(final Long taskId) {
         return getOutputs(taskId).getRefProg();
     }
 
-    public byte[] getOutputZip(final long taskId) {
+    public byte[] getOutputZip(final Long taskId) {
         return zipDirectory(
             configuration.getOutputsDirectoryPath(
                 getFinishedTaskById(taskId)
@@ -183,22 +183,22 @@ public class MergingTaskManagementService {
         }
     }
 
-    private Artifacts getArtifacts(final long taskId) {
+    private Artifacts getArtifacts(final Long taskId) {
         return getFinishedTaskById(taskId).getArtifacts();
     }
 
-    private Outputs getOutputs(final long taskId) {
+    private Outputs getOutputs(final Long taskId) {
         return getFinishedTaskById(taskId).getOutputs();
     }
 
-    private MergingTask getTaskById(final long taskId) {
+    private MergingTask getTaskById(final Long taskId) {
         final MergingTask task = repository.findById(taskId)
             .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available", taskId)));
         handleDaylightSavingTime(task);
         return task;
     }
 
-    private MergingTask getFinishedTaskById(final long taskId) throws TaskNotRunException {
+    private MergingTask getFinishedTaskById(final Long taskId) throws TaskNotRunException {
         final MergingTask task = getTaskById(taskId);
 
         return switch (task.getStatus()) {

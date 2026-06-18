@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.common;
 
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 public final class CeMergingConstants {
 
@@ -35,6 +36,10 @@ public final class CeMergingConstants {
     public static final String OUTPUTS_TAG = "Outputs";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
 
+    // Numbers
+    public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
+
     // Date management
     public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
+    public static final ZoneOffset DEFAULT_REQUEST_OFFSET = ZoneOffset.of("+01:00");
 }

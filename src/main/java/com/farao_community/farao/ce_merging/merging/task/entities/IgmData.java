@@ -18,6 +18,10 @@ import java.util.regex.Pattern;
 
 import static jakarta.persistence.CascadeType.ALL;
 
+/**
+ * WARNING: this class is used by the merging supervisor (EMERGE).
+ * Please contact them to check compatibility if any modification is needed
+ */
 @Embeddable
 public class IgmData implements Serializable {
 
@@ -26,22 +30,11 @@ public class IgmData implements Serializable {
     private static final String UCTE_FILENAME_REGEX = "^(?<year>\\d{4})(?<month>\\d{2})(?<day>\\d{2})_(?<hour>\\d{2}|B2)(?<minutes>\\d{2})_(?<type>FO|2D|SN|RE|LR)(?<dayOfWeek>\\d)_(?<countryCode>[A-Z0-9]{2})(?<version>\\d)\\.(uct|UCT)$";
     private static final Pattern UCTE_PATTERN = Pattern.compile(UCTE_FILENAME_REGEX);
     private static final String NAMING_ERROR = "File '%s' does not match UCTE file naming convention";
-    /**
-     * The country of the IGM
-     */
+
     private String country;
-    /**
-     * The type of the IGM
-     */
     private IgmType type;
-    /**
-     * The saved IGM
-     */
     @OneToOne(cascade = ALL)
     private SavedFile igmFile = new SavedFile();
-    /**
-     * The saved IGM quality report
-     */
     @OneToOne(cascade = ALL)
     private SavedFile igmQualityReportFile = new SavedFile();
 

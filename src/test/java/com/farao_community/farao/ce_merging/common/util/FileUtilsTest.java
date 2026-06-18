@@ -22,13 +22,16 @@ import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 class FileUtilsTest {
 
     @Test
-    void shouldCreateAttachments() {
+    void shouldCreateAttachmentFromBytes() {
         final ResponseEntity<byte[]> response = FileUtils.toAttachmentFileResponse("hello".getBytes(UTF_8),
                                                                                    "hello.txt");
         assertEquals(OK, response.getStatusCode());
         assertNotNull(response.getBody());
-        assertEquals("hello", new String(response.getBody()));
+        assertEquals("hello", new String(response.getBody(), UTF_8));
+    }
 
+    @Test
+    void shouldCreateAttachmentFromSavedFile() {
         final SavedFile file = new SavedFile();
         file.setLocation("testFiles");
         file.setOriginalName("testXnode.xml");
@@ -47,18 +50,18 @@ class FileUtilsTest {
                                                   "/path/to/non/existing/file.txt",
                                                   "/dumb/file/location");
         assertThatThrownBy(() -> FileUtils.toAttachmentFileResponse(savedFile))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessageContaining("/path/to/non/existing/file.txt");
     }
 
     @Test
     void shouldFailResolvingIncorrectPaths() {
         assertThatThrownBy(() -> getIfInside("", pathOf("request-metadata")))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessage("Missing file path");
 
         assertThatThrownBy(() -> getIfInside("../../../", pathOf("blank.file")))
-            .isServiceException()
+            .isValidServiceException()
             .hasMessageContaining("Invalid file path");
     }
 

@@ -12,6 +12,7 @@ import static java.util.Arrays.stream;
 
 public enum IgmType {
 
+    // We'll have to check if every type should be accepted (see also IgmData class)
     SNAPSHOT("SN"),
     DACF("FO"),
     D2CF("2D"),

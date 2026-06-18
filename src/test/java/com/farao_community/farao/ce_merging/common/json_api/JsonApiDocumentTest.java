@@ -26,13 +26,13 @@ class JsonApiDocumentTest {
 
     @Test
     void shouldBuildJsonDocumentFromMergingTaskDto() throws IOException {
-        assertEquals("{\"data\":[{\"taskId\":0,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
-                     "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":0,\"type\":\"merging-task\"}]}",
+        assertEquals("{\"data\":[{\"taskId\":null,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
+                     "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":null,\"type\":\"merging-task\"}]}",
                      stringify(JsonApiDocument.fromData(new MergingTaskDto())));
-        assertEquals("{\"data\":[{\"taskId\":0,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
-                     "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":0,\"type\":\"merging-task\"}," +
-                     "{\"taskId\":0,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
-                     "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":0,\"type\":\"merging-task\"}]}",
+        assertEquals("{\"data\":[{\"taskId\":null,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
+                     "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":null,\"type\":\"merging-task\"}," +
+                     "{\"taskId\":null,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
+                     "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":null,\"type\":\"merging-task\"}]}",
                      stringify(JsonApiDocument.fromDataList(List.of(new MergingTaskDto(),
                                                                     new MergingTaskDto()))));
     }

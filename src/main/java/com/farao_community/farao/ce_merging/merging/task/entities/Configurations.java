@@ -18,49 +18,27 @@ import java.util.List;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
+/**
+ * WARNING: this class is used by the merging supervisor (EMERGE).
+ * Please contact them to check compatibility if any modification is needed
+ */
 @Embeddable
 public class Configurations implements Serializable {
 
-    /**
-     * virtual hubs list
-     */
     @ElementCollection(fetch = LAZY)
     private List<VirtualHubRecord> virtualHubList = new ArrayList<>();
-    /**
-     * Border direction list
-     */
     @ElementCollection(fetch = LAZY)
     private List<BorderDirectionRecord> borderDirectionRecords = new ArrayList<>();
-    /**
-     * The dc load flow parameters file
-     */
     @OneToOne(cascade = ALL)
     private SavedFile dcLoadFlowParameters = new SavedFile();
-    /**
-     * The ac load flow parameters file
-     */
     @OneToOne(cascade = ALL)
     private SavedFile acLoadFlowParameters = new SavedFile();
-    /**
-     * The basecase improvement parameters file
-     */
     @OneToOne(cascade = ALL)
     private SavedFile basecaseImprovementParameters = new SavedFile();
-    /**
-     * The balances adjustment parameters file
-     */
     @OneToOne(cascade = ALL)
     private SavedFile balancesAdjustmentParameters = new SavedFile();
-
-    /**
-     * Xnode config list
-     */
     @ElementCollection(fetch = LAZY)
     private List<Xnode> xnodeList = new ArrayList<>();
-
-    /**
-     * The SavedFile of the recessivity parameters file
-     */
     @OneToOne(cascade = ALL)
     private SavedFile recessivityParameters = new SavedFile();
 
