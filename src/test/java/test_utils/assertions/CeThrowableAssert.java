@@ -38,12 +38,10 @@ public class CeThrowableAssert<T extends Throwable> extends AbstractThrowableAss
             assertNotNull(abstractServiceException.getTitle());
             assertNotNull(abstractServiceException.getCode());
             assertNotNull(abstractServiceException.getStatus());
-        }
-        else {
+        } else {
             failWithMessage("%s is not a service exception",
                             actual.getClass().getName());
         }
-
 
         return this;
 
@@ -51,8 +49,8 @@ public class CeThrowableAssert<T extends Throwable> extends AbstractThrowableAss
 
     public CeThrowableAssert<T> isTaskException() {
         return this.isOfAnyClassIn(TaskAlreadyRunningException.class,
-                                                          TaskNotFoundException.class,
-                                                          TaskNotRunException.class,
-                                                          TaskNotValidException.class);
+                                   TaskNotFoundException.class,
+                                   TaskNotRunException.class,
+                                   TaskNotValidException.class);
     }
 }

@@ -26,8 +26,6 @@ class InputsAndInputsDtoTest {
 
     private static final int NEW_ALEGRO_THRESHOLD = 1234;
 
-
-
     @Test
     void shouldHaveStandardGettersAndSetters() {
         GetterSetterVerifier.forClass(Inputs.class)

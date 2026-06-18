@@ -19,11 +19,11 @@ class SavedFileTest {
         final SavedFile file = new SavedFile();
         assertThatThrownBy(() -> file.feedPathAndName(""))
             .isValidServiceException()
-            .hasMessage("null or empty is not a path");
+            .hasMessage("Path cannot be empty");
 
         assertThatThrownBy(() -> file.feedPathAndName((Path) null))
             .isValidServiceException()
-            .hasMessage("null is not a path");
+            .hasMessage("Path cannot be empty");
     }
 
 }

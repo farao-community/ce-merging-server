@@ -28,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
@@ -35,11 +36,11 @@ import java.time.ZoneOffset;
 
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.unzipInputFileInTmp;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirectory;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static java.nio.file.Files.createDirectories;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
@@ -84,18 +85,18 @@ public class MergingTaskManagementService {
                                         final String inputRequestMetadata) {
 
         final MergingTask task = new MergingTask();
-        // empty at this stage, but done to init id
+        // empty at this stage, but done to init ID to be able to create directories
         repository.save(task);
 
         final String inputsDir = configuration.getInputsDirectoryPath(task);
         final RequestMetadataManager requestMgr = new RequestMetadataManager(inputsDir, inputRequestMetadata);
 
+        final Path inputsPath = Path.of(inputsDir);
         try {
             final Path tmpInputPath = unzipInputFileInTmp(inputZip);
             requestMgr.checkIfAllInputsAvailable(tmpInputPath);
 
             // create data in tmp folder then move it to the permanent one
-            final Path inputsPath = Paths.get(inputsDir);
             createDirectories(inputsPath);
             createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(task)));
             createDirectories(Paths.get(configuration.getOutputsDirectoryPath(task)));
@@ -114,9 +115,14 @@ public class MergingTaskManagementService {
             final String error = "Error during merging task creation";
             LOGGER.error(error, e);
             repository.delete(task);
+            try {
+                deleteRecursively(inputsPath);
+            } catch (final IOException ioe) {
+                LOGGER.error(error, ioe);
+                e.initCause(ioe);
+            }
             throw new ServiceIOException(error, e);
         }
-
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-

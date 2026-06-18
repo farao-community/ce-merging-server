@@ -33,21 +33,6 @@ public class CeTaskAssert extends AbstractAssert<CeTaskAssert, MergingTask> {
     }
 
     @CanIgnoreReturnValue
-    public CeTaskAssert isSameTaskAs(final MergingTask other) {
-        if (!actual.getId().equals(other.getId())
-            || actual.getStatus() != other.getStatus()
-            || !Objects.equals(actual.getName(), other.getName())
-            || !Objects.equals(actual.getArchiveFileOriginalName(), other.getArchiveFileOriginalName())) {
-            failWithMessage(
-                "Tasks are different. Actual: %s, expected: %s",
-                actual,
-                other
-            );
-        }
-        return this;
-    }
-
-    @CanIgnoreReturnValue
     public CeTaskAssert isSameTaskAs(final MergingTaskDto dto) {
         if (!actual.getId().equals(dto.getTaskId())
             || actual.getStatus() != dto.getTaskStatus()

@@ -10,8 +10,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.common.util.ListUtils.deNulledList;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.util.Collections.singletonList;
 
@@ -20,7 +20,7 @@ public class JsonApiErrorDocument {
     List<JsonApiError> errors;
 
     public static JsonApiErrorDocument fromErrors(final List<JsonApiError> errors) {
-        return new JsonApiErrorDocument(deNulledList(errors));
+        return new JsonApiErrorDocument(Optional.ofNullable(errors).orElse(new ArrayList<>()));
     }
 
     public static JsonApiErrorDocument fromError(final Exception e,
