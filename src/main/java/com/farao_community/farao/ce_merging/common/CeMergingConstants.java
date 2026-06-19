@@ -1,0 +1,45 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package com.farao_community.farao.ce_merging.common;
+
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+
+public final class CeMergingConstants {
+
+    private CeMergingConstants() {
+        // constants class
+    }
+
+    // Strings
+    public static final String CE_MERGING_URL = "/ce-merging/";
+    public static final String API_VERSION = "v1";
+    public static final String JSON_API_MIME_TYPE = "application/vnd.api+json";
+    public static final String ORIGIN_ANY = "*";
+    public static final String MERGING_TASK_ID = "Merging task ID";
+    public static final String TASK_NOT_RUN = "Merging task with given ID has not been run";
+    public static final String OK = "200";
+    public static final String CREATED = "201";
+    public static final String BAD_REQUEST = "400";
+    public static final String NOT_FOUND = "404";
+    public static final String INTERNAL_ERROR = "500";
+    public static final String INPUTS_DIR = "inputs";
+    public static final String OUTPUTS_DIR = "outputs";
+    public static final String DAILY_OUTPUTS_DIR = "daily-outputs";
+    public static final String DAILY_INPUTS_DIR = "daily-inputs";
+    public static final String ARTIFACTS_DIR = "artifacts";
+    public static final String ARTIFACTS_TAG = "Artifacts";
+    public static final String OUTPUTS_TAG = "Outputs";
+    public static final String TASK_MANAGEMENT_TAG = "Tasks management";
+
+    // Numbers
+    public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
+
+    // Date management
+    public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
+    public static final ZoneOffset DEFAULT_REQUEST_OFFSET = ZoneOffset.of("+01:00");
+}

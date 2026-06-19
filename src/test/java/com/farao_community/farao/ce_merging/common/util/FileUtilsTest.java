@@ -1,0 +1,68 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package com.farao_community.farao.ce_merging.common.util;
+
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
+
+import static com.farao_community.farao.ce_merging.common.util.FileUtils.getPathInParent;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.http.HttpStatus.OK;
+import static test_utils.CeTestUtils.pathOf;
+import static test_utils.CeTestUtils.stringPathOf;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
+
+class FileUtilsTest {
+
+    @Test
+    void shouldCreateAttachmentFromBytes() {
+        final ResponseEntity<byte[]> response = FileUtils.toAttachmentFileResponse("hello".getBytes(UTF_8),
+                                                                                   "hello.txt");
+        assertEquals(OK, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("hello", new String(response.getBody(), UTF_8));
+    }
+
+    @Test
+    void shouldCreateAttachmentFromSavedFile() {
+        final SavedFile file = new SavedFile();
+        file.setLocation("testFiles");
+        file.setOriginalName("testXnode.xml");
+        file.setPath(stringPathOf("testXnode.xml"));
+        file.setFileId(1);
+
+        final ResponseEntity<byte[]> responseXml = FileUtils.toAttachmentFileResponse(file);
+
+        assertEquals(OK, responseXml.getStatusCode());
+        assertNotNull(responseXml.getBody());
+    }
+
+    @Test
+    void shouldFailIfFileDoNotExists() {
+        final SavedFile savedFile = new SavedFile("filename.txt",
+                                                  "/path/to/non/existing/file.txt",
+                                                  "/dumb/file/location");
+        assertThatThrownBy(() -> FileUtils.toAttachmentFileResponse(savedFile))
+            .isValidServiceException()
+            .hasMessageContaining("/path/to/non/existing/file.txt");
+    }
+
+    @Test
+    void shouldFailResolvingIncorrectPaths() {
+        assertThatThrownBy(() -> getPathInParent("", pathOf("request-metadata")))
+            .isValidServiceException()
+            .hasMessage("Missing file path");
+
+        assertThatThrownBy(() -> getPathInParent("../../../", pathOf("blank.file")))
+            .isValidServiceException()
+            .hasMessageContaining("Invalid file path");
+    }
+
+}

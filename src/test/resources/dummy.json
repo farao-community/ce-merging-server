@@ -1,0 +1,6 @@
+{
+  "stringValue": "test",
+  "boolValue": true,
+  "numValue": 0,
+  "listValue" : ["1","2","3"]
+}

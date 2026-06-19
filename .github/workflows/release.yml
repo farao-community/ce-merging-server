@@ -50,7 +50,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Commit and tag release version
-        uses: stefanzweifel/git-auto-commit-action@v7.1.0
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 #v7.1.0
         with:
           branch: release-v${{ env.RELEASE_VERSION }}
           create_branch: true
@@ -75,7 +75,7 @@ jobs:
           NEXT_VERSION: ${{ github.event.inputs.nextVersion }}
 
       - name: Commit next version
-        uses: stefanzweifel/git-auto-commit-action@v7.1.0
+        uses: stefanzweifel/git-auto-commit-action@04702edda442b2e678b25b537cec683a1493fcb9 #v7.1.0
         with:
           branch: next-release-v${{ env.NEXT_VERSION  }}
           create_branch: true
@@ -86,7 +86,7 @@ jobs:
           NEXT_VERSION: ${{ github.event.inputs.nextVersion }}
 
       - name: Merge automatically into source branch
-        uses: devmasx/merge-branch@v1.4.0
+        uses: devmasx/merge-branch@854d3ac71ed1e9deb668e0074781b81fdd6e771f #v1.4.0
         with:
           type: now
           from_branch: next-release-v${{ env.NEXT_VERSION }}
@@ -98,7 +98,7 @@ jobs:
           NEXT_VERSION: ${{ github.event.inputs.nextVersion }}
 
       - name: Delete merged branch
-        uses: dawidd6/action-delete-branch@v3
+        uses: dawidd6/action-delete-branch@d1efac9a6f7a9b408d4e8ff663a99c1fbac17b3f #v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branches: next-release-v${{ env.NEXT_VERSION }}
