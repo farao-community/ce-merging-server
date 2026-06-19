@@ -10,18 +10,20 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+import java.io.Serializable;
+
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NAME;
-import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
 @Table(name = "tsoinfosdto")
-public class TsoInfosDto {
+public class TsoInfosDto implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long ref;
 
     @Column(name = NAME)
