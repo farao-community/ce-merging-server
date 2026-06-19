@@ -55,7 +55,7 @@ class ZipUtilsTest {
     }
 
     @Test
-    void shouldFailWhenUnzippingToReadOnlyDirectory() throws IOException {
+    void shouldFailWhenUnzippingToReadOnlyDirectory() {
         assertTrue(tmp.toFile().setReadOnly());
         final Path zipInput = pathOf(TEST_ZIP);
         assertThatThrownBy(() -> unzipFile(zipInput, tmp))
