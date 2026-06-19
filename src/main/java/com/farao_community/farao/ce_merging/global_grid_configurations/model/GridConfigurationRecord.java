@@ -6,7 +6,7 @@ import jakarta.persistence.Id;
 import java.time.LocalDateTime;
 
 @Entity
-public abstract class AbstractGridConfiguration {
+public abstract class GridConfigurationRecord {
     @Id
     protected String id;
     protected LocalDateTime validFrom;

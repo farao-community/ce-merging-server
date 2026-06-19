@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.GridConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges.BECKeyConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges.JsonBecConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.hvdc_alignment.HvdcAlignmentConfigurationRecord;
@@ -37,8 +37,8 @@ class GridConfigurationServicesTest {
     private GridConfigurationRepository repository = mock(GridConfigurationRepository.class);
 
     private static final List<
-        Pair<AbstractGridConfigurationService<? extends AbstractGridConfiguration, ?>,
-            Pair<? extends AbstractGridConfiguration, Class<?>>>
+        Pair<AbstractGridConfigurationService<? extends GridConfigurationRecord, ?>,
+            Pair<? extends GridConfigurationRecord, Class<?>>>
         > SERVICES_AND_CONFIGS = List.of(Pair.of(new BECKeyConfigurationService(new RegionConfigurationService()),
                                                  Pair.of(new BECKeyConfigurationRecord(),
                                                          JsonBecConfiguration.class)),
@@ -57,8 +57,8 @@ class GridConfigurationServicesTest {
 
     @ParameterizedTest
     @FieldSource("SERVICES_AND_CONFIGS")
-    void shouldGetDefaultJsonConfig(final Pair<AbstractGridConfigurationService<? extends AbstractGridConfiguration, ?>,
-        Pair<? extends AbstractGridConfiguration, Class<?>>> serviceAndConfigs) throws IOException {
+    void shouldGetDefaultJsonConfig(final Pair<AbstractGridConfigurationService<? extends GridConfigurationRecord, ?>,
+        Pair<? extends GridConfigurationRecord, Class<?>>> serviceAndConfigs) throws IOException {
         final AbstractGridConfigurationService<?, ?> service = serviceAndConfigs.getFirst();
         service.setRepository(repository);
         when(repository.findLastPublishedValid(any(LocalDateTime.class)))
@@ -70,8 +70,8 @@ class GridConfigurationServicesTest {
 
     @ParameterizedTest
     @FieldSource("SERVICES_AND_CONFIGS")
-    void shouldPublish(final Pair<AbstractGridConfigurationService<? extends AbstractGridConfiguration, ?>,
-        Pair<? extends AbstractGridConfiguration, Class<?>>> serviceAndConfigs) throws IOException {
+    void shouldPublish(final Pair<AbstractGridConfigurationService<? extends GridConfigurationRecord, ?>,
+        Pair<? extends GridConfigurationRecord, Class<?>>> serviceAndConfigs) throws IOException {
         final AbstractGridConfigurationService<?, ?> service = serviceAndConfigs.getFirst();
         service.setRepository(repository);
 

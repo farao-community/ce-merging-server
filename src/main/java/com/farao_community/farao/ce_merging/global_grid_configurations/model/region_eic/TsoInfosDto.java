@@ -26,7 +26,6 @@ public class TsoInfosDto {
 
     @Column(name = NAME)
     @JsonProperty(value = "tsoName")
-
     private String name;
 
     @Column(name = "eic")
