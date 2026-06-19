@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_ALEGRO_THRESHOLD;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_REQUEST_OFFSET;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_WINTER_OFFSET;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 
@@ -64,7 +64,7 @@ public class Inputs implements Serializable {
 
     public ZoneOffset getRealOffset() {
         return Optional.ofNullable(realOffset)
-            .orElse(DEFAULT_REQUEST_OFFSET);
+            .orElse(PARIS_WINTER_OFFSET);
     }
 
     public Boolean getMergingWithInternalHvdc() {
