@@ -55,7 +55,7 @@ public class InputsDto implements Serializable {
     }
 
     public Boolean getMergingWithInternalHvdc() {
-        return mergingWithInternalHvdc;
+        return Optional.ofNullable(mergingWithInternalHvdc).orElse(true);
     }
 
     public void setMergingWithInternalHvdc(final Boolean mergingWithInternalHvdc) {

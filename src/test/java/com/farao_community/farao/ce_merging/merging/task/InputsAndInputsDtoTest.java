@@ -50,7 +50,7 @@ class InputsAndInputsDtoTest {
         assertEquals(DEFAULT_ALEGRO_THRESHOLD, inputsDto.getAlegroThreshold());
         assertEquals(DEFAULT_REQUEST_OFFSET, inputs.getRealOffset());
         assertTrue(inputs.getMergingWithInternalHvdc());
-        assertTrue(inputs.getMergingWithInternalHvdc());
+        assertTrue(inputsDto.getMergingWithInternalHvdc());
     }
 
     @Test

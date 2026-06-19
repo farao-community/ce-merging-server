@@ -15,12 +15,14 @@ import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.mock.web.MockMultipartFile;
 
 import java.util.ArrayList;
@@ -40,6 +42,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static test_utils.CeTestUtils.ID_1;
 import static test_utils.CeTestUtils.INPUTS;
 import static test_utils.CeTestUtils.INPUTS_ZIP_NAME;
 import static test_utils.CeTestUtils.METADATA;
@@ -54,10 +57,8 @@ import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 @SpringBootTest
 @TestConfiguration
+@ExtendWith(OutputCaptureExtension.class)
 class MergingTaskManagementServiceTest {
-
-    private static final long ONE = 1L;
-
     @Autowired
     CeMergingConfiguration ceMergingConfiguration;
 
@@ -79,14 +80,9 @@ class MergingTaskManagementServiceTest {
     @Test
     void shouldCreateTask() {
         when(repository.save(anyTask()))
-            .thenReturn(taskWithIdAndStatus(1L, CREATED));
+            .thenReturn(taskWithIdAndStatus(ID_1, CREATED));
 
-        final MockMultipartFile zipFile = new MockMultipartFile(INPUTS_ZIP_NAME,
-                                                                INPUTS_ZIP_NAME,
-                                                                MIME_ZIP,
-                                                                byteContentOf(INPUTS));
-
-        service.createNewTask(zipFile, stringContentOf(METADATA));
+        service.createNewTask(mockZip(INPUTS), stringContentOf(METADATA));
 
         verify(repository, times(2))
             .save(anyTask());
@@ -97,14 +93,9 @@ class MergingTaskManagementServiceTest {
     @Test
     void shouldCatchExceptionInCreation() {
         when(repository.save(anyTask()))
-            .thenReturn(taskWithIdAndStatus(1L, CREATED));
+            .thenReturn(taskWithIdAndStatus(ID_1, CREATED));
 
-        final MockMultipartFile zipFile = new MockMultipartFile(INPUTS_ZIP_NAME,
-                                                                INPUTS_ZIP_NAME,
-                                                                "application/zip",
-                                                                byteContentOf(METADATA));
-
-        assertThatThrownBy(() -> service.createNewTask(zipFile, stringContentOf(METADATA)))
+        assertThatThrownBy(() -> service.createNewTask(mockZip(METADATA), stringContentOf(METADATA)))
             .isValidServiceException();
 
         verify(repository)
@@ -114,12 +105,12 @@ class MergingTaskManagementServiceTest {
     @Test
     void shouldRunTask() {
 
-        final MergingTask task = taskWithIdAndStatus(ONE, CREATED);
+        final MergingTask task = taskWithIdAndStatus(ID_1, CREATED);
 
-        when(repository.findById(ONE))
+        when(repository.findById(ID_1))
             .thenReturn(Optional.of(task));
 
-        service.runTask(ONE);
+        service.runTask(ID_1);
 
         verify(mergingService)
             .run(anyTask());
@@ -133,11 +124,11 @@ class MergingTaskManagementServiceTest {
 
     @Test
     void shouldThrowIfTaskAlreadyRunning() {
-        final MergingTask runningTask = taskWithIdAndStatus(ONE, RUNNING);
-        when(repository.findById(ONE))
+        final MergingTask runningTask = taskWithIdAndStatus(ID_1, RUNNING);
+        when(repository.findById(ID_1))
             .thenReturn(Optional.of(runningTask));
 
-        assertThatThrownBy(() -> service.runTask(ONE))
+        assertThatThrownBy(() -> service.runTask(ID_1))
             .isTaskException()
             .hasMessage("Task 1 already running, could not be run again");
 
@@ -146,25 +137,25 @@ class MergingTaskManagementServiceTest {
 
     @Test
     void shouldThrowIfTaskNotFound() {
-        when(repository.findById(ONE))
+        when(repository.findById(ID_1))
             .thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> service.runTask(ONE))
+        assertThatThrownBy(() -> service.runTask(ID_1))
             .isTaskException()
             .hasMessage("Task 1 not available");
     }
 
     @Test
     void shouldChangeStatusToErrorIfExceptionThrown() {
-        final MergingTask failingTask = taskWithIdAndStatus(ONE, CREATED);
-        when(repository.findById(ONE))
+        final MergingTask failingTask = taskWithIdAndStatus(ID_1, CREATED);
+        when(repository.findById(ID_1))
             .thenReturn(Optional.of(failingTask));
 
         doThrow(new TaskNotValidException("test"))
             .when(mergingService)
             .run(anyTask());
 
-        assertThatThrownBy(() -> service.runTask(ONE))
+        assertThatThrownBy(() -> service.runTask(ID_1))
             .isValidServiceException();
 
         assertThat(failingTask).hasStatus(ERROR);
@@ -172,13 +163,13 @@ class MergingTaskManagementServiceTest {
 
     @Test
     void shouldGetTaskJsonDoc() {
-        final MergingTask task = taskWithIdAndStatus(ONE, CREATED);
-        when(repository.findById(ONE))
+        final MergingTask task = taskWithIdAndStatus(ID_1, CREATED);
+        when(repository.findById(ID_1))
             .thenReturn(Optional.of(task));
-        when(mapper.mergingTaskToMergingTaskDto(anyTask())).thenReturn(taskDtoWithIdAndStatus(ONE, CREATED));
+        when(mapper.mergingTaskToMergingTaskDto(anyTask())).thenReturn(taskDtoWithIdAndStatus(ID_1, CREATED));
 
         assertThat(task)
-            .isSameTaskAs(service.getTaskJsonDoc(ONE).data.getFirst());
+            .isSameTaskAs(service.getTaskJsonDoc(ID_1).data.getFirst());
     }
 
     private static final List<TaskStatus> FINISHED_STATUSES = List.of(SUCCESS, ERROR);
@@ -194,27 +185,27 @@ class MergingTaskManagementServiceTest {
     @ParameterizedTest
     @FieldSource("FINISHED_STATUSES")
     void shouldGetTaskFilesIfTaskFinished(final TaskStatus status) {
-        final MergingTask task = taskWithIdAndStatus(ONE, status);
-        when(repository.findById(ONE))
+        final MergingTask task = taskWithIdAndStatus(ID_1, status);
+        when(repository.findById(ID_1))
             .thenReturn(Optional.of(task));
 
-        service.getCgm(ONE);
-        service.getCgmNetPositions(ONE);
-        service.getRefProg(ONE);
-        service.getXnodesInformation(ONE);
+        service.getCgm(ID_1);
+        service.getCgmNetPositions(ID_1);
+        service.getRefProg(ID_1);
+        service.getXnodesInformation(ID_1);
 
         verify(repository, times(4))
-            .findById(ONE);
+            .findById(ID_1);
     }
 
     @ParameterizedTest
     @FieldSource("NOT_FINISHED_STATUSES")
     void shouldNotGetTaskFilesIfTaskNotFinished(final TaskStatus status) {
-        final MergingTask task = taskWithIdAndStatus(ONE, status);
-        when(repository.findById(ONE))
+        final MergingTask task = taskWithIdAndStatus(ID_1, status);
+        when(repository.findById(ID_1))
             .thenReturn(Optional.of(task));
 
-        assertThatThrownBy(() -> service.getCgm(ONE))
+        assertThatThrownBy(() -> service.getCgm(ID_1))
             .isTaskException()
             .hasMessageContaining("Task 1");
     }
@@ -223,17 +214,24 @@ class MergingTaskManagementServiceTest {
     void shouldGetOutputZip() {
         try (final MockedStatic<ZipUtils> zipUtils = mockStatic(ZipUtils.class)) {
 
-            final MergingTask task = taskWithIdAndStatus(ONE, SUCCESS);
-            when(repository.findById(ONE))
+            final MergingTask task = taskWithIdAndStatus(ID_1, SUCCESS);
+            when(repository.findById(ID_1))
                 .thenReturn(Optional.of(task));
 
             zipUtils.when(() -> ZipUtils.zipDirectory(anyString()))
                 .thenReturn("TEST".getBytes(UTF_8));
-            final byte[] response = service.getOutputZip(ONE);
+            final byte[] response = service.getOutputZip(ID_1);
 
             zipUtils.verify(() -> ZipUtils.zipDirectory(anyString()));
             assertEquals("TEST", new String(response));
 
         }
+    }
+
+    private MockMultipartFile mockZip(final String path) {
+        return new MockMultipartFile(INPUTS_ZIP_NAME,
+                                     INPUTS_ZIP_NAME,
+                                     MIME_ZIP,
+                                     byteContentOf(path));
     }
 }

@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
@@ -42,6 +41,7 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 import static java.nio.file.Files.createDirectories;
+import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.springframework.util.FileSystemUtils.copyRecursively;
 import static org.springframework.util.FileSystemUtils.deleteRecursively;
 
@@ -115,12 +115,7 @@ public class MergingTaskManagementService {
             final String error = "Error during merging task creation";
             LOGGER.error(error, e);
             repository.delete(task);
-            try {
-                deleteRecursively(inputsPath);
-            } catch (final IOException ioe) {
-                LOGGER.error(error, ioe);
-                e.initCause(ioe);
-            }
+            deleteQuietly(inputsPath.toFile());
             throw new ServiceIOException(error, e);
         }
     }

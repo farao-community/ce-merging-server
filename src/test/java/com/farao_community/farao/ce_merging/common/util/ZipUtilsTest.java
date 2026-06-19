@@ -6,8 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,27 +28,34 @@ import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 class ZipUtilsTest {
     private static final String TEST_ZIP = "testZip.zip";
 
-    @TempDir
-    Path tempDir;
+    private Path tmp;
+
+    @BeforeEach
+    void setup() throws IOException {
+        tmp = Files.createTempDirectory("zip-test");
+    }
+
+    @AfterEach
+    void teardown() throws IOException {
+        FileSystemUtils.deleteRecursively(tmp);
+    }
 
     @Test
-    void shouldUnzipThenZipAgain() throws IOException {
-        final Path parent = Files.createTempDirectory("zip-test");
-        unzipFile(pathOf(TEST_ZIP), parent);
+    void shouldUnzipThenZipAgain() {
+        unzipFile(pathOf(TEST_ZIP), tmp);
 
         Stream.of("file1.txt",
                   "file2.txt",
                   "directory/file3.txt",
                   "existing-dir/file4.txt")
-            .map(parent::resolve)
+            .map(tmp::resolve)
             .forEach(path -> assertTrue(Files.exists(path)));
 
-        assertTrue(zipDirectory(parent.toString()).length > 0);
+        assertTrue(zipDirectory(tmp.toString()).length > 0);
     }
 
     @Test
-    void shouldFailWhenUnzippingToReadOnlyDirectory() {
-        final Path tmp = tempDir;
+    void shouldFailWhenUnzippingToReadOnlyDirectory() throws IOException {
         assertTrue(tmp.toFile().setReadOnly());
         final Path zipInput = pathOf(TEST_ZIP);
         assertThatThrownBy(() -> unzipFile(zipInput, tmp))

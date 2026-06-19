@@ -33,6 +33,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
+import static test_utils.CeTestUtils.ID_1;
 import static test_utils.CeTestUtils.INPUTS;
 import static test_utils.CeTestUtils.INPUTS_ZIP_NAME;
 import static test_utils.CeTestUtils.METADATA;
@@ -49,21 +50,21 @@ class MergingControllerTest {
 
     @Test
     void shouldGetOutputsAsAttachments() {
-        when(taskManager.getCgm(1L))
+        when(taskManager.getCgm(ID_1))
             .thenReturn(new SavedFile());
-        when(taskManager.getCgmNetPositions(1L))
+        when(taskManager.getCgmNetPositions(ID_1))
             .thenReturn(new SavedFile());
-        when(taskManager.getOutputZip(1L))
+        when(taskManager.getOutputZip(ID_1))
             .thenReturn(new byte[0]);
-        when(taskManager.getRefProg(1L))
+        when(taskManager.getRefProg(ID_1))
             .thenReturn(new SavedFile());
-        when(taskManager.getXnodesInformation(1L))
+        when(taskManager.getXnodesInformation(ID_1))
             .thenReturn(new SavedFile());
 
         try (final MockedStatic<FileUtils> fileUtils = mockStatic(FileUtils.class)) {
-            controller.getCgmOutput(1L);
-            controller.getOutputsByTaskId(1L);
-            controller.getRefProgOutput(1L);
+            controller.getCgmOutput(ID_1);
+            controller.getOutputsByTaskId(ID_1);
+            controller.getRefProgOutput(ID_1);
 
             fileUtils.verify(() -> FileUtils.toAttachmentFileResponse(anyFile()),
                              times(2));
@@ -106,20 +107,20 @@ class MergingControllerTest {
 
     @Test
     void shouldGetTask() {
-        final MergingTaskDto task = taskDtoWithIdAndStatus(1L, ERROR);
-        when(taskManager.getTaskJsonDoc(1L))
+        final MergingTaskDto task = taskDtoWithIdAndStatus(ID_1, ERROR);
+        when(taskManager.getTaskJsonDoc(ID_1))
             .thenReturn(JsonApiDocument.fromData(task));
 
-        assertTaskIsInOkResponse(task, controller.getTask(1L));
+        assertTaskIsInOkResponse(task, controller.getTask(ID_1));
     }
 
     @Test
     void shouldRunTask() {
-        final MergingTaskDto task = taskDtoWithIdAndStatus(1L, SUCCESS);
-        when(taskManager.runTask(1L))
+        final MergingTaskDto task = taskDtoWithIdAndStatus(ID_1, SUCCESS);
+        when(taskManager.runTask(ID_1))
             .thenReturn(task);
 
-        assertTaskIsInOkResponse(task, controller.runTask(1L));
+        assertTaskIsInOkResponse(task, controller.runTask(ID_1));
     }
 
     void assertTaskIsInOkResponse(final MergingTaskDto task, final ResponseEntity<JsonApiDocument<MergingTaskDto>> response) {

@@ -13,13 +13,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static test_utils.CeTestUtils.ID_1;
 
 class JsonApiDataImplementorsTest {
     static Map<String, JsonApiData> withId1ByType = new HashMap<>();
 
     static {
         final MergingTaskDto mergingTaskDto = new MergingTaskDto();
-        mergingTaskDto.setTaskId(1L);
+        mergingTaskDto.setTaskId(ID_1);
         mergingTaskDto.setTaskName("Test");
         withId1ByType.put("merging-task", mergingTaskDto);
     }
@@ -27,10 +28,8 @@ class JsonApiDataImplementorsTest {
     @Test
     void implementorsShouldHaveTwoGetters() {
         withId1ByType.forEach((expectedType, instance) -> {
-            assertThat(instance.getId())
-                .isEqualTo(1);
-            assertThat(instance.getType())
-                .isEqualTo(expectedType);
+            assertThat(instance.getId()).isEqualTo(ID_1);
+            assertThat(instance.getType()).isEqualTo(expectedType);
         });
 
     }
