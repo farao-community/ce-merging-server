@@ -9,23 +9,6 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model.hv
 import jakarta.persistence.Embeddable;
 
 @Embeddable
-public class HvdcAlignmentXNodeCoupleDto {
-    private String referenceXNode;
-    private String recessiveXNode;
+public class HvdcAlignmentXNodeCoupleDto extends HvdcAlignmentXNodeCouple {
 
-    public String getReferenceXNode() {
-        return referenceXNode;
-    }
-
-    public void setReferenceXNode(final String referenceXNode) {
-        this.referenceXNode = referenceXNode;
-    }
-
-    public String getRecessiveXNode() {
-        return recessiveXNode;
-    }
-
-    public void setRecessiveXNode(final String recessiveXNode) {
-        this.recessiveXNode = recessiveXNode;
-    }
 }

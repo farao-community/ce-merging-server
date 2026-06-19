@@ -12,8 +12,8 @@ import java.io.Serializable;
 
 @Embeddable
 public class HvdcAlignmentXNodeCouple implements Serializable {
-    private String referenceXNode;
-    private String recessiveXNode;
+    protected String referenceXNode;
+    protected String recessiveXNode;
 
     public String getReferenceXNode() {
         return referenceXNode;

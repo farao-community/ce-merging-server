@@ -12,8 +12,8 @@ import java.io.Serializable;
 
 @Embeddable
 public class ZeroFlowNode implements Serializable {
-    private String xnode;
-    private String countryCode;
+    protected String xnode;
+    protected String countryCode;
 
     public String getXnode() {
         return xnode;

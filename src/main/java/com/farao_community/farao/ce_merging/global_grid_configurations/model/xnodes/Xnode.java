@@ -12,11 +12,11 @@ import java.io.Serializable;
 
 @Embeddable
 public class Xnode implements Serializable {
-    private String name;
-    private String area1;
-    private String area2;
-    private String subarea1;
-    private String subarea2;
+    protected String name;
+    protected String area1;
+    protected String area2;
+    protected String subarea1;
+    protected String subarea2;
 
     public Xnode(final String name,
                  final String area1,

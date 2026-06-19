@@ -10,18 +10,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NAME;
+import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
 @Table(name = "tsoinfosdto")
 public class TsoInfosDto {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = AUTO)
     private Long ref;
 
     @Column(name = NAME)

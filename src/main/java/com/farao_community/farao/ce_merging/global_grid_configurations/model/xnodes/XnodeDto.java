@@ -8,16 +8,8 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model.xn
 
 import jakarta.persistence.Embeddable;
 
-import java.io.Serializable;
-
 @Embeddable
-public class XnodeDto implements Serializable {
-    private String name;
-    private String area1;
-    private String area2;
-    private String subarea1;
-    private String subarea2;
-
+public class XnodeDto extends Xnode {
     public XnodeDto(final String name,
                     final String area1,
                     final String area2,
@@ -32,45 +24,5 @@ public class XnodeDto implements Serializable {
 
     public XnodeDto() {
 
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public String getArea1() {
-        return area1;
-    }
-
-    public void setArea1(final String area1) {
-        this.area1 = area1;
-    }
-
-    public String getArea2() {
-        return area2;
-    }
-
-    public void setArea2(final String area2) {
-        this.area2 = area2;
-    }
-
-    public String getSubarea1() {
-        return subarea1;
-    }
-
-    public void setSubarea1(final String subarea1) {
-        this.subarea1 = subarea1;
-    }
-
-    public String getSubarea2() {
-        return subarea2;
-    }
-
-    public void setSubarea2(final String subarea2) {
-        this.subarea2 = subarea2;
     }
 }
