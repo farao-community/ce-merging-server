@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.GridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -28,7 +28,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * @param <R> as in Record
  * @param <C> as in (JSON) Configuration
  */
-public abstract class AbstractGridConfigurationService<R extends GridConfigurationRecord, C> {
+public abstract class AbstractGridConfigurationService<R extends AbstractGridConfigurationRecord, C> {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractGridConfigurationService.class);
     private static final String DEFAULT_CONFIGURATIONS_DIR = "gridDefaultConfigurations/%s";
 

@@ -6,14 +6,14 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.virtual_hubs;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.GridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
 
 import java.time.LocalDateTime;
 
 @Entity
-public class VirtualHubsConfigurationRecord extends GridConfigurationRecord {
+public class VirtualHubsConfigurationRecord extends AbstractGridConfigurationRecord {
     @Lob
     private String configurationJson;
 

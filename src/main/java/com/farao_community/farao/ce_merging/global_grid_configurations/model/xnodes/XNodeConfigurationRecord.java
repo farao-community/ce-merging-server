@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.xnodes;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.GridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 
@@ -17,7 +17,7 @@ import java.util.List;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
-public class XNodeConfigurationRecord extends GridConfigurationRecord {
+public class XNodeConfigurationRecord extends AbstractGridConfigurationRecord {
     @ElementCollection(fetch = LAZY)
     private List<XnodeDto> xNodeList = new ArrayList<>();
 

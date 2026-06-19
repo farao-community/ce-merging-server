@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.region_eic;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.GridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToOne;
 
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 import static jakarta.persistence.CascadeType.ALL;
 
 @Entity
-public class RegionConfigurationRecord extends GridConfigurationRecord {
+public class RegionConfigurationRecord extends AbstractGridConfigurationRecord {
     @OneToOne(cascade = ALL)
     private RegionConfigurationDto regionConfiguration;
 

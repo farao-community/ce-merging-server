@@ -6,12 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.GridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
 import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;
 
-public interface GridConfigurationRepository<T extends GridConfigurationRecord> extends CrudRepository<T, String> {
+public interface GridConfigurationRepository<T extends AbstractGridConfigurationRecord> extends CrudRepository<T, String> {
     T findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(LocalDateTime date1, LocalDateTime date2);
 
     default T findLastPublishedValid(final LocalDateTime validityDate) {

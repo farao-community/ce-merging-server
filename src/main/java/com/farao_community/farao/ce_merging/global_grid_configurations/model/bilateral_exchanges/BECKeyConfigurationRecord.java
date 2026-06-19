@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.GridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 
@@ -17,7 +17,7 @@ import java.util.List;
 import static jakarta.persistence.CascadeType.ALL;
 
 @Entity
-public class BECKeyConfigurationRecord extends GridConfigurationRecord {
+public class BECKeyConfigurationRecord extends AbstractGridConfigurationRecord {
     @OneToMany(cascade = ALL)
     private List<BecByBoundaryDto> becMatrix = new ArrayList<>();
 

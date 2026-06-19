@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.hvdc_alignment;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.GridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 
@@ -17,7 +17,7 @@ import java.util.List;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
-public class HvdcAlignmentConfigurationRecord extends GridConfigurationRecord {
+public class HvdcAlignmentConfigurationRecord extends AbstractGridConfigurationRecord {
     @ElementCollection(fetch = LAZY)
     private List<HvdcAlignmentXNodeCoupleDto> hvdcXNodeAlignmentCouplesDto = new ArrayList<>();
 
