@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
+
 @Service
 
 public class XNodeConfigurationService extends AbstractGridConfigurationService<XNodeConfigurationRecord, JsonXNodeConfiguration> {
@@ -43,7 +45,7 @@ public class XNodeConfigurationService extends AbstractGridConfigurationService<
         return new XNodeConfigurationRecord(generateUuidString(),
                                             validFrom.toLocalDateTime(),
                                             validTo.toLocalDateTime(),
-                                            LocalDateTime.now(),
+                                            LocalDateTime.now(UTC_ZONE_ID),
                                             xNodeList);
     }
 
@@ -51,12 +53,7 @@ public class XNodeConfigurationService extends AbstractGridConfigurationService<
         return xnodes
             .getXnode()
             .stream()
-            .map(xnode -> new XnodeDto(xnode.getName(),
-                                       xnode.getArea1(),
-                                       xnode.getSubarea1(),
-                                       xnode.getArea2(),
-                                       xnode.getSubarea2())
-            )
+            .map(XnodeDto::fromXNodeEntity)
             .toList();
     }
 }

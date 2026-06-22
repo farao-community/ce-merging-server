@@ -29,6 +29,7 @@ import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ARROW;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CSV_SEPARATOR;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
 
 @Service
 public class BECKeyConfigurationService extends AbstractGridConfigurationService<BECKeyConfigurationRecord, JsonBecConfiguration> {
@@ -59,7 +60,7 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
         return new BECKeyConfigurationRecord(generateUuidString(),
                                              validFrom.toLocalDateTime(),
                                              validTo.toLocalDateTime(),
-                                             LocalDateTime.now(),
+                                             LocalDateTime.now(UTC_ZONE_ID),
                                              becMatrix);
     }
 
@@ -77,7 +78,7 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
                 String[] values = line.split(CSV_SEPARATOR);
                 exchanges.add(Arrays.asList(values));
             }
-        } catch (final IOException e) {
+        } catch (final Exception e) {
             LOGGER.error("Could not parse sharing keys BEC file from class resources");
             throw new ServiceIOException("Could not parse sharing keys BEC file from class resources", e);
         }

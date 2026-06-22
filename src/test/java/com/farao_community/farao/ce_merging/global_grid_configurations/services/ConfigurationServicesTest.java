@@ -33,6 +33,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.BEGINNING_OF_2000;
+import static test_utils.CeTestUtils.S_IO_EXCEPTION;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class ConfigurationServicesTest {
     private GridConfigurationRepository repository = mock(GridConfigurationRepository.class);
@@ -60,22 +62,27 @@ class ConfigurationServicesTest {
     @FieldSource("SERVICES_AND_CONFIGS")
     void shouldGetJsonConfig(final Pair<AbstractGridConfigurationService<? extends AbstractGridConfigurationRecord, ?>,
         Pair<? extends AbstractGridConfigurationRecord, Class<?>>> serviceAndConfigs) throws IOException {
+
         final AbstractGridConfigurationService<?, ?> service = serviceAndConfigs.getFirst();
+        final AbstractGridConfigurationRecord recordObject = serviceAndConfigs.getSecond().getFirst();
+        final Class<?> jsonConfigClass = serviceAndConfigs.getSecond().getSecond();
         service.setRepository(repository);
 
         when(repository.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
             any(LocalDateTime.class), any(LocalDateTime.class))
-        ).thenReturn(serviceAndConfigs.getSecond().getFirst());
+        ).thenReturn(recordObject);
 
         assertThat(service.getConfiguration(BEGINNING_OF_2000))
-            .isInstanceOf(serviceAndConfigs.getSecond().getSecond());
+            .isInstanceOf(jsonConfigClass);
     }
 
     @ParameterizedTest
     @FieldSource("SERVICES_AND_CONFIGS")
     void shouldGetDefaultConfig(final Pair<AbstractGridConfigurationService<? extends AbstractGridConfigurationRecord, ?>,
         Pair<? extends AbstractGridConfigurationRecord, Class<?>>> serviceAndConfigs) throws IOException {
+
         final AbstractGridConfigurationService<?, ?> service = serviceAndConfigs.getFirst();
+        final Class<?> jsonConfigClass = serviceAndConfigs.getSecond().getSecond();
         service.setRepository(repository);
 
         when(repository.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
@@ -83,18 +90,19 @@ class ConfigurationServicesTest {
         ).thenReturn(null);
 
         assertThat(service.getConfiguration(BEGINNING_OF_2000))
-            .isInstanceOf(serviceAndConfigs.getSecond().getSecond());
+            .isInstanceOf(jsonConfigClass);
     }
 
     @ParameterizedTest
     @FieldSource("SERVICES_AND_CONFIGS")
     void shouldPublish(final Pair<AbstractGridConfigurationService<? extends AbstractGridConfigurationRecord, ?>,
         Pair<? extends AbstractGridConfigurationRecord, Class<?>>> serviceAndConfigs) throws IOException {
+
         final AbstractGridConfigurationService<?, ?> service = serviceAndConfigs.getFirst();
+        final AbstractGridConfigurationRecord recordObject = serviceAndConfigs.getSecond().getFirst();
         service.setRepository(repository);
 
-        when(repository.save(any()))
-            .thenReturn(serviceAndConfigs.getSecond().getFirst());
+        when(repository.save(any())).thenReturn(recordObject);
 
         service.publish(new MockMultipartFile("testfile", service.getDefaultFileBytes()),
                         BEGINNING_OF_2000, BEGINNING_OF_2000);
@@ -102,6 +110,32 @@ class ConfigurationServicesTest {
         verify(repository).save(any());
     }
 
-    //TODO getDefaultJsonConfig
+    @ParameterizedTest
+    @FieldSource("SERVICES_AND_CONFIGS")
+    void shouldThrowIfEmptyFile(final Pair<AbstractGridConfigurationService<? extends AbstractGridConfigurationRecord, ?>,
+        Pair<? extends AbstractGridConfigurationRecord, Class<?>>> serviceAndConfigs) {
+
+        final AbstractGridConfigurationService<?, ?> service = serviceAndConfigs.getFirst();
+        assertThatThrownBy(() -> service.getTextContent(new MockMultipartFile("name", new byte[]{})))
+            .isValidServiceException()
+            .hasMessageContaining("empty");
+    }
+
+    @ParameterizedTest
+    @FieldSource("SERVICES_AND_CONFIGS")
+    void shouldThrowIfRepoErrorWhenPublishing(final Pair<AbstractGridConfigurationService<? extends AbstractGridConfigurationRecord, ?>,
+        Pair<? extends AbstractGridConfigurationRecord, Class<?>>> serviceAndConfigs) {
+
+        final AbstractGridConfigurationService<?, ?> service = serviceAndConfigs.getFirst();
+        service.setRepository(repository);
+
+        when(repository.save(any())).thenThrow(S_IO_EXCEPTION);
+
+        assertThatThrownBy(() -> service.publish(new MockMultipartFile("testfile", service.getDefaultFileBytes()),
+                                                 BEGINNING_OF_2000, BEGINNING_OF_2000))
+            .isValidServiceException()
+            .hasCause(S_IO_EXCEPTION)
+            .hasMessageContaining("Configuration could not be published");
+    }
 
 }

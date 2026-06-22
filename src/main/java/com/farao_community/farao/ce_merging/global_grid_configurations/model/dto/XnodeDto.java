@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
+import com.farao_community.farao.ce_merging.xsd.Xnode;
 import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
@@ -18,20 +19,14 @@ public class XnodeDto implements Serializable {
     private String subarea1;
     private String subarea2;
 
-    public XnodeDto(final String name,
-                    final String area1,
-                    final String area2,
-                    final String subarea1,
-                    final String subarea2) {
-        this.name = name;
-        this.area1 = area1;
-        this.area2 = area2;
-        this.subarea1 = subarea1;
-        this.subarea2 = subarea2;
-    }
-
-    public XnodeDto() {
-
+    public static XnodeDto fromXNodeEntity(final Xnode xnode) {
+        final XnodeDto dto = new XnodeDto();
+        dto.setName(xnode.getName());
+        dto.setArea1(xnode.getArea1());
+        dto.setArea2(xnode.getArea2());
+        dto.setSubarea1(xnode.getSubarea1());
+        dto.setSubarea2(xnode.getSubarea2());
+        return dto;
     }
 
     public String getName() {

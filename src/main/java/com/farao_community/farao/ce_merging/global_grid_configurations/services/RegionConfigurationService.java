@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
+
 @Service
 public class RegionConfigurationService extends AbstractGridConfigurationService<RegionConfigurationRecord, JsonRegionConfiguration> {
 
@@ -45,7 +47,7 @@ public class RegionConfigurationService extends AbstractGridConfigurationService
         return new RegionConfigurationRecord(generateUuidString(),
                                              validFrom.toLocalDateTime(),
                                              validTo.toLocalDateTime(),
-                                             LocalDateTime.now(),
+                                             LocalDateTime.now(UTC_ZONE_ID),
                                              regionConfiguration);
     }
 }

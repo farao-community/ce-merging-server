@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
 import static java.util.function.Predicate.not;
 
 @Service
@@ -60,7 +61,7 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
             generateUuidString(),
             validFrom.toLocalDateTime(),
             validTo.toLocalDateTime(),
-            LocalDateTime.now(),
+            LocalDateTime.now(UTC_ZONE_ID),
             xNodeCouples,
             alignmentConfiguration.getSetZeroFlowNodes(),
             alignmentConfiguration.getDkHvdcXnodes(),

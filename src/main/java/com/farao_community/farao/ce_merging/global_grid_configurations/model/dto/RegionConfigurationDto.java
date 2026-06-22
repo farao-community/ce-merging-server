@@ -60,24 +60,6 @@ public class RegionConfigurationDto {
     @JsonProperty(value = "germanyZones")
     private Map<String, TsoInfosDto> germanyZone;
 
-    public RegionConfigurationDto(final Map<String, String> areasOut,
-                                  final long ref,
-                                  final String name,
-                                  final String id,
-                                  final Map<String, String> areasIn,
-                                  final Map<String, TsoInfosDto> germanyZone) {
-        this.areasOut = areasOut;
-        this.ref = ref;
-        this.name = name;
-        this.id = id;
-        this.areasIn = areasIn;
-        this.germanyZone = germanyZone;
-    }
-
-    public RegionConfigurationDto() {
-
-    }
-
     public Long getRef() {
         return ref;
     }
@@ -136,7 +118,7 @@ public class RegionConfigurationDto {
 
     @Override
     public String toString() {
-        ObjectMapper mapper = new ObjectMapper();
+        final ObjectMapper mapper = new ObjectMapper();
         try {
             return mapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {

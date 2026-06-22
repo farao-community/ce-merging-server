@@ -19,6 +19,7 @@ import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
@@ -48,7 +49,7 @@ public class VirtualHubsConfigurationService extends AbstractGridConfigurationSe
         return new VirtualHubsConfigurationRecord(generateUuidString(),
                                                   validFrom.toLocalDateTime(),
                                                   validTo.toLocalDateTime(),
-                                                  LocalDateTime.now(),
+                                                  LocalDateTime.now(UTC_ZONE_ID),
                                                   cfgWriter.toString());
     }
 }
