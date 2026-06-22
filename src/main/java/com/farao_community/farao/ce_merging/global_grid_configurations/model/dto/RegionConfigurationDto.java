@@ -6,11 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -114,16 +111,6 @@ public class RegionConfigurationDto {
         areasAllMap.putAll(areasIn);
         areasAllMap.putAll(areasOut);
         return areasAllMap;
-    }
-
-    @Override
-    public String toString() {
-        final ObjectMapper mapper = new ObjectMapper();
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            throw new ServiceIOException("Error during json parse regions configuration", e);
-        }
     }
 
 }

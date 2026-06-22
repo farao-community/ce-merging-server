@@ -89,10 +89,6 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
         }
     }
 
-    protected byte[] getConfigurationAsBytes(final OffsetDateTime targetDate) throws IOException {
-        return JsonUtils.writeToBytes(getJsonConfigClass(), getConfiguration(targetDate));
-    }
-
     public C getConfiguration(final OffsetDateTime targetDate) throws IOException {
         try {
             final R configRecord = findLastPublishedValid(targetDate.toLocalDateTime());
@@ -110,10 +106,6 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
             throw new CeMergingException("file %s is empty".formatted(file.getOriginalFilename()));
         }
         return fileContent;
-    }
-
-    public GridConfigurationRepository<R> getRepository() {
-        return repository;
     }
 
     public void setRepository(final GridConfigurationRepository<R> repository) {

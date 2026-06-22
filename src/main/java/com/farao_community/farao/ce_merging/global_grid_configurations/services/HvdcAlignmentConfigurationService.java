@@ -19,14 +19,13 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
 import static java.util.function.Predicate.not;
 
 @Service
 public class HvdcAlignmentConfigurationService extends AbstractGridConfigurationService<HvdcAlignmentConfigurationRecord, JsonHvdcAlignmentConfiguration> {
-    private static final String XNODE_NOT_FOUND = "%s XNode %s should be present in the virtual hubs configuration";
-
     private final VirtualHubsConfigurationService virtualHubsConfigurationService;
 
     public HvdcAlignmentConfigurationService(final VirtualHubsConfigurationService virtualHubsConfigurationService) {
@@ -82,18 +81,16 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
         final String reference = couple.getReferenceXNode();
         final String recessive = couple.getRecessiveXNode();
 
-        if (isNotVirtualHub(recessive, virtualHubs)) {
-            throw new CeMergingException(XNODE_NOT_FOUND.formatted("Recessive", recessive));
-        }
-
-        if (isNotVirtualHub(reference, virtualHubs)) {
-            throw new CeMergingException(XNODE_NOT_FOUND.formatted("Reference", reference));
+        if (isNotVirtualHub(recessive, virtualHubs) || isNotVirtualHub(reference, virtualHubs)) {
+            throw new CeMergingException("XNode couple (%s,%s) should be present in the virtual hubs configuration"
+                                             .formatted(recessive, reference));
         }
     }
 
     private static boolean isNotVirtualHub(final String node, final List<VirtualHub> virtualHubs) {
         return virtualHubs.stream()
             .map(VirtualHub::nodeName)
+            .filter(Objects::nonNull)
             .filter(not(String::isBlank))
             .noneMatch(node::equals);
     }
