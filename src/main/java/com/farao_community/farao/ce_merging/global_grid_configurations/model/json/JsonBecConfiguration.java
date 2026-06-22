@@ -17,6 +17,9 @@ public class JsonBecConfiguration {
         this.becByBoundaries = becByBoundaries;
     }
 
+    public JsonBecConfiguration() {
+    }
+
     public List<BecByBoundaryDto> getBecByBoundaries() {
         return becByBoundaries;
     }

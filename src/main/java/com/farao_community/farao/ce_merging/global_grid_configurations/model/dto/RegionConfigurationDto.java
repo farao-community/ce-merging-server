@@ -82,6 +82,10 @@ public class RegionConfigurationDto {
         return ref;
     }
 
+    public void setRef(final Long ref) {
+        this.ref = ref;
+    }
+
     public String getName() {
         return name;
     }

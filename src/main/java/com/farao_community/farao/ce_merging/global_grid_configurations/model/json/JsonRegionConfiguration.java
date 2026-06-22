@@ -19,6 +19,9 @@ public class JsonRegionConfiguration {
         this.regionConfiguration = regionConfiguration;
     }
 
+    public JsonRegionConfiguration() {
+    }
+
     public RegionConfigurationDto getRegionConfiguration() {
         return regionConfiguration;
     }

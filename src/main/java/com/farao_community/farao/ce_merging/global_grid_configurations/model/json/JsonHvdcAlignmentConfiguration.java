@@ -33,6 +33,9 @@ public class JsonHvdcAlignmentConfiguration {
         this.defaultSlackNode = defaultSlackNode;
     }
 
+    public JsonHvdcAlignmentConfiguration() {
+    }
+
     public List<HvdcAlignmentXNodeCoupleDto> getHvdcXNodeAlignment() {
         return hvdcXNodeAlignment;
     }

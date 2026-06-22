@@ -45,6 +45,10 @@ public class TsoInfosDto implements Serializable {
         return ref;
     }
 
+    public void setRef(final Long ref) {
+        this.ref = ref;
+    }
+
     public String getEic() {
         return eic;
     }

@@ -8,9 +8,9 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.HvdcAlignmentConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.HvdcAlignmentConfigurationRecord;
 import com.powsybl.openrao.virtualhubs.VirtualHub;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +19,8 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Objects;
+
+import static java.util.function.Predicate.not;
 
 @Service
 public class HvdcAlignmentConfigurationService extends AbstractGridConfigurationService<HvdcAlignmentConfigurationRecord, JsonHvdcAlignmentConfiguration> {
@@ -80,7 +81,7 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
         final String reference = couple.getReferenceXNode();
         final String recessive = couple.getRecessiveXNode();
 
-        if (isNotVirtualHub(reference, virtualHubs)) {
+        if (isNotVirtualHub(recessive, virtualHubs)) {
             throw new CeMergingException(XNODE_NOT_FOUND.formatted("Recessive", recessive));
         }
 
@@ -92,7 +93,7 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
     private static boolean isNotVirtualHub(final String node, final List<VirtualHub> virtualHubs) {
         return virtualHubs.stream()
             .map(VirtualHub::nodeName)
-            .filter(Objects::nonNull)
+            .filter(not(String::isBlank))
             .noneMatch(node::equals);
     }
 }

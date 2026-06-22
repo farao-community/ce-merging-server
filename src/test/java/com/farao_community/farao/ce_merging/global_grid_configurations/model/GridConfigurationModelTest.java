@@ -14,6 +14,15 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.TsoInfosDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonXNodeConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.AbstractGridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.RegionConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.VirtualHubsConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.XNodeConfigurationRecord;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 import test_utils.GetterSetterVerifier;
@@ -30,9 +39,31 @@ class GridConfigurationModelTest {
                                          TsoInfosDto.class,
                                          XnodeDto.class);
 
+    static List<Class<? extends AbstractGridConfigurationRecord>> records = List.of(BECKeyConfigurationRecord.class,
+                                                                                    RegionConfigurationRecord.class,
+                                                                                    VirtualHubsConfigurationRecord.class,
+                                                                                    XNodeConfigurationRecord.class);
+
+    static List<Class<?>> jsonConfigs = List.of(JsonBecConfiguration.class,
+                                                JsonHvdcAlignmentConfiguration.class,
+                                                JsonRegionConfiguration.class,
+                                                JsonXNodeConfiguration.class);
+
     @ParameterizedTest
     @FieldSource("dtos")
     void dtosShouldHaveStandardGettersAndSetters(final Class<?> clazz) {
+        GetterSetterVerifier.forClass(clazz).verify();
+    }
+
+    @ParameterizedTest
+    @FieldSource("records")
+    void recordsShouldHaveStandardGettersAndSetters(final Class<?> clazz) {
+        GetterSetterVerifier.forClass(clazz).verify();
+    }
+
+    @ParameterizedTest
+    @FieldSource("jsonConfigs")
+    void jsonConfigsShouldHaveStandardGettersAndSetters(final Class<?> clazz) {
         GetterSetterVerifier.forClass(clazz).verify();
     }
 

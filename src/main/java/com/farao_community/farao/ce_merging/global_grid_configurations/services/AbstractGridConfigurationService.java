@@ -8,6 +8,8 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.DefaultConfigFileNameFactory;
+import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.AbstractGridConfigurationRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.ParameterizedType;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -41,6 +44,12 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
     protected abstract R getConfigurationRecordFromFile(final MultipartFile configurationFile,
                                                         final OffsetDateTime validFrom,
                                                         final OffsetDateTime validTo) throws IOException;
+
+    protected R findLastPublishedValid(final LocalDateTime validityDate) {
+        return repository.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
+            validityDate, validityDate
+        );
+    }
 
     protected String generateUuidString() {
         return UUID.randomUUID().toString();
@@ -86,7 +95,7 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
 
     public C getConfiguration(final OffsetDateTime targetDate) throws IOException {
         try {
-            final R configRecord = repository.findLastPublishedValid(targetDate.toLocalDateTime());
+            final R configRecord = findLastPublishedValid(targetDate.toLocalDateTime());
             LOGGER.info("configuration retrieved from server");
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {

@@ -6,15 +6,16 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.AbstractGridConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.HvdcAlignmentConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonXNodeConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.AbstractGridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.HvdcAlignmentConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.RegionConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.VirtualHubsConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonXNodeConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.XNodeConfigurationRecord;
 import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.BEGINNING_OF_2000;
 
-class GridConfigurationServicesTest {
+class ConfigurationServicesTest {
     private GridConfigurationRepository repository = mock(GridConfigurationRepository.class);
 
     private static final List<
@@ -57,12 +58,29 @@ class GridConfigurationServicesTest {
 
     @ParameterizedTest
     @FieldSource("SERVICES_AND_CONFIGS")
-    void shouldGetDefaultJsonConfig(final Pair<AbstractGridConfigurationService<? extends AbstractGridConfigurationRecord, ?>,
+    void shouldGetJsonConfig(final Pair<AbstractGridConfigurationService<? extends AbstractGridConfigurationRecord, ?>,
         Pair<? extends AbstractGridConfigurationRecord, Class<?>>> serviceAndConfigs) throws IOException {
         final AbstractGridConfigurationService<?, ?> service = serviceAndConfigs.getFirst();
         service.setRepository(repository);
-        when(repository.findLastPublishedValid(any(LocalDateTime.class)))
-            .thenReturn(serviceAndConfigs.getSecond().getFirst());
+
+        when(repository.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
+            any(LocalDateTime.class), any(LocalDateTime.class))
+        ).thenReturn(serviceAndConfigs.getSecond().getFirst());
+
+        assertThat(service.getConfiguration(BEGINNING_OF_2000))
+            .isInstanceOf(serviceAndConfigs.getSecond().getSecond());
+    }
+
+    @ParameterizedTest
+    @FieldSource("SERVICES_AND_CONFIGS")
+    void shouldGetDefaultConfig(final Pair<AbstractGridConfigurationService<? extends AbstractGridConfigurationRecord, ?>,
+        Pair<? extends AbstractGridConfigurationRecord, Class<?>>> serviceAndConfigs) throws IOException {
+        final AbstractGridConfigurationService<?, ?> service = serviceAndConfigs.getFirst();
+        service.setRepository(repository);
+
+        when(repository.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
+            any(LocalDateTime.class), any(LocalDateTime.class))
+        ).thenReturn(null);
 
         assertThat(service.getConfiguration(BEGINNING_OF_2000))
             .isInstanceOf(serviceAndConfigs.getSecond().getSecond());
@@ -83,5 +101,7 @@ class GridConfigurationServicesTest {
 
         verify(repository).save(any());
     }
+
+    //TODO getDefaultJsonConfig
 
 }

@@ -20,6 +20,9 @@ public class JsonXNodeConfiguration {
         this.xNodesList = xNodesList;
     }
 
+    public JsonXNodeConfiguration() {
+    }
+
     public List<XnodeDto> getXNodesList() {
         return xNodesList;
     }
