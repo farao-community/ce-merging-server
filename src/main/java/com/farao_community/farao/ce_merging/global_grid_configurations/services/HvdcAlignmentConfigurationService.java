@@ -78,20 +78,19 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
 
     private static void assertCoupleInHubs(final HvdcAlignmentXNodeCoupleDto couple,
                                            final List<VirtualHub> virtualHubs) {
-        final String reference = couple.getReferenceXNode();
-        final String recessive = couple.getRecessiveXNode();
-
-        if (isNotVirtualHub(recessive, virtualHubs) || isNotVirtualHub(reference, virtualHubs)) {
+        if (isNotInVirtualHubs(couple, virtualHubs)) {
             throw new CeMergingException("XNode couple (%s,%s) should be present in the virtual hubs configuration"
-                                             .formatted(recessive, reference));
+                                             .formatted(couple.getRecessiveXNode(), couple.getReferenceXNode()));
         }
     }
 
-    private static boolean isNotVirtualHub(final String node, final List<VirtualHub> virtualHubs) {
+    private static boolean isNotInVirtualHubs(final HvdcAlignmentXNodeCoupleDto couple,
+                                              final List<VirtualHub> virtualHubs) {
         return virtualHubs.stream()
             .map(VirtualHub::nodeName)
             .filter(Objects::nonNull)
             .filter(not(String::isBlank))
-            .noneMatch(node::equals);
+            .noneMatch(node -> node.equals(couple.getRecessiveXNode())
+                               || node.equals(couple.getReferenceXNode()));
     }
 }
