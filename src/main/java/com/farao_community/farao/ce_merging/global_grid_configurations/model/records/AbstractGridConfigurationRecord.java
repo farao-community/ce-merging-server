@@ -1,11 +1,13 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Inheritance;
 
 import java.time.LocalDateTime;
 
-@MappedSuperclass
+@Entity
+@Inheritance
 public abstract class AbstractGridConfigurationRecord {
     @Id
     protected String id;
@@ -23,7 +25,8 @@ public abstract class AbstractGridConfigurationRecord {
         this.publishedOn = publishedOn;
     }
 
-    protected AbstractGridConfigurationRecord() {}
+    protected AbstractGridConfigurationRecord() {
+    }
 
     public String getId() {
         return id;

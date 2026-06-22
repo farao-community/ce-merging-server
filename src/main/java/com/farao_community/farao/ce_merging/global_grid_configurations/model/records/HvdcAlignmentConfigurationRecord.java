@@ -38,14 +38,15 @@ public class HvdcAlignmentConfigurationRecord extends AbstractGridConfigurationR
                                             final List<ZeroFlowNodeDto> zeroFlowNodeDtos,
                                             final List<String> dkHvdcXnodes,
                                             final String defaultSlackNode) {
-        super(id,validFrom, validTo, publishedOn);
+        super(id, validFrom, validTo, publishedOn);
         this.hvdcXNodeAlignmentCouplesDto = hvdcXNodeAlignmentCouplesDto;
         this.zeroFlowNodeDtos = zeroFlowNodeDtos;
         this.dkHvdcXnodes = dkHvdcXnodes;
         this.defaultSlackNode = defaultSlackNode;
     }
 
-    public HvdcAlignmentConfigurationRecord() {}
+    public HvdcAlignmentConfigurationRecord() {
+    }
 
     public String getDefaultSlackNode() {
         return defaultSlackNode;

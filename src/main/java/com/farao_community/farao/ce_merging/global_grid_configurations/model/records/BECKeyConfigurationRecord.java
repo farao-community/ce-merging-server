@@ -30,7 +30,8 @@ public class BECKeyConfigurationRecord extends AbstractGridConfigurationRecord {
         this.becMatrix = becMatrix;
     }
 
-    public BECKeyConfigurationRecord() {}
+    public BECKeyConfigurationRecord() {
+    }
 
     public List<BecByBoundaryDto> getBecMatrix() {
         return becMatrix;
