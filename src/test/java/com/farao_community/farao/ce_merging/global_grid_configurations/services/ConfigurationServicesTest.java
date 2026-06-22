@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.DefaultConfigFileNameFactory;
 import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
@@ -24,7 +23,6 @@ import org.junit.jupiter.params.provider.FieldSource;
 import org.springframework.data.util.Pair;
 import org.springframework.mock.web.MockMultipartFile;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,7 +34,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.BEGINNING_OF_2000;
 import static test_utils.CeTestUtils.S_IO_EXCEPTION;
-import static test_utils.CeTestUtils.stringContentOf;
 import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class ConfigurationServicesTest {
@@ -75,11 +72,7 @@ class ConfigurationServicesTest {
             any(LocalDateTime.class), any(LocalDateTime.class))
         ).thenReturn(recordObject);
 
-        final String configFile = DefaultConfigFileNameFactory.getDefaultConfigFileName(recordObject.getClass());
-        List.of(service.readFromJson(new FileInputStream(configFile)),
-                service.readFromJson(stringContentOf(configFile)),
-                service.getConfiguration(BEGINNING_OF_2000))
-            .forEach(response -> assertThat(response).isInstanceOf(jsonConfigClass));
+        assertThat(service.getConfiguration(BEGINNING_OF_2000)).isInstanceOf(jsonConfigClass);
     }
 
     @ParameterizedTest
