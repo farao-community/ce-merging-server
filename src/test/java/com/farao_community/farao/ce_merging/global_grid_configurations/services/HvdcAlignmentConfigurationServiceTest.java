@@ -36,11 +36,9 @@ class HvdcAlignmentConfigurationServiceTest {
         when(vhService.getConfiguration(any())).thenReturn(new VirtualHubsConfiguration());
 
         assertThatThrownBy(() -> service.publish(new MockMultipartFile("testfile", service.getDefaultFileBytes()),
-                        BEGINNING_OF_2000, BEGINNING_OF_2000))
+                                                 BEGINNING_OF_2000, BEGINNING_OF_2000))
             .isValidServiceException()
             .hasCauseExactlyInstanceOf(CeMergingException.class);
 
     }
-
-
 }
