@@ -4,16 +4,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.hvdc_alignment;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
 import jakarta.persistence.Embeddable;
 
-import java.io.Serializable;
-
 @Embeddable
-public class ZeroFlowNode implements Serializable {
-    protected String xnode;
-    protected String countryCode;
+public class ZeroFlowNodeDto {
+    private String xnode;
+    private String countryCode;
 
     public String getXnode() {
         return xnode;

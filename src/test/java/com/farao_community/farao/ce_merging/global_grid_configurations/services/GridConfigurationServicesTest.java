@@ -6,16 +6,16 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges.BECKeyConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges.JsonBecConfiguration;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.hvdc_alignment.HvdcAlignmentConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.hvdc_alignment.JsonHvdcAlignmentConfiguration;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.region_eic.JsonRegionConfiguration;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.region_eic.RegionConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.virtual_hubs.VirtualHubsConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.xnodes.JsonXNodeConfiguration;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.xnodes.XNodeConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.AbstractGridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.HvdcAlignmentConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.RegionConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.VirtualHubsConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonXNodeConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.XNodeConfigurationRecord;
 import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;

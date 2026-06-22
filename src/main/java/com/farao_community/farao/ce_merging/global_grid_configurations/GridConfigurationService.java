@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations;
 
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.json.JsonLoadFlowParameters;
 import org.slf4j.Logger;
@@ -21,10 +22,10 @@ public class GridConfigurationService {
 
     private static void setLoadFlowParameters(final MergingTask task) {
         final LoadFlowParameters loadFlowParameters;
-        final String path = task.getConfigurations().getAcLoadFlowParameters().getPath();
-        if (path != null) {
-            loadFlowParameters = JsonLoadFlowParameters.read(Paths.get(path));
-            LOGGER.info("Reading load flow parameters from {}", task.getConfigurations().getAcLoadFlowParameters().getOriginalName());
+        final SavedFile acLfConfig = task.getConfigurations().getAcLoadFlowParameters();
+        if (acLfConfig != null && acLfConfig.getPath() != null) {
+            loadFlowParameters = JsonLoadFlowParameters.read(Paths.get(acLfConfig.getPath()));
+            LOGGER.info("Reading load flow parameters from {}", acLfConfig.getOriginalName());
         } else {
             LOGGER.info("Reading default load flow parameters");
             loadFlowParameters = LoadFlowParameters.load();
@@ -33,5 +34,5 @@ public class GridConfigurationService {
         LOGGER.info("Load flow parameters are set in task configuration");
     }
 
-    //TODO implement the remaining functions
+    // remaining functions not yet implemented
 }

@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.region_eic;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,66 +21,60 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ID;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NAME;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
-@Table(name = "regionconfiguration")
-public class RegionConfiguration implements Serializable {
-    private static final Logger LOGGER = LoggerFactory.getLogger(RegionConfiguration.class);
+@Table(name = "regionconfigurationdto")
+public class RegionConfigurationDto {
 
     @Id
     @GeneratedValue(strategy = AUTO)
     private Long ref;
 
-    @Column(name = NAME)
+    @Column(name = "name")
     private String name;
 
-    @Column(name = ID)
+    @Column(name = "id")
     private String id;
 
     @ElementCollection
-    @CollectionTable(name = "regionconfiguration_areasin_code_mapping",
-            joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
+    @CollectionTable(name = "regionconfigurationdto_areasin_code_mapping",
+            joinColumns = {@JoinColumn(name = "regionconfigurationdto_ref", referencedColumnName = "ref")})
     @MapKeyColumn(name = "areasin_name")
     @Column(name = "areasin_eic")
     private Map<String, String> areasIn;
 
     @ElementCollection
-    @CollectionTable(name = "regionconfiguration_areasout_code_mapping",
-            joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
+    @CollectionTable(name = "regionconfigurationdto_areasout_code_mapping",
+            joinColumns = {@JoinColumn(name = "regionconfigurationdto_ref", referencedColumnName = "ref")})
     @MapKeyColumn(name = "areasout_name")
     @Column(name = "areasout_eic")
     private Map<String, String> areasOut;
 
     @OneToMany(cascade = ALL)
     @JsonProperty(value = "germanyZones")
-    private Map<String, TsoInfos> germanyZone;
+    private Map<String, TsoInfosDto> germanyZone;
 
-    public RegionConfiguration(final long ref,
-                               final String name,
-                               final String id,
-                               final Map<String, String> areasIn,
-                               final Map<String, String> areasOut,
-                               final Map<String, TsoInfos> germanyZone) {
+    public RegionConfigurationDto(final Map<String, String> areasOut,
+                                  final long ref,
+                                  final String name,
+                                  final String id,
+                                  final Map<String, String> areasIn,
+                                  final Map<String, TsoInfosDto> germanyZone) {
+        this.areasOut = areasOut;
         this.ref = ref;
         this.name = name;
         this.id = id;
         this.areasIn = areasIn;
-        this.areasOut = areasOut;
         this.germanyZone = germanyZone;
     }
 
-    public RegionConfiguration() {
+    public RegionConfigurationDto() {
 
     }
 
@@ -120,17 +114,17 @@ public class RegionConfiguration implements Serializable {
         this.areasOut = areasOut;
     }
 
-    public Map<String, TsoInfos> getGermanyZone() {
+    public Map<String, TsoInfosDto> getGermanyZone() {
         return germanyZone;
     }
 
-    public void setGermanyZone(final Map<String, TsoInfos> germanyZone) {
+    public void setGermanyZone(final Map<String, TsoInfosDto> germanyZone) {
         this.germanyZone = germanyZone;
     }
 
     @JsonIgnore
-    public Map<String, String> getAllAreas() {
-        final Map<String, String> areasAllMap = new HashMap<>();
+    public Map<String, String> getAreasAll() {
+        Map<String, String> areasAllMap = new HashMap<>();
         areasAllMap.putAll(areasIn);
         areasAllMap.putAll(areasOut);
         return areasAllMap;
@@ -138,12 +132,12 @@ public class RegionConfiguration implements Serializable {
 
     @Override
     public String toString() {
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            return new ObjectMapper().writeValueAsString(this);
-        } catch (final JsonProcessingException e) {
-            final String errorMsg = "Error during JSON parsing of regions configuration";
-            LOGGER.error(errorMsg);
-            throw new ServiceIOException(errorMsg, e);
+            return mapper.writeValueAsString(this);
+        } catch (JsonProcessingException e) {
+            throw new ServiceIOException("Error during json parse regions configuration", e);
         }
     }
+
 }

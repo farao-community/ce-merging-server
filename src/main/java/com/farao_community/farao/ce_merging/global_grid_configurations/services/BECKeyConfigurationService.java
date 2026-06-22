@@ -7,12 +7,12 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges.BECKeyConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges.BecByBoundaryDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges.BecCoefficientsDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges.BorderDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges.JsonBecConfiguration;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.region_eic.RegionConfigurationDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecCoefficientsDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BorderDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

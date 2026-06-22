@@ -6,11 +6,11 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges.BECKeyConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.hvdc_alignment.HvdcAlignmentConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.region_eic.RegionConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.virtual_hubs.VirtualHubsConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.xnodes.XNodeConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.HvdcAlignmentConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.RegionConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.VirtualHubsConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.XNodeConfigurationRecord;
 
 import java.util.Map;
 

@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.bilateral_exchanges;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -14,7 +14,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
-import java.io.Serializable;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ID;
@@ -22,7 +21,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-public class BecByBoundary implements Serializable {
+public class BecByBoundaryDto {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -31,10 +30,20 @@ public class BecByBoundary implements Serializable {
     private long id;
 
     @Embedded
-    private Border border;
+    private BorderDto border;
 
     @ElementCollection(fetch = LAZY)
-    private List<BecCoefficients> coefficientByCountry;
+    private List<BecCoefficientsDto> coefficientByCountry;
+
+    public BecByBoundaryDto(final BorderDto border,
+                            final List<BecCoefficientsDto> coefficientByCountry) {
+        this.border = border;
+        this.coefficientByCountry = coefficientByCountry;
+    }
+
+    public BecByBoundaryDto() {
+
+    }
 
     public long getId() {
         return id;
@@ -44,19 +53,19 @@ public class BecByBoundary implements Serializable {
         this.id = id;
     }
 
-    public Border getBorder() {
+    public BorderDto getBorder() {
         return border;
     }
 
-    public void setBorder(final Border border) {
+    public void setBorder(final BorderDto border) {
         this.border = border;
     }
 
-    public List<BecCoefficients> getCoefficientByCountry() {
+    public List<BecCoefficientsDto> getCoefficientByCountry() {
         return coefficientByCountry;
     }
 
-    public void setCoefficientByCountry(final List<BecCoefficients> coefficientByCountry) {
+    public void setCoefficientByCountry(final List<BecCoefficientsDto> coefficientByCountry) {
         this.coefficientByCountry = coefficientByCountry;
     }
 }

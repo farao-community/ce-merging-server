@@ -4,9 +4,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.virtual_hubs;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Lob;
 
@@ -22,10 +21,7 @@ public class VirtualHubsConfigurationRecord extends AbstractGridConfigurationRec
                                           final LocalDateTime validTo,
                                           final LocalDateTime publishedOn,
                                           final String configurationJson) {
-        this.id = id;
-        this.validFrom = validFrom;
-        this.validTo = validTo;
-        this.publishedOn = publishedOn;
+        super(id, validFrom, validTo, publishedOn);
         this.configurationJson = configurationJson;
     }
 

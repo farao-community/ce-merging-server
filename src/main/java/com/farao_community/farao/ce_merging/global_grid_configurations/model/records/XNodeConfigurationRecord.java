@@ -4,9 +4,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.xnodes;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 
@@ -26,10 +26,7 @@ public class XNodeConfigurationRecord extends AbstractGridConfigurationRecord {
                                     final LocalDateTime validTo,
                                     final LocalDateTime publishedOn,
                                     final List<XnodeDto> xNodeList) {
-        this.id = id;
-        this.validFrom = validFrom;
-        this.validTo = validTo;
-        this.publishedOn = publishedOn;
+        super(id, validFrom, validTo, publishedOn);
         this.xNodeList = xNodeList;
     }
 

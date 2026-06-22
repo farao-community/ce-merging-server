@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.AbstractGridConfigurationRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;

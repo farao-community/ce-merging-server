@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.AbstractGridConfigurationRecord;
 import org.springframework.data.repository.CrudRepository;
 
 import java.time.LocalDateTime;

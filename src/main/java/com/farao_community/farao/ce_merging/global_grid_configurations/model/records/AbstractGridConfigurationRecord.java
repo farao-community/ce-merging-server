@@ -1,17 +1,29 @@
-package com.farao_community.farao.ce_merging.global_grid_configurations.model;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 import java.time.LocalDateTime;
 
-@Entity
+@MappedSuperclass
 public abstract class AbstractGridConfigurationRecord {
     @Id
     protected String id;
     protected LocalDateTime validFrom;
     protected LocalDateTime validTo;
     protected LocalDateTime publishedOn;
+
+    protected AbstractGridConfigurationRecord(final String id,
+                                              final LocalDateTime validFrom,
+                                              final LocalDateTime validTo,
+                                              final LocalDateTime publishedOn) {
+        this.id = id;
+        this.validFrom = validFrom;
+        this.validTo = validTo;
+        this.publishedOn = publishedOn;
+    }
+
+    protected AbstractGridConfigurationRecord() {}
 
     public String getId() {
         return id;

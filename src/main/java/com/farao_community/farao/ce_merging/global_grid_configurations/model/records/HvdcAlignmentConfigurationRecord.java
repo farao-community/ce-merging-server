@@ -4,9 +4,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.hvdc_alignment;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.AbstractGridConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 
@@ -37,19 +38,14 @@ public class HvdcAlignmentConfigurationRecord extends AbstractGridConfigurationR
                                             final List<ZeroFlowNodeDto> zeroFlowNodeDtos,
                                             final List<String> dkHvdcXnodes,
                                             final String defaultSlackNode) {
-        this.id = id;
-        this.validFrom = validFrom;
-        this.validTo = validTo;
-        this.publishedOn = publishedOn;
+        super(id,validFrom, validTo, publishedOn);
         this.hvdcXNodeAlignmentCouplesDto = hvdcXNodeAlignmentCouplesDto;
         this.zeroFlowNodeDtos = zeroFlowNodeDtos;
         this.dkHvdcXnodes = dkHvdcXnodes;
         this.defaultSlackNode = defaultSlackNode;
     }
 
-    public HvdcAlignmentConfigurationRecord() {
-
-    }
+    public HvdcAlignmentConfigurationRecord() {}
 
     public String getDefaultSlackNode() {
         return defaultSlackNode;

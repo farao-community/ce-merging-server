@@ -4,14 +4,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.hvdc_alignment;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
 import jakarta.persistence.Embeddable;
 
-import java.io.Serializable;
-
 @Embeddable
-public class HvdcAlignmentXNodeCouple implements Serializable {
+public class HvdcAlignmentXNodeCoupleDto {
     private String referenceXNode;
     private String recessiveXNode;
 

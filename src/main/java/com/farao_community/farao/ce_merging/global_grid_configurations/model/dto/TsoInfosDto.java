@@ -4,26 +4,26 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.region_eic;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 import java.io.Serializable;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NAME;
-import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
-@Table(name = "tsoinfos")
-public class TsoInfos implements Serializable {
+@Table(name = "tsoinfosdto")
+public class TsoInfosDto implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long ref;
 
     @Column(name = NAME)
@@ -33,16 +33,16 @@ public class TsoInfos implements Serializable {
     @Column(name = "eic")
     private String eic;
 
-    public Long getRef() {
-        return ref;
-    }
-
     public String getName() {
         return name;
     }
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public Long getRef() {
+        return ref;
     }
 
     public String getEic() {
