@@ -35,6 +35,11 @@ public final class CeMergingConstants {
     public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
+    public static final String UCTE_FORMAT = "UCTE";
+    public static final String DK_COUNTRY_CODE = "D1";
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
+    public static final String DK_HVDC_XNODES_PROPERTY = "dk.hvdc.xnodes";
+    public static final String DK_NAMING_STRATEGY = "DKNamingStrategy";
 
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
