@@ -11,6 +11,7 @@ import com.farao_community.farao.ce_merging.common.logs.LogsCustomisationService
 import com.farao_community.farao.ce_merging.merging.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.json.JsonLoadFlowParameters;
 import org.springframework.core.annotation.Order;
@@ -41,8 +42,8 @@ public class O0GridConfigurationService extends AbstractMergingService {
     }
 
     private static void setLoadFlowParameters(final MergingTask task) {
-        final String acConfigPath = task.getConfigurations().getAcLoadFlowParameters().getPath();
-        final LoadFlowParameters loadFlowParameters = Optional.ofNullable(acConfigPath)
+        final LoadFlowParameters loadFlowParameters = Optional.ofNullable(task.getConfigurations().getAcLoadFlowParameters())
+            .map(SavedFile::getPath)
             .map(Paths::get)
             .map(JsonLoadFlowParameters::read)
             .orElse(LoadFlowParameters.load());

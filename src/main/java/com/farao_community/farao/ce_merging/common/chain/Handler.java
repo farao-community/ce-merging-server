@@ -12,5 +12,8 @@ package com.farao_community.farao.ce_merging.common.chain;
  */
 public interface Handler<T> {
 
+    /**
+     * @return true to stop chain processing here, false to continue with the next handler
+     */
     boolean handle(final T request);
 }

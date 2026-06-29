@@ -7,15 +7,19 @@
 package com.farao_community.farao.ce_merging.merging.task.enums;
 
 import org.junit.jupiter.api.Test;
-import test_utils.GetterSetterVerifier;
+
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class ArtifactTypeTest {
 
     @Test
-    void shouldHaveGetters() {
-        GetterSetterVerifier
-            .forClass(ArtifactType.class)
-            .verify();
+    void shouldExposeExpectedMetadata() {
+        assertEquals("xnodesInformation.json", XNODES_INFORMATION_FILE.getFileName());
+        assertEquals("xnodes-information", XNODES_INFORMATION_FILE.getLocation());
+        assertEquals("cgmNetPositions.json", CGM_NET_POSITIONS_FILE.getFileName());
+        assertEquals("cgm-net-positions", CGM_NET_POSITIONS_FILE.getLocation());
     }
 
 }
