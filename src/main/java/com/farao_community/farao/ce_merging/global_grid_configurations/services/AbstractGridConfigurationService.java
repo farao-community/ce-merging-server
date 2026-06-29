@@ -54,14 +54,14 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
     }
 
     @SuppressWarnings("unchecked")
-    private Class<R> getJsonConfigClass() {
+    private Class<R> getRecordClass() {
         // [0] because the classes are <R,C>
         return (Class<R>) ((ParameterizedType) getClass()
-            .getGenericSuperclass()).getActualTypeArguments()[1];
+            .getGenericSuperclass()).getActualTypeArguments()[0];
     }
 
     protected InputStream getDefaultConfigFileStream() throws IOException {
-        final String configFileName = DefaultConfigFileNameFactory.getDefaultConfigFileName(getJsonConfigClass());
+        final String configFileName = DefaultConfigFileNameFactory.getDefaultConfigFileName(getRecordClass());
         return new ClassPathResource(DEFAULT_CONFIGURATIONS_DIR.formatted(configFileName)).getInputStream();
     }
 
