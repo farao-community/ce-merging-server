@@ -126,7 +126,9 @@ public class MergingTaskManagementService {
     }
 
     public JsonApiDocument getAllTasks() {
-        return JsonApiDocument.fromDataList(mapper.mergingTasksToMergingTasksDto(repository.findAll()));
+        final Iterable<MergingTask> tasks = repository.findAll();
+        tasks.forEach(this::handleDaylightSavingTime);
+        return JsonApiDocument.fromDataList(mapper.mergingTasksToMergingTasksDto(tasks));
     }
 
     public void deleteTask(final Long taskId) {
