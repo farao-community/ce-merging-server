@@ -8,8 +8,11 @@ package test_utils;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -96,6 +99,9 @@ public final class CeTestUtils {
                                                12, 0, 0, 0,
                                                UTC));
         task.setInputs(inputs);
+        task.setArtifacts(new Artifacts());
+        task.setConfigurations(new Configurations());
+        task.setOutputs(new Outputs());
 
         return task;
     }

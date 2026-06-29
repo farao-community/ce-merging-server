@@ -7,17 +7,25 @@
 package com.farao_community.farao.ce_merging.merging.process;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.stubbing.Answer;
 import org.springframework.boot.test.context.SpringBootTest;
+import test_utils.assertions.CeTaskAssert;
 
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.anyTask;
+import static test_utils.CeTestUtils.taskWithIdAndStatus;
 
 @SpringBootTest
 class O0GridConfigurationServiceTest {
@@ -29,14 +37,25 @@ class O0GridConfigurationServiceTest {
 
     @Test
     void shouldSetDefaultLoadFlowParameters() {
-        final MergingTask task = new MergingTask();
-        task.setId(1L);
-        final Configurations configurations = new Configurations();
-        configurations.setAcLoadFlowParameters(new SavedFile());
-        task.setConfigurations(configurations);
+        final MergingTask task = taskWithIdAndStatus(1L, CREATED);
         service.handle(task);
-
         assertThat(task.getConfigurations().getLoadFlowParameters()).isNotNull();
         verify(repository).save(anyTask());
+    }
+
+    @Test
+    void shouldSaveArtifact() {
+        // must be moved later in a more suitable test class
+        try (final MockedStatic<JsonUtils> jsonUtils = mockStatic(JsonUtils.class)) {
+            when(configuration.getArtifactsDirectoryPath(anyTask())).thenReturn("artifacts");
+            final MergingTask task = taskWithIdAndStatus(1L, CREATED);
+
+            jsonUtils.when(() -> JsonUtils.writeInPath(any(), any(), any()))
+                .thenAnswer((Answer<Void>) invocation -> null);
+
+            service.saveArtifactFile(XNODES_INFORMATION_FILE, "TEST", task);
+
+            CeTaskAssert.assertThat(task).hasArtifact(XNODES_INFORMATION_FILE);
+        }
     }
 }
