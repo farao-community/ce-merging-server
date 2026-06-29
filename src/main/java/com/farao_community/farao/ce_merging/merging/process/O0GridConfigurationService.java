@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.merging.process;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.logs.LogsCustomisationService;
-import com.farao_community.farao.ce_merging.merging.config.MergingStep;
+import com.farao_community.farao.ce_merging.merging.enums.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -21,11 +21,11 @@ import java.util.Optional;
 
 @Order(0)
 @Service
-public class GridConfigurationService extends AbstractMergingService {
+public class O0GridConfigurationService extends AbstractMergingService {
 
-    protected GridConfigurationService(final MergingTaskRepository tasksRepository,
-                                       final CeMergingConfiguration configuration,
-                                       final LogsCustomisationService logsCustomisationService) {
+    protected O0GridConfigurationService(final MergingTaskRepository tasksRepository,
+                                         final CeMergingConfiguration configuration,
+                                         final LogsCustomisationService logsCustomisationService) {
         super(tasksRepository, configuration, logsCustomisationService);
     }
 

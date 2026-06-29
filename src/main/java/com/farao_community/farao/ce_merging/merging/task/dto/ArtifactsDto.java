@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.dto;
 
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.farao_community.farao.ce_merging.merging.enums.ArtifactType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.ElementCollection;
 

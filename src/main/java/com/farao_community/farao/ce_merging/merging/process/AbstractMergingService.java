@@ -11,11 +11,11 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.logs.LogsCustomisationService;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import com.farao_community.farao.ce_merging.merging.config.MergingStep;
+import com.farao_community.farao.ce_merging.merging.enums.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.farao_community.farao.ce_merging.merging.enums.ArtifactType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -50,23 +50,16 @@ public abstract class AbstractMergingService implements Handler<MergingTask> {
 
     @Override
     public boolean handle(final MergingTask task) {
+        final MergingStep step = getStep();
         try {
-            logsCustomisationService.setExtraFieldsInLogsMdc(task.getId(), getStep().name());
+            logsCustomisationService.setExtraFieldsInLogsMdc(task.getId(), step.name());
             handleStep(task);
             tasksRepository.save(task);
         } catch (final Exception e) {
-            return true;
+            throw new CeMergingException("error in step %d (%s)".formatted(step.ordinal(), step.name()), e);
         }
 
         return false;
-    }
-
-    public MergingTaskRepository getTasksRepository() {
-        return tasksRepository;
-    }
-
-    public CeMergingConfiguration getConfiguration() {
-        return configuration;
     }
 
     protected <T> void saveArtifactFile(final ArtifactType fileType,

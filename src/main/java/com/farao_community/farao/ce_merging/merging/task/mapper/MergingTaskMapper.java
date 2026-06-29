@@ -11,7 +11,7 @@ import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.farao_community.farao.ce_merging.merging.enums.ArtifactType;
 import org.mapstruct.Mapper;
 
 import java.util.Optional;

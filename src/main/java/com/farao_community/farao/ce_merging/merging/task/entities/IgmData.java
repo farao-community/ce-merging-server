@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
-import com.farao_community.farao.ce_merging.merging.task.enums.IgmType;
+import com.farao_community.farao.ce_merging.merging.enums.IgmType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToOne;
 
