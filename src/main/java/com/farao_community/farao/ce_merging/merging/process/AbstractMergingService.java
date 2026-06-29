@@ -20,9 +20,11 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATETIME_FMT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NUMBER_FORMAT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.STRING_FORMAT;
 import static java.util.Locale.FRANCE;
 
 public abstract class AbstractMergingService implements Handler<MergingTask> {
@@ -35,20 +37,6 @@ public abstract class AbstractMergingService implements Handler<MergingTask> {
                                      final CeMergingConfiguration configuration) {
         this.tasksRepository = tasksRepository;
         this.configuration = configuration;
-    }
-
-    protected abstract void handleStep(final MergingTask task);
-
-    @Override
-    public boolean handle(final MergingTask task) {
-        try {
-            handleStep(task);
-            tasksRepository.save(task);
-        } catch (final Exception e) {
-            throw new CeMergingException("error while running task %d".formatted(task.getId()), e);
-        }
-
-        return false;
     }
 
     protected <T> void saveArtifactFile(final ArtifactType fileType,
@@ -72,12 +60,12 @@ public abstract class AbstractMergingService implements Handler<MergingTask> {
 
     private String getFileName(final ArtifactType fileType, final MergingTask task) {
         final ZonedDateTime targetZdtParis = task.getInputs().getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
-        final String dateAndTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withLocale(FRANCE).format(targetZdtParis);
+        final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
         final String fileName = fileType.getFileName();
 
-        if (fileName.contains("%s") && fileName.contains("%d")) {
+        if (fileName.contains(STRING_FORMAT) && fileName.contains(NUMBER_FORMAT)) {
             return fileName.formatted(dateAndTime, targetZdtParis.getDayOfWeek().getValue());
-        } else if (fileName.contains("%s")) {
+        } else if (fileName.contains(STRING_FORMAT)) {
             return fileName.formatted(dateAndTime);
         } else {
             return fileName;

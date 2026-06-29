@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -28,9 +29,16 @@ public class O0GridConfigurationService extends AbstractMergingService {
     }
 
     @Override
-    protected void handleStep(final MergingTask task) {
+    public boolean handle(final MergingTask task) {
         // most configuration is missing, to be done when grid configurations are merged
-        setLoadFlowParameters(task);
+
+        try {
+            setLoadFlowParameters(task);
+            tasksRepository.save(task);
+        } catch (final Exception e) {
+            throw new CeMergingException("error while setting configurations of task %d".formatted(task.getId()), e);
+        }
+        return false;
     }
 
     private static void setLoadFlowParameters(final MergingTask task) {
