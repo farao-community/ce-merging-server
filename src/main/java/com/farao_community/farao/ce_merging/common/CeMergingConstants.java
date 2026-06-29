@@ -35,6 +35,7 @@ public final class CeMergingConstants {
     public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
+    public static final String UCT_SUFFIX = ".uct";
 
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;

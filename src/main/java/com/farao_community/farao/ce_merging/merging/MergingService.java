@@ -6,12 +6,20 @@
  */
 package com.farao_community.farao.ce_merging.merging;
 
+import com.farao_community.farao.ce_merging.common.chain.Chain;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.springframework.stereotype.Service;
 
 @Service
 public class MergingService {
+
+    private final Chain<MergingTask> mergingTaskChain;
+
+    public MergingService(final Chain<MergingTask> mergingTaskChain) {
+        this.mergingTaskChain = mergingTaskChain;
+    }
+
     public void run(final MergingTask task) {
-        // to be implemented later, here to have something to call from task management service
+        this.mergingTaskChain.handle(task);
     }
 }

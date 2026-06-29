@@ -36,11 +36,10 @@ public final class ChainBuilder<T> {
             this.current = current;
         }
 
-        public SuccessorBuilder next(final Handler<T> next) {
+        public void next(final Handler<T> next) {
             final HandlerImpl<T> successorWrapper = new HandlerImpl<>(next);
             current.setNext(successorWrapper);
             current = successorWrapper;
-            return this;
         }
 
         public Chain<T> build() {
@@ -48,13 +47,7 @@ public final class ChainBuilder<T> {
         }
     }
 
-    private static final class ChainImpl<T> implements Chain<T> {
-
-        private final Handler<T> first;
-
-        private ChainImpl(final Handler<T> first) {
-            this.first = first;
-        }
+    private record ChainImpl<T>(Handler<T> first) implements Chain<T> {
 
         @Override
         public void handle(final T t) {
@@ -65,7 +58,7 @@ public final class ChainBuilder<T> {
     private static final class HandlerImpl<T> implements Handler<T> {
 
         private final Handler<T> delegate;
-        private       Handler<T> next;
+        private Handler<T> next;
 
         private HandlerImpl(final Handler<T> delegate) {
             this.delegate = delegate;
@@ -78,7 +71,7 @@ public final class ChainBuilder<T> {
         @Override
         public boolean handle(final T t) {
             return delegate.handle(t) ||
-                       next != null && next.handle(t);
+                   next != null && next.handle(t);
         }
     }
 }
