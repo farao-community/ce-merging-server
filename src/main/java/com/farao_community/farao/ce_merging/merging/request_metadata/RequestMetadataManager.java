@@ -46,7 +46,8 @@ public class RequestMetadataManager {
         "generation-load-shift-keys", Inputs::getGenerationLoadShiftKeys,
         "external-constraints", Inputs::getExternalConstraints,
         "feasibility-ranges", Inputs::getFeasibilityRanges,
-        "net-position-forecast", Inputs::getNetPositionForecast);
+        "net-position-forecast", Inputs::getNetPositionForecast,
+        "dc-links", Inputs::getDcLinks);
 
     private static final Map<String, Function<Configurations, SavedFile>> PARAMETER_GETTERS_BY_LOCATION = Map.of(
         "dc-load-flow-parameters", Configurations::getDcLoadFlowParameters,
@@ -117,7 +118,7 @@ public class RequestMetadataManager {
         }
     }
 
-    private Inputs getTaskInputs(final Long taskId) {
+    private Inputs getTaskInputs(final long taskId) {
         final Inputs inputs = getRequestInputs();
         final String inputsLocation = TASKS + taskId + "/inputs/";
         // update paths to make them absolute & location for GET output
@@ -130,7 +131,7 @@ public class RequestMetadataManager {
         return inputs;
     }
 
-    private Configurations getTaskConfigurations(final Long taskId) {
+    private Configurations getTaskConfigurations(final long taskId) {
         final Configurations configs = getRequestData().getConfigurations();
         final String configLocation = TASKS + taskId + "/configurations/";
 

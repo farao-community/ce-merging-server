@@ -14,12 +14,15 @@ import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import org.mapstruct.Mapper;
 
+import java.util.List;
 import java.util.Optional;
 
 @Mapper(componentModel = "spring")
 public interface MergingTaskMapper {
 
     MergingTaskDto mergingTaskToMergingTaskDto(final MergingTask mergingTask);
+
+    List<MergingTaskDto> mergingTasksToMergingTasksDto(final Iterable<MergingTask> coreMergingTaskEntity);
 
     default ArtifactsDto artifactsToArtifactsDto(final Artifacts artifacts) {
         final ArtifactsDto mapped = new ArtifactsDto();
