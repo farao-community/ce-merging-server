@@ -118,7 +118,7 @@ public class RequestMetadataManager {
         }
     }
 
-    private Inputs getTaskInputs(final long taskId) {
+    private Inputs getTaskInputs(final Long taskId) {
         final Inputs inputs = getRequestInputs();
         final String inputsLocation = TASKS + taskId + "/inputs/";
         // update paths to make them absolute & location for GET output
@@ -131,7 +131,7 @@ public class RequestMetadataManager {
         return inputs;
     }
 
-    private Configurations getTaskConfigurations(final long taskId) {
+    private Configurations getTaskConfigurations(final Long taskId) {
         final Configurations configs = getRequestData().getConfigurations();
         final String configLocation = TASKS + taskId + "/configurations/";
 
