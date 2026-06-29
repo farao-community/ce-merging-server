@@ -54,9 +54,10 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
     }
 
     @SuppressWarnings("unchecked")
-    private Class<C> getJsonConfigClass() {
-        return (Class<C>) ((ParameterizedType) getClass()
-            .getGenericSuperclass()).getActualTypeArguments()[0];
+    private Class<R> getJsonConfigClass() {
+        // [0] because the classes are <R,C>
+        return (Class<R>) ((ParameterizedType) getClass()
+            .getGenericSuperclass()).getActualTypeArguments()[1];
     }
 
     protected InputStream getDefaultConfigFileStream() throws IOException {
