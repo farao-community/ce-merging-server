@@ -9,16 +9,13 @@ package com.farao_community.farao.ce_merging.merging.process;
 import com.farao_community.farao.ce_merging.common.chain.Handler;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.logs.LogsCustomisationService;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import com.farao_community.farao.ce_merging.merging.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.annotation.Order;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,35 +25,27 @@ import java.time.format.DateTimeFormatter;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 import static java.util.Locale.FRANCE;
 
-@Order(0)
 public abstract class AbstractMergingService implements Handler<MergingTask> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMergingService.class);
     protected final MergingTaskRepository tasksRepository;
     protected final CeMergingConfiguration configuration;
-    protected final LogsCustomisationService logsCustomisationService;
 
     protected AbstractMergingService(final MergingTaskRepository tasksRepository,
-                                     final CeMergingConfiguration configuration,
-                                     final LogsCustomisationService logsCustomisationService) {
+                                     final CeMergingConfiguration configuration) {
         this.tasksRepository = tasksRepository;
         this.configuration = configuration;
-        this.logsCustomisationService = logsCustomisationService;
     }
-
-    protected abstract MergingStep getStep();
 
     protected abstract void handleStep(final MergingTask task);
 
     @Override
     public boolean handle(final MergingTask task) {
-        final MergingStep step = getStep();
         try {
-            logsCustomisationService.setExtraFieldsInLogsMdc(task.getId(), step.name());
             handleStep(task);
             tasksRepository.save(task);
         } catch (final Exception e) {
-            throw new CeMergingException("error in step %d (%s)".formatted(step.ordinal(), step.name()), e);
+            throw new CeMergingException("error while running task %d".formatted(task.getId()), e);
         }
 
         return false;
@@ -75,9 +64,7 @@ public abstract class AbstractMergingService implements Handler<MergingTask> {
             task.getArtifacts().putFile(fileType, artifactFile);
             LOGGER.info("File '{}' is saved in task {} artifacts", fileName, task.getId());
         } catch (final Exception e) {
-            final String errorMessage = String.format(
-                "error while saving artifact for step %d (%s)".formatted(getStep().ordinal(), getStep().name())
-            );
+            final String errorMessage = "error while saving %s artifact".formatted(fileType.name());
             LOGGER.error(errorMessage);
             throw new CeMergingException(errorMessage, e);
         }

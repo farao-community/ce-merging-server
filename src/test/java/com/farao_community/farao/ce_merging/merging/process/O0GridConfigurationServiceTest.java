@@ -7,7 +7,6 @@
 package com.farao_community.farao.ce_merging.merging.process;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.logs.LogsCustomisationService;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
@@ -16,8 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static test_utils.CeTestUtils.anyTask;
@@ -27,9 +24,8 @@ class O0GridConfigurationServiceTest {
 
     private final MergingTaskRepository repository = mock(MergingTaskRepository.class);
     private final CeMergingConfiguration configuration = mock(CeMergingConfiguration.class);
-    private final LogsCustomisationService logsService = mock(LogsCustomisationService.class);
 
-    O0GridConfigurationService service = new O0GridConfigurationService(repository, configuration, logsService);
+    O0GridConfigurationService service = new O0GridConfigurationService(repository, configuration);
 
     @Test
     void shouldSetDefaultLoadFlowParameters() {
@@ -41,7 +37,6 @@ class O0GridConfigurationServiceTest {
         service.handle(task);
 
         assertThat(task.getConfigurations().getLoadFlowParameters()).isNotNull();
-        verify(logsService).setExtraFieldsInLogsMdc(anyLong(), anyString());
         verify(repository).save(anyTask());
     }
 }

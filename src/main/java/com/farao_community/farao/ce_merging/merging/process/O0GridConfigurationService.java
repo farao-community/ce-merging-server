@@ -7,8 +7,6 @@
 package com.farao_community.farao.ce_merging.merging.process;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.logs.LogsCustomisationService;
-import com.farao_community.farao.ce_merging.merging.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -25,14 +23,8 @@ import java.util.Optional;
 public class O0GridConfigurationService extends AbstractMergingService {
 
     protected O0GridConfigurationService(final MergingTaskRepository tasksRepository,
-                                         final CeMergingConfiguration configuration,
-                                         final LogsCustomisationService logsCustomisationService) {
-        super(tasksRepository, configuration, logsCustomisationService);
-    }
-
-    @Override
-    protected MergingStep getStep() {
-        return MergingStep.CONFIGURATIONS;
+                                         final CeMergingConfiguration configuration) {
+        super(tasksRepository, configuration);
     }
 
     @Override
