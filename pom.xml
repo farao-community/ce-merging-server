@@ -25,7 +25,6 @@
         <powsybl.rte.core.version>4.11.1</powsybl.rte.core.version>
         <assertj-core.version>3.26.3</assertj-core.version>
     </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -61,6 +60,15 @@
                             <version>${org.mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>com.powsybl:powsybl-config-classic</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
                 </configuration>
             </plugin>
         </plugins>

@@ -8,6 +8,7 @@ package test_utils.assertions;
 
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.util.CanIgnoreReturnValue;
@@ -28,6 +29,14 @@ public class CeTaskAssert extends AbstractAssert<CeTaskAssert, MergingTask> {
     public CeTaskAssert hasStatus(final TaskStatus expected) {
         if (actual.getStatus() != expected) {
             failWithActualExpectedAndMessage(actual.getStatus(), expected, "Unexpected task status");
+        }
+        return this;
+    }
+
+    @CanIgnoreReturnValue
+    public CeTaskAssert hasArtifact(final ArtifactType type) {
+        if (actual.getArtifacts().getFile(type) == null) {
+            failWithMessage("task does not have artifact %s".formatted(type.name()));
         }
         return this;
     }
