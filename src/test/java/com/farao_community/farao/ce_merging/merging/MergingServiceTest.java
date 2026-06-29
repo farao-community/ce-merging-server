@@ -10,7 +10,7 @@ import com.farao_community.farao.ce_merging.common.chain.Chain;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.junit.jupiter.api.Test;
 
-import static com.farao_community.farao.ce_merging.merging.enums.TaskStatus.CREATED;
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.mock;
 import static test_utils.CeTestUtils.taskWithIdAndStatus;

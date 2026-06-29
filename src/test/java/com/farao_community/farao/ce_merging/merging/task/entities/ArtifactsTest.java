@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import org.junit.jupiter.api.Test;
 
-import static com.farao_community.farao.ce_merging.merging.enums.ArtifactType.XNODES_INFORMATION_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ArtifactsTest {

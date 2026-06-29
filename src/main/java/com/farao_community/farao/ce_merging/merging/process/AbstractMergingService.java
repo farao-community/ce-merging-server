@@ -11,11 +11,11 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.logs.LogsCustomisationService;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import com.farao_community.farao.ce_merging.merging.enums.MergingStep;
+import com.farao_community.farao.ce_merging.merging.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.enums.ArtifactType;
+import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -75,8 +75,9 @@ public abstract class AbstractMergingService implements Handler<MergingTask> {
             task.getArtifacts().putFile(fileType, artifactFile);
             LOGGER.info("File '{}' is saved in task {} artifacts", fileName, task.getId());
         } catch (final Exception e) {
-            final String errorMessage = String.format("German pre-merge failed for task %d with target date %s, cause: %s",
-                                                      task.getId(), task.getInputs().getTargetDate(), e.getMessage());
+            final String errorMessage = String.format(
+                "error while saving artifact for step %d (%s)".formatted(getStep().ordinal(), getStep().name())
+            );
             LOGGER.error(errorMessage);
             throw new CeMergingException(errorMessage, e);
         }

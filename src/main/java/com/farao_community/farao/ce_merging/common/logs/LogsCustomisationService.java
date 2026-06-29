@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 public class LogsCustomisationService {
 
     private static final String TASK_ID_EXTRA_FIELD = "taskId";
-    private static final String TSO_EXTRA_FIELD = "tso";
     private static final String MERGING_STEP_EXTRA_FIELD = "merging-step";
 
     private final Tracer tracer;
@@ -36,18 +35,6 @@ public class LogsCustomisationService {
 
         BaggageField mergingStepField = BaggageField.getByName(currentContext(), MERGING_STEP_EXTRA_FIELD);
         mergingStepField.updateValue(mergingStepValue);
-    }
-
-    public void setTsoExtraFieldInLogsMdc(final String tso) {
-        MDC.put(TSO_EXTRA_FIELD, tso);
-        BaggageField tsoField = BaggageField.getByName(currentContext(), TSO_EXTRA_FIELD);
-        tsoField.updateValue(tso);
-    }
-
-    public void removeTsoFieldFromMdc() {
-        MDC.remove(TSO_EXTRA_FIELD);
-        BaggageField tsoField = BaggageField.getByName(currentContext(), TSO_EXTRA_FIELD);
-        tsoField.updateValue("");
     }
 
     private TraceContext currentContext() {

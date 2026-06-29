@@ -16,7 +16,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static test_utils.CeTestUtils.anyTask;
 
 @SpringBootTest
 class O0GridConfigurationServiceTest {
@@ -37,5 +41,7 @@ class O0GridConfigurationServiceTest {
         service.handle(task);
 
         assertThat(task.getConfigurations().getLoadFlowParameters()).isNotNull();
+        verify(logsService).setExtraFieldsInLogsMdc(anyLong(), anyString());
+        verify(repository).save(anyTask());
     }
 }

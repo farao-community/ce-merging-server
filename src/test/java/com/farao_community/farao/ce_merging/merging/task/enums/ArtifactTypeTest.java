@@ -4,16 +4,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.enums;
+package com.farao_community.farao.ce_merging.merging.task.enums;
 
 import org.junit.jupiter.api.Test;
 import test_utils.GetterSetterVerifier;
 
-class MergingStepTest {
+class ArtifactTypeTest {
+
     @Test
     void shouldHaveGetters() {
         GetterSetterVerifier
-            .forClass(MergingStep.class)
+            .forClass(ArtifactType.class)
             .verify();
     }
+
 }
