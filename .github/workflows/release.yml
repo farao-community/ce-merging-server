@@ -69,6 +69,14 @@ jobs:
       - name: Re-build with Maven to avoid multiple .jar archives
         run: mvn --batch-mode -Pdefault,coverage clean install -DskipTests
 
+      - name: Build and publish Docker image
+        uses: elgohr/Publish-Docker-Github-Action@v5
+        with:
+          name: farao/ce-merging-server
+          username: farao
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          tags: v${{ github.event.inputs.releaseVersion }}
+
       - name: Change Maven version to next version
         run: mvn --batch-mode versions:set -DgenerateBackupPoms=false -DnewVersion=$NEXT_VERSION-SNAPSHOT
         env:
