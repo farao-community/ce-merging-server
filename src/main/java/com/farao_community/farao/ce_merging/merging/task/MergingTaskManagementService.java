@@ -475,7 +475,6 @@ public class MergingTaskManagementService {
 
     private IgmData getIgmData(final Long taskId, final String areaId) {
         final MergingTask task = getTaskById(taskId);
-        return task.getInputs().getIgms().stream().filter(igm -> igm.getCountry().equals(areaId)).findFirst().orElseThrow(() -> new CeMergingException(String.format("Area '%s' not found in task %d inputs", areaId, taskId)));
+        return task.getInputs().getIgm(areaId);
     }
-
 }
