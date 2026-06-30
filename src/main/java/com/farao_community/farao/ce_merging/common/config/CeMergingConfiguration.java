@@ -64,8 +64,14 @@ public class CeMergingConfiguration {
         return getDirectoryPath(task, ARTIFACTS_DIR);
     }
 
-    private String getDirectoryPath(final MergingTask task, final String directory) {
+    public String getDirectoryPath(final MergingTask task, final String directory) {
         return resolveTaskDirInRoot(task, directory, ceMergingRoot);
+    }
+
+    public String getTaskDirectoryPath(final MergingTask task) {
+        return Path.of(ceMergingRoot)
+                .resolve(task.getId().toString())
+                .toString();
     }
 
     private String getDailyDirectoryPath(final MergingTask task, final String directory) {

@@ -14,7 +14,8 @@
         "generationLoadShiftKeysFilePath" : "GLSK.CWE_GSK",
         "externalConstraintsFilePath" : "EC.EC",
         "feasibilityRangesFilePath" : "FR.xml",
-        "netPositionForecastFilePath" : "NPF.PEVF"
+        "netPositionForecastFilePath" : "NPF.PEVF",
+        "dcLinksFilePath" : "DCLinks.CGMES_EQX"
       }
     },
     "configurations" : {
