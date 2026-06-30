@@ -66,18 +66,17 @@ public class BciProcess {
     }
 
     public void run() {
-        importRequiredData();
+        importFiles();
         computeBci();
         createBciOutput();
         updateOutputTask();
     }
 
-    private void importRequiredData() {
+    private void importFiles() {
         importForecastNetPositionFile();
         computeInRegionNetPositions();
-        if (task.getBciInputs().getAlegroNetPositionsPath() != null) {
-            updateInRegionNetPositions();
-        }
+        Optional.ofNullable(task.getBciInputs().getAlegroNetPositionsPath())
+            .ifPresent(this::updateInRegionNetPositions);
         importRegionFeasibilityRanges();
     }
 
@@ -87,8 +86,8 @@ public class BciProcess {
         initialGlobalNetPositions.forEach((k, v) -> initialRegionNetPositions.put(k, v - outRegionNetPositions.getOrDefault(k, 0.)));
     }
 
-    private void updateInRegionNetPositions() {
-        AlegroData alegroData = JsonUtils.read(AlegroData.class, task.getBciInputs().getAlegroNetPositionsPath());
+    private void updateInRegionNetPositions(final String alegroNetPositionsPath) {
+        AlegroData alegroData = JsonUtils.read(AlegroData.class, alegroNetPositionsPath);
         Map<String, Interval> externalContraintsMapForAlegro = getExternalConstraintsForAlegro();
         double maxEc = getCommonLimit(alegroData, externalContraintsMapForAlegro);
         double minEc = -maxEc;
