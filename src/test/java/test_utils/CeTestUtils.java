@@ -45,6 +45,7 @@ public final class CeTestUtils {
     public static final String METADATA = "request-metadata/metadata.json";
     public static final String MIME_ZIP = "application/zip";
     public static final Long ID_1 = 1L;
+    public static final Long ID_2 = 2L;
 
     public static final ServiceIOException S_IO_EXCEPTION = new ServiceIOException("Test");
 

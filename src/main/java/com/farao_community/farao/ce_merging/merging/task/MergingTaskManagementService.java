@@ -32,7 +32,6 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
@@ -138,7 +137,7 @@ public class MergingTaskManagementService {
             // Delete entity in database
             repository.deleteById(taskId);
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new CeMergingException("Error during merging task delete", e);
         }
     }
 
@@ -380,6 +379,15 @@ public class MergingTaskManagementService {
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+                   MERGING SUPERVISOR
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
+    public byte[] exportMergingLogs(long taskId) {
+        //TODO
+        return null;
+    }
+
+    /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
                    INTERNAL (PRIVATE)
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
@@ -466,8 +474,8 @@ public class MergingTaskManagementService {
     }
 
     private IgmData getIgmData(final Long taskId, final String areaId) {
-        MergingTask task = getTaskById(taskId);
-        return task.getInputs().getIgms().stream().filter(igm -> igm.getCountry().equals(areaId)).findFirst().orElseThrow(() -> new CeMergingException(String.format("Area '%s' not found in task '%d' inputs", areaId, taskId)));
+        final MergingTask task = getTaskById(taskId);
+        return task.getInputs().getIgms().stream().filter(igm -> igm.getCountry().equals(areaId)).findFirst().orElseThrow(() -> new CeMergingException(String.format("Area '%s' not found in task %d inputs", areaId, taskId)));
     }
 
 }

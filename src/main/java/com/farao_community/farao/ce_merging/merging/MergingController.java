@@ -181,7 +181,7 @@ public class MergingController {
 
     @GetMapping(value = "/tasks/{taskId}/inputs/generation-load-shift-keys", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
     @Operation(tags = INPUTS_TAG,
-            summary = "Get the GLSK input of the merging task with ID {taskId}.")
+            summary = "Get the GLSK input of the merging task with given ID.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "GLSK data returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found.")
@@ -374,7 +374,7 @@ public class MergingController {
 
     @GetMapping(value = "/tasks/{taskId}/configurations/dc-load-flow-parameters", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
     @Operation(tags = TASK_MANAGEMENT_TAG,
-            summary = "Get the DC load flow parameters of the merging task with ID {taskId}.")
+            summary = "Get the DC load flow parameters of the merging task with given ID.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "The DC load flow parameters  returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or not reachable.")
@@ -407,7 +407,7 @@ public class MergingController {
 
     @GetMapping(value = "/tasks/{taskId}/configurations/balances-adjustment-parameters", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
     @Operation(tags = TASK_CONFIGURATIONS_TAG,
-            summary = "Get the balances adjustment parameters of the merging task with ID {taskId}.")
+            summary = "Get the balances adjustment parameters of the merging task with given ID.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "The Get the balances adjustment parameters  returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or not reachable.")
@@ -440,7 +440,7 @@ public class MergingController {
         @ApiResponse(responseCode = BAD_REQUEST, description = "Merging task with given ID has not been run"),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or German pre-merged IGM not available")
     })
-    public ResponseEntity<byte[]> getGermanPreMerge(@Parameter(description = "Merging task ID") @PathVariable final long taskId) throws IOException {
+    public ResponseEntity<byte[]> getGermanPreMerge(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
         return toAttachmentFileResponse(taskManager.getGermanPreMerge(taskId), "germanpremerged.uct");
     }
 
@@ -466,7 +466,7 @@ public class MergingController {
         @ApiResponse(responseCode = BAD_REQUEST, description = "Merging task with given ID has not been run"),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or topological merge artifact not available")
     })
-    public ResponseEntity<byte[]> getTopologicalMerge(@Parameter(description = "Merging task ID") @PathVariable final long taskId) throws IOException {
+    public ResponseEntity<byte[]> getTopologicalMerge(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
         return toAttachmentFileResponse(taskManager.getTopologicalMerge(taskId), "topologicalmerged.uct");
     }
 
@@ -478,7 +478,7 @@ public class MergingController {
         @ApiResponse(responseCode = BAD_REQUEST, description = "Merging task with given ID has not been run"),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or cgm after recessivity artifact not available")
     })
-    public ResponseEntity<byte[]> getCgmAfterRecessivity(@Parameter(description = "Merging task ID") @PathVariable final long taskId) throws IOException {
+    public ResponseEntity<byte[]> getCgmAfterRecessivity(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
         return toAttachmentFileResponse(taskManager.getCgmAfterRecessivity(taskId), "cgm-after-recessivity.uct");
     }
 
@@ -491,7 +491,7 @@ public class MergingController {
         @ApiResponse(responseCode = BAD_REQUEST, description = "Merging task with given ID has not been run"),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or cgm after pst-special-procedure artifact not available")
     })
-    public ResponseEntity<byte[]> getCgmAfterPstSpecialProcedure(@Parameter(description = "Merging task ID") @PathVariable final long taskId) throws IOException {
+    public ResponseEntity<byte[]> getCgmAfterPstSpecialProcedure(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
         return toAttachmentFileResponse(taskManager.getCgmAfterPstSpecialProcedure(taskId), "cgm-after-pst-special-procedure.uct");
     }
 
@@ -617,7 +617,7 @@ public class MergingController {
         @ApiResponse(responseCode = BAD_REQUEST, description = "Merging task with given ID has not been run"),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or CGM output of merging task not available")
     })
-    public ResponseEntity<byte[]> getBalancedCgm(@Parameter(description = "Merging task ID") @PathVariable final long taskId) throws IOException {
+    public ResponseEntity<byte[]> getBalancedCgm(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
         return toAttachmentFileResponse(taskManager.getBalancedCgm(taskId), "balancedcgm.uct");
     }
 
@@ -743,4 +743,15 @@ public class MergingController {
         return toAttachmentFileResponse(taskManager.getMergingLogs(taskId));
     }
 
+    @GetMapping(value = "/tasks/{taskId}/merging-supervisor/bci-logs", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
+    @Operation(tags = MERGING_SUPERVISOR_TAG,
+            summary = "Get the merging logs converted for the merging supervisor application of merging task with given ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Bci logs returned successfully"),
+        @ApiResponse(responseCode = "400", description = TASK_NOT_RUN),
+        @ApiResponse(responseCode = "404", description = "Merging task with given ID not found in the server, or merging logs not available")
+    })
+    public ResponseEntity exportBciLogs(@Parameter(description = "Merging task ID") @PathVariable long taskId) {
+        return toAttachmentFileResponse(taskManager.exportMergingLogs(taskId), "resultat_bci_nf.xml");
+    }
 }
