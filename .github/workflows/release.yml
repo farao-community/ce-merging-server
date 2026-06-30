@@ -70,7 +70,7 @@ jobs:
         run: mvn --batch-mode -Pdefault,coverage clean install -DskipTests
 
       - name: Build and publish Docker image
-        uses: elgohr/Publish-Docker-Github-Action@v5
+        uses: elgohr/Publish-Docker-Github-Action@1c2f28ccd9476e8a936ac9a1f287405504c93304
         with:
           name: farao/ce-merging-server
           username: farao
