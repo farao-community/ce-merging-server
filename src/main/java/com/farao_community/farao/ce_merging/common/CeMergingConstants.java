@@ -32,18 +32,18 @@ public final class CeMergingConstants {
     public static final String DAILY_OUTPUTS_DIR = "daily-outputs";
     public static final String DAILY_INPUTS_DIR = "daily-inputs";
     public static final String ARTIFACTS_DIR = "artifacts";
-    public static final String ID = "id";
-    public static final String NAME = "name";
+    public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";
+    public static final String MERGING_SUPERVISOR_TAG  = "Merging supervisor";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
-    public static final String CSV_SEPARATOR = ";";
-    public static final String ARROW = "->";
+    public static final String INPUTS_TAG = "Inputs";
+    public static final String GLOBAL_CONFIGURATIONS_TAG = "Global Configurations";
+    public static final String TASK_CONFIGURATIONS_TAG = "Task Configurations";
 
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
 
     // Date management
     public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
-    public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");
-    public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
+    public static final ZoneOffset DEFAULT_REQUEST_OFFSET = ZoneOffset.of("+01:00");
 }

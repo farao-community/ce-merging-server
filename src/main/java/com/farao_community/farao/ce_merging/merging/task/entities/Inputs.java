@@ -53,6 +53,8 @@ public class Inputs implements Serializable {
     private SavedFile feasibilityRanges = new SavedFile();
     @OneToOne(cascade = ALL)
     private SavedFile netPositionForecast = new SavedFile();
+    @OneToOne(cascade = ALL)
+    private SavedFile dcLinks = new SavedFile();
 
     public IgmData getIgm(final String country) {
         return igms.stream()
@@ -93,6 +95,10 @@ public class Inputs implements Serializable {
 
     public void setNetPositionForecastFilePath(final String filePath) {
         netPositionForecast.feedPathAndName(filePath);
+    }
+
+    public void setDcLinksFilePath(final String filePath) {
+        dcLinks.feedPathAndName(filePath);
     }
 
     public List<IgmData> getIgms() {
@@ -153,5 +159,13 @@ public class Inputs implements Serializable {
 
     public void setNetPositionForecast(final SavedFile netPositionForecast) {
         this.netPositionForecast = netPositionForecast;
+    }
+
+    public SavedFile getDcLinks() {
+        return dcLinks;
+    }
+
+    public void setDcLinks(final SavedFile dcLinks) {
+        this.dcLinks = dcLinks;
     }
 }
