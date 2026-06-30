@@ -43,7 +43,7 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
                                                         final OffsetDateTime validFrom,
                                                         final OffsetDateTime validTo) throws IOException;
 
-    protected R findLastPublishedValid(final LocalDateTime validityDate) {
+    protected R findLatestPublished(final LocalDateTime validityDate) {
         return repository.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
             validityDate, validityDate
         );
@@ -82,11 +82,11 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
 
     public C getConfiguration(final OffsetDateTime targetDate) throws IOException {
         try {
-            final R configRecord = findLastPublishedValid(targetDate.toLocalDateTime());
+            final R configRecord = findLatestPublished(targetDate.toLocalDateTime());
             LOGGER.info("configuration retrieved from server");
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {
-            LOGGER.warn("configuration cannot be retrieved, default configuration will be used");
+            LOGGER.warn("configuration cannot be retrieved, default configuration will be used, cause : ", e);
             return getDefaultJsonConfiguration(targetDate);
         }
     }
