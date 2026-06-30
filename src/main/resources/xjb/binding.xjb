@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jxb:bindings version="3.0"
+              xmlns:jxb="https://jakarta.ee/xml/ns/jaxb"
+              xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <jxb:bindings schemaLocation="../xsd/flowbasedexternalconstraintdocument-06.xsd">
+        <jxb:schemaBindings>
+            <jxb:package name="com.farao_community.farao.ce_merging.base_case_improvement.external_constraints" />
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="../xsd/feasibility-range-document.xsd">
+        <jxb:schemaBindings>
+            <jxb:package name="com.farao_community.farao.ce_merging.base_case_improvement.feasibility_ranges" />
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="../xsd/urn-entsoe-eu-wgedi-codelists.xsd">
+        <jxb:schemaBindings>
+            <jxb:package name="com.farao_community.farao.ce_merging.base_case_improvement.forecast_netpositions" />
+        </jxb:schemaBindings>
+    </jxb:bindings>
+    <jxb:bindings schemaLocation="../xsd/iec62325-451-n-reportinginformation_v2_1.xsd">
+        <jxb:schemaBindings>
+            <jxb:package name="com.farao_community.farao.ce_merging.base_case_improvement.forecast_netpositions" />
+        </jxb:schemaBindings>
+    </jxb:bindings>
+</jxb:bindings>

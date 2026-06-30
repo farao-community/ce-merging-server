@@ -35,6 +35,8 @@ public final class CeMergingConstants {
     public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
+    public static final String ALEGRO_BE_NODE_NAME = "BE_AL";
+    public static final String ALEGRO_DE_NODE_NAME = "DE_AL";
 
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;

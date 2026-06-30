@@ -21,9 +21,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.CREATED;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.ERROR;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

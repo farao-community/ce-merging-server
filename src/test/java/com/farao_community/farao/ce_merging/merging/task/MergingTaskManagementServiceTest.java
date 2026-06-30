@@ -11,7 +11,7 @@ import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidEx
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
 import com.farao_community.farao.ce_merging.merging.MergingService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import com.farao_community.farao.ce_merging.common.task.TaskStatus;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,10 +29,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.CREATED;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.ERROR;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.RUNNING;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.SUCCESS;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;

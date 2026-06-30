@@ -16,8 +16,8 @@ import java.io.FileNotFoundException;
 import java.time.ZoneOffset;
 import java.util.InputMismatchException;
 
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.CREATED;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.ID_1;

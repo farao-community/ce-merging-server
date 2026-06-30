@@ -6,7 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import com.farao_community.farao.ce_merging.common.task.Task;
+import com.farao_community.farao.ce_merging.common.task.TaskStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -24,7 +25,7 @@ import static jakarta.persistence.GenerationType.AUTO;
  * Please contact them to check compatibility if any modification is needed
  */
 @Entity
-public class MergingTask implements Serializable {
+public class MergingTask implements Serializable, Task {
     @Id
     @GeneratedValue(strategy = AUTO)
     private Long id;

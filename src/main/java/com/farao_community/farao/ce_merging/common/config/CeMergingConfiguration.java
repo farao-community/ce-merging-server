@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.config;
 
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.common.task.Task;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -44,31 +44,31 @@ public class CeMergingConfiguration {
         this.dailyMergingRoot = dailyMergingRoot;
     }
 
-    public String getInputsDirectoryPath(final MergingTask task) {
+    public String getInputsDirectoryPath(final Task task) {
         return getDirectoryPath(task, INPUTS_DIR);
     }
 
-    public String getDailyInputsDirectoryPath(final MergingTask task) {
+    public String getDailyInputsDirectoryPath(final Task task) {
         return getDailyDirectoryPath(task, DAILY_INPUTS_DIR);
     }
 
-    public String getDailyOutputsDirectoryPath(final MergingTask task) {
+    public String getDailyOutputsDirectoryPath(final Task task) {
         return getDailyDirectoryPath(task, DAILY_OUTPUTS_DIR);
     }
 
-    public String getOutputsDirectoryPath(final MergingTask task) {
+    public String getOutputsDirectoryPath(final Task task) {
         return getDirectoryPath(task, OUTPUTS_DIR);
     }
 
-    public String getArtifactsDirectoryPath(final MergingTask task) {
+    public String getArtifactsDirectoryPath(final Task task) {
         return getDirectoryPath(task, ARTIFACTS_DIR);
     }
 
-    private String getDirectoryPath(final MergingTask task, final String directory) {
+    private String getDirectoryPath(final Task task, final String directory) {
         return resolveTaskDirInRoot(task, directory, ceMergingRoot);
     }
 
-    private String getDailyDirectoryPath(final MergingTask task, final String directory) {
+    private String getDailyDirectoryPath(final Task task, final String directory) {
         return resolveTaskDirInRoot(task, directory, dailyMergingRoot);
     }
 
@@ -78,7 +78,7 @@ public class CeMergingConfiguration {
      * @param directory : each type of file (in, out, ...) has its subdirectory inside
      * @return /path/to/root/task_id/directory
      */
-    private String resolveTaskDirInRoot(final MergingTask task, final String directory, final String root) {
+    private String resolveTaskDirInRoot(final Task task, final String directory, final String root) {
         return Path.of(root + separator + task.getId())
             .resolve(directory)
             .toString();

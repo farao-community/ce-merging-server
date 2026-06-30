@@ -7,8 +7,8 @@
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
-import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeDeserializer;
-import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeSerializer;
+import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeDeserializer;
+import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.ElementCollection;
