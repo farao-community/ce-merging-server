@@ -359,7 +359,7 @@ public class MergingTaskManagementService {
         hvdcAlignmentConfigurationService.publish(configurationFile, validFrom, validTo);
     }
 
-    public byte[] getVirtualHubsConfigurationBytes(final OffsetDateTime dateTime) throws IOException {
+    public byte[] getVirtualHubsConfiguration(final OffsetDateTime dateTime) throws IOException {
         return virtualHubsConfigurationService.getConfigAsJsonBytes(dateTime);
     }
 

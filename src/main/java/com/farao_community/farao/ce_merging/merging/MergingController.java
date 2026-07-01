@@ -265,7 +265,7 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "No valid virtual hubs configuration found for this instant.")
     })
     public ResponseEntity<byte[]> getVirtualHubsConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws IOException {
-        return toAttachmentFileResponse(taskManager.getVirtualHubsConfigurationBytes(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "virtual-hubs-config.json");
+        return toAttachmentFileResponse(taskManager.getVirtualHubsConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "virtual-hubs-config.json");
     }
 
     @PostMapping(value = "/global-configurations/xnodes-configuration/publish", produces = JSON_API_MIME_TYPE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

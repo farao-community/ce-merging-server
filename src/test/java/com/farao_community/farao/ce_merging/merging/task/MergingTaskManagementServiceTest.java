@@ -9,6 +9,12 @@ package com.farao_community.farao.ce_merging.merging.task;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.AbstractGridConfigurationService;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.HvdcAlignmentConfigurationService;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.RegionConfigurationService;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.VirtualHubsConfigurationService;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.XNodeConfigurationService;
 import com.farao_community.farao.ce_merging.merging.MergingService;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -26,8 +32,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -49,17 +57,18 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static test_utils.CeTestUtils.BEGINNING_OF_2000;
 import static test_utils.CeTestUtils.ID_1;
 import static test_utils.CeTestUtils.ID_2;
+import static test_utils.CeTestUtils.INPUTS;
+import static test_utils.CeTestUtils.INPUTS_ZIP_NAME;
+import static test_utils.CeTestUtils.METADATA;
+import static test_utils.CeTestUtils.MIME_ZIP;
+import static test_utils.CeTestUtils.anyTask;
+import static test_utils.CeTestUtils.byteContentOf;
+import static test_utils.CeTestUtils.stringContentOf;
 import static test_utils.CeTestUtils.taskDtoWithIdAndStatus;
 import static test_utils.CeTestUtils.taskWithIdAndStatus;
-import static test_utils.CeTestUtils.anyTask;
-import static test_utils.CeTestUtils.INPUTS_ZIP_NAME;
-import static test_utils.CeTestUtils.INPUTS;
-import static test_utils.CeTestUtils.MIME_ZIP;
-import static test_utils.CeTestUtils.METADATA;
-import static test_utils.CeTestUtils.stringContentOf;
-import static test_utils.CeTestUtils.byteContentOf;
 import static test_utils.assertions.CeTaskAssert.assertThat;
 import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
@@ -73,6 +82,11 @@ class MergingTaskManagementServiceTest {
     private final MergingService mergingService = mock(MergingService.class);
     private final MergingTaskRepository repository = mock(MergingTaskRepository.class);
     private final MergingTaskMapper mapper = mock(MergingTaskMapper.class);
+    private final BECKeyConfigurationService becKeyConfigurationService = mock(BECKeyConfigurationService.class);
+    private final RegionConfigurationService regionConfigurationService = mock(RegionConfigurationService.class);
+    private final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService = mock(HvdcAlignmentConfigurationService.class);
+    private final VirtualHubsConfigurationService virtualHubsConfigurationService = mock(VirtualHubsConfigurationService.class);
+    private final XNodeConfigurationService xNodeConfigurationService = mock(XNodeConfigurationService.class);
 
     MergingTaskManagementService service;
 
@@ -83,11 +97,11 @@ class MergingTaskManagementServiceTest {
                                                    mergingService,
                                                    repository,
                                                    mapper,
-                                                   mock(),
-                                                   mock(),
-                                                   mock(),
-                                                   mock(),
-                                                   mock());
+                                                   virtualHubsConfigurationService,
+                                                   xNodeConfigurationService,
+                                                   becKeyConfigurationService,
+                                                   regionConfigurationService,
+                                                   hvdcAlignmentConfigurationService);
     }
 
     @Test
@@ -290,6 +304,49 @@ class MergingTaskManagementServiceTest {
         assertSame(bciFile, service.getBasecaseImprovementParameters(ID_1));
         assertSame(balancesFile, service.getBalancesAdjustmentParameters(ID_1));
         verify(repository, times(4)).findById(ID_1);
+    }
+
+    @Test
+    void shouldGetGlobalGridConfigurations() throws IOException {
+        service.getBECKeyConfiguration(BEGINNING_OF_2000);
+        service.getHvdcXNodeAlignmentConfiguration(BEGINNING_OF_2000);
+        service.getXNodesConfiguration(BEGINNING_OF_2000);
+        service.getRegionConfiguration(BEGINNING_OF_2000);
+        service.getVirtualHubsConfiguration(BEGINNING_OF_2000);
+
+        final List<AbstractGridConfigurationService<?,?>> configurationServices = List.of(becKeyConfigurationService,
+                                                                                          hvdcAlignmentConfigurationService,
+                                                                                          xNodeConfigurationService,
+                                                                                          regionConfigurationService,
+                                                                                          virtualHubsConfigurationService);
+
+        for (final AbstractGridConfigurationService<?, ?> configurationService : configurationServices) {
+            verify(configurationService).getConfigAsJsonBytes(BEGINNING_OF_2000);
+        }
+    }
+
+    @Test
+    void shouldPublishGlobalGridConfigurations() {
+        final MockMultipartFile file = new MockMultipartFile(
+            "configurationFile",
+            "config.json",
+            MediaType.APPLICATION_JSON_VALUE,
+            new byte[0]
+        );
+
+        service.publishBECKeyConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+        service.publishHvdcXNodeAlignmentConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+        service.publishXNodesConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+        service.publishRegionConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+        service.publishVirtualHubsConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+
+        List.of(becKeyConfigurationService,
+                hvdcAlignmentConfigurationService,
+                xNodeConfigurationService,
+                regionConfigurationService,
+                virtualHubsConfigurationService)
+            .forEach(configurationService ->
+                         verify(configurationService).publish(file, BEGINNING_OF_2000, BEGINNING_OF_2000));
     }
 
     @Test

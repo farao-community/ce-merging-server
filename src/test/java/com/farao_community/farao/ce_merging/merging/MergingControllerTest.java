@@ -209,7 +209,7 @@ class MergingControllerTest {
 
     @Test
     void shouldGetGlobalConfigurationsAsAttachments() throws Exception {
-        when(taskManager.getVirtualHubsConfigurationBytes(any())).thenReturn(new byte[0]);
+        when(taskManager.getVirtualHubsConfiguration(any())).thenReturn(new byte[0]);
         when(taskManager.getXNodesConfiguration(any())).thenReturn(new byte[0]);
         when(taskManager.getHvdcXNodeAlignmentConfiguration(any())).thenReturn(new byte[0]);
         when(taskManager.getBECKeyConfiguration(any())).thenReturn(new byte[0]);
