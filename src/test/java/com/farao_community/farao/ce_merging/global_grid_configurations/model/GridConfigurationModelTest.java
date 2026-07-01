@@ -14,6 +14,14 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.TsoInfosDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecCoefficients;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.HvdcAlignmentXNodeCouple;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.TsoInfos;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
@@ -39,6 +47,15 @@ class GridConfigurationModelTest {
                                          TsoInfosDto.class,
                                          XnodeConfigDto.class);
 
+    static List<Class<?>> entities = List.of(BecByBoundary.class,
+                                             BecCoefficients.class,
+                                             Border.class,
+                                             HvdcAlignmentXNodeCouple.class,
+                                             ZeroFlowNode.class,
+                                             RegionConfiguration.class,
+                                             TsoInfos.class,
+                                             XnodeConfig.class);
+
     static List<Class<? extends AbstractGridConfigurationRecord>> records = List.of(BECKeyConfigurationRecord.class,
                                                                                     RegionConfigurationRecord.class,
                                                                                     VirtualHubsConfigurationRecord.class,
@@ -54,6 +71,12 @@ class GridConfigurationModelTest {
     void dtosShouldHaveStandardGettersAndSetters(final Class<?> clazz) {
         GetterSetterVerifier.forClass(clazz).verify();
     }
+    @ParameterizedTest
+    @FieldSource("entities")
+    void entitiesShouldHaveStandardGettersAndSetters(final Class<?> clazz) {
+        GetterSetterVerifier.forClass(clazz).verify();
+    }
+
 
     @ParameterizedTest
     @FieldSource("records")
