@@ -17,12 +17,14 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 public class ReferenceProgram implements Serializable {
 
@@ -31,17 +33,81 @@ public class ReferenceProgram implements Serializable {
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     @JsonDeserialize(using = OffsetDateTimeDeserializer.class)
     private OffsetDateTime targetDateTime;
-    private List<ReferenceExchangeData> referenceExchangeDataList;
+    private List<ReferenceExchangeData> referenceExchanges;
 
     @JsonCreator
     public ReferenceProgram(@JsonProperty("timeInterval") final String dailyTimeInterval,
                             @JsonProperty("targetDateTime") final OffsetDateTime targetDateTime,
-                            @JsonProperty("referenceExchangeData") final List<ReferenceExchangeData> referenceExchangeDataList) {
+                            @JsonProperty("referenceExchangeData") final List<ReferenceExchangeData> referenceExchanges) {
         this.dailyTimeInterval = dailyTimeInterval;
         this.targetDateTime = targetDateTime;
-        this.referenceExchangeDataList = referenceExchangeDataList;
+        this.referenceExchanges = referenceExchanges;
     }
 
+    public Map<String, Double> computeGlobalNetPositionsForOutAreas(final RegionConfiguration region) {
+        final Predicate<String> isNotRegionOrItsAreasIn = areaId -> !region.getId().equals(areaId)
+                                                                  && !region.getAreasIn().containsValue(areaId);
+        return Stream
+            .concat(referenceExchanges.stream().map(ReferenceExchangeData::getAreaInId),
+                    referenceExchanges.stream().map(ReferenceExchangeData::getAreaOutId))
+            .distinct()
+            .filter(isNotRegionOrItsAreasIn)
+            .collect(toMap(identity(), this::getAreaGlobalNetPosition));
+    }
+
+    public Map<String, Double> computeAllNetPositionsInRegion(final RegionConfiguration region) {
+        return computeForAllAreasIn(region, areaId -> getAreaNetPositionInRegion(areaId, region));
+    }
+
+    public Map<String, Double> computeAllNetPositionsOutRegion(final RegionConfiguration region) {
+        return computeForAllAreasIn(region, areaId -> getAreaNetPositionOutRegion(areaId, region));
+    }
+
+    public Map<String, Double> computeAllGlobalNetPositions(final RegionConfiguration region) {
+        return computeForAllAreasIn(region, this::getAreaGlobalNetPosition);
+    }
+
+    private double getAreaGlobalNetPosition(final String areaId) {
+        final double leavingArea = sumFlowsGiven(exc -> exc.comesFrom(areaId));
+        final double enteringArea = sumFlowsGiven(exc -> exc.goesTo(areaId));
+        return leavingArea - enteringArea;
+    }
+
+    private double getAreaNetPositionInRegion(final String areaId, final RegionConfiguration region) {
+        // compute the netPosition of an area relative to a region
+        final double enteringRegion = sumFlowsGiven(exc -> exc.flowsBetween(areaId, region.getId()));
+        final double leavingRegion = sumFlowsGiven(exc -> exc.flowsBetween(region.getId(), areaId));
+        return enteringRegion - leavingRegion;
+    }
+
+    private double getAreaNetPositionOutRegion(final String areaId, final RegionConfiguration region) {
+        // compute the exchange of an area out of region
+        final double outOfAreaToElsewhere = sumFlowsGiven(exc -> exc.comesFrom(areaId)
+                                                                 && !exc.goesTo(region.getId()));
+
+        final double intoAreaFromElsewhere = sumFlowsGiven(exc -> exc.goesTo(areaId)
+                                                                  && !exc.comesFrom(region.getId()));
+        return outOfAreaToElsewhere - intoAreaFromElsewhere;
+    }
+
+    private double sumFlowsGiven(final Predicate<ReferenceExchangeData> condition) {
+        return referenceExchanges.stream()
+            .filter(condition)
+            .mapToDouble(ReferenceExchangeData::getFlow)
+            .sum();
+    }
+
+    private Map<String, Double> computeForAllAreasIn(final RegionConfiguration region,
+                                                     final Function<String, Double> areaToNetPosition) {
+        return region.getAreasIn()
+            .values()
+            .stream()
+            .collect(toMap(identity(), areaToNetPosition));
+    }
+
+    /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+                            ACCESSORS
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
     public String getDailyTimeInterval() {
         return dailyTimeInterval;
     }
@@ -58,76 +124,15 @@ public class ReferenceProgram implements Serializable {
         this.targetDateTime = targetDateTime;
     }
 
-    public ReferenceProgram(final List<ReferenceExchangeData> referenceExchangeDataList) {
-        this(null, null, referenceExchangeDataList);
+    public ReferenceProgram(final List<ReferenceExchangeData> referenceExchanges) {
+        this(null, null, referenceExchanges);
     }
 
-    public List<ReferenceExchangeData> getReferenceExchangeDataList() {
-        return referenceExchangeDataList;
+    public List<ReferenceExchangeData> getReferenceExchanges() {
+        return referenceExchanges;
     }
 
-    public void setReferenceExchangeDataList(final List<ReferenceExchangeData> referenceExchangeDataList) {
-        this.referenceExchangeDataList = referenceExchangeDataList;
+    public void setReferenceExchanges(final List<ReferenceExchangeData> referenceExchanges) {
+        this.referenceExchanges = referenceExchanges;
     }
-
-    double getAreaGlobalNetPosition(final String areaId) {
-        double netPosition = 0.;
-        netPosition += referenceExchangeDataList.stream()
-                .filter(referenceExchangeData -> referenceExchangeData.getAreaOutId().equals(areaId))
-                .mapToDouble(ReferenceExchangeData::getFlow).sum();
-        netPosition -= referenceExchangeDataList.stream()
-                .filter(referenceExchangeData -> referenceExchangeData.getAreaInId().equals(areaId))
-                .mapToDouble(ReferenceExchangeData::getFlow).sum();
-        return netPosition;
-    }
-
-    double getAreaNetPositionInRegion(final String areaId, final RegionConfiguration region) {
-        // compute the netPosition of an area relative to a region
-        double netPosition = 0.;
-        netPosition += referenceExchangeDataList.stream()
-                .filter(referenceExchange -> referenceExchange.isAreaOutToAreaInExchange(areaId, region.getId()))
-                .mapToDouble(ReferenceExchangeData::getFlow).sum();
-        netPosition -= referenceExchangeDataList.stream()
-                .filter(referenceExchange -> referenceExchange.isAreaOutToAreaInExchange(region.getId(), areaId))
-                .mapToDouble(ReferenceExchangeData::getFlow).sum();
-        return netPosition;
-    }
-
-    double getAreaNetPositionOutRegion(final String areaId, final RegionConfiguration region) {
-        // compute the exchange of an area out of region
-        double netPosition = 0.;
-        netPosition += referenceExchangeDataList.stream()
-                .filter(referenceExchangeData -> referenceExchangeData.getAreaOutId().equals(areaId)
-                        && !region.getId().equals(referenceExchangeData.getAreaInId()))
-                .mapToDouble(ReferenceExchangeData::getFlow).sum();
-        netPosition -= referenceExchangeDataList.stream()
-                .filter(referenceExchangeData -> referenceExchangeData.getAreaInId().equals(areaId)
-                        && !region.getId().equals(referenceExchangeData.getAreaOutId()))
-                .mapToDouble(ReferenceExchangeData::getFlow).sum();
-        return netPosition;
-    }
-
-    public Map<String, Double> computeAllNetPositionsInRegion(final RegionConfiguration region) {
-        return region.getAreasIn().values().stream().collect(Collectors.toMap(Function.identity(), areaId -> getAreaNetPositionInRegion(areaId, region)));
-    }
-
-    public Map<String, Double> computeAllNetPositionsOutRegion(final RegionConfiguration region) {
-        Map<String, Double> outNetPositionByArea = new HashMap<>();
-        region.getAreasIn().values().forEach(areaId -> outNetPositionByArea.put(areaId, this.getAreaNetPositionOutRegion(areaId, region)));
-        return outNetPositionByArea;
-    }
-
-    public Map<String, Double> computeAllGlobalNetPositions(final RegionConfiguration region) {
-        return region.getAreasIn().values().stream().collect(Collectors.toMap(Function.identity(), this::getAreaGlobalNetPosition));
-    }
-
-    public Map<String, Double> computeGlobalNetPositionsForOutAreas(final RegionConfiguration region) {
-        List<String> outRegionAreas = Stream.concat(referenceExchangeDataList.stream().map(ReferenceExchangeData::getAreaInId),
-                        referenceExchangeDataList.stream().map(ReferenceExchangeData::getAreaOutId))
-                .distinct()
-                .filter(areaId -> !region.getId().equals(areaId) && !region.getAreasIn().containsValue(areaId))
-                .collect(Collectors.toList());
-        return outRegionAreas.stream().collect(Collectors.toMap(Function.identity(), this::getAreaGlobalNetPosition));
-    }
-
 }

@@ -54,7 +54,15 @@ public class ReferenceExchangeData {
         this.flow = flow;
     }
 
-    boolean isAreaOutToAreaInExchange(final String areaOutId, final String areaInId) {
-        return this.areaInId.equals(areaInId) && this.areaOutId.equals(areaOutId);
+    boolean flowsBetween(final String areaOutId, final String areaInId) {
+        return goesTo(areaInId) && comesFrom(areaOutId);
+    }
+
+    public boolean comesFrom(final String areaId) {
+        return areaOutId.equals(areaId);
+    }
+
+    public boolean goesTo(final String areaId) {
+        return areaInId.equals(areaId);
     }
 }

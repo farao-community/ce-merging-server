@@ -8,8 +8,6 @@ package com.farao_community.farao.ce_merging.base_case_improvement.feasibility_r
 
 import com.farao_community.farao.ce_merging.base_case_improvement.RegionConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.xsd.FlowBasedExternalConstraintDocument;
-import com.farao_community.farao.ce_merging.xsd.NetPositionConstraint;
 import com.google.common.io.ByteSource;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.Unmarshaller;
@@ -17,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,6 +23,7 @@ import java.util.Map;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
 public final class ExternalConstraintsImporter {
 
@@ -52,7 +50,7 @@ public final class ExternalConstraintsImporter {
         List<NetPositionConstraint> validIntervalConstraints = getNetPositionConstraints(externalConstraints, targetDate);
         List<ExternalConstraintsInputs> externalConstraintsTmp = new ArrayList<>();
         validIntervalConstraints.stream().filter(netPositionConstraint -> netPositionConstraint.getHub().equalsIgnoreCase(ALEGRO_BE_NODE_NAME) || netPositionConstraint.getHub().equalsIgnoreCase(ALEGRO_DE_NODE_NAME)).forEach(ec -> externalConstraintsTmp.add(
-                new ExternalConstraintsInputs(ec.getHub().toUpperCase(), ec.getDirection(), ec.getValue().doubleValue())));
+            new ExternalConstraintsInputs(ec.getHub().toUpperCase(), ec.getDirection(), ec.getValue().doubleValue())));
         if (externalConstraintsTmp.isEmpty()) {
             LOGGER.warn("BE_AL and DE_AL does not exists in the External constraints file for the chosen target date {}. The Ec values for BE_AL and DE_AL will be the infinity", targetDate);
         }
@@ -83,7 +81,7 @@ public final class ExternalConstraintsImporter {
                 }
             });
             return validIntervalConstraints;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             String errorMessage = "Couldn't import external constraints file, cause: " + e.getMessage();
             LOGGER.error(errorMessage);
             throw new CeMergingException(errorMessage);
@@ -93,29 +91,28 @@ public final class ExternalConstraintsImporter {
     private static void updateExternalConstraintsIntervals(final List<ExternalConstraintsInputs> externalConstraintsTmp,
                                                            final Map<String, Interval> externalConstraintsMap) {
         externalConstraintsTmp.forEach(ec -> {
-            Interval interval = externalConstraintsMap.get(ec.getAreaId());
+            final Interval interval = externalConstraintsMap.get(ec.getAreaId());
             switch (ec.getDirection()) {
                 case "EXPORT":
                     interval.setMaxValue(ec.getValue());
-                    externalConstraintsMap.put(ec.getAreaId(), interval);
                     break;
                 case "IMPORT":
-                    interval = externalConstraintsMap.get(ec.getAreaId());
                     interval.setMinValue(-ec.getValue());
-                    externalConstraintsMap.put(ec.getAreaId(), interval);
                     break;
                 default:
                     LOGGER.error("External constraints direction {} is not acceptable", ec.getDirection());
                     throw new CeMergingException("External constraints direction " + ec.getDirection() + " is not acceptable");
             }
+
+            externalConstraintsMap.put(ec.getAreaId(), interval);
         });
     }
 
     private static boolean isWithinRange(final OffsetDateTime targetDate,
                                          final String timeInterval) {
-        List<String> externalConstraintsDates = Arrays.asList(timeInterval.split("/"));
-        OffsetDateTime startDate = OffsetDateTime.parse(externalConstraintsDates.get(0), DateTimeFormatter.ISO_DATE_TIME);
-        OffsetDateTime endDate = OffsetDateTime.parse(externalConstraintsDates.get(1), DateTimeFormatter.ISO_DATE_TIME);
-        return (targetDate.isAfter(startDate) || targetDate.isEqual(startDate)) && (targetDate.isBefore(endDate) || targetDate.isEqual(endDate));
+        final List<String> externalConstraintsDates = Arrays.asList(timeInterval.split("/"));
+        final OffsetDateTime start = OffsetDateTime.parse(externalConstraintsDates.get(0), ISO_DATE_TIME);
+        final OffsetDateTime end = OffsetDateTime.parse(externalConstraintsDates.get(1), ISO_DATE_TIME);
+        return !targetDate.isBefore(start) && !targetDate.isAfter(end);
     }
 }

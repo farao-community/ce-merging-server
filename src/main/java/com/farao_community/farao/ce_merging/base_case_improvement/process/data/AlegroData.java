@@ -11,26 +11,26 @@ import java.io.Serializable;
 public class AlegroData implements Serializable {
 
     private Boolean alegroInOutage;
-    private AlegroFlows aldeFlows;
-    private AlegroFlows albeFlows;
+    private AlegroFlows alDeFlows;
+    private AlegroFlows alBeFlows;
 
     public AlegroData() {
     }
 
-    public AlegroFlows getAldeFlows() {
-        return aldeFlows;
+    public AlegroFlows getAlDeFlows() {
+        return alDeFlows;
     }
 
-    public void setAldeFlows(final AlegroFlows aldeFlows) {
-        this.aldeFlows = aldeFlows;
+    public void setAlDeFlows(final AlegroFlows alDeFlows) {
+        this.alDeFlows = alDeFlows;
     }
 
-    public AlegroFlows getAlbeFlows() {
-        return albeFlows;
+    public AlegroFlows getAlBeFlows() {
+        return alBeFlows;
     }
 
-    public void setAlbeFlows(final AlegroFlows albeFlows) {
-        this.albeFlows = albeFlows;
+    public void setAlBeFlows(final AlegroFlows alBeFlows) {
+        this.alBeFlows = alBeFlows;
     }
 
     public Boolean getAlegroInOutage() {
