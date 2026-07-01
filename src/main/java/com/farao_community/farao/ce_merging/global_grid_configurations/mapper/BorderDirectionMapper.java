@@ -10,16 +10,14 @@ import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectio
 import com.powsybl.openrao.virtualhubs.BorderDirection;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface BorderDirectionMapper {
-    @Mappings({
-        @Mapping(source = "from", target = "borderFrom"),
-        @Mapping(source = "to", target = "borderTo")
-    })
+
+    @Mapping(source = "from", target = "borderFrom")
+    @Mapping(source = "to", target = "borderTo")
     BorderDirectionRecord mapToBorderDirectionRecord(BorderDirection borderDirection);
 
     List<BorderDirectionRecord> mapToBorderDirectionRecordList(List<BorderDirection> borderDirectionList);

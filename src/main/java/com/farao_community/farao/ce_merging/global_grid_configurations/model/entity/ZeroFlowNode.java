@@ -11,8 +11,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.io.Serializable;
+
 @Embeddable
-public class ZeroFlowNode {
+public class ZeroFlowNode implements Serializable {
     private String xnode;
     private String countryCode;
 

@@ -12,10 +12,8 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import com.powsybl.loadflow.LoadFlowParameters;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 
@@ -49,13 +47,13 @@ public class Configurations implements Serializable {
     private List<XnodeConfig> xnodeList = new ArrayList<>();
     @OneToOne(cascade = ALL)
     private SavedFile recessivityParameters = new SavedFile();
-    @OneToMany(cascade = {CascadeType.ALL})
+    @OneToMany(cascade = ALL)
     private List<BecByBoundary> becMatrixConfig = new ArrayList<>();
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = ALL)
     private RegionConfiguration regionConfiguration;
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = LAZY)
     private List<HvdcAlignmentXNodeCouple> virtualHubsAlignmentCouples = new ArrayList<>();
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = LAZY)
     private List<ZeroFlowNode> zeroFlowNodes = new ArrayList<>();
     @ElementCollection(fetch = LAZY)
     private List<String> dkHvdcXnodes = new ArrayList<>();

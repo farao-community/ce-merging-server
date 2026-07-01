@@ -16,10 +16,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.io.Serializable;
 import java.util.List;
 
 @Entity
-public class BecByBoundary {
+public class BecByBoundary implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -10,16 +10,14 @@ import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubReco
 import com.powsybl.openrao.virtualhubs.VirtualHub;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface VirtualHubMapper {
-    @Mappings({
-        @Mapping(source = "relatedMa.code", target = "relatedMaCode"),
-        @Mapping(source = "relatedMa.eic", target = "relatedMaEic")
-    })
+
+    @Mapping(source = "relatedMa.code", target = "relatedMaCode")
+    @Mapping(source = "relatedMa.eic", target = "relatedMaEic")
     VirtualHubRecord mapToVirtualHubRecord(VirtualHub virtualHub);
 
     List<VirtualHubRecord> mapToVirtualHubRecordList(List<VirtualHub> virtualHubList);
