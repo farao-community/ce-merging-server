@@ -15,6 +15,14 @@ public class BorderDirectionRecord implements Serializable {
     private String borderFrom;
     private String borderTo;
 
+    public BorderDirectionRecord(final String borderFrom, final String borderTo) {
+        this.borderFrom = borderFrom;
+        this.borderTo = borderTo;
+    }
+
+    public BorderDirectionRecord() {
+    }
+
     public String getBorderFrom() {
         return borderFrom;
     }

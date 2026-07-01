@@ -12,15 +12,15 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
-public class XnodeDto implements Serializable {
+public class XnodeConfigDto implements Serializable {
     private String name;
     private String area1;
     private String area2;
     private String subarea1;
     private String subarea2;
 
-    public static XnodeDto fromXNodeEntity(final Xnode xnode) {
-        final XnodeDto dto = new XnodeDto();
+    public static XnodeConfigDto fromXNodeEntity(final Xnode xnode) {
+        final XnodeConfigDto dto = new XnodeConfigDto();
         dto.setName(xnode.getName());
         dto.setArea1(xnode.getArea1());
         dto.setArea2(xnode.getArea2());

@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.entity;
 
+import com.farao_community.farao.ce_merging.xsd.Xnode;
 import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
@@ -28,6 +29,16 @@ public class XnodeConfig implements Serializable {
         this.area2 = area2;
         this.subarea1 = subarea1;
         this.subarea2 = subarea2;
+    }
+
+    public static XnodeConfig fromXNodeEntity(final Xnode xnode) {
+        final XnodeConfig cfg = new XnodeConfig();
+        cfg.setName(xnode.getName());
+        cfg.setArea1(xnode.getArea1());
+        cfg.setArea2(xnode.getArea2());
+        cfg.setSubarea1(xnode.getSubarea1());
+        cfg.setSubarea2(xnode.getSubarea2());
+        return cfg;
     }
 
     public String getName() {

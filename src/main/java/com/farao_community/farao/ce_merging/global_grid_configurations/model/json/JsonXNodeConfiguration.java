@@ -6,28 +6,28 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.json;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 
 import java.util.List;
 
 public class JsonXNodeConfiguration {
 
-    private List<XnodeDto> xNodesList;
+    private List<XnodeConfigDto> xNodesList;
 
     @JsonCreator
-    public JsonXNodeConfiguration(final List<XnodeDto> xNodesList) {
+    public JsonXNodeConfiguration(final List<XnodeConfigDto> xNodesList) {
         this.xNodesList = xNodesList;
     }
 
     public JsonXNodeConfiguration() {
     }
 
-    public List<XnodeDto> getXNodesList() {
+    public List<XnodeConfigDto> getXNodesList() {
         return xNodesList;
     }
 
-    public void setXNodesList(final List<XnodeDto> xNodesList) {
+    public void setXNodesList(final List<XnodeConfigDto> xNodesList) {
         this.xNodesList = xNodesList;
     }
 }

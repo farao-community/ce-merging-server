@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.mapper;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import org.mapstruct.Mapper;
 
@@ -14,5 +14,5 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface XnodeMapper {
-    List<XnodeConfig> mapToXnodeList(List<XnodeDto> xnodeDtoList);
+    List<XnodeConfig> mapToXnodeList(List<XnodeConfigDto> xnodeConfigDtoList);
 }

@@ -12,7 +12,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.TsoInfosDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
@@ -37,7 +37,7 @@ class GridConfigurationModelTest {
                                          ZeroFlowNodeDto.class,
                                          RegionConfigurationDto.class,
                                          TsoInfosDto.class,
-                                         XnodeDto.class);
+                                         XnodeConfigDto.class);
 
     static List<Class<? extends AbstractGridConfigurationRecord>> records = List.of(BECKeyConfigurationRecord.class,
                                                                                     RegionConfigurationRecord.class,

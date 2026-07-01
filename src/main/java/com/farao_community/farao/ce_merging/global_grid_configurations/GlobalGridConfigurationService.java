@@ -15,7 +15,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.Vi
 import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.XnodeMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.ZeroFlowNodeMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
@@ -138,7 +138,7 @@ public class GlobalGridConfigurationService {
     }
 
     void setXnodesConfiguration(final MergingTask task) throws IOException {
-        final List<XnodeDto> xnodesDtoList = xNodeConfigurationService.getConfiguration(task.getInputs().getTargetDate()).getXNodesList();
+        final List<XnodeConfigDto> xnodesDtoList = xNodeConfigurationService.getConfiguration(task.getInputs().getTargetDate()).getXNodesList();
         task.getConfigurations().setXnodeList(xnodeMapper.mapToXnodeList(xnodesDtoList));
         LOGGER.info("XNodes configuration is set on task configuration");
     }

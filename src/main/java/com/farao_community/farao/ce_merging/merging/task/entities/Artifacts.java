@@ -22,7 +22,7 @@ import static jakarta.persistence.CascadeType.ALL;
 public class Artifacts implements Serializable {
 
     @OneToMany(cascade = ALL)
-    private EnumMap<ArtifactType, SavedFile> artifactFiles = new EnumMap<>(ArtifactType.class);
+    private Map<ArtifactType, SavedFile> artifactFiles = new EnumMap<>(ArtifactType.class);
 
     @Transient
     private Map<String, SavedFile> preTreatedIgmMap = new HashMap<>();
