@@ -54,7 +54,7 @@ public class MergingController {
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                   TASK MANAGEMENT
+               TASK MANAGEMENT
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
     @PostMapping(value = "/tasks",
             consumes = {MULTIPART_FORM_DATA_VALUE},
@@ -141,7 +141,7 @@ public class MergingController {
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-           INPUTS
+                    INPUTS
     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
     @GetMapping(value = "/tasks/{taskId}/inputs",
             produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
@@ -238,7 +238,7 @@ public class MergingController {
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-            Global Configurations
+            GLOBAL CONFIGURATIONS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     @PostMapping(value = "/global-configurations/virtual-hubs-configuration/publish",
@@ -368,8 +368,8 @@ public class MergingController {
         return toAttachmentFileResponse(taskManager.getRegionConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "region_configuration.json");
     }
 
-        /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                   TASK CONFIGURATION
+    /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+              TASK CONFIGURATION
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     @GetMapping(value = "/tasks/{taskId}/configurations/dc-load-flow-parameters", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
