@@ -23,7 +23,11 @@ public class XnodeConfig implements Serializable {
     public XnodeConfig() {
     }
 
-    public XnodeConfig(String name, String area1, String subarea1, String area2, String subarea2) {
+    public XnodeConfig(final String name,
+                       final String area1,
+                       final String subarea1,
+                       final String area2,
+                       final String subarea2) {
         this.name = name;
         this.area1 = area1;
         this.area2 = area2;
@@ -45,7 +49,7 @@ public class XnodeConfig implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -53,7 +57,7 @@ public class XnodeConfig implements Serializable {
         return area1;
     }
 
-    public void setArea1(String area1) {
+    public void setArea1(final String area1) {
         this.area1 = area1;
     }
 
@@ -61,7 +65,7 @@ public class XnodeConfig implements Serializable {
         return area2;
     }
 
-    public void setArea2(String area2) {
+    public void setArea2(final String area2) {
         this.area2 = area2;
     }
 
@@ -69,7 +73,7 @@ public class XnodeConfig implements Serializable {
         return subarea1;
     }
 
-    public void setSubarea1(String subarea1) {
+    public void setSubarea1(final String subarea1) {
         this.subarea1 = subarea1;
     }
 
@@ -77,7 +81,7 @@ public class XnodeConfig implements Serializable {
         return subarea2;
     }
 
-    public void setSubarea2(String subarea2) {
+    public void setSubarea2(final String subarea2) {
         this.subarea2 = subarea2;
     }
 }

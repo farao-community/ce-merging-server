@@ -10,19 +10,22 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.io.Serializable;
+
+import static jakarta.persistence.GenerationType.AUTO;
+
 @Entity
 @Table(name = "tsoinfos")
-public class TsoInfos {
+public class TsoInfos implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = AUTO)
     private long ref;
 
     @Column(name = "name")
@@ -36,7 +39,7 @@ public class TsoInfos {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -44,12 +47,12 @@ public class TsoInfos {
         return eic;
     }
 
-    public void setEic(String eic) {
+    public void setEic(final String eic) {
         this.eic = eic;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         return EqualsBuilder.reflectionEquals(this, o, "ref");
     }
 

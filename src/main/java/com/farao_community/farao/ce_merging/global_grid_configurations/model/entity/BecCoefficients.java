@@ -8,12 +8,14 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model.en
 
 import jakarta.persistence.Embeddable;
 
+import java.io.Serializable;
+
 @Embeddable
-public class BecCoefficients {
+public class BecCoefficients implements Serializable {
     private String countryCode;
     private Double coefficient;
 
-    public BecCoefficients(String countryCode, double coefficient) {
+    public BecCoefficients(final String countryCode, final double coefficient) {
         this.countryCode = countryCode;
         this.coefficient = coefficient;
     }
@@ -25,7 +27,7 @@ public class BecCoefficients {
         return countryCode;
     }
 
-    public void setCountryCode(String countryCode) {
+    public void setCountryCode(final String countryCode) {
         this.countryCode = countryCode;
     }
 
@@ -33,7 +35,7 @@ public class BecCoefficients {
         return coefficient;
     }
 
-    public void setCoefficient(Double coefficient) {
+    public void setCoefficient(final Double coefficient) {
         this.coefficient = coefficient;
     }
 }

@@ -11,8 +11,10 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+import java.io.Serializable;
+
 @Embeddable
-public class Border {
+public class Border implements Serializable {
     private String outArea;
 
     private String inArea;
@@ -20,7 +22,7 @@ public class Border {
     public Border() {
     }
 
-    public Border(String outArea, String inArea) {
+    public Border(final String outArea, final String inArea) {
         this.outArea = outArea;
         this.inArea = inArea;
     }
@@ -29,7 +31,7 @@ public class Border {
         return outArea;
     }
 
-    public void setOutArea(String outArea) {
+    public void setOutArea(final String outArea) {
         this.outArea = outArea;
     }
 
@@ -37,12 +39,12 @@ public class Border {
         return inArea;
     }
 
-    public void setInArea(String inArea) {
+    public void setInArea(final String inArea) {
         this.inArea = inArea;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         return EqualsBuilder.reflectionEquals(this, o);
     }
 

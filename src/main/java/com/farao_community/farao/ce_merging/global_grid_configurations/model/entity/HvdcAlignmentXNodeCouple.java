@@ -21,7 +21,7 @@ public class HvdcAlignmentXNodeCouple implements Serializable {
     public HvdcAlignmentXNodeCouple() {
     }
 
-    public HvdcAlignmentXNodeCouple(String referenceXNode, String recessiveXNode) {
+    public HvdcAlignmentXNodeCouple(final String referenceXNode, final String recessiveXNode) {
         this.referenceXNode = referenceXNode;
         this.recessiveXNode = recessiveXNode;
     }
@@ -30,7 +30,7 @@ public class HvdcAlignmentXNodeCouple implements Serializable {
         return referenceXNode;
     }
 
-    public void setReferenceXNode(String referenceXNode) {
+    public void setReferenceXNode(final String referenceXNode) {
         this.referenceXNode = referenceXNode;
     }
 
@@ -38,12 +38,12 @@ public class HvdcAlignmentXNodeCouple implements Serializable {
         return recessiveXNode;
     }
 
-    public void setRecessiveXNode(String recessiveXNode) {
+    public void setRecessiveXNode(final String recessiveXNode) {
         this.recessiveXNode = recessiveXNode;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         return EqualsBuilder.reflectionEquals(this, o);
     }
 

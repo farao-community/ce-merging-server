@@ -21,7 +21,7 @@ public class ZeroFlowNode implements Serializable {
     public ZeroFlowNode() {
     }
 
-    public ZeroFlowNode(String xnode, String countryCode) {
+    public ZeroFlowNode(final String xnode, final String countryCode) {
         this.xnode = xnode;
         this.countryCode = countryCode;
     }
@@ -30,7 +30,7 @@ public class ZeroFlowNode implements Serializable {
         return xnode;
     }
 
-    public void setXnode(String xnode) {
+    public void setXnode(final String xnode) {
         this.xnode = xnode;
     }
 
@@ -38,12 +38,12 @@ public class ZeroFlowNode implements Serializable {
         return countryCode;
     }
 
-    public void setCountryCode(String countryCode) {
+    public void setCountryCode(final String countryCode) {
         this.countryCode = countryCode;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(final Object o) {
         return EqualsBuilder.reflectionEquals(this, o);
     }
 

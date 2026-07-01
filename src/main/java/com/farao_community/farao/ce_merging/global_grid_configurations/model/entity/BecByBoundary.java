@@ -11,19 +11,20 @@ import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 import java.io.Serializable;
 import java.util.List;
 
+import static jakarta.persistence.FetchType.LAZY;
+import static jakarta.persistence.GenerationType.IDENTITY;
+
 @Entity
 public class BecByBoundary implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = IDENTITY)
     @Basic(optional = false)
     @Column(name = "id", unique = true, nullable = false)
     private long id;
@@ -31,10 +32,10 @@ public class BecByBoundary implements Serializable {
     @Embedded
     private Border border;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = LAZY)
     private List<BecCoefficients> coefficientByCountry;
 
-    public BecByBoundary(Border border, List<BecCoefficients> coefficientByCountry) {
+    public BecByBoundary(final Border border, final List<BecCoefficients> coefficientByCountry) {
         this.border = border;
         this.coefficientByCountry = coefficientByCountry;
     }
@@ -46,7 +47,7 @@ public class BecByBoundary implements Serializable {
         return border;
     }
 
-    public void setBorder(Border border) {
+    public void setBorder(final Border border) {
         this.border = border;
     }
 
@@ -54,7 +55,7 @@ public class BecByBoundary implements Serializable {
         return coefficientByCountry;
     }
 
-    public void setCoefficientByCountry(List<BecCoefficients> coefficientByCountry) {
+    public void setCoefficientByCountry(final List<BecCoefficients> coefficientByCountry) {
         this.coefficientByCountry = coefficientByCountry;
     }
 }

@@ -11,13 +11,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapKeyColumn;
@@ -30,13 +28,16 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import static jakarta.persistence.CascadeType.ALL;
+import static jakarta.persistence.GenerationType.AUTO;
+
 @Entity
 @Table(name = "regionconfiguration")
 public class RegionConfiguration implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegionConfiguration.class);
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = AUTO)
     private long ref;
 
     @Column(name = "name")
@@ -59,7 +60,7 @@ public class RegionConfiguration implements Serializable {
     @Column(name = "ariasout_eic")
     private Map<String, String> areasOut;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(cascade = ALL)
     @JsonProperty(value = "germanyZones")
     private Map<String, TsoInfos> germanyZone;
 
@@ -67,7 +68,7 @@ public class RegionConfiguration implements Serializable {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
@@ -75,7 +76,7 @@ public class RegionConfiguration implements Serializable {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
@@ -83,7 +84,7 @@ public class RegionConfiguration implements Serializable {
         return areasIn;
     }
 
-    public void setAreasIn(Map<String, String> areasIn) {
+    public void setAreasIn(final Map<String, String> areasIn) {
         this.areasIn = areasIn;
     }
 
@@ -91,7 +92,7 @@ public class RegionConfiguration implements Serializable {
         return areasOut;
     }
 
-    public void setAreasOut(Map<String, String> areasOut) {
+    public void setAreasOut(final Map<String, String> areasOut) {
         this.areasOut = areasOut;
     }
 
@@ -107,7 +108,7 @@ public class RegionConfiguration implements Serializable {
         return germanyZone;
     }
 
-    public void setGermanyZone(Map<String, TsoInfos> germanyZone) {
+    public void setGermanyZone(final Map<String, TsoInfos> germanyZone) {
         this.germanyZone = germanyZone;
     }
 
