@@ -234,8 +234,8 @@ class MergingTaskManagementServiceTest {
     @Test
     void shouldGetAllTasks() {
         final List<MergingTask> tasks = List.of(
-                taskWithIdAndStatus(ID_1, CREATED),
-                taskWithIdAndStatus(ID_2, SUCCESS)
+            taskWithIdAndStatus(ID_1, CREATED),
+            taskWithIdAndStatus(ID_2, SUCCESS)
         );
         when(repository.findAll()).thenReturn(tasks);
         when(mapper.mergingTasksToMergingTasksDto(tasks)).thenReturn(List.of());
@@ -256,8 +256,8 @@ class MergingTaskManagementServiceTest {
     void shouldThrowWhenDeletingUnknownTask() {
         when(repository.findById(ID_1)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.deleteTask(ID_1))
-                .isTaskException()
-                .hasMessage("Task 1 not available");
+            .isTaskException()
+            .hasMessage("Task 1 not available");
         verify(repository, times(0)).deleteById(anyLong());
     }
 
@@ -314,11 +314,11 @@ class MergingTaskManagementServiceTest {
         service.getRegionConfiguration(BEGINNING_OF_2000);
         service.getVirtualHubsConfiguration(BEGINNING_OF_2000);
 
-        final List<AbstractGridConfigurationService<?,?>> configurationServices = List.of(becKeyConfigurationService,
-                                                                                          hvdcAlignmentConfigurationService,
-                                                                                          xNodeConfigurationService,
-                                                                                          regionConfigurationService,
-                                                                                          virtualHubsConfigurationService);
+        final List<AbstractGridConfigurationService<?, ?>> configurationServices = List.of(becKeyConfigurationService,
+                                                                                           hvdcAlignmentConfigurationService,
+                                                                                           xNodeConfigurationService,
+                                                                                           regionConfigurationService,
+                                                                                           virtualHubsConfigurationService);
 
         for (final AbstractGridConfigurationService<?, ?> configurationService : configurationServices) {
             verify(configurationService).getConfigAsJsonBytes(BEGINNING_OF_2000);
@@ -367,9 +367,9 @@ class MergingTaskManagementServiceTest {
 
     private Stream<Function<Long, byte[]>> zipMethods() {
         return Stream.of(
-                service::getInputsZip,
-                service::getArtifactsZip,
-                service::getOutputZip
+            service::getInputsZip,
+            service::getArtifactsZip,
+            service::getOutputZip
         );
     }
 
