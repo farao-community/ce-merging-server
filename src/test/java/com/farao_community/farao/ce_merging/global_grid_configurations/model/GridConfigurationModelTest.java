@@ -71,12 +71,12 @@ class GridConfigurationModelTest {
     void dtosShouldHaveStandardGettersAndSetters(final Class<?> clazz) {
         GetterSetterVerifier.forClass(clazz).verify();
     }
+
     @ParameterizedTest
     @FieldSource("entities")
     void entitiesShouldHaveStandardGettersAndSetters(final Class<?> clazz) {
         GetterSetterVerifier.forClass(clazz).verify();
     }
-
 
     @ParameterizedTest
     @FieldSource("records")
