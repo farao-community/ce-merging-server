@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.entity;
 
-
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

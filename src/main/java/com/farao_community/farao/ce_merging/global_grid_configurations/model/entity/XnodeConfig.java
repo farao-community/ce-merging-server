@@ -11,7 +11,7 @@ import jakarta.persistence.Embeddable;
 import java.io.Serializable;
 
 @Embeddable
-public class Xnode implements Serializable {
+public class XnodeConfig implements Serializable {
 
     private String name;
     private String area1;
@@ -19,10 +19,10 @@ public class Xnode implements Serializable {
     private String subarea1;
     private String subarea2;
 
-    public Xnode() {
+    public XnodeConfig() {
     }
 
-    public Xnode(String name, String area1, String subarea1, String area2, String subarea2) {
+    public XnodeConfig(String name, String area1, String subarea1, String area2, String subarea2) {
         this.name = name;
         this.area1 = area1;
         this.area2 = area2;

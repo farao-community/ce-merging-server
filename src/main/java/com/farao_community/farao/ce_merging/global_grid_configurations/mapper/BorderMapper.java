@@ -7,9 +7,8 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.mapper;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BorderDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
 import org.mapstruct.Mapper;
-
-import javax.swing.border.Border;
 
 @Mapper(componentModel = "spring")
 public interface BorderMapper {

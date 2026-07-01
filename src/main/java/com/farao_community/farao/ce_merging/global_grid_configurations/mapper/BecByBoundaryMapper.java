@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.mapper;
 
-
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
 import org.mapstruct.Mapper;

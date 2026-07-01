@@ -15,14 +15,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.Vi
 import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.XnodeMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.ZeroFlowNodeMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.HvdcAlignmentXNodeCouple;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Xnode;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
@@ -34,6 +27,7 @@ import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectionRecord;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.json.JsonLoadFlowParameters;
@@ -43,8 +37,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
+
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapKsToXk;
 
 @Service
 public class GlobalGridConfigurationService {
@@ -64,19 +62,19 @@ public class GlobalGridConfigurationService {
     private final HvdcAlignmentXNodeCoupleMapper hvdcAlignmentXNodeCoupleMapper;
     private final ZeroFlowNodeMapper zeroFlowNodeMapper;
 
-    public GlobalGridConfigurationService(MergingTaskRepository repository,
-                                          VirtualHubsConfigurationService virtualHubsConfigurationService,
-                                          XNodeConfigurationService xNodeConfigurationService,
-                                          BECKeyConfigurationService becKeyConfigurationService,
-                                          HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService,
-                                          RegionConfigurationService regionConfigurationService,
-                                          VirtualHubMapper virtualHubMapper,
-                                          BorderDirectionMapper borderDirectionMapper,
-                                          XnodeMapper xnodeMapper,
-                                          BecByBoundaryMapper becByBoundaryMapper,
-                                          RegionConfigurationMapper regionConfigurationMapper,
-                                          HvdcAlignmentXNodeCoupleMapper hvdcAlignmentXNodeCoupleMapper,
-                                          ZeroFlowNodeMapper zeroFlowNodeMapper) {
+    public GlobalGridConfigurationService(final MergingTaskRepository repository,
+                                          final VirtualHubsConfigurationService virtualHubsConfigurationService,
+                                          final XNodeConfigurationService xNodeConfigurationService,
+                                          final BECKeyConfigurationService becKeyConfigurationService,
+                                          final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService,
+                                          final RegionConfigurationService regionConfigurationService,
+                                          final VirtualHubMapper virtualHubMapper,
+                                          final BorderDirectionMapper borderDirectionMapper,
+                                          final XnodeMapper xnodeMapper,
+                                          final BecByBoundaryMapper becByBoundaryMapper,
+                                          final RegionConfigurationMapper regionConfigurationMapper,
+                                          final HvdcAlignmentXNodeCoupleMapper hvdcAlignmentXNodeCoupleMapper,
+                                          final ZeroFlowNodeMapper zeroFlowNodeMapper) {
         this.repository = repository;
         this.virtualHubsConfigurationService = virtualHubsConfigurationService;
         this.xNodeConfigurationService = xNodeConfigurationService;
@@ -93,129 +91,94 @@ public class GlobalGridConfigurationService {
     }
 
     public void setConfigurations(final MergingTask task) {
-        setRegionEicConfiguration(task);
-        setVirtualHubsConfiguration(task);
-        setHvdcXNodeAlignmentConfiguration(task);
-        setXnodesConfiguration(task);
-        setBecKeyConfiguration(task);
-        setLoadflowParameters(task);
-        repository.save(task);
+        try {
+            setRegionEicConfiguration(task);
+            setVirtualHubsConfiguration(task);
+            setHvdcXNodeAlignmentConfiguration(task);
+            setXnodesConfiguration(task);
+            setBecKeyConfiguration(task);
+            setLoadFlowParameters(task);
+            repository.save(task);
+        } catch (final Exception e) {
+            final String errorMessage = "Error occurred while trying to set task configuration";
+            LOGGER.error(errorMessage);
+            throw new CeMergingException(errorMessage, e);
+        }
     }
 
-    private static void setLoadflowParameters(MergingTask taskEntity) {
-        LoadFlowParameters loadFlowParameters;
-        String path = taskEntity.getConfigurations().getAcLoadFlowParameters().getPath();
-        if (path != null) {
-            loadFlowParameters = JsonLoadFlowParameters.read(Paths.get(path));
-            LOGGER.info("Reading loadflow parameters from {}", taskEntity.getConfigurations().getAcLoadFlowParameters().getOriginalName());
-        } else {
-            LOGGER.info("Reading default loadflow parameters");
-            loadFlowParameters = LoadFlowParameters.load();
-        }
-        taskEntity.getConfigurations().setLoadFlowParameters(loadFlowParameters);
+    private static void setLoadFlowParameters(final MergingTask task) {
+        final LoadFlowParameters loadFlowParameters = Optional.ofNullable(task.getConfigurations().getAcLoadFlowParameters())
+            .map(SavedFile::getPath)
+            .map(Paths::get)
+            .map(JsonLoadFlowParameters::read)
+            .orElse(LoadFlowParameters.load());
+        task.getConfigurations().setLoadFlowParameters(loadFlowParameters);
         LOGGER.info("Loadflow parameters are set in task configuration");
     }
 
-    void setVirtualHubsConfiguration(MergingTask taskEntity) {
-        try {
-            VirtualHubsConfiguration virtualHubsConfiguration = virtualHubsConfigurationService.getConfiguration(taskEntity.getInputs().getTargetDate());
+    void setVirtualHubsConfiguration(final MergingTask task) throws IOException {
 
-            final List<VirtualHub> virtualHubList = virtualHubsConfiguration.getVirtualHubs().stream()
-                    .filter(virtualHub -> virtualHub.nodeName() != null)
-                    .toList();
-            taskEntity.getConfigurations().setVirtualHubList(virtualHubMapper.mapToVirtualHubRecordList(virtualHubList));
-            taskEntity.getConfigurations().setBorderDirectionRecords(borderDirectionMapper.mapToBorderDirectionRecordList(virtualHubsConfiguration.getBorderDirections()));
+        final VirtualHubsConfiguration virtualHubsConfiguration = virtualHubsConfigurationService.getConfiguration(task.getInputs().getTargetDate());
 
-            adaptCountryCodeForVirtualHub(taskEntity.getConfigurations().getVirtualHubList());
-            adaptCountryCodeForBorderDirection(taskEntity.getConfigurations().getBorderDirectionRecords());
+        final List<VirtualHub> virtualHubList = virtualHubsConfiguration
+            .getVirtualHubs()
+            .stream()
+            .filter(virtualHub -> virtualHub.nodeName() != null)
+            .toList();
 
-            LOGGER.info("Virtual hubs configuration is set on task configuration");
-        } catch (Exception e) {
-            String errorMessage = "Error occurred while trying to set Virtual hubs configuration, cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage);
-        }
+        final Configurations configurations = task.getConfigurations();
+
+        configurations.setVirtualHubList(virtualHubMapper.mapToVirtualHubRecordList(virtualHubList));
+        configurations.setBorderDirectionRecords(borderDirectionMapper.mapToBorderDirectionRecordList(virtualHubsConfiguration.getBorderDirections()));
+
+        fixKosovoVirtualHubs(configurations.getVirtualHubList());
+        fixKosovoBorderDirections(configurations.getBorderDirectionRecords());
+        LOGGER.info("Virtual hubs configuration is set on task configuration");
+
     }
 
-    void setXnodesConfiguration(MergingTask taskEntity) {
-        try {
-            List<XnodeDto> xnodesDtoList = xNodeConfigurationService.getConfiguration(taskEntity.getInputs().getTargetDate()).getXNodeList();
-            List<Xnode> xNodesFromConfigRepository = xnodeMapper.mapToXnodeList(xnodesDtoList);
-            taskEntity.getConfigurations().setXnodeList(xNodesFromConfigRepository);
-            LOGGER.info("XNodes configuration is set on task configuration");
-        } catch (Exception e) {
-            String errorMessage = "Error occurred while trying to set XNodes configuration, cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage, e);
-        }
+    void setXnodesConfiguration(final MergingTask task) throws IOException {
+        final List<XnodeDto> xnodesDtoList = xNodeConfigurationService.getConfiguration(task.getInputs().getTargetDate()).getXNodesList();
+        task.getConfigurations().setXnodeList(xnodeMapper.mapToXnodeList(xnodesDtoList));
+        LOGGER.info("XNodes configuration is set on task configuration");
     }
 
-    void setBecKeyConfiguration(MergingTask taskEntity) {
-        try {
-            List<BecByBoundaryDto> becByBoundaryDtoList = becKeyConfigurationService.getConfiguration(taskEntity.getInputs().getTargetDate()).getBecByBoundaries();
-            List<BecByBoundary> becByBoundaryList = becByBoundaryMapper.mapToBecByBoundaryList(becByBoundaryDtoList);
-            taskEntity.getConfigurations().setBecMatrixConfig(becByBoundaryList);
-            LOGGER.info("BEC Key configuration is set on task configuration");
-        } catch (Exception e) {
-            String errorMessage = "Error occurred while trying to set BEC Key configuration, cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage, e);
-        }
+    void setBecKeyConfiguration(final MergingTask task) throws IOException {
+        final List<BecByBoundaryDto> becByBoundaryDtos = becKeyConfigurationService.getConfiguration(task.getInputs().getTargetDate()).getBecByBoundaries();
+        task.getConfigurations().setBecMatrixConfig(becByBoundaryMapper.mapToBecByBoundaryList(becByBoundaryDtos));
+        LOGGER.info("BEC Key configuration is set on task configuration");
     }
 
-    void setRegionEicConfiguration(MergingTask taskEntity) {
-        try {
-            JsonRegionConfiguration jsonRegionConfiguration = regionConfigurationService.getConfiguration(taskEntity.getInputs().getTargetDate());
-            LOGGER.trace("EIC config : {}", jsonRegionConfiguration.getRegionConfiguration().toString());
-            RegionConfiguration regionConfiguration = regionConfigurationMapper.mapToRegionConfiguration(jsonRegionConfiguration.getRegionConfiguration());
-            LOGGER.trace("EIC config : {}", regionConfiguration.toString());
-            taskEntity.getConfigurations().setRegionConfiguration(regionConfiguration);
-            LOGGER.trace("EIC config : {}", taskEntity.getConfigurations().getRegionConfiguration().toString());
-            repository.save(taskEntity);
-            LOGGER.trace("EIC config : {}", taskEntity.getConfigurations().getRegionConfiguration().toString());
-            LOGGER.info("Region EIC configuration is set on task configuration");
-        } catch (Exception e) {
-            String errorMessage = "Error occurred while trying to set Region EIC configuration, cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage, e);
-        }
+    void setRegionEicConfiguration(final MergingTask task) throws IOException {
+        final JsonRegionConfiguration jsonConfig = regionConfigurationService.getConfiguration(task.getInputs().getTargetDate());
+        task.getConfigurations().setRegionConfiguration(
+            regionConfigurationMapper.mapToRegionConfiguration(jsonConfig.getRegionConfiguration())
+        );
+        repository.save(task);
+        LOGGER.info("Region EIC configuration is set on task configuration");
     }
 
-    void setHvdcXNodeAlignmentConfiguration(MergingTask taskEntity) {
-        try {
-            JsonHvdcAlignmentConfiguration jsonHvdcAlignmentConfiguration = hvdcAlignmentConfigurationService.getConfiguration(taskEntity.getInputs().getTargetDate());
-            Configurations configurations = taskEntity.getConfigurations();
+    void setHvdcXNodeAlignmentConfiguration(final MergingTask task) throws IOException {
+        final JsonHvdcAlignmentConfiguration jsonConfig = hvdcAlignmentConfigurationService.getConfiguration(task.getInputs()
+                                                                                                                 .getTargetDate());
+        final Configurations configurations = task.getConfigurations();
 
-            List<HvdcAlignmentXNodeCoupleDto> hvdcAlignmentXNodeCoupleDtos = jsonHvdcAlignmentConfiguration.getHvdcXNodeAlignment();
-            List<HvdcAlignmentXNodeCouple> hvdcAlignmentXNodeCouples = hvdcAlignmentXNodeCoupleMapper.mapToHvdcAlignmentXNodeCoupleList(hvdcAlignmentXNodeCoupleDtos);
-            configurations.setVirtualHubsAlignmentCouples(hvdcAlignmentXNodeCouples);
-
-            List<ZeroFlowNodeDto> zeroFlowNodeDtos = jsonHvdcAlignmentConfiguration.getSetZeroFlowNodes();
-            List<ZeroFlowNode> zeroFlowNodes = zeroFlowNodeMapper.mapToZeroFlowNodeList(zeroFlowNodeDtos);
-            configurations.setZeroFlowNodes(zeroFlowNodes);
-
-            List<String> dkHvdcXnodes = jsonHvdcAlignmentConfiguration.getDkHvdcXnodes();
-            configurations.setDkHvdcXnodes(dkHvdcXnodes);
-
-            String defaultSlackNode = jsonHvdcAlignmentConfiguration.getDefaultSlackNode();
-            configurations.setDefaultSlackNode(defaultSlackNode);
-
-            LOGGER.info("HVDC XNode alignment configuration is set on task configuration");
-        } catch (Exception e) {
-            String errorMessage = "Error occurred while trying to set HVDC XNode alignment configuration, cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage, e);
-        }
+        configurations.setZeroFlowNodes(zeroFlowNodeMapper.mapToZeroFlowNodeList(jsonConfig.getSetZeroFlowNodes()));
+        configurations.setDkHvdcXnodes(jsonConfig.getDkHvdcXnodes());
+        configurations.setDefaultSlackNode(jsonConfig.getDefaultSlackNode());
+        configurations.setVirtualHubsAlignmentCouples(
+            hvdcAlignmentXNodeCoupleMapper.mapToHvdcAlignmentXNodeCoupleList(jsonConfig.getHvdcXNodeAlignment())
+        );
     }
 
-    private static void adaptCountryCodeForVirtualHub(List<VirtualHubRecord> virtualHubList) {
-        virtualHubList.forEach(virtualHubRecord -> virtualHubRecord.setRelatedMaCode(CountryUtils.mapKsToXk(virtualHubRecord.getRelatedMaCode())));
+    private static void fixKosovoVirtualHubs(final List<VirtualHubRecord> virtualHubs) {
+        virtualHubs.forEach(hub -> hub.setRelatedMaCode(mapKsToXk(hub.getRelatedMaCode())));
     }
 
-    private static void adaptCountryCodeForBorderDirection(List<BorderDirectionRecord> borderDirectionRecords) {
-        borderDirectionRecords.forEach(borderDirectionRecord -> {
-            borderDirectionRecord.setBorderFrom(CountryUtils.mapKsToXk(borderDirectionRecord.getBorderFrom()));
-            borderDirectionRecord.setBorderTo(CountryUtils.mapKsToXk(borderDirectionRecord.getBorderTo()));
+    private static void fixKosovoBorderDirections(final List<BorderDirectionRecord> borderDirections) {
+        borderDirections.forEach(direction -> {
+            direction.setBorderFrom(mapKsToXk(direction.getBorderFrom()));
+            direction.setBorderTo(mapKsToXk(direction.getBorderTo()));
         });
     }
 }

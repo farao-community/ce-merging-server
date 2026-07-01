@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.mapper;
 
-
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.openrao.virtualhubs.VirtualHub;
 import org.mapstruct.Mapper;
