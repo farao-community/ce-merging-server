@@ -264,7 +264,7 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "Valid virtual hubs configuration  returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "No valid virtual hubs configuration found for this instant.")
     })
-    public ResponseEntity<byte[]> getVirtualHubsConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) {
+    public ResponseEntity<byte[]> getVirtualHubsConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws IOException {
         return toAttachmentFileResponse(taskManager.getVirtualHubsConfigurationBytes(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "virtual-hubs-config.json");
     }
 
@@ -314,7 +314,7 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "HVDC XNode alignment configuration returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "No valid HVDC XNode alignment configuration found for this instant.")
     })
-    public ResponseEntity<byte[]> getHvdcXnodeAlignementConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) {
+    public ResponseEntity<byte[]> getHvdcXnodeAlignementConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws IOException {
         return toAttachmentFileResponse(taskManager.getHvdcXNodeAlignmentConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "hvdc-xnode-alignment-configuration.json");
     }
 

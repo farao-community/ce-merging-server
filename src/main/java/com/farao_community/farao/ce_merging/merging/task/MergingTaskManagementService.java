@@ -14,16 +14,21 @@ import com.farao_community.farao.ce_merging.common.exception.task.TaskNotFoundEx
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotRunException;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.HvdcAlignmentConfigurationService;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.RegionConfigurationService;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.VirtualHubsConfigurationService;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.XNodeConfigurationService;
 import com.farao_community.farao.ce_merging.merging.MergingService;
 import com.farao_community.farao.ce_merging.merging.request_metadata.RequestMetadataManager;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
-import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +45,9 @@ import java.util.function.Function;
 
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.unzipInputFileInTmp;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirectory;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
@@ -60,15 +65,30 @@ public class MergingTaskManagementService {
     private final MergingService mergingService;
     private final MergingTaskRepository repository;
     private final MergingTaskMapper mapper;
+    private final VirtualHubsConfigurationService virtualHubsConfigurationService;
+    private final XNodeConfigurationService xNodeConfigurationService;
+    private final BECKeyConfigurationService becKeyConfigurationService;
+    private final RegionConfigurationService regionConfigurationService;
+    private final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService;
 
     public MergingTaskManagementService(final CeMergingConfiguration configuration,
                                         final MergingService mergingService,
                                         final MergingTaskRepository repository,
-                                        final MergingTaskMapper mapper) {
+                                        final MergingTaskMapper mapper,
+                                        final VirtualHubsConfigurationService virtualHubsConfigurationService,
+                                        final XNodeConfigurationService xNodeConfigurationService,
+                                        final BECKeyConfigurationService becKeyConfigurationService,
+                                        final RegionConfigurationService regionConfigurationService,
+                                        final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService) {
         this.configuration = configuration;
         this.mergingService = mergingService;
         this.repository = repository;
         this.mapper = mapper;
+        this.virtualHubsConfigurationService = virtualHubsConfigurationService;
+        this.xNodeConfigurationService = xNodeConfigurationService;
+        this.becKeyConfigurationService = becKeyConfigurationService;
+        this.regionConfigurationService = regionConfigurationService;
+        this.hvdcAlignmentConfigurationService = hvdcAlignmentConfigurationService;
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -228,7 +248,7 @@ public class MergingTaskManagementService {
 
     public byte[] getTopologicalMerge(final Long taskId) {
         //TODO: Implement. The method signature can be changed if necessary.
-        return  null;
+        return null;
     }
 
     public byte[] getCgmAfterRecessivity(final Long taskId) {
@@ -305,53 +325,58 @@ public class MergingTaskManagementService {
         //TODO: Implement. The method signature can be changed if necessary.
         return null;
     }
-       /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                        GLOBAL CONFIGURATIONS
+    /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+                    GLOBAL CONFIGURATIONS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-    public byte[] getBECKeyConfiguration(final OffsetDateTime dateTime) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+    public byte[] getBECKeyConfiguration(final OffsetDateTime dateTime) throws IOException {
+        return becKeyConfigurationService.getConfigAsJsonBytes(dateTime);
     }
 
-    public void publishRegionConfiguration(final MultipartFile configurationFile, final OffsetDateTime validFrom, final OffsetDateTime validTo) {
-        //TODO: Implement. The method signature can be changed if necessary.
+    public void publishBECKeyConfiguration(final MultipartFile configurationFile,
+                                           final OffsetDateTime validFrom,
+                                           final OffsetDateTime validTo) {
+        becKeyConfigurationService.publish(configurationFile, validFrom, validTo);
     }
 
-    public byte[] getHvdcXNodeAlignmentConfiguration(final OffsetDateTime dateTime) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+    public byte[] getRegionConfiguration(final OffsetDateTime dateTime) throws IOException {
+        return regionConfigurationService.getConfigAsJsonBytes(dateTime);
     }
 
-    public void publishHvdcXNodeAlignmentConfiguration(final MultipartFile configurationFile, final OffsetDateTime validFrom, final OffsetDateTime validTo) {
-        //TODO: Implement. The method signature can be changed if necessary.
+    public void publishRegionConfiguration(final MultipartFile configurationFile,
+                                           final OffsetDateTime validFrom,
+                                           final OffsetDateTime validTo) {
+        regionConfigurationService.publish(configurationFile, validFrom, validTo);
     }
 
-    public void publishBECKeyConfiguration(final MultipartFile configurationFile, final OffsetDateTime validFrom, final OffsetDateTime validTo) {
-        //TODO: Implement. The method signature can be changed if necessary.
+    public byte[] getHvdcXNodeAlignmentConfiguration(final OffsetDateTime dateTime) throws IOException {
+        return hvdcAlignmentConfigurationService.getConfigAsJsonBytes(dateTime);
     }
 
-    public byte[] getRegionConfiguration(final OffsetDateTime dateTime) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+    public void publishHvdcXNodeAlignmentConfiguration(final MultipartFile configurationFile,
+                                                       final OffsetDateTime validFrom,
+                                                       final OffsetDateTime validTo) {
+        hvdcAlignmentConfigurationService.publish(configurationFile, validFrom, validTo);
     }
 
-    public byte[] getVirtualHubsConfigurationBytes(final OffsetDateTime dateTime) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+    public byte[] getVirtualHubsConfigurationBytes(final OffsetDateTime dateTime) throws IOException {
+        return virtualHubsConfigurationService.getConfigAsJsonBytes(dateTime);
     }
 
-    public void publishVirtualHubsConfiguration(final MultipartFile configurationFile, final OffsetDateTime validFrom, final OffsetDateTime validTo) {
-        //TODO: Implement. The method signature can be changed if necessary.
+    public void publishVirtualHubsConfiguration(final MultipartFile configurationFile,
+                                                final OffsetDateTime validFrom,
+                                                final OffsetDateTime validTo) {
+        virtualHubsConfigurationService.publish(configurationFile, validFrom, validTo);
     }
 
-    public void publishXNodesConfiguration(final MultipartFile configurationFile, final OffsetDateTime validFrom, final OffsetDateTime validTo) {
-        //TODO: Implement. The method signature can be changed if necessary.
+    public byte[] getXNodesConfiguration(final OffsetDateTime dateTime) throws IOException {
+        return xNodeConfigurationService.getConfigAsJsonBytes(dateTime);
     }
 
-    public byte[] getXNodesConfiguration(final OffsetDateTime dateTime) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+    public void publishXNodesConfiguration(final MultipartFile configurationFile,
+                                           final OffsetDateTime validFrom,
+                                           final OffsetDateTime validTo) {
+        xNodeConfigurationService.publish(configurationFile, validFrom, validTo);
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-

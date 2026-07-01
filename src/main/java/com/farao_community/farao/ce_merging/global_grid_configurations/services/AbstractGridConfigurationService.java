@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.DefaultConfigFileNameFactory;
 import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.AbstractGridConfigurationRecord;
@@ -53,11 +54,22 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
         return UUID.randomUUID().toString();
     }
 
+    public byte[] getConfigAsJsonBytes(final OffsetDateTime targetDate) throws IOException {
+        return JsonUtils.writeToBytes(getJsonClass(), getConfiguration(targetDate));
+    }
+
     @SuppressWarnings("unchecked")
     private Class<R> getRecordClass() {
         // [0] because the classes are <R,C>
         return (Class<R>) ((ParameterizedType) getClass()
             .getGenericSuperclass()).getActualTypeArguments()[0];
+    }
+
+    @SuppressWarnings("unchecked")
+    private Class<C> getJsonClass() {
+        // [1] because the classes are <R,C>
+        return (Class<C>) ((ParameterizedType) getClass()
+            .getGenericSuperclass()).getActualTypeArguments()[1];
     }
 
     protected InputStream getDefaultConfigFileStream() throws IOException {
@@ -69,9 +81,9 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
         return getDefaultConfigFileStream().readAllBytes();
     }
 
-    protected void publish(final MultipartFile configurationFile,
-                        final OffsetDateTime validFrom,
-                        final OffsetDateTime validTo) {
+    public void publish(final MultipartFile configurationFile,
+                           final OffsetDateTime validFrom,
+                           final OffsetDateTime validTo) {
         try {
             repository.save(getConfigurationRecordFromFile(configurationFile, validFrom, validTo));
         } catch (final Exception e) {

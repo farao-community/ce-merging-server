@@ -82,7 +82,12 @@ class MergingTaskManagementServiceTest {
         service = new MergingTaskManagementService(ceMergingConfiguration,
                                                    mergingService,
                                                    repository,
-                                                   mapper);
+                                                   mapper,
+                                                   mock(),
+                                                   mock(),
+                                                   mock(),
+                                                   mock(),
+                                                   mock());
     }
 
     @Test
