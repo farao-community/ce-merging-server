@@ -11,6 +11,8 @@ import com.farao_community.farao.ce_merging.base_case_improvement.feasibility_ra
 import com.farao_community.farao.ce_merging.base_case_improvement.forecast_netpositions.ReferenceProgram;
 import com.farao_community.farao.ce_merging.base_case_improvement.process.result.BciAreaResults;
 import com.farao_community.farao.ce_merging.base_case_improvement.process.result.BciComputationResult;
+import com.farao_community.farao.ce_merging.base_case_improvement.process.result.GlobalNetPositions;
+import com.farao_community.farao.ce_merging.base_case_improvement.process.result.InRegionNetPositions;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -20,8 +22,13 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import java.util.function.ToDoubleFunction;
+
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+import static java.util.stream.Collectors.toMap;
 
 public class BciComputation {
     private static final double EPSILON = 0.01;
@@ -29,10 +36,10 @@ public class BciComputation {
 
     private final RegionConfiguration region;
     private final ReferenceProgram referenceProgram;
-    private Map<String, Double> forecastNetPositionInRegionByArea = new HashMap<>();
-    private Map<String, Double> targetNetPositionInRegionByArea = new HashMap<>();
-    private Map<String, Double> forecastGlobalNetPositionByArea = new HashMap<>();
-    private Map<String, Double> targetGlobalNetPositionByArea = new HashMap<>();
+    private Map<String, Double> inRegionNpfByArea = new HashMap<>();
+    private Map<String, Double> targetInRegionNpByArea = new HashMap<>();
+    private Map<String, Double> globalNpfByArea = new HashMap<>();
+    private Map<String, Double> targetGlobalNpByArea = new HashMap<>();
     private final Map<String, Boolean> bciAppliedByArea = new HashMap<>();
 
     BciComputation(final RegionConfiguration region, final ReferenceProgram referenceProgram) {
@@ -42,9 +49,9 @@ public class BciComputation {
 
     public BciComputationResult run(final Map<String, Interval> regionFeasibilityRanges,
                                     final Map<String, Double> initialRegionNetPositions,
-                                    final double valueAlbeThatShouldBeDisplayedInCgm,
-                                    final double valueAldeThatShouldBeDisplayedInCgm) {
-        Map<String, BciAreaResults> results;
+                                    final double alBeToCeFlow,
+                                    final double alDeToCeFlow) {
+        final Map<String, BciAreaResults> results;
 
         if (!validFeasibilityRanges(regionFeasibilityRanges)) {
             LOGGER.error("The feasibility ranges are not valid");
@@ -52,136 +59,141 @@ public class BciComputation {
         }
 
         // compute forecast net position inside region and exchange out region for each area
-        forecastNetPositionInRegionByArea = referenceProgram.computeAllNetPositionsInRegion(region);
-        forecastGlobalNetPositionByArea = referenceProgram.computeAllGlobalNetPositions(region);
-        updateFroecastNetPositionsWithAlegro(forecastNetPositionInRegionByArea, forecastGlobalNetPositionByArea, valueAlbeThatShouldBeDisplayedInCgm, valueAldeThatShouldBeDisplayedInCgm);
+        inRegionNpfByArea = referenceProgram.computeAllNetPositionsInRegion(region);
+        globalNpfByArea = referenceProgram.computeAllGlobalNetPositions(region);
+        shiftNpfWithAlegro(inRegionNpfByArea, globalNpfByArea, alBeToCeFlow, alDeToCeFlow);
 
-        Map<String, Double> outNetPositionByArea = referenceProgram.computeAllNetPositionsOutRegion(region);
+        final Map<String, Double> outNetPositionByArea = referenceProgram.computeAllNetPositionsOutRegion(region);
 
         // check net position in feasibility ranges
-        if (validForecastNetPosition(forecastNetPositionInRegionByArea, regionFeasibilityRanges)) {
+        if (isNpfValid(inRegionNpfByArea, regionFeasibilityRanges)) {
             LOGGER.info("All forecast net positions are in the feasibility ranges, Bci is not applied");
-            targetNetPositionInRegionByArea = forecastNetPositionInRegionByArea;
-            targetGlobalNetPositionByArea = forecastGlobalNetPositionByArea;
+            targetInRegionNpByArea = inRegionNpfByArea;
+            targetGlobalNpByArea = globalNpfByArea;
             results = createResults(regionFeasibilityRanges, initialRegionNetPositions);
-            results.forEach((key, value) -> value.setBciApplied(Boolean.FALSE));
+            results.forEach((key, value) -> value.setBciApplied(FALSE));
             return new BciComputationResult(false, false, results);
         } else {
             LOGGER.info("Not all forecast net positions are in the feasibility ranges, Bci will be applied");
-            Pair<Boolean, Map<String, Double>> resultBci = applyBci(forecastNetPositionInRegionByArea, regionFeasibilityRanges, bciAppliedByArea);
-            targetNetPositionInRegionByArea = resultBci.getRight();
-            targetGlobalNetPositionByArea = targetNetPositionInRegionByArea.entrySet().stream().collect(Collectors.toMap(Entry::getKey, e -> e.getValue() + outNetPositionByArea.get(e.getKey())));
+            final Pair<Boolean, Map<String, Double>> resultBci = applyBci(inRegionNpfByArea, regionFeasibilityRanges, bciAppliedByArea);
+            targetInRegionNpByArea = resultBci.getRight();
+            targetGlobalNpByArea = targetInRegionNpByArea.entrySet().stream()
+                .collect(toMap(Entry::getKey,
+                               e -> e.getValue() + outNetPositionByArea.get(e.getKey())));
             results = createResults(regionFeasibilityRanges, initialRegionNetPositions);
             return new BciComputationResult(true, resultBci.getLeft(), results);
         }
     }
 
-    private void updateFroecastNetPositionsWithAlegro(final Map<String, Double> forecastNetPositionInRegionByArea,
-                                                      final Map<String, Double> forecastGlobalNetPositionByArea,
-                                                      final double valueAlbeThatShouldBeDisplayedInCgm,
-                                                      final double valueAldeThatShouldBeDisplayedInCgm) {
+    private void shiftNpfWithAlegro(final Map<String, Double> inRegionNpfByArea,
+                                    final Map<String, Double> globalNpfByArea,
+                                    final double alBeToCeFlow,
+                                    final double alDeToCeFlow) {
         // Bci process should not take Alegro flows into account.
-        // ForecastNetPositionInRegionByArea = BE-CORE from NPF file which contains already ALBE-CORE flow
-        // That's why we must subtract from it valueXThatShouldBeDisplayedInCgm (= ALBE-CORE flow) to have only the AC target flow as the Bci target flow.
-        forecastNetPositionInRegionByArea.put(region.getAreasIn().get("BE"), forecastNetPositionInRegionByArea.get(region.getAreasIn().get("BE")) - valueAlbeThatShouldBeDisplayedInCgm);
-        forecastNetPositionInRegionByArea.put(region.getAreasIn().get("DE"), forecastNetPositionInRegionByArea.get(region.getAreasIn().get("DE")) - valueAldeThatShouldBeDisplayedInCgm);
-        forecastGlobalNetPositionByArea.put(region.getAreasIn().get("BE"), forecastGlobalNetPositionByArea.get(region.getAreasIn().get("BE")) - valueAlbeThatShouldBeDisplayedInCgm);
-        forecastGlobalNetPositionByArea.put(region.getAreasIn().get("DE"), forecastGlobalNetPositionByArea.get(region.getAreasIn().get("DE")) - valueAldeThatShouldBeDisplayedInCgm);
+        // ForecastNetPositionInRegionByArea = BE-CE from NPF file which contains already ALBE-CE flow
+        // That's why we must subtract from it ALBE-CE flow to have only the AC target flow as the BCI target flow.
+        final String belgium = region.getAreasIn().get("BE");
+        final String germany = region.getAreasIn().get("DE");
+
+        globalNpfByArea.computeIfPresent(belgium, (k, np) -> np + alBeToCeFlow);
+        inRegionNpfByArea.computeIfPresent(belgium, (k, np) -> np + alBeToCeFlow);
+        globalNpfByArea.computeIfPresent(germany, (k, np) -> np + alDeToCeFlow);
+        inRegionNpfByArea.computeIfPresent(germany, (k, np) -> np + alDeToCeFlow);
     }
 
     private Map<String, BciAreaResults> createResults(final Map<String, Interval> regionFeasibilityRanges,
-                                                      final Map<String, Double> initialNetPositionInRegionByArea) {
-        Map<String, BciAreaResults> resultsMap = region.getAreasIn().entrySet().stream()
-            .collect(Collectors.toMap(Entry::getKey, entry -> this.createBciAreaResult(entry.getValue(), regionFeasibilityRanges, initialNetPositionInRegionByArea, bciAppliedByArea)));
-        return new TreeMap<>(resultsMap);
+                                                      final Map<String, Double> initialInRegionNpByArea) {
+        return region.getAreasIn().entrySet().stream()
+            .collect(toMap(Entry::getKey, entry -> this.createBciAreaResult(
+                entry.getValue(), regionFeasibilityRanges, initialInRegionNpByArea, bciAppliedByArea))
+            );
     }
 
     private BciAreaResults createBciAreaResult(final String areaId,
                                                final Map<String, Interval> regionFeasibilityRanges,
-                                               final Map<String, Double> initialNetPositionInRegionByArea,
+                                               final Map<String, Double> initialRegionNpByArea,
                                                final Map<String, Boolean> bciAppliedByArea) {
-        BciAreaResults.InRegionNetPositions inRegionResults = new BciAreaResults.InRegionNetPositions(
-            initialNetPositionInRegionByArea.getOrDefault(areaId, 0.),
-            regionFeasibilityRanges.get(areaId).getMinValue(),
-            regionFeasibilityRanges.get(areaId).getMaxValue(),
-            Math.min(regionFeasibilityRanges.get(areaId).getMinValue(), targetNetPositionInRegionByArea.get(areaId)),
-            Math.max(regionFeasibilityRanges.get(areaId).getMaxValue(), targetNetPositionInRegionByArea.get(areaId)),
-            forecastNetPositionInRegionByArea.get(areaId),
-            targetNetPositionInRegionByArea.get(areaId));
-        Boolean bciApplied = bciAppliedByArea.get(areaId);
+        final double targetRegionNp = targetInRegionNpByArea.get(areaId);
+        final double regionMinFeasible = regionFeasibilityRanges.get(areaId).getMinValue();
+        final double regionMaxFeasible = regionFeasibilityRanges.get(areaId).getMaxValue();
 
-        BciAreaResults.GlobalNetPositions globalResults = new BciAreaResults.GlobalNetPositions(
-            forecastGlobalNetPositionByArea.get(areaId),
-            targetGlobalNetPositionByArea.get(areaId));
-        return new BciAreaResults(inRegionResults, globalResults, bciApplied);
+        final InRegionNetPositions inRegionResults = new InRegionNetPositions(
+            initialRegionNpByArea.getOrDefault(areaId, 0.),
+            regionMinFeasible,
+            regionMaxFeasible,
+            min(regionMinFeasible, targetRegionNp),
+            max(regionMaxFeasible, targetRegionNp),
+            inRegionNpfByArea.get(areaId),
+            targetRegionNp
+        );
+
+        final Boolean isBciApplied = bciAppliedByArea.get(areaId);
+        final GlobalNetPositions globalResults = new GlobalNetPositions(globalNpfByArea.get(areaId),
+                                                                        targetGlobalNpByArea.get(areaId));
+
+        return new BciAreaResults(inRegionResults, globalResults, isBciApplied);
     }
 
     private boolean validFeasibilityRanges(final Map<String, Interval> regionFeasibilityRanges) {
         return regionFeasibilityRanges.keySet().containsAll(region.getAreasIn().values());
     }
 
-    private static boolean validForecastNetPosition(final Map<String, Double> netPositionInRegionByArea,
-                                                    final Map<String, Interval> regionFeasibilityRanges) {
-        boolean validForecastNetPositionFlag = Boolean.TRUE;
-        for (Entry<String, Double> e : netPositionInRegionByArea.entrySet()) {
-            String areaId = e.getKey();
-            if (!regionFeasibilityRanges.get(areaId).containsValue(e.getValue())) {
-                LOGGER.warn("Area: {} : Feasibility range interval is {}, but Forecast Net Position in region {} is outside interval", areaId, regionFeasibilityRanges.get(areaId).toString(), e.getValue());
-                validForecastNetPositionFlag = Boolean.FALSE;
-            } else {
-                LOGGER.info("Area: {} : Feasibility range interval is {}, Forecast Net Position in region {} is inside interval", areaId, regionFeasibilityRanges.get(areaId).toString(), e.getValue());
-            }
-        }
-        return validForecastNetPositionFlag;
+    private static boolean isNpfValid(final Map<String, Double> inRegionNpByArea,
+                                      final Map<String, Interval> regionFeasibilityRanges) {
+
+        return inRegionNpByArea.entrySet().stream()
+            .allMatch((e -> regionFeasibilityRanges.get(e.getKey()).containsValue(e.getValue())));
     }
 
-    private static boolean isDifferentFromZero(final double value) {
-        BigDecimal bigDecimalValue = BigDecimal.valueOf(value);
-        BigDecimal bigDecimalEpsilon = BigDecimal.valueOf(BciComputation.EPSILON);
-        return bigDecimalValue.abs().compareTo(bigDecimalEpsilon) > 0;
+    private static boolean isNotNegligible(final double value) {
+        return BigDecimal.valueOf(value).abs().compareTo(BigDecimal.valueOf(EPSILON)) > 0;
     }
 
     private static Pair<Boolean, Map<String, Double>> applyBci(final Map<String, Double> refNetPositionInRegionByArea,
                                                                final Map<String, Interval> regionFeasibilityRanges,
                                                                final Map<String, Boolean> bciAppliedByArea) {
-        Map<String, Double> targetNetPositionInRegionByAreaId = new HashMap<>(refNetPositionInRegionByArea);
-        targetNetPositionInRegionByAreaId.keySet().forEach(areaId -> bciAppliedByArea.put(areaId, Boolean.FALSE));
+        Map<String, Double> targetInRegionNpByArea = new HashMap<>(refNetPositionInRegionByArea);
+        targetInRegionNpByArea.keySet().forEach(areaId -> bciAppliedByArea.put(areaId, FALSE));
 
         // Initial violation
 
-        Map<String, Double> violationsByArea = computeViolationsByArea(targetNetPositionInRegionByAreaId, regionFeasibilityRanges);
-        double totalViolations = violationsByArea.values().stream().mapToDouble(Double::doubleValue).sum();
-        double contraryViolations = computeContraryViolations(violationsByArea, totalViolations);
+        Map<String, Double> violationsByArea = computeViolationsByArea(targetInRegionNpByArea, regionFeasibilityRanges);
+        double totalViolations = sumOfValues(violationsByArea);
+        final double contraryViolations = computeContraryViolations(violationsByArea, totalViolations);
 
         // Step 1, Preliminary BCI to solve contrary violations
 
-        if (isDifferentFromZero(contraryViolations)) {
+        if (isNotNegligible(contraryViolations)) {
             LOGGER.info("Total violation {}, Contrary violations : {} , Prelimanry BC to solve contrary violations will be aplied", totalViolations, contraryViolations);
-            applyBciStep1(targetNetPositionInRegionByAreaId, regionFeasibilityRanges, violationsByArea, bciAppliedByArea, totalViolations, contraryViolations);
-            violationsByArea = computeViolationsByArea(targetNetPositionInRegionByAreaId, regionFeasibilityRanges);
-            totalViolations = violationsByArea.values().stream().mapToDouble(Double::doubleValue).sum();
+            applyBciStep1(targetInRegionNpByArea, regionFeasibilityRanges, violationsByArea, bciAppliedByArea, totalViolations, contraryViolations);
+            violationsByArea = computeViolationsByArea(targetInRegionNpByArea, regionFeasibilityRanges);
+            totalViolations = sumOfValues(violationsByArea);
         }
 
         // Step 2, solving of violations while respecting feasibility ranges
 
-        if (isDifferentFromZero(totalViolations)) {
+        if (isNotNegligible(totalViolations)) {
             LOGGER.info("Total violations after solving contrary  violation : {}, Normal BCI will be applied", totalViolations);
-            applyBciStep2(targetNetPositionInRegionByAreaId, regionFeasibilityRanges, violationsByArea, bciAppliedByArea, totalViolations);
+            applyBciStep2(targetInRegionNpByArea, regionFeasibilityRanges, violationsByArea, bciAppliedByArea, totalViolations);
         }
 
         // Step 3, Compensation of remaining imbalance
 
-        double totalImbalance = targetNetPositionInRegionByAreaId.values().stream().mapToDouble(Double::doubleValue).sum();
+        double totalImbalance = sumOfValues(targetInRegionNpByArea);
 
         boolean isExtendedBciFeasibilityRanges = false;
 
-        if (isDifferentFromZero(totalImbalance)) {
+        if (isNotNegligible(totalImbalance)) {
             LOGGER.info("Total imbalance after BCI : {}, compensation of remaining imbalance will be applied", totalImbalance);
-            applyBciStep3(targetNetPositionInRegionByAreaId, regionFeasibilityRanges, totalImbalance);
+            applyBciStep3(targetInRegionNpByArea, regionFeasibilityRanges, totalImbalance);
             isExtendedBciFeasibilityRanges = true;
         }
 
-        return Pair.of(isExtendedBciFeasibilityRanges, targetNetPositionInRegionByAreaId);
+        return Pair.of(isExtendedBciFeasibilityRanges, targetInRegionNpByArea);
+    }
+
+    private static double sumOfValues(final Map<String, Double> valuesByArea) {
+        return valuesByArea.values().stream().mapToDouble(Double::doubleValue).sum();
     }
 
     private static void applyBciStep1(final Map<String, Double> targetNetPositionInRegionByAreaId,
@@ -203,14 +215,14 @@ public class BciComputation {
             if (isInContraryViolation(violation, totalViolations)) {
                 double newNetPosition = contraryViolations > 0 ? frMax : frMin;
                 targetNetPositionInRegionByAreaId.put(areaId, newNetPosition);
-                bciAppliedByArea.put(areaId, Boolean.TRUE);
+                bciAppliedByArea.put(areaId, TRUE);
             } else if (isInMainViolation(violation, totalViolations)) {
                 double netPosition = targetNetPositionInRegionByAreaId.get(areaId);
-                double shiftAvailable = computeAvailableShiftWithContraryViolation(contraryViolations, frMin, frMax, netPosition);
+                double shiftAvailable = computeAvailableShiftWithContraryViolation(contraryViolations, interval, netPosition);
                 double shiftApplied = contraryViolations * (shiftAvailable / totalShiftAvailableForHubsInMainViolation);
                 double newNetPosition = netPosition + shiftApplied;
                 targetNetPositionInRegionByAreaId.put(areaId, newNetPosition);
-                bciAppliedByArea.put(areaId, Boolean.TRUE);
+                bciAppliedByArea.put(areaId, TRUE);
             }
         }
     }
@@ -223,8 +235,8 @@ public class BciComputation {
         double totalShiftAvailableForHubsNotInViolation = computeTotalShiftAvailableForHubsNotInViolation(totalViolations, violationsByArea, targetNetPositionInRegionByAreaId, regionFeasibilityRanges);
 
         double totalShiftToApplied = totalViolations < 0
-            ? Math.max(totalShiftAvailableForHubsNotInViolation, totalViolations)
-            : Math.min(totalShiftAvailableForHubsNotInViolation, totalViolations);
+            ? max(totalShiftAvailableForHubsNotInViolation, totalViolations)
+            : min(totalShiftAvailableForHubsNotInViolation, totalViolations);
 
         for (Entry<String, Double> entry : violationsByArea.entrySet()) {
             String areaId = entry.getKey();
@@ -238,9 +250,9 @@ public class BciComputation {
             if (isInViolation(violation)) {
                 double newNetPosition = totalViolations > 0 ? frMax : frMin;
                 targetNetPositionInRegionByAreaId.put(areaId, newNetPosition);
-                bciAppliedByArea.put(areaId, Boolean.TRUE);
-            } else if (isDifferentFromZero(totalShiftAvailableForHubsNotInViolation)) {
-                double shiftAvailable = computeAvailableShiftWithTotalViolation(totalViolations, frMin, frMax, netPosition);
+                bciAppliedByArea.put(areaId, TRUE);
+            } else if (isNotNegligible(totalShiftAvailableForHubsNotInViolation)) {
+                double shiftAvailable = computeAvailableShiftWithTotalViolation(totalViolations, interval, netPosition);
                 double shiftApplied = totalShiftToApplied * (shiftAvailable / totalShiftAvailableForHubsNotInViolation);
                 double newNetPosition = netPosition + shiftApplied;
                 targetNetPositionInRegionByAreaId.put(areaId, newNetPosition);
@@ -248,61 +260,52 @@ public class BciComputation {
         }
     }
 
-    private static void applyBciStep3(final Map<String, Double> targetNetPositionInRegionByAreaId,
+    private static void applyBciStep3(final Map<String, Double> targetInRegionNpByArea,
                                       final Map<String, Interval> regionFeasibilityRanges,
                                       final double totalImbalance) {
 
-        double totalFeasibilityRanges = computeTotalFeasibilityRanges(regionFeasibilityRanges);
+        final double totalFeasibilityRanges = computeTotalFeasibilityRanges(regionFeasibilityRanges);
 
-        for (Entry<String, Double> entry : targetNetPositionInRegionByAreaId.entrySet()) {
-            String areaId = entry.getKey();
-            double netPosition = entry.getValue();
-
-            Interval interval = regionFeasibilityRanges.get(areaId);
-            double frMin = interval.getMinValue();
-            double frMax = interval.getMaxValue();
-
-            double shiftApplied = -totalImbalance * ((frMax - frMin) / totalFeasibilityRanges);
-            double newNetPosition = netPosition + shiftApplied;
-            targetNetPositionInRegionByAreaId.put(areaId, newNetPosition);
-        }
+        targetInRegionNpByArea.keySet()
+            .forEach(area -> targetInRegionNpByArea.compute(area, (areaId, np) ->
+                np - (totalImbalance * regionFeasibilityRanges.get(areaId).getRange() / totalFeasibilityRanges)
+            ));
     }
 
     private static Map<String, Double> computeViolationsByArea(final Map<String, Double> netPositionInRegionByArea,
                                                                final Map<String, Interval> regionFeasibilityRanges) {
         return netPositionInRegionByArea.entrySet().stream()
-            .collect(Collectors.toMap(
+            .collect(toMap(
                 Entry::getKey,
                 entry -> {
                     String areaId = entry.getKey();
                     double netPosition = netPositionInRegionByArea.get(areaId);
                     Interval interval = regionFeasibilityRanges.get(areaId);
-                    double min = interval.getMinValue();
-                    double max = interval.getMaxValue();
-                    return (netPosition < min) ? netPosition - min :
-                        (netPosition > max) ? netPosition - max : 0.0;
+                    return netPosition - Math.clamp(netPosition, interval.getMinValue(), interval.getMaxValue());
                 }
             ));
     }
 
-    private static double computeContraryViolations(final Map<String, Double> violationsByArea, final double totalViolations) {
-        return totalViolations < 0
-            ? violationsByArea.values().stream().mapToDouble(violation -> Math.max(violation, 0.0)).sum()
-            : violationsByArea.values().stream().mapToDouble(violation -> Math.min(violation, 0.0)).sum();
+    private static double computeContraryViolations(final Map<String, Double> violationsByArea,
+                                                    final double totalViolations) {
+        final ToDoubleFunction<Double> toContraryViolation = v -> totalViolations < 0 ? max(v, .0) : min(v, .0);
+        return violationsByArea.values().stream().mapToDouble(toContraryViolation).sum();
     }
 
     private static double computeAvailableShiftWithContraryViolation(final double contraryViolation,
-                                                                     final double frMin,
-                                                                     final double frMax,
+                                                                     final Interval feasibilityInterval,
                                                                      final double netPosition) {
-        return contraryViolation < 0 ? frMax - netPosition : frMin - netPosition;
+        double frMin = feasibilityInterval.getMinValue();
+        double frMax = feasibilityInterval.getMaxValue();
+        return (contraryViolation < 0 ? frMax : frMin) - netPosition;
     }
 
     private static double computeAvailableShiftWithTotalViolation(final double totalViolation,
-                                                                  final double frMin,
-                                                                  final double frMax,
+                                                                  final Interval feasibilityInterval,
                                                                   final double netPosition) {
-        return totalViolation > 0 ? frMax - netPosition : frMin - netPosition;
+        double frMin = feasibilityInterval.getMinValue();
+        double frMax = feasibilityInterval.getMaxValue();
+        return (totalViolation > 0 ? frMax : frMin) - netPosition;
     }
 
     private static double computeTotalShiftAvailableForHubsInMainViolation(final double contraryViolations,
@@ -315,12 +318,9 @@ public class BciComputation {
             .mapToDouble(entry -> {
                 String areaId = entry.getKey();
                 double netPosition = entry.getValue();
-
-                Interval interval = regionFeasibilityRanges.get(areaId);
-                double frMin = interval.getMinValue();
-                double frMax = interval.getMaxValue();
-
-                return computeAvailableShiftWithContraryViolation(contraryViolations, frMin, frMax, netPosition);
+                return computeAvailableShiftWithContraryViolation(contraryViolations,
+                                                                  regionFeasibilityRanges.get(areaId),
+                                                                  netPosition);
             })
             .sum();
     }
@@ -334,30 +334,25 @@ public class BciComputation {
             .mapToDouble(entry -> {
                 String areaId = entry.getKey();
                 double netPosition = entry.getValue();
-
-                Interval interval = regionFeasibilityRanges.get(areaId);
-                double frMin = interval.getMinValue();
-                double frMax = interval.getMaxValue();
-
-                return computeAvailableShiftWithTotalViolation(totalViolations, frMin, frMax, netPosition);
+                return computeAvailableShiftWithTotalViolation(totalViolations,
+                                                               regionFeasibilityRanges.get(areaId),
+                                                               netPosition);
             })
             .sum();
     }
 
     private static double computeTotalFeasibilityRanges(final Map<String, Interval> regionFeasibilityRanges) {
         return regionFeasibilityRanges.values().stream()
-            .mapToDouble(interval -> interval.getMaxValue() - interval.getMinValue())
+            .mapToDouble(Interval::getRange)
             .sum();
     }
 
     private static boolean isInContraryViolation(final double violation, final double totalViolations) {
-        return totalViolations >= 0 && violation < 0 ||
-               totalViolations < 0 && violation > 0;
+        return isInViolation(violation) && totalViolations * violation <= 0;
     }
 
     private static boolean isInMainViolation(final double violation, final double totalViolations) {
-        return totalViolations >= 0 && violation > 0 ||
-               totalViolations < 0 && violation < 0;
+        return isInViolation(violation) && totalViolations * violation >= 0;
     }
 
     private static boolean isNotInViolation(final double violation) {

@@ -57,6 +57,10 @@ public class Interval {
         return value >= minValue && value <= maxValue;
     }
 
+    public double getRange() {
+        return maxValue - minValue;
+    }
+
     public String toString() {
         return String.format("[%s, %s]", minValue, maxValue);
     }

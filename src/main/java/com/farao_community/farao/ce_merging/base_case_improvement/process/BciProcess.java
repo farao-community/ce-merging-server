@@ -103,10 +103,10 @@ public class BciProcess {
     private void updateInRegionNetPositions(final String alegroNetPositionsPath) {
         final AlegroData alegroData = JsonUtils.read(AlegroData.class, alegroNetPositionsPath);
 
-        final double alDeDisplayValue = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlDeFlows());
-        final double germanAlegroGap = alDeDisplayValue - alegroData.getAlDeFlows().getInitialFlow();
-        final double alBeDisplayValue = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlBeFlows());
-        final double belgianAlegroGap = alBeDisplayValue - alegroData.getAlBeFlows().getInitialFlow();
+        final double alDeToCeFlow = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlDeFlows());
+        final double germanAlegroGap = alDeToCeFlow - alegroData.getAlDeFlows().getInitialFlow();
+        final double alBeToCeFlow = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlBeFlows());
+        final double belgianAlegroGap = alBeToCeFlow - alegroData.getAlBeFlows().getInitialFlow();
 
         final String germany = regionConfiguration.getAreasIn().get("DE");
         final String belgium = regionConfiguration.getAreasIn().get("BE");
@@ -148,22 +148,22 @@ public class BciProcess {
         final BciComputation computation = new BciComputation(regionConfiguration, referenceProgram);
         boolean isMergingWithAlegro = getAlegroNetPosPath() != null;
 
-        final double alDeDisplayValue;
-        final double alBeDisplayValue;
+        final double alDeToCeFlow;
+        final double alBeToCeFlow;
         if (isMergingWithAlegro) {
             final AlegroData alegroData = JsonUtils.read(AlegroData.class, getAlegroNetPosPath());
-            alDeDisplayValue = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlDeFlows());
-            alBeDisplayValue = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlBeFlows());
+            alDeToCeFlow = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlDeFlows());
+            alBeToCeFlow = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlBeFlows());
         }
         else {
-            alDeDisplayValue = 0;
-            alBeDisplayValue = 0;
+            alDeToCeFlow = 0;
+            alBeToCeFlow = 0;
         }
 
         final BciComputationResult bciResults = computation.run(regionFeasibilityRanges,
                                                                 initialRegionNetPositions,
-                                                                alBeDisplayValue,
-                                                                alDeDisplayValue);
+                                                                alBeToCeFlow,
+                                                                alDeToCeFlow);
 
         processResult = new BciProcessResult(regionConfiguration.getName(),
                                              task.getProcessTargetDate(),
