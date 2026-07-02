@@ -73,6 +73,7 @@ class ConfigurationServicesTest {
         ).thenReturn(recordObject);
 
         assertThat(service.getConfiguration(BEGINNING_OF_2000)).isInstanceOf(jsonConfigClass);
+        assertThat(service.getConfigAsJsonBytes(BEGINNING_OF_2000)).isNotEmpty();
     }
 
     @ParameterizedTest
