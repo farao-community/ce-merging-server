@@ -22,7 +22,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-public class BecByBoundary extends AbstractBecByBoundary implements Serializable {
+public class BecByBoundary extends AbstractBecByBoundary<BecCoefficients> implements Serializable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)

@@ -6,10 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
 
+import jakarta.persistence.MappedSuperclass;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
+@MappedSuperclass
 public abstract class AbstractZeroFlowNode {
     protected String xnode;
     protected String countryCode;

@@ -6,6 +6,9 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
 
+import jakarta.persistence.MappedSuperclass;
+
+@MappedSuperclass
 public abstract class AbstractBecCoefficients {
     protected String countryCode;
     protected Double coefficient;

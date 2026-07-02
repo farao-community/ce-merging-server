@@ -7,13 +7,21 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Id;
+import jakarta.persistence.MappedSuperclass;
 
 import java.util.List;
 
-public abstract class AbstractBecByBoundary {
+import static jakarta.persistence.FetchType.LAZY;
+
+@MappedSuperclass
+public abstract class AbstractBecByBoundary<T extends AbstractBecCoefficients> {
+    @Id
     protected Long id;
     protected Border border;
-    protected List<? extends AbstractBecCoefficients> coefficientByCountry;
+    @ElementCollection(fetch = LAZY)
+    protected List<T> coefficientByCountry;
 
     public Long getId() {
         return id;
@@ -31,11 +39,11 @@ public abstract class AbstractBecByBoundary {
         this.border = border;
     }
 
-    public List<? extends AbstractBecCoefficients> getCoefficientByCountry() {
+    public List<T> getCoefficientByCountry() {
         return coefficientByCountry;
     }
 
-    public void setCoefficientByCountry(final List<? extends AbstractBecCoefficients> coefficientByCountry) {
+    public void setCoefficientByCountry(final List<T> coefficientByCountry) {
         this.coefficientByCountry = coefficientByCountry;
     }
 }

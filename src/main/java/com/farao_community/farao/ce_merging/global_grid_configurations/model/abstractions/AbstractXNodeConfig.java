@@ -5,7 +5,9 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
+import jakarta.persistence.MappedSuperclass;
 
+@MappedSuperclass
 public abstract class AbstractXNodeConfig {
     protected String name;
     protected String area1;

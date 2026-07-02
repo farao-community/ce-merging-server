@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractBecByBoundary;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -21,7 +22,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-public class BecByBoundaryDto {
+public class BecByBoundaryDto extends AbstractBecByBoundary<BecCoefficientsDto> {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -43,29 +44,5 @@ public class BecByBoundaryDto {
 
     public BecByBoundaryDto() {
 
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(final long id) {
-        this.id = id;
-    }
-
-    public BorderDto getBorder() {
-        return border;
-    }
-
-    public void setBorder(final BorderDto border) {
-        this.border = border;
-    }
-
-    public List<BecCoefficientsDto> getCoefficientByCountry() {
-        return coefficientByCountry;
-    }
-
-    public void setCoefficientByCountry(final List<BecCoefficientsDto> coefficientByCountry) {
-        this.coefficientByCountry = coefficientByCountry;
     }
 }
