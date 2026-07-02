@@ -8,6 +8,7 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.VirtualHubsConfigurationRecord;
+import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,12 +23,11 @@ import static test_utils.CeTestUtils.BEGINNING_OF_2000;
 class VirtualHubsConfigurationServiceTest {
 
     final GridConfigurationRepository<VirtualHubsConfigurationRecord> repository = mock(GridConfigurationRepository.class);
-    final VirtualHubsConfigurationService service = new VirtualHubsConfigurationService();
+    final VirtualHubsConfigurationService service = new VirtualHubsConfigurationService(repository);
 
     @Test
     void shouldGetJsonConfigCallingRecord() throws IOException {
 
-        service.setRepository(repository);
         final VirtualHubsConfigurationRecord mock = mock(VirtualHubsConfigurationRecord.class);
 
         when(repository.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
@@ -37,6 +37,14 @@ class VirtualHubsConfigurationServiceTest {
         service.getConfiguration(BEGINNING_OF_2000);
 
         verify(mock).getConfigurationJson();
+    }
+
+    @Test
+    void shouldHaveCommonMethodsWorking() throws IOException {
+        new ConfigurationServicesTestHelper<>(service,
+                                              new VirtualHubsConfigurationRecord(),
+                                              VirtualHubsConfiguration.class)
+            .testAllAbstractMethods();
     }
 
 }

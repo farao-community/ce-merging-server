@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.VirtualHubsConfigurationRecord;
 import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
 import com.powsybl.openrao.virtualhubs.json.JsonVirtualHubsConfiguration;
@@ -24,6 +25,17 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
 public class VirtualHubsConfigurationService extends AbstractGridConfigurationService<VirtualHubsConfigurationRecord, VirtualHubsConfiguration> {
+
+    private final GridConfigurationRepository<VirtualHubsConfigurationRecord> repository;
+
+    public VirtualHubsConfigurationService(final GridConfigurationRepository<VirtualHubsConfigurationRecord> repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    protected GridConfigurationRepository<VirtualHubsConfigurationRecord> getRepository() {
+        return repository;
+    }
 
     @Override
     protected VirtualHubsConfiguration getDefaultJsonConfiguration(final OffsetDateTime targetDate) throws IOException {
