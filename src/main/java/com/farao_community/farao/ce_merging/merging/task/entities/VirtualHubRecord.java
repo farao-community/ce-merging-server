@@ -18,6 +18,21 @@ public class VirtualHubRecord implements Serializable {
     private String relatedMaCode;
     private String relatedMaEic;
 
+    public VirtualHubRecord(final String code,
+                            final String eic,
+                            final String nodeName,
+                            final String relatedMaCode,
+                            final String relatedMaEic) {
+        this.code = code;
+        this.eic = eic;
+        this.nodeName = nodeName;
+        this.relatedMaCode = relatedMaCode;
+        this.relatedMaEic = relatedMaEic;
+    }
+
+    public VirtualHubRecord() {
+    }
+
     public String getEic() {
         return eic;
     }

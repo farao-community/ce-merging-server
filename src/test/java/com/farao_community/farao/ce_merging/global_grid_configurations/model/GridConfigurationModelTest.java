@@ -9,11 +9,19 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecCoefficientsDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BorderDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.TsoInfosDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecCoefficients;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.TsoInfos;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
@@ -33,11 +41,20 @@ class GridConfigurationModelTest {
     static List<Class<?>> dtos = List.of(BecByBoundaryDto.class,
                                          BecCoefficientsDto.class,
                                          BorderDto.class,
-                                         HvdcAlignmentXNodeCoupleDto.class,
+                                         VirtualHubsAlignmentCoupleDto.class,
                                          ZeroFlowNodeDto.class,
                                          RegionConfigurationDto.class,
                                          TsoInfosDto.class,
-                                         XnodeDto.class);
+                                         XnodeConfigDto.class);
+
+    static List<Class<?>> entities = List.of(BecByBoundary.class,
+                                             BecCoefficients.class,
+                                             Border.class,
+                                             VirtualHubsAlignmentCouple.class,
+                                             ZeroFlowNode.class,
+                                             RegionConfiguration.class,
+                                             TsoInfos.class,
+                                             XnodeConfig.class);
 
     static List<Class<? extends AbstractGridConfigurationRecord>> records = List.of(BECKeyConfigurationRecord.class,
                                                                                     RegionConfigurationRecord.class,
@@ -52,6 +69,12 @@ class GridConfigurationModelTest {
     @ParameterizedTest
     @FieldSource("dtos")
     void dtosShouldHaveStandardGettersAndSetters(final Class<?> clazz) {
+        GetterSetterVerifier.forClass(clazz).verify();
+    }
+
+    @ParameterizedTest
+    @FieldSource("entities")
+    void entitiesShouldHaveStandardGettersAndSetters(final Class<?> clazz) {
         GetterSetterVerifier.forClass(clazz).verify();
     }
 

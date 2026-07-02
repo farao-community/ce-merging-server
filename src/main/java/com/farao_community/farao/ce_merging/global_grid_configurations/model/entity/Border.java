@@ -4,19 +4,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.entity;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractBorder;
 import jakarta.persistence.Embeddable;
 
+import java.io.Serializable;
+
 @Embeddable
-public class BorderDto extends AbstractBorder {
-    public BorderDto(final String outArea, final String inArea) {
+public class Border extends AbstractBorder implements Serializable {
+    public Border(final String outArea, final String inArea) {
         this.outArea = outArea;
         this.inArea = inArea;
     }
 
-    public BorderDto() {
+    public Border() {
 
     }
 }

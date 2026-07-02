@@ -1,0 +1,79 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
+
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.TsoInfos;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.OneToMany;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static jakarta.persistence.FetchType.LAZY;
+
+@MappedSuperclass
+public abstract class AbstractRegionConfiguration {
+
+    protected String id;
+    protected String name;
+    @ElementCollection(fetch = LAZY)
+    protected Map<String, String> areasIn;
+    @ElementCollection(fetch = LAZY)
+    protected Map<String, String> areasOut;
+    @OneToMany
+    protected Map<String, TsoInfos> germanyZone;
+
+    @JsonIgnore
+    public Map<String, String> getAreasAll() {
+        final Map<String, String> areasAllMap = new HashMap<>();
+        areasAllMap.putAll(areasIn);
+        areasAllMap.putAll(areasOut);
+        return areasAllMap;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public Map<String, String> getAreasIn() {
+        return areasIn;
+    }
+
+    public void setAreasIn(final Map<String, String> areasIn) {
+        this.areasIn = areasIn;
+    }
+
+    public Map<String, String> getAreasOut() {
+        return areasOut;
+    }
+
+    public void setAreasOut(final Map<String, String> areasOut) {
+        this.areasOut = areasOut;
+    }
+
+    public Map<String, TsoInfos> getGermanyZone() {
+        return germanyZone;
+    }
+
+    public void setGermanyZone(final Map<String, TsoInfos> germanyZone) {
+        this.germanyZone = germanyZone;
+    }
+}

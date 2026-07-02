@@ -4,20 +4,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.entity;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractBecCoefficients;
 import jakarta.persistence.Embeddable;
 
-@Embeddable
-public class BecCoefficientsDto extends AbstractBecCoefficients {
+import java.io.Serializable;
 
-    public BecCoefficientsDto(final String countryCode, final Double coefficient) {
+@Embeddable
+public class BecCoefficients extends AbstractBecCoefficients implements Serializable {
+
+    public BecCoefficients(final String countryCode, final double coefficient) {
         this.countryCode = countryCode;
         this.coefficient = coefficient;
     }
 
-    public BecCoefficientsDto() {
-
+    public BecCoefficients() {
     }
+
 }

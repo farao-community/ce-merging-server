@@ -4,30 +4,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
+import jakarta.persistence.MappedSuperclass;
 
-import com.farao_community.farao.ce_merging.xsd.Xnode;
-import jakarta.persistence.Embeddable;
-
-import java.io.Serializable;
-
-@Embeddable
-public class XnodeDto implements Serializable {
-    private String name;
-    private String area1;
-    private String area2;
-    private String subarea1;
-    private String subarea2;
-
-    public static XnodeDto fromXNodeEntity(final Xnode xnode) {
-        final XnodeDto dto = new XnodeDto();
-        dto.setName(xnode.getName());
-        dto.setArea1(xnode.getArea1());
-        dto.setArea2(xnode.getArea2());
-        dto.setSubarea1(xnode.getSubarea1());
-        dto.setSubarea2(xnode.getSubarea2());
-        return dto;
-    }
+@MappedSuperclass
+public abstract class AbstractXNodeConfig {
+    protected String name;
+    protected String area1;
+    protected String area2;
+    protected String subarea1;
+    protected String subarea2;
 
     public String getName() {
         return name;
