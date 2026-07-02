@@ -15,7 +15,7 @@ import test_utils.GetterSetterVerifier;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_ALEGRO_THRESHOLD;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_REQUEST_OFFSET;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_WINTER_OFFSET;
 import static com.farao_community.farao.ce_merging.merging.task.enums.IgmType.SNAPSHOT;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,7 +48,7 @@ class InputsAndInputsDtoTest {
 
         assertEquals(DEFAULT_ALEGRO_THRESHOLD, inputs.getAlegroThreshold());
         assertEquals(DEFAULT_ALEGRO_THRESHOLD, inputsDto.getAlegroThreshold());
-        assertEquals(DEFAULT_REQUEST_OFFSET, inputs.getRealOffset());
+        assertEquals(PARIS_WINTER_OFFSET, inputs.getRealOffset());
         assertTrue(inputs.getMergingWithInternalHvdc());
         assertTrue(inputsDto.getMergingWithInternalHvdc());
     }

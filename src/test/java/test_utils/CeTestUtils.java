@@ -45,6 +45,10 @@ public final class CeTestUtils {
     public static final String METADATA = "request-metadata/metadata.json";
     public static final String MIME_ZIP = "application/zip";
     public static final Long ID_1 = 1L;
+    public static final Long ID_2 = 2L;
+    public static final OffsetDateTime BEGINNING_OF_2000 = OffsetDateTime.of(2000, 1, 1,
+                                                                             12, 0, 0, 0,
+                                                                             UTC);
 
     public static final ServiceIOException S_IO_EXCEPTION = new ServiceIOException("Test");
 
@@ -92,9 +96,7 @@ public final class CeTestUtils {
         task.setArchiveFileOriginalName(INPUTS_ZIP_NAME);
         task.setStatus(status);
         final Inputs inputs = new Inputs();
-        inputs.setTargetDate(OffsetDateTime.of(2000, 1, 1,
-                                               12, 0, 0, 0,
-                                               UTC));
+        inputs.setTargetDate(BEGINNING_OF_2000);
         task.setInputs(inputs);
 
         return task;

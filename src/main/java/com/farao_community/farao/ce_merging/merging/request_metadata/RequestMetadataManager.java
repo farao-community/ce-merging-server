@@ -46,7 +46,8 @@ public class RequestMetadataManager {
         "generation-load-shift-keys", Inputs::getGenerationLoadShiftKeys,
         "external-constraints", Inputs::getExternalConstraints,
         "feasibility-ranges", Inputs::getFeasibilityRanges,
-        "net-position-forecast", Inputs::getNetPositionForecast);
+        "net-position-forecast", Inputs::getNetPositionForecast,
+        "dc-links", Inputs::getDcLinks);
 
     private static final Map<String, Function<Configurations, SavedFile>> PARAMETER_GETTERS_BY_LOCATION = Map.of(
         "dc-load-flow-parameters", Configurations::getDcLoadFlowParameters,
