@@ -34,7 +34,7 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractGridConfigurationService.class);
     private static final String DEFAULT_CONFIGURATIONS_DIR = "gridDefaultConfigurations/%s";
 
-    protected GridConfigurationRepository<R> repository;
+    protected abstract GridConfigurationRepository<R> getRepository();
 
     protected abstract C getDefaultJsonConfiguration(final OffsetDateTime targetDate) throws IOException;
 
@@ -45,7 +45,7 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
                                                         final OffsetDateTime validTo) throws IOException;
 
     protected R findLatestPublishedValid(final LocalDateTime validityDate) {
-        return repository.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
+        return getRepository().findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
             validityDate, validityDate
         );
     }
@@ -85,7 +85,7 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
                            final OffsetDateTime validFrom,
                            final OffsetDateTime validTo) {
         try {
-            repository.save(getConfigurationRecordFromFile(configurationFile, validFrom, validTo));
+            getRepository().save(getConfigurationRecordFromFile(configurationFile, validFrom, validTo));
         } catch (final Exception e) {
             LOGGER.error("Configuration cannot be published to server");
             throw new CeMergingException("Configuration could not be published, file or dates could be invalid.", e);
@@ -109,10 +109,6 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
             throw new CeMergingException("file %s is empty".formatted(file.getOriginalFilename()));
         }
         return fileContent;
-    }
-
-    public void setRepository(final GridConfigurationRepository<R> repository) {
-        this.repository = repository;
     }
 
 }

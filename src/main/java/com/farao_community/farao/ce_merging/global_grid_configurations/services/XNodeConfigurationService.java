@@ -7,9 +7,10 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonXNodeConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.XNodeConfigurationRecord;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
 import com.farao_community.farao.ce_merging.xsd.Xnodes;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,16 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC
 @Service
 
 public class XNodeConfigurationService extends AbstractGridConfigurationService<XNodeConfigurationRecord, JsonXNodeConfiguration> {
+    private final GridConfigurationRepository<XNodeConfigurationRecord> repository;
+
+    public XNodeConfigurationService(final GridConfigurationRepository<XNodeConfigurationRecord> repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    protected GridConfigurationRepository<XNodeConfigurationRecord> getRepository() {
+        return repository;
+    }
 
     @Override
     protected JsonXNodeConfiguration getDefaultJsonConfiguration(final OffsetDateTime targetDate) throws IOException {
