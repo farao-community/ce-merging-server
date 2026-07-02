@@ -6,13 +6,13 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.mapper;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.HvdcAlignmentXNodeCouple;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import org.mapstruct.Mapper;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface HvdcAlignmentXNodeCoupleMapper {
-    List<HvdcAlignmentXNodeCouple> mapToHvdcAlignmentXNodeCoupleList(List<HvdcAlignmentXNodeCoupleDto> hvdcAlignmentXNodeCoupleDtoList);
+    List<VirtualHubsAlignmentCouple> mapToHvdcAlignmentXNodeCoupleList(List<VirtualHubsAlignmentCoupleDto> virtualHubsAlignmentCouplesDtoList);
 }

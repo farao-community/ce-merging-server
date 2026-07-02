@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.entity;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractRegionConfiguration;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,12 +34,12 @@ import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
 @Table(name = "regionconfiguration")
-public class RegionConfiguration implements Serializable {
+public class RegionConfiguration extends AbstractRegionConfiguration implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegionConfiguration.class);
 
     @Id
     @GeneratedValue(strategy = AUTO)
-    private long ref;
+    private Long ref;
 
     @Column(name = "name")
     private String name;
@@ -64,52 +65,12 @@ public class RegionConfiguration implements Serializable {
     @JsonProperty(value = "germanyZones")
     private Map<String, TsoInfos> germanyZone;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(final String id) {
-        this.id = id;
-    }
-
-    public Map<String, String> getAreasIn() {
-        return areasIn;
-    }
-
-    public void setAreasIn(final Map<String, String> areasIn) {
-        this.areasIn = areasIn;
-    }
-
-    public Map<String, String> getAreasOut() {
-        return areasOut;
-    }
-
-    public void setAreasOut(final Map<String, String> areasOut) {
-        this.areasOut = areasOut;
-    }
-
     @JsonIgnore
     public Map<String, String> getAreasAll() {
         Map<String, String> areasAllMap = new HashMap<>();
         areasAllMap.putAll(areasIn);
         areasAllMap.putAll(areasOut);
         return areasAllMap;
-    }
-
-    public Map<String, TsoInfos> getGermanyZone() {
-        return germanyZone;
-    }
-
-    public void setGermanyZone(final Map<String, TsoInfos> germanyZone) {
-        this.germanyZone = germanyZone;
     }
 
     @Override

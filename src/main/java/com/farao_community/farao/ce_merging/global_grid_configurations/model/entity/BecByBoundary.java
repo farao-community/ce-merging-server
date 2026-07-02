@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.entity;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractBecByBoundary;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -21,13 +22,13 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-public class BecByBoundary implements Serializable {
+public class BecByBoundary extends AbstractBecByBoundary implements Serializable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Basic(optional = false)
     @Column(name = "id", unique = true, nullable = false)
-    private long id;
+    private Long id;
 
     @Embedded
     private Border border;
@@ -43,19 +44,4 @@ public class BecByBoundary implements Serializable {
     public BecByBoundary() {
     }
 
-    public Border getBorder() {
-        return border;
-    }
-
-    public void setBorder(final Border border) {
-        this.border = border;
-    }
-
-    public List<BecCoefficients> getCoefficientByCountry() {
-        return coefficientByCountry;
-    }
-
-    public void setCoefficientByCountry(final List<BecCoefficients> coefficientByCountry) {
-        this.coefficientByCountry = coefficientByCountry;
-    }
 }

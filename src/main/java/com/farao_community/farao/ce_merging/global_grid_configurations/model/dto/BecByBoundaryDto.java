@@ -27,7 +27,7 @@ public class BecByBoundaryDto {
     @GeneratedValue(strategy = IDENTITY)
     @Basic(optional = false)
     @Column(name = ID, unique = true, nullable = false)
-    private long id;
+    private Long id;
 
     @Embedded
     private BorderDto border;

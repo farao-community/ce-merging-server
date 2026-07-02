@@ -8,9 +8,9 @@ package test_utils;
 
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.HvdcAlignmentXNodeCouple;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
@@ -94,9 +94,9 @@ public final class TaskTestUtils {
 
         Configurations configurations = taskEntity.getConfigurations();
 
-        List<HvdcAlignmentXNodeCoupleDto> hvdcAlignmentXNodeCoupleDtos = jsonHvdcAlignmentConfiguration.getHvdcXNodeAlignment();
-        List<HvdcAlignmentXNodeCouple> hvdcAlignmentXNodeCouples = mapToHvdcAlignmentXNodeCouples(hvdcAlignmentXNodeCoupleDtos);
-        configurations.setVirtualHubsAlignmentCouples(hvdcAlignmentXNodeCouples);
+        List<VirtualHubsAlignmentCoupleDto> virtualHubsAlignmentCouplesDtos = jsonHvdcAlignmentConfiguration.getHvdcXNodeAlignment();
+        List<VirtualHubsAlignmentCouple> virtualHubsAlignmentCouples = mapToHvdcAlignmentXNodeCouples(virtualHubsAlignmentCouplesDtos);
+        configurations.setVirtualHubsAlignmentCouples(virtualHubsAlignmentCouples);
 
         List<ZeroFlowNodeDto> zeroFlowNodeDtos = jsonHvdcAlignmentConfiguration.getSetZeroFlowNodes();
         List<ZeroFlowNode> zeroFlowNodes = mapToZeroFlowNodes(zeroFlowNodeDtos);
@@ -121,9 +121,9 @@ public final class TaskTestUtils {
             .toList();
     }
 
-    private static List<HvdcAlignmentXNodeCouple> mapToHvdcAlignmentXNodeCouples(List<HvdcAlignmentXNodeCoupleDto> hvdcAlignmentXNodeCoupleDtos) {
-        return hvdcAlignmentXNodeCoupleDtos.stream()
-            .map(hvdcAlignmentXNodeCoupleDto -> new HvdcAlignmentXNodeCouple(hvdcAlignmentXNodeCoupleDto.getReferenceXNode(), hvdcAlignmentXNodeCoupleDto.getRecessiveXNode()))
+    private static List<VirtualHubsAlignmentCouple> mapToHvdcAlignmentXNodeCouples(List<VirtualHubsAlignmentCoupleDto> virtualHubsAlignmentCouplesDtos) {
+        return virtualHubsAlignmentCouplesDtos.stream()
+            .map(hvdcAlignmentXNodeCoupleDto -> new VirtualHubsAlignmentCouple(hvdcAlignmentXNodeCoupleDto.getReferenceXNode(), hvdcAlignmentXNodeCoupleDto.getRecessiveXNode()))
             .toList();
     }
 

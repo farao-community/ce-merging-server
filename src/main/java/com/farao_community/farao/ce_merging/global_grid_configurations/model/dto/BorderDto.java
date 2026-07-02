@@ -6,13 +6,11 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractBorder;
 import jakarta.persistence.Embeddable;
 
 @Embeddable
-public class BorderDto {
-    private String outArea;
-    private String inArea;
-
+public class BorderDto extends AbstractBorder {
     public BorderDto(final String outArea, final String inArea) {
         this.outArea = outArea;
         this.inArea = inArea;
@@ -20,21 +18,5 @@ public class BorderDto {
 
     public BorderDto() {
 
-    }
-
-    public String getOutArea() {
-        return outArea;
-    }
-
-    public void setOutArea(final String outArea) {
-        this.outArea = outArea;
-    }
-
-    public String getInArea() {
-        return inArea;
-    }
-
-    public void setInArea(final String inArea) {
-        this.inArea = inArea;
     }
 }

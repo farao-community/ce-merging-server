@@ -6,26 +6,17 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractZeroFlowNode;
 import jakarta.persistence.Embeddable;
 
 @Embeddable
-public class ZeroFlowNodeDto {
-    private String xnode;
-    private String countryCode;
+public class ZeroFlowNodeDto extends AbstractZeroFlowNode {
 
-    public String getXnode() {
-        return xnode;
-    }
-
-    public void setXnode(final String xnode) {
+    public ZeroFlowNodeDto(final String xnode, final String countryCode) {
         this.xnode = xnode;
-    }
-
-    public String getCountryCode() {
-        return countryCode;
-    }
-
-    public void setCountryCode(final String countryCode) {
         this.countryCode = countryCode;
+    }
+
+    public ZeroFlowNodeDto() {
     }
 }

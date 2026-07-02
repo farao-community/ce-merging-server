@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.HvdcAlignmentXNodeCouple;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
@@ -52,7 +52,7 @@ public class Configurations implements Serializable {
     @OneToOne(cascade = ALL)
     private RegionConfiguration regionConfiguration;
     @ElementCollection(fetch = LAZY)
-    private List<HvdcAlignmentXNodeCouple> virtualHubsAlignmentCouples = new ArrayList<>();
+    private List<VirtualHubsAlignmentCouple> virtualHubsAlignmentCouples = new ArrayList<>();
     @ElementCollection(fetch = LAZY)
     private List<ZeroFlowNode> zeroFlowNodes = new ArrayList<>();
     @ElementCollection(fetch = LAZY)
@@ -180,11 +180,11 @@ public class Configurations implements Serializable {
         this.zeroFlowNodes = zeroFlowNodes;
     }
 
-    public List<HvdcAlignmentXNodeCouple> getVirtualHubsAlignmentCouples() {
+    public List<VirtualHubsAlignmentCouple> getVirtualHubsAlignmentCouples() {
         return virtualHubsAlignmentCouples;
     }
 
-    public void setVirtualHubsAlignmentCouples(final List<HvdcAlignmentXNodeCouple> virtualHubsAlignmentCouples) {
+    public void setVirtualHubsAlignmentCouples(final List<VirtualHubsAlignmentCouple> virtualHubsAlignmentCouples) {
         this.virtualHubsAlignmentCouples = virtualHubsAlignmentCouples;
     }
 

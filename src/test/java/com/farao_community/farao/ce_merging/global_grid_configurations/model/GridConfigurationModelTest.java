@@ -9,7 +9,7 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecCoefficientsDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BorderDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.TsoInfosDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
@@ -17,7 +17,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecCoefficients;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.HvdcAlignmentXNodeCouple;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.TsoInfos;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
@@ -41,7 +41,7 @@ class GridConfigurationModelTest {
     static List<Class<?>> dtos = List.of(BecByBoundaryDto.class,
                                          BecCoefficientsDto.class,
                                          BorderDto.class,
-                                         HvdcAlignmentXNodeCoupleDto.class,
+                                         VirtualHubsAlignmentCoupleDto.class,
                                          ZeroFlowNodeDto.class,
                                          RegionConfigurationDto.class,
                                          TsoInfosDto.class,
@@ -50,7 +50,7 @@ class GridConfigurationModelTest {
     static List<Class<?>> entities = List.of(BecByBoundary.class,
                                              BecCoefficients.class,
                                              Border.class,
-                                             HvdcAlignmentXNodeCouple.class,
+                                             VirtualHubsAlignmentCouple.class,
                                              ZeroFlowNode.class,
                                              RegionConfiguration.class,
                                              TsoInfos.class,

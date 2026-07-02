@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractRegionConfiguration;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CollectionTable;
@@ -27,7 +28,7 @@ import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
 @Table(name = "regionconfigurationdto")
-public class RegionConfigurationDto {
+public class RegionConfigurationDto extends AbstractRegionConfiguration {
 
     @Id
     @GeneratedValue(strategy = AUTO)
@@ -56,54 +57,6 @@ public class RegionConfigurationDto {
     @OneToMany(cascade = ALL)
     @JsonProperty(value = "germanyZones")
     private Map<String, TsoInfosDto> germanyZone;
-
-    public Long getRef() {
-        return ref;
-    }
-
-    public void setRef(final Long ref) {
-        this.ref = ref;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(final String id) {
-        this.id = id;
-    }
-
-    public Map<String, String> getAreasIn() {
-        return areasIn;
-    }
-
-    public void setAreasIn(final Map<String, String> areasIn) {
-        this.areasIn = areasIn;
-    }
-
-    public Map<String, String> getAreasOut() {
-        return areasOut;
-    }
-
-    public void setAreasOut(final Map<String, String> areasOut) {
-        this.areasOut = areasOut;
-    }
-
-    public Map<String, TsoInfosDto> getGermanyZone() {
-        return germanyZone;
-    }
-
-    public void setGermanyZone(final Map<String, TsoInfosDto> germanyZone) {
-        this.germanyZone = germanyZone;
-    }
 
     @JsonIgnore
     public Map<String, String> getAreasAll() {

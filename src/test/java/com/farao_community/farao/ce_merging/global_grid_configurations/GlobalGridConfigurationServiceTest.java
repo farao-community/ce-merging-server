@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.HvdcAlignmentXNodeCouple;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.TsoInfos;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
@@ -99,9 +99,9 @@ class GlobalGridConfigurationServiceTest {
     void taskShouldContainDefaultHvdcAlignmentConfigurations() throws IOException {
         service.setHvdcXNodeAlignmentConfiguration(task);
 
-        HvdcAlignmentXNodeCouple xedCouple = new HvdcAlignmentXNodeCouple("XED_EE1N", "XED_EE1D");
-        HvdcAlignmentXNodeCouple xarCouple = new HvdcAlignmentXNodeCouple("XAR_GA1I", "XAR_GA1G");
-        final List<HvdcAlignmentXNodeCouple> expectedHvdcAlignmentXnodeCouple = List.of(xedCouple, xarCouple);
+        VirtualHubsAlignmentCouple xedCouple = new VirtualHubsAlignmentCouple("XED_EE1N", "XED_EE1D");
+        VirtualHubsAlignmentCouple xarCouple = new VirtualHubsAlignmentCouple("XAR_GA1I", "XAR_GA1G");
+        final List<VirtualHubsAlignmentCouple> expectedVirtualHubsAlignmentCouples = List.of(xedCouple, xarCouple);
 
         ZeroFlowNode xbaKf31Node = new ZeroFlowNode("XBA_KF31", "DE");
         ZeroFlowNode xbaKf32Node = new ZeroFlowNode("XBA_KF32", "DE");
@@ -111,12 +111,12 @@ class GlobalGridConfigurationServiceTest {
         final String expectedDefaultSlackNode = "ELA MU11";
 
         Configurations configurations = task.getConfigurations();
-        List<HvdcAlignmentXNodeCouple> hvdcAlignmentXNodeCouples = configurations.getVirtualHubsAlignmentCouples();
+        List<VirtualHubsAlignmentCouple> virtualHubsAlignmentCouples = configurations.getVirtualHubsAlignmentCouples();
         List<ZeroFlowNode> zeroFlowNodes = configurations.getZeroFlowNodes();
         List<String> dkHvdcXnodes = configurations.getDkHvdcXnodes();
         String defaultSlackNode = configurations.getDefaultSlackNode();
 
-        assertEquals(expectedHvdcAlignmentXnodeCouple, hvdcAlignmentXNodeCouples);
+        assertEquals(expectedVirtualHubsAlignmentCouples, virtualHubsAlignmentCouples);
         assertEquals(expectedZeroFlowNodes, zeroFlowNodes);
         assertEquals(expectedDkHvdcXnodes, dkHvdcXnodes);
         assertEquals(expectedDefaultSlackNode, defaultSlackNode);

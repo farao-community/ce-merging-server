@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractTsoInfos;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -20,7 +21,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NAM
 
 @Entity
 @Table(name = "tsoinfosdto")
-public class TsoInfosDto implements Serializable {
+public class TsoInfosDto extends AbstractTsoInfos implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -33,27 +34,4 @@ public class TsoInfosDto implements Serializable {
     @Column(name = "eic")
     private String eic;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public Long getRef() {
-        return ref;
-    }
-
-    public void setRef(final Long ref) {
-        this.ref = ref;
-    }
-
-    public String getEic() {
-        return eic;
-    }
-
-    public void setEic(final String eic) {
-        this.eic = eic;
-    }
 }
