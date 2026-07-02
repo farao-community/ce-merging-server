@@ -8,7 +8,6 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model.en
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractRegionConfiguration;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.HashMap;
 import java.util.Map;
 
 import static jakarta.persistence.CascadeType.ALL;
@@ -36,7 +34,6 @@ import static jakarta.persistence.GenerationType.AUTO;
 @Table(name = "regionconfiguration")
 public class RegionConfiguration extends AbstractRegionConfiguration implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegionConfiguration.class);
-
     @Id
     @GeneratedValue(strategy = AUTO)
     private Long ref;
@@ -49,29 +46,21 @@ public class RegionConfiguration extends AbstractRegionConfiguration implements 
 
     @ElementCollection
     @CollectionTable(name = "regionconfiguration_ariasin_code_mapping",
-            joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
+        joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
     @MapKeyColumn(name = "ariasin_name")
     @Column(name = "ariasin_eic")
-    private Map<String, String> areasIn;
+    protected Map<String, String> areasIn;
 
     @ElementCollection
     @CollectionTable(name = "regionconfiguration_ariasout_code_mapping",
-            joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
+        joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
     @MapKeyColumn(name = "ariasout_name")
     @Column(name = "ariasout_eic")
-    private Map<String, String> areasOut;
+    protected Map<String, String> areasOut;
 
     @OneToMany(cascade = ALL)
     @JsonProperty(value = "germanyZones")
     private Map<String, TsoInfos> germanyZone;
-
-    @JsonIgnore
-    public Map<String, String> getAreasAll() {
-        Map<String, String> areasAllMap = new HashMap<>();
-        areasAllMap.putAll(areasIn);
-        areasAllMap.putAll(areasOut);
-        return areasAllMap;
-    }
 
     @Override
     public String toString() {
@@ -82,5 +71,13 @@ public class RegionConfiguration extends AbstractRegionConfiguration implements 
             LOGGER.error("Error during json parse regions configuration");
             throw new ServiceIOException("Error during json parse regions configuration", e);
         }
+    }
+
+    public Long getRef() {
+        return ref;
+    }
+
+    public void setRef(final Long ref) {
+        this.ref = ref;
     }
 }

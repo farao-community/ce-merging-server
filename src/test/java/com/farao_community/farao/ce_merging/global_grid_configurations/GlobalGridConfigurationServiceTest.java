@@ -13,6 +13,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectionRecord;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,7 @@ import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static test_utils.CeTestUtils.BEGINNING_OF_2000;
 
 @SpringBootTest
 class GlobalGridConfigurationServiceTest {
@@ -42,6 +44,9 @@ class GlobalGridConfigurationServiceTest {
     @BeforeEach
     void setUp() {
         task = new MergingTask();
+        final Inputs inputs = new Inputs();
+        inputs.setTargetDate(BEGINNING_OF_2000);
+        task.setInputs(inputs);
         TaskTestUtils.setTaskDefaultConfigurations(task);
     }
 

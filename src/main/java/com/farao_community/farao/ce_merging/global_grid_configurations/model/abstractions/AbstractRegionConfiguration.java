@@ -7,19 +7,19 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.TsoInfos;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Id;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static jakarta.persistence.FetchType.LAZY;
 
 @MappedSuperclass
 public abstract class AbstractRegionConfiguration {
-    @Id
-    protected Long ref;
+
     protected String id;
     protected String name;
     @ElementCollection(fetch = LAZY)
@@ -29,12 +29,12 @@ public abstract class AbstractRegionConfiguration {
     @OneToMany
     protected Map<String, TsoInfos> germanyZone;
 
-    public Long getRef() {
-        return ref;
-    }
-
-    public void setRef(final Long ref) {
-        this.ref = ref;
+    @JsonIgnore
+    public Map<String, String> getAreasAll() {
+        final Map<String, String> areasAllMap = new HashMap<>();
+        areasAllMap.putAll(areasIn);
+        areasAllMap.putAll(areasOut);
+        return areasAllMap;
     }
 
     public String getId() {

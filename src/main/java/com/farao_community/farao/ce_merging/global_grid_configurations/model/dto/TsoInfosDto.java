@@ -34,4 +34,12 @@ public class TsoInfosDto extends AbstractTsoInfos implements Serializable {
     @Column(name = "eic")
     private String eic;
 
+    public Long getRef() {
+        return ref;
+    }
+
+    public void setRef(final Long ref) {
+        this.ref = ref;
+    }
+
 }

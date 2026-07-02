@@ -7,7 +7,6 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractRegionConfiguration;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -20,7 +19,6 @@ import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static jakarta.persistence.CascadeType.ALL;
@@ -29,7 +27,6 @@ import static jakarta.persistence.GenerationType.AUTO;
 @Entity
 @Table(name = "regionconfigurationdto")
 public class RegionConfigurationDto extends AbstractRegionConfiguration {
-
     @Id
     @GeneratedValue(strategy = AUTO)
     private Long ref;
@@ -45,25 +42,25 @@ public class RegionConfigurationDto extends AbstractRegionConfiguration {
             joinColumns = {@JoinColumn(name = "regionconfigurationdto_ref", referencedColumnName = "ref")})
     @MapKeyColumn(name = "areasin_name")
     @Column(name = "areasin_eic")
-    private Map<String, String> areasIn;
+    protected Map<String, String> areasIn;
 
     @ElementCollection
     @CollectionTable(name = "regionconfigurationdto_areasout_code_mapping",
             joinColumns = {@JoinColumn(name = "regionconfigurationdto_ref", referencedColumnName = "ref")})
     @MapKeyColumn(name = "areasout_name")
     @Column(name = "areasout_eic")
-    private Map<String, String> areasOut;
+    protected Map<String, String> areasOut;
 
     @OneToMany(cascade = ALL)
     @JsonProperty(value = "germanyZones")
     private Map<String, TsoInfosDto> germanyZone;
 
-    @JsonIgnore
-    public Map<String, String> getAreasAll() {
-        Map<String, String> areasAllMap = new HashMap<>();
-        areasAllMap.putAll(areasIn);
-        areasAllMap.putAll(areasOut);
-        return areasAllMap;
+    public Long getRef() {
+        return ref;
+    }
+
+    public void setRef(final Long ref) {
+        this.ref = ref;
     }
 
 }
