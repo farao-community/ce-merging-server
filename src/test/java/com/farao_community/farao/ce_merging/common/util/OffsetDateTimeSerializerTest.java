@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
+import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeSerializer;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -48,9 +48,9 @@ import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirec
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.ERROR;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.RUNNING;
+import static com.farao_community.farao.ce_merging.common.task.TaskStatus.SUCCESS;
 import static java.nio.file.Files.createDirectories;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 import static org.springframework.util.FileSystemUtils.copyRecursively;

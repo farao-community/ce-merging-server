@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,11 +38,18 @@ public final class JsonUtils {
      * @param <T>   the class of the object
      * @param path  the path of the file to read from
      * @return an object from a JSON file path
-     * @throws FileNotFoundException if the file does not exist
      */
     public static <T> T read(final Class<T> clazz,
-                             final String path) throws FileNotFoundException {
-        return read(clazz, new FileInputStream(path));
+                             final String path) {
+        try (final FileInputStream fis = new FileInputStream(path)) {
+            return read(clazz, fis);
+        } catch (final IOException e) {
+            final String errorMessage = String.format("Error occurred when converting JSON file to object of type %s",
+                                                      clazz.getSimpleName());
+            LOGGER.error(errorMessage);
+            throw new ServiceIOException(errorMessage, e);
+        }
+
     }
 
     /**

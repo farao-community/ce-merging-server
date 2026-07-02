@@ -11,7 +11,7 @@ import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import com.farao_community.farao.ce_merging.common.task.TaskStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.ThrowableAssert;

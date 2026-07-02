@@ -41,6 +41,12 @@
                             <sources>
                                 <source>src/main/resources/xsd</source>
                             </sources>
+                            <xjbSources>
+                                <xjbSource>src/main/resources/xjb/binding.xjb</xjbSource>
+                            </xjbSources>
+                            <arguments>
+                                <argument>-XautoNameResolution</argument>
+                            </arguments>
                             <packageName>com.farao_community.farao.ce_merging.xsd</packageName>
                         </configuration>
                     </execution>
