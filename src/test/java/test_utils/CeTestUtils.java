@@ -104,8 +104,8 @@ public final class CeTestUtils {
 
     public static MergingTaskDto taskDtoWithIdAndStatus(final long id, final TaskStatus status) {
         final MergingTaskDto task = new MergingTaskDto();
-        task.setTaskId(id);
-        task.setTaskStatus(status);
+        task.setId(id);
+        task.setStatus(status);
 
         return task;
     }

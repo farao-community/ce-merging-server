@@ -43,6 +43,7 @@ public final class CeMergingConstants {
     public static final String NAME = "name";
     public static final String CSV_SEPARATOR = ";";
     public static final String ARROW = "->";
+    public static final String TAG_VERSION = "1.0.0";
 
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
