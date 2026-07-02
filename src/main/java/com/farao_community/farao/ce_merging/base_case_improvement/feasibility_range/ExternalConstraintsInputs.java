@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range;
 
+import com.farao_community.farao.ce_merging.xsd.NetPositionConstraint;
+
 public class ExternalConstraintsInputs {
 
     private String areaId;
@@ -16,6 +18,12 @@ public class ExternalConstraintsInputs {
         this.areaId = areaId;
         this.direction = direction;
         this.value = value;
+    }
+
+    public static ExternalConstraintsInputs fromNetPositionConstraint(final NetPositionConstraint npc) {
+        return new ExternalConstraintsInputs(npc.getHub().toUpperCase(),
+                                             npc.getDirection(),
+                                             npc.getValue().doubleValue());
     }
 
     public String getAreaId() {

@@ -8,22 +8,28 @@ package com.farao_community.farao.ce_merging.base_case_improvement.feasibility_r
 
 import com.farao_community.farao.ce_merging.base_case_improvement.RegionConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.xsd.FlowBasedExternalConstraintDocument;
+import com.farao_community.farao.ce_merging.xsd.NetPositionConstraint;
 import com.google.common.io.ByteSource;
 import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
+import static com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.ExternalConstraintsInputs.fromNetPositionConstraint;
+import static com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.Interval.infinity;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
+import static java.util.function.Function.identity;
+import static java.util.function.Predicate.not;
+import static java.util.stream.Collectors.toMap;
 
 public final class ExternalConstraintsImporter {
 
@@ -35,56 +41,79 @@ public final class ExternalConstraintsImporter {
     public static Map<String, Interval> calculateConstraints(final byte[] externalConstraints,
                                                              final RegionConfiguration regionConfiguration,
                                                              final OffsetDateTime targetDate) {
-        List<NetPositionConstraint> validIntervalConstraints = getNetPositionConstraints(externalConstraints, targetDate);
-        Map<String, String> regionAreasIdByCountry = regionConfiguration.getAreasIn();
-        List<ExternalConstraintsInputs> externalConstraintsTmp = new ArrayList<>();
-        validIntervalConstraints.stream().filter(netPositionConstraint -> !(netPositionConstraint.getHub().equalsIgnoreCase(ALEGRO_BE_NODE_NAME) || netPositionConstraint.getHub().equalsIgnoreCase(ALEGRO_DE_NODE_NAME))).forEach(ec -> externalConstraintsTmp.add(new ExternalConstraintsInputs(regionAreasIdByCountry.get(ec.getTsoOrigin()), ec.getDirection(), ec.getValue().doubleValue())));
-        Map<String, Interval> externalConstraintsMap = new HashMap<>();
-        regionAreasIdByCountry.values().forEach(v -> externalConstraintsMap.put(v, Interval.allDoubles()));
+        final Map<String, String> regionAreasIdByCountry = regionConfiguration.getAreasIn();
+
+        final List<ExternalConstraintsInputs> externalConstraintsTmp = getNetPositionConstraints(externalConstraints, targetDate)
+            .stream()
+            .filter(not(constrainsAlegro()))
+            .map(npc -> {
+                final ExternalConstraintsInputs eci = fromNetPositionConstraint(npc);
+                eci.setAreaId(regionAreasIdByCountry.get(npc.getTsoOrigin()));
+                return eci;
+            })
+            .toList();
+
+        final Map<String, Interval> externalConstraintsMap = regionAreasIdByCountry.values()
+            .stream()
+            .collect(toMap(identity(), c -> infinity()));
+
         updateExternalConstraintsIntervals(externalConstraintsTmp, externalConstraintsMap);
         return externalConstraintsMap;
     }
 
     public static Map<String, Interval> calculateConstraintsForAlegro(final byte[] externalConstraints,
                                                                       final OffsetDateTime targetDate) {
-        List<NetPositionConstraint> validIntervalConstraints = getNetPositionConstraints(externalConstraints, targetDate);
-        List<ExternalConstraintsInputs> externalConstraintsTmp = new ArrayList<>();
-        validIntervalConstraints.stream().filter(netPositionConstraint -> netPositionConstraint.getHub().equalsIgnoreCase(ALEGRO_BE_NODE_NAME) || netPositionConstraint.getHub().equalsIgnoreCase(ALEGRO_DE_NODE_NAME)).forEach(ec -> externalConstraintsTmp.add(
-            new ExternalConstraintsInputs(ec.getHub().toUpperCase(), ec.getDirection(), ec.getValue().doubleValue())));
+
+        final List<ExternalConstraintsInputs> externalConstraintsTmp = getNetPositionConstraints(externalConstraints, targetDate)
+            .stream()
+            .filter(constrainsAlegro())
+            .map(ExternalConstraintsInputs::fromNetPositionConstraint)
+            .toList();
+
         if (externalConstraintsTmp.isEmpty()) {
-            LOGGER.warn("BE_AL and DE_AL does not exists in the External constraints file for the chosen target date {}. The Ec values for BE_AL and DE_AL will be the infinity", targetDate);
+            LOGGER.warn("BE_AL and DE_AL do not exist in the external constraints file for the chosen target date {}. The EC values for BE_AL and DE_AL will be infinite", targetDate);
         }
-        Map<String, Interval> externalConstraintsMapAlegro = new HashMap<>();
-        externalConstraintsMapAlegro.put(ALEGRO_BE_NODE_NAME, Interval.allDoubles());
-        externalConstraintsMapAlegro.put(ALEGRO_DE_NODE_NAME, Interval.allDoubles());
-        updateExternalConstraintsIntervals(externalConstraintsTmp, externalConstraintsMapAlegro);
-        return externalConstraintsMapAlegro;
+
+        final Map<String, Interval> alegroConstraints = new HashMap<>();
+        alegroConstraints.put(ALEGRO_BE_NODE_NAME, infinity());
+        alegroConstraints.put(ALEGRO_DE_NODE_NAME, infinity());
+        updateExternalConstraintsIntervals(externalConstraintsTmp, alegroConstraints);
+        return alegroConstraints;
+    }
+
+    static Predicate<NetPositionConstraint> constrainsAlegro() {
+        return npc -> npc.getHub().equalsIgnoreCase(ALEGRO_BE_NODE_NAME)
+                      || npc.getHub().equalsIgnoreCase(ALEGRO_DE_NODE_NAME);
     }
 
     private static List<NetPositionConstraint> getNetPositionConstraints(final byte[] externalConstraints,
                                                                          final OffsetDateTime targetDate) {
         try {
             LOGGER.info("Importing external constraints file");
-            JAXBContext jaxbContext = JAXBContext.newInstance(FlowBasedExternalConstraintDocument.class);
-            Unmarshaller jaxbMarshaller = jaxbContext.createUnmarshaller();
-            FlowBasedExternalConstraintDocument document = (FlowBasedExternalConstraintDocument) jaxbMarshaller.unmarshal(ByteSource.wrap(externalConstraints).openStream());
-            String timeInterval = document.getExternalConstraintTimeInterval().getV();
+            final FlowBasedExternalConstraintDocument document = (FlowBasedExternalConstraintDocument) JAXBContext
+                .newInstance(FlowBasedExternalConstraintDocument.class)
+                .createUnmarshaller()
+                .unmarshal(ByteSource.wrap(externalConstraints).openStream());
+
+            final String timeInterval = document.getExternalConstraintTimeInterval().getV();
+
             if (!isWithinRange(targetDate, timeInterval)) {
-                String errorMessage = "External constraints time interval: " + timeInterval + " does not include the process target date: " + targetDate;
+                final String errorMessage = "External constraints time interval %s does not include the process target date %s "
+                    .formatted(timeInterval, targetDate);
                 LOGGER.error(errorMessage);
                 throw new CeMergingException(errorMessage);
             }
-            List<NetPositionConstraint> validIntervalConstraints = new ArrayList<>();
-            document.getConstraints().getNetPositionConstraint().forEach(netPositionConstraint -> {
-                if (isWithinRange(targetDate, netPositionConstraint.getTimeInterval().getV())) {
-                    validIntervalConstraints.add(netPositionConstraint);
-                }
-            });
-            return validIntervalConstraints;
+
+            return document.getConstraints()
+                .getNetPositionConstraint()
+                .stream()
+                .filter(ct -> isWithinRange(targetDate, ct.getTimeInterval().getV()))
+                .toList();
+
         } catch (final Exception e) {
-            String errorMessage = "Couldn't import external constraints file, cause: " + e.getMessage();
+            String errorMessage = "Couldn't import external constraints file";
             LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage);
+            throw new CeMergingException(errorMessage, e);
         }
     }
 
@@ -100,8 +129,10 @@ public final class ExternalConstraintsImporter {
                     interval.setMinValue(-ec.getValue());
                     break;
                 default:
-                    LOGGER.error("External constraints direction {} is not acceptable", ec.getDirection());
-                    throw new CeMergingException("External constraints direction " + ec.getDirection() + " is not acceptable");
+                    final String errorMessage = "External constraints direction %s is not acceptable"
+                        .formatted(ec.getDirection());
+                    LOGGER.error(errorMessage);
+                    throw new CeMergingException(errorMessage);
             }
 
             externalConstraintsMap.put(ec.getAreaId(), interval);

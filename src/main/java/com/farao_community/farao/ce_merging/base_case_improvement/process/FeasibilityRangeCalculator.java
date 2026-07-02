@@ -25,7 +25,7 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.Interval.allDoubles;
+import static com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.Interval.infinity;
 
 public class FeasibilityRangeCalculator {
 
@@ -57,7 +57,7 @@ public class FeasibilityRangeCalculator {
         Map<String, Interval> finalContraintsMap = new HashMap<>();
         for (Map.Entry<String, Interval> entry : extConstraintsMap.entrySet()) {
             try {
-                Interval finalInterval = entry.getValue().join(feasibilityRangeMap.getOrDefault(entry.getKey(), allDoubles()));
+                Interval finalInterval = entry.getValue().join(feasibilityRangeMap.getOrDefault(entry.getKey(), infinity()));
                 finalContraintsMap.put(entry.getKey(), finalInterval);
             } catch (ArithmeticException e) {
                 LOGGER.error("Impossible to join intervals for area '{}' ", entry.getKey(), e);
@@ -74,7 +74,7 @@ public class FeasibilityRangeCalculator {
 
         Map<String, Interval> feasibilityRangesMap = new HashMap<>();
         Map<String, String> regionAreasIdByCountry = regionConfiguration.getAreasIn();
-        regionAreasIdByCountry.values().forEach(v -> feasibilityRangesMap.put(v, allDoubles()));
+        regionAreasIdByCountry.values().forEach(v -> feasibilityRangesMap.put(v, infinity()));
 
         document.getConstraints().getFeasibilityRangeConstraint().forEach(feasibilityRangeConstraint -> {
             Interval newInterval = computeIntervalForFeasibilityRangeConstraint(feasibilityRangeConstraint, netPositionMap);

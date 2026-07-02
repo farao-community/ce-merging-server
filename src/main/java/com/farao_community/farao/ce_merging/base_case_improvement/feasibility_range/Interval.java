@@ -44,7 +44,7 @@ public class Interval {
         this.maxValue = maxValue;
     }
 
-    public static Interval allDoubles() {
+    public static Interval infinity() {
         return new Interval(-MAX_VALUE, MAX_VALUE);
     }
 

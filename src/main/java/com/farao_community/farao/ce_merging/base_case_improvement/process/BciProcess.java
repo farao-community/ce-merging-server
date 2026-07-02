@@ -21,17 +21,15 @@ import com.farao_community.farao.ce_merging.base_case_improvement.task.BciOutput
 import com.farao_community.farao.ce_merging.base_case_improvement.task.BciTask;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.FileUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +43,8 @@ import static com.farao_community.farao.ce_merging.base_case_improvement.feasibi
 import static com.farao_community.farao.ce_merging.base_case_improvement.initial_netpositions.InitialNetPositionsImporter.getGlobalNetPosition;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
-import static java.util.Collections.emptyMap;
+import static com.farao_community.farao.ce_merging.common.util.FileUtils.readBytesFromPath;
+import static java.nio.file.Files.readAllBytes;
 
 public class BciProcess {
     private static final Logger LOGGER = LoggerFactory.getLogger(BciProcess.class);
@@ -59,36 +58,54 @@ public class BciProcess {
     private Map<String, Interval> regionFeasibilityRanges;
     private ReferenceProgram referenceProgram;
     private BciOutput bciOutput;
+    private final AlegroData alegroData;
 
     public BciProcess(final BciTask task,
                       final CeMergingConfiguration configuration,
                       final RegionConfiguration regionConfiguration) {
         this.task = task;
+        this.alegroData = Optional.ofNullable(task.getBciInputs().getAlegroNetPositionsPath())
+            .map(path -> JsonUtils.read(AlegroData.class, path))
+            .orElse(null);
         this.configuration = configuration;
         this.regionConfiguration = regionConfiguration;
     }
 
     public void run() {
-        importFiles();
-        computeBci();
-        createBciOutput();
-        task.setBciOutput(bciOutput);
+        try {
+            importFiles();
+            computeBci();
+            createBciOutput();
+            task.setBciOutput(bciOutput);
+        } catch (final Exception e) {
+            final String errorMessage = "Error while running BCI";
+            LOGGER.error(errorMessage);
+            throw new CeMergingException(errorMessage, e);
+        }
     }
 
-    private String getAlegroNetPosPath() {
-        return task.getBciInputs().getAlegroNetPositionsPath();
+    private String getInitialNpPath() {
+        return task.getBciInputs().getInitialNetPositionsPath();
     }
 
     private String getExternalConstraintsPath() {
         return task.getBciInputs().getAlegroNetPositionsPath();
     }
 
-    private void importFiles() {
-        importNpf();
-        importInitialGlobalNetPositions();
+    private String getFeasibilityRangePath() {
+        return task.getBciInputs().getFeasibilityRangePath();
+    }
+
+    private String getNpfPath() {
+        return task.getBciInputs().getForecastNetPositionsPath();
+    }
+
+    private void importFiles() throws IOException {
+        referenceProgram = JsonUtils.read(ReferenceProgram.class, getNpfPath());
+        initialGlobalNetPositions = getGlobalNetPosition(getInitialNpPath(), regionConfiguration);
         computeInRegionNetPositions();
-        Optional.ofNullable(getAlegroNetPosPath()).ifPresent(this::updateInRegionNetPositions);
-        importRegionFeasibilityRanges();
+        updateAlegroRegionsNetPosition();
+        regionFeasibilityRanges = calculateRegionFeasibilityRanges();
     }
 
     private void computeInRegionNetPositions() {
@@ -97,65 +114,46 @@ public class BciProcess {
             final double outNp = outRegionNetPositions.getOrDefault(region, 0.);
             initialRegionNetPositions.put(region, inNp - outNp);
         });
-
     }
 
-    private void updateInRegionNetPositions(final String alegroNetPositionsPath) {
-        final AlegroData alegroData = JsonUtils.read(AlegroData.class, alegroNetPositionsPath);
-
-        final double alDeToCeFlow = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlDeFlows());
-        final double germanAlegroGap = alDeToCeFlow - alegroData.getAlDeFlows().getInitialFlow();
-        final double alBeToCeFlow = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlBeFlows());
-        final double belgianAlegroGap = alBeToCeFlow - alegroData.getAlBeFlows().getInitialFlow();
-
-        final String germany = regionConfiguration.getAreasIn().get("DE");
-        final String belgium = regionConfiguration.getAreasIn().get("BE");
-
-        initialRegionNetPositions.computeIfPresent(germany, (k, np) -> np + germanAlegroGap);
-        initialRegionNetPositions.computeIfPresent(belgium, (k, np) -> np + belgianAlegroGap);
-    }
-
-    private Map<String, Interval> getAlegroExternalConstraints() {
-        try {
-            final byte[] externalConstraints = Files.readAllBytes(Paths.get(getExternalConstraintsPath()));
-            return calculateConstraintsForAlegro(externalConstraints, task.getProcessTargetDate());
-        } catch (final IOException e) {
-            String errorMessage = "Could not import external constraints file, " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage);
+    private void updateAlegroRegionsNetPosition() throws IOException {
+        if (alegroData == null) {
+            return;
         }
-
+        updateAlegroRegionNetPosition("BE", alegroData.getAlBeFlows());
+        updateAlegroRegionNetPosition("DE", alegroData.getAlDeFlows());
     }
 
-    private double getAlegroConstrainedTargetFlow(final AlegroData alegroData,
-                                                  final AlegroFlows toConstrain) {
+    private void updateAlegroRegionNetPosition(final String countryCode,
+                                               final AlegroFlows flows) throws IOException {
+        final double alHubToCeFlow = getAlegroConstrainedTargetFlow(flows);
+        final double countryAlegroGap = alHubToCeFlow - flows.getInitialFlow();
+
+        final String countryEic = regionConfiguration.getAreasIn().get(countryCode);
+
+        initialRegionNetPositions.computeIfPresent(countryEic, (k, np) -> np + countryAlegroGap);
+    }
+
+    private Map<String, Interval> getAlegroExternalConstraints() throws IOException {
+        final byte[] externalConstraints = readAllBytes(Paths.get(getExternalConstraintsPath()));
+        return calculateConstraintsForAlegro(externalConstraints, task.getProcessTargetDate());
+    }
+
+    private double getAlegroConstrainedTargetFlow(final AlegroFlows toConstrain) throws IOException {
         final double maxFlow = getCommonLimit(alegroData, getAlegroExternalConstraints());
-        return alegroData.getAlegroInOutage() ? 0 : Math.clamp(toConstrain.getTargetFlow(), -maxFlow, maxFlow);
+        return alegroData.isInOutage() ? 0 : Math.clamp(toConstrain.getTargetFlow(), -maxFlow, maxFlow);
     }
 
-    private void importNpf() {
-        try {
-            LOGGER.info("Importing forecast net positions file: " + FilenameUtils.getName(task.getBciInputs().getForecastNetPositionsPath()));
-            referenceProgram = JsonUtils.read(ReferenceProgram.class, task.getBciInputs().getForecastNetPositionsPath());
-        } catch (final Exception e) {
-            String errorMessage = "Could not import forecast net positions file, " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage);
-        }
-    }
-
-    private void computeBci() {
+    private void computeBci() throws IOException {
         final BciComputation computation = new BciComputation(regionConfiguration, referenceProgram);
-        boolean isMergingWithAlegro = getAlegroNetPosPath() != null;
+        boolean isMergingWithAlegro = alegroData != null;
 
         final double alDeToCeFlow;
         final double alBeToCeFlow;
         if (isMergingWithAlegro) {
-            final AlegroData alegroData = JsonUtils.read(AlegroData.class, getAlegroNetPosPath());
-            alDeToCeFlow = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlDeFlows());
-            alBeToCeFlow = getAlegroConstrainedTargetFlow(alegroData, alegroData.getAlBeFlows());
-        }
-        else {
+            alDeToCeFlow = getAlegroConstrainedTargetFlow(alegroData.getAlDeFlows());
+            alBeToCeFlow = getAlegroConstrainedTargetFlow(alegroData.getAlBeFlows());
+        } else {
             alDeToCeFlow = 0;
             alBeToCeFlow = 0;
         }
@@ -169,25 +167,16 @@ public class BciProcess {
                                              task.getProcessTargetDate(),
                                              bciResults,
                                              getOutRegionResults(),
-                                             isMergingWithAlegro ? getBciAlegroData() : null);
+                                             getBciAlegroData());
     }
 
-    private BciAlegroData getBciAlegroData() {
-        final AlegroData alegroData = JsonUtils.read(AlegroData.class, getAlegroNetPosPath());
+    private BciAlegroData getBciAlegroData() throws IOException {
 
-        if (alegroData.getAlegroInOutage()) {
+        if (alegroData.isInOutage()) {
             return null;
         }
 
-        final byte[] externalConstraints;
-        try {
-            externalConstraints = Files.readAllBytes(Paths.get(getExternalConstraintsPath()));
-        } catch (final IOException e) {
-            String errorMessage = "Cannot import external constraint fie, cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage);
-        }
-
+        final byte[] externalConstraints = readBytesFromPath(getExternalConstraintsPath());
         final Map<String, Interval> alegroEc = calculateConstraintsForAlegro(externalConstraints,
                                                                              task.getProcessTargetDate());
         final Interval alDeConstraints = alegroEc.get(ALEGRO_DE_NODE_NAME);
@@ -204,7 +193,6 @@ public class BciProcess {
         return new BciAlegroData(alDeFlows, alBeFlows);
     }
 
-
     private OutRegionResults getOutRegionResults() {
         final Map<String, Double> globalNetPositionsByAreaId = referenceProgram
             .computeGlobalNetPositionsForOutAreas(regionConfiguration);
@@ -218,7 +206,7 @@ public class BciProcess {
         return new OutRegionResults(globalNetPositionsByCountry);
     }
 
-    private Collector<Map.Entry<String,String>, ?, TreeMap<String, Double>> sameKeysValuesFrom(
+    private Collector<Map.Entry<String, String>, ?, TreeMap<String, Double>> sameKeysValuesFrom(
         final Map<String, Double> globalNetPositionsByAreaId
     ) {
         return Collectors.toMap(Map.Entry::getKey,
@@ -231,54 +219,23 @@ public class BciProcess {
         return e -> globalNetPositionsByAreaId.getOrDefault(e.getValue(), 0.);
     }
 
-    private void createBciOutput() {
+    private void createBciOutput() throws FileNotFoundException {
         final String outputPath = configuration.getOutputsDirectoryPath(task) + File.separator + BCI_OUTPUT_FILE_NAME;
-        try (final OutputStream outputStream = new FileOutputStream(outputPath)) {
-            JsonBciResult.write(processResult, outputStream);
-            bciOutput = new BciOutput(outputPath);
-        } catch (final Exception e) {
-            String errorMessage = "Cannot create base case improvement output fie, cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage);
-        }
+        JsonBciResult.write(processResult, new FileOutputStream(outputPath));
+        bciOutput = new BciOutput(outputPath);
     }
 
-    private void importInitialGlobalNetPositions() {
-        initialGlobalNetPositions = Optional.ofNullable(task.getBciInputs().getInitialNetPositionsPath())
-            .map(this::safeImportGlobalNp)
-            .orElse(emptyMap());
-    }
+    private Map<String, Interval> calculateRegionFeasibilityRanges() {
+        final byte[] feasibilityRange = Optional.ofNullable(getFeasibilityRangePath())
+            .map(FileUtils::readBytesFromPath)
+            .orElse(new byte[0]);
 
-    private Map<String, Double> safeImportGlobalNp(final String path) {
-        try {
-            return getGlobalNetPosition(new FileInputStream(path), regionConfiguration);
-        } catch (final Exception e) {
-            final String errorMessage = "Error during import of initial net positions"
-                                        + FilenameUtils.getName(path)
-                                        + ", cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage);
-        }
-    }
+        return new FeasibilityRangeCalculator(regionConfiguration)
+            .getRegionFeasibilityRanges(readBytesFromPath(getExternalConstraintsPath()),
+                                        task.getProcessTargetDate(),
+                                        initialRegionNetPositions,
+                                        feasibilityRange);
 
-    private void importRegionFeasibilityRanges() {
-        try {
-            final byte[] externalConstraints = Files.readAllBytes(Paths.get(getExternalConstraintsPath()));
-            final FeasibilityRangeCalculator calculator = new FeasibilityRangeCalculator(regionConfiguration);
-            final String feasibilityRangePath = task.getBciInputs().getFeasibilityRangePath();
-
-            final byte[] feasibilityRange = feasibilityRangePath != null ?
-                Files.readAllBytes(Paths.get(feasibilityRangePath)) : new byte[0];
-
-            regionFeasibilityRanges = calculator.getRegionFeasibilityRanges(externalConstraints,
-                                                                            task.getProcessTargetDate(),
-                                                                            initialRegionNetPositions,
-                                                                            feasibilityRange);
-        } catch (final Exception e) {
-            String errorMessage = "Could not calculate feasibility ranges, cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage);
-        }
     }
 
     private double getCommonLimit(final AlegroData bciAlegroData,
@@ -287,16 +244,11 @@ public class BciProcess {
         final Interval alDeConstraints = alegroExternalConstraints.get(ALEGRO_DE_NODE_NAME);
         final Interval alBeConstraints = alegroExternalConstraints.get(ALEGRO_BE_NODE_NAME);
 
-        final double minEcAlDe = alDeConstraints.getMinValue();
-        final double maxEcAlDe = alDeConstraints.getMaxValue();
-        final double minEcAlBe = alBeConstraints.getMinValue();
-        final double maxEcAlBe = alBeConstraints.getMaxValue();
-
         final boolean flowsToGermany = bciAlegroData.getAlBeFlows().getTargetFlow() < 0;
 
-        final double maxAtOrigin = Math.abs(flowsToGermany ? maxEcAlBe : maxEcAlDe);
+        final double maxAtOrigin = Math.abs((flowsToGermany ? alBeConstraints : alDeConstraints).getMaxValue());
         // because min < 0
-        final double maxAtDestination = Math.abs(flowsToGermany ? minEcAlDe : minEcAlBe);
+        final double maxAtDestination = Math.abs((flowsToGermany ? alDeConstraints : alBeConstraints).getMinValue());
 
         return Math.min(maxAtOrigin, maxAtDestination);
     }

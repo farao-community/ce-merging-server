@@ -11,18 +11,21 @@ import com.farao_community.farao.ce_merging.base_case_improvement.initial_netpos
 import com.farao_community.farao.ce_merging.base_case_improvement.initial_netpositions.model.InitialNetPositions;
 import com.farao_community.farao.ce_merging.base_case_improvement.initial_netpositions.model.NetPosition;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.powsybl.commons.json.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import static com.powsybl.commons.json.JsonUtil.createObjectMapper;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public final class InitialNetPositionsImporter {
 
@@ -33,12 +36,19 @@ public final class InitialNetPositionsImporter {
 
     static Map<String, Double> getInRegionNetPositions(final InputStream initialNpFile,
                                                        final RegionConfiguration region) {
-        return getNetPositionsWithoutVirtualHubs(initialNpFile, region, CountryNetPositions::getInRegionNetPosition);
+        return getNetPositionsWithoutVirtualHubs(initialNpFile, region,
+                                                 CountryNetPositions::getInRegionNetPosition);
     }
 
-    public static Map<String, Double> getGlobalNetPosition(final InputStream initialNpFile,
-                                                           final RegionConfiguration region) {
-        return getNetPositionsWithoutVirtualHubs(initialNpFile, region, CountryNetPositions::getGlobalNetPosition);
+    public static Map<String, Double> getGlobalNetPosition(final String netPosFilePath,
+                                                           final RegionConfiguration region) throws FileNotFoundException {
+
+        if (isBlank(netPosFilePath)){
+            return Collections.emptyMap();
+        }
+
+        return getNetPositionsWithoutVirtualHubs(new FileInputStream(netPosFilePath), region,
+                                                 CountryNetPositions::getGlobalNetPosition);
     }
 
     private static Map<String, Double> getNetPositionsWithoutVirtualHubs(final InputStream initialNpFile,
@@ -63,8 +73,7 @@ public final class InitialNetPositionsImporter {
 
     private static Map<String, CountryNetPositions> netPositionsMapFromContent(final InputStream is) {
         try {
-            final ObjectMapper objectMapper = createObjectMapper();
-            final InitialNetPositions netPositions = objectMapper.readValue(is, InitialNetPositions.class);
+            final InitialNetPositions netPositions = createObjectMapper().readValue(is, InitialNetPositions.class);
             return netPositions.getCountryNetPositionsMap();
         } catch (IOException e) {
             LOGGER.error("Error while reading initial net positions in BCI process", e);
@@ -72,9 +81,6 @@ public final class InitialNetPositionsImporter {
         }
     }
 
-    private static ObjectMapper createObjectMapper() {
-        return JsonUtil.createObjectMapper();
-    }
 }
 
 

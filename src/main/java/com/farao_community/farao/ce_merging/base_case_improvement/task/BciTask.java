@@ -24,7 +24,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_REQUEST_OFFSET;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_WINTER_OFFSET;
 import static com.farao_community.farao.ce_merging.common.task.TaskStatus.CREATED;
 import static jakarta.persistence.GenerationType.AUTO;
 
@@ -101,7 +101,7 @@ public class BciTask implements JsonApiData, Task {
 
     public ZoneOffset getRealOffset() {
         return Optional.ofNullable(realOffset)
-            .orElse(DEFAULT_REQUEST_OFFSET);
+            .orElse(PARIS_WINTER_OFFSET);
     }
 
     public void setRealOffset(final ZoneOffset realOffset) {

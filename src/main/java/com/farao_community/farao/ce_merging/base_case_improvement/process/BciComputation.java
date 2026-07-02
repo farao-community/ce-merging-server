@@ -142,7 +142,7 @@ public class BciComputation {
                                       final Map<String, Interval> regionFeasibilityRanges) {
 
         return inRegionNpByArea.entrySet().stream()
-            .allMatch((e -> regionFeasibilityRanges.get(e.getKey()).containsValue(e.getValue())));
+            .allMatch(e -> regionFeasibilityRanges.get(e.getKey()).containsValue(e.getValue()));
     }
 
     private static boolean isNotNegligible(final double value) {

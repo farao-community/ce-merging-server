@@ -10,7 +10,7 @@ import java.io.Serializable;
 
 public class AlegroData implements Serializable {
 
-    private Boolean alegroInOutage;
+    private boolean isInOutage;
     private AlegroFlows alDeFlows;
     private AlegroFlows alBeFlows;
 
@@ -33,11 +33,11 @@ public class AlegroData implements Serializable {
         this.alBeFlows = alBeFlows;
     }
 
-    public Boolean getAlegroInOutage() {
-        return alegroInOutage;
+    public boolean isInOutage() {
+        return isInOutage;
     }
 
-    public void setAlegroInOutage(final Boolean alegroInOutage) {
-        this.alegroInOutage = alegroInOutage;
+    public void setInOutage(final boolean isInOutage) {
+        this.isInOutage = isInOutage;
     }
 }
