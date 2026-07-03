@@ -1,0 +1,13 @@
+{
+  "hvdcXNodeAlignment": [
+    {
+      "referenceXNode": "X0R_GA1I",
+      "recessiveXNode": "X0R_GA1G"
+    }
+  ],
+  "setZeroFlowNodes": [
+  ],
+  "dkHvdcXnodes": [
+  ],
+  "defaultSlackNode": ""
+}
