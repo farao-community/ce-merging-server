@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.base_case_improvement.forecast_netpositions;
 
 import com.farao_community.farao.ce_merging.base_case_improvement.RegionConfiguration;
+import com.farao_community.farao.ce_merging.base_case_improvement.process.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeDeserializer;
 import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -18,13 +19,12 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static com.farao_community.farao.ce_merging.base_case_improvement.process.FlowByAreaMap.toNetPositionsMap;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 public class ReferenceProgram implements Serializable {
 
@@ -44,7 +44,7 @@ public class ReferenceProgram implements Serializable {
         this.referenceExchanges = referenceExchanges;
     }
 
-    public Map<String, Double> computeGlobalNetPositionsForOutAreas(final RegionConfiguration region) {
+    public FlowByAreaMap computeGlobalNetPositionsForOutAreas(final RegionConfiguration region) {
         final Predicate<String> isNotRegionOrItsAreasIn = areaId -> !region.getId().equals(areaId)
                                                                   && !region.getAreasIn().containsValue(areaId);
         return Stream
@@ -52,18 +52,18 @@ public class ReferenceProgram implements Serializable {
                     referenceExchanges.stream().map(ReferenceExchangeData::getAreaOutId))
             .distinct()
             .filter(isNotRegionOrItsAreasIn)
-            .collect(toMap(identity(), this::getAreaGlobalNetPosition));
+            .collect(toNetPositionsMap(identity(), this::getAreaGlobalNetPosition));
     }
 
-    public Map<String, Double> computeAllNetPositionsInRegion(final RegionConfiguration region) {
+    public FlowByAreaMap computeAllNetPositionsInRegion(final RegionConfiguration region) {
         return computeForAllAreasIn(region, areaId -> getAreaNetPositionInRegion(areaId, region));
     }
 
-    public Map<String, Double> computeAllNetPositionsOutRegion(final RegionConfiguration region) {
+    public FlowByAreaMap computeAllNetPositionsOutRegion(final RegionConfiguration region) {
         return computeForAllAreasIn(region, areaId -> getAreaNetPositionOutRegion(areaId, region));
     }
 
-    public Map<String, Double> computeAllGlobalNetPositions(final RegionConfiguration region) {
+    public FlowByAreaMap computeAllGlobalNetPositions(final RegionConfiguration region) {
         return computeForAllAreasIn(region, this::getAreaGlobalNetPosition);
     }
 
@@ -97,12 +97,11 @@ public class ReferenceProgram implements Serializable {
             .sum();
     }
 
-    private Map<String, Double> computeForAllAreasIn(final RegionConfiguration region,
-                                                     final Function<String, Double> areaToNetPosition) {
-        return region.getAreasIn()
-            .values()
+    private FlowByAreaMap computeForAllAreasIn(final RegionConfiguration region,
+                                               final Function<String, Double> areaToNetPosition) {
+        return region.getAreasIn().values()
             .stream()
-            .collect(toMap(identity(), areaToNetPosition));
+            .collect(toNetPositionsMap(identity(), areaToNetPosition));
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-

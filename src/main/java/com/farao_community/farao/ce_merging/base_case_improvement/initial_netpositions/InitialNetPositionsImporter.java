@@ -10,6 +10,7 @@ import com.farao_community.farao.ce_merging.base_case_improvement.RegionConfigur
 import com.farao_community.farao.ce_merging.base_case_improvement.initial_netpositions.model.CountryNetPositions;
 import com.farao_community.farao.ce_merging.base_case_improvement.initial_netpositions.model.InitialNetPositions;
 import com.farao_community.farao.ce_merging.base_case_improvement.initial_netpositions.model.NetPosition;
+import com.farao_community.farao.ce_merging.base_case_improvement.process.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,13 +19,12 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import static com.farao_community.farao.ce_merging.base_case_improvement.process.FlowByAreaMap.toNetPositionsMap;
 import static com.powsybl.commons.json.JsonUtil.createObjectMapper;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public final class InitialNetPositionsImporter {
@@ -34,34 +34,34 @@ public final class InitialNetPositionsImporter {
     private InitialNetPositionsImporter() {
     }
 
-    static Map<String, Double> getInRegionNetPositions(final InputStream initialNpFile,
-                                                       final RegionConfiguration region) {
+    static FlowByAreaMap getInRegionNetPositions(final InputStream initialNpFile,
+                                                 final RegionConfiguration region) {
         return getNetPositionsWithoutVirtualHubs(initialNpFile, region,
                                                  CountryNetPositions::getInRegionNetPosition);
     }
 
-    public static Map<String, Double> getGlobalNetPosition(final String netPosFilePath,
-                                                           final RegionConfiguration region) throws FileNotFoundException {
+    public static FlowByAreaMap getGlobalNetPosition(final String netPosFilePath,
+                                                     final RegionConfiguration region) throws FileNotFoundException {
 
-        if (isBlank(netPosFilePath)){
-            return Collections.emptyMap();
+        if (isBlank(netPosFilePath)) {
+            return new FlowByAreaMap();
         }
 
         return getNetPositionsWithoutVirtualHubs(new FileInputStream(netPosFilePath), region,
                                                  CountryNetPositions::getGlobalNetPosition);
     }
 
-    private static Map<String, Double> getNetPositionsWithoutVirtualHubs(final InputStream initialNpFile,
-                                                                         final RegionConfiguration region,
-                                                                         final Function<CountryNetPositions, NetPosition> npGetter) {
+    private static FlowByAreaMap getNetPositionsWithoutVirtualHubs(final InputStream initialNpFile,
+                                                                   final RegionConfiguration region,
+                                                                   final Function<CountryNetPositions, NetPosition> npGetter) {
         final Map<String, String> areasIdByCountry = getAreasIdByCountry(region);
 
         return netPositionsMapFromContent(initialNpFile)
             .entrySet()
             .stream()
             .filter(entry -> areasIdByCountry.containsKey(entry.getKey()))
-            .collect(toMap(entry -> areasIdByCountry.get(entry.getKey()),
-                           entry -> npGetter.apply(entry.getValue()).getWithoutVirtualHubs()));
+            .collect(toNetPositionsMap(entry -> areasIdByCountry.get(entry.getKey()),
+                                       entry -> npGetter.apply(entry.getValue()).getWithoutVirtualHubs()));
     }
 
     private static Map<String, String> getAreasIdByCountry(final RegionConfiguration region) {

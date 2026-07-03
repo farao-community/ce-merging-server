@@ -30,8 +30,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -44,7 +42,6 @@ import static com.farao_community.farao.ce_merging.base_case_improvement.initial
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.readBytesFromPath;
-import static java.nio.file.Files.readAllBytes;
 
 public class BciProcess {
     private static final Logger LOGGER = LoggerFactory.getLogger(BciProcess.class);
@@ -53,8 +50,8 @@ public class BciProcess {
     private final RegionConfiguration regionConfiguration;
     private final CeMergingConfiguration configuration;
     private BciProcessResult processResult;
-    private final Map<String, Double> initialRegionNetPositions = new HashMap<>();
-    private Map<String, Double> initialGlobalNetPositions;
+    private final FlowByAreaMap initialRegionNetPositions = new FlowByAreaMap();
+    private FlowByAreaMap initialGlobalNetPositions;
     private Map<String, Interval> regionFeasibilityRanges;
     private ReferenceProgram referenceProgram;
     private BciOutput bciOutput;
@@ -109,11 +106,11 @@ public class BciProcess {
     }
 
     private void computeInRegionNetPositions() {
-        Map<String, Double> outRegionNetPositions = referenceProgram.computeAllNetPositionsOutRegion(regionConfiguration);
-        initialGlobalNetPositions.forEach((region, inNp) -> {
-            final double outNp = outRegionNetPositions.getOrDefault(region, 0.);
-            initialRegionNetPositions.put(region, inNp - outNp);
-        });
+        final FlowByAreaMap outRegionNetPositions = referenceProgram.computeAllNetPositionsOutRegion(regionConfiguration);
+        initialRegionNetPositions.putAll(
+            initialGlobalNetPositions.withValuesShiftedBy(region -> -outRegionNetPositions
+                .getOrDefault(region, 0.))
+        );
     }
 
     private void updateAlegroRegionsNetPosition() throws IOException {
@@ -128,24 +125,23 @@ public class BciProcess {
                                                final AlegroFlows flows) throws IOException {
         final double alHubToCeFlow = getAlegroConstrainedTargetFlow(flows);
         final double countryAlegroGap = alHubToCeFlow - flows.getInitialFlow();
-
         final String countryEic = regionConfiguration.getAreasIn().get(countryCode);
 
-        initialRegionNetPositions.computeIfPresent(countryEic, (k, np) -> np + countryAlegroGap);
+        initialRegionNetPositions.shift(countryEic, countryAlegroGap);
     }
 
     private Map<String, Interval> getAlegroExternalConstraints() throws IOException {
-        final byte[] externalConstraints = readAllBytes(Paths.get(getExternalConstraintsPath()));
+        final byte[] externalConstraints = readBytesFromPath(getExternalConstraintsPath());
         return calculateConstraintsForAlegro(externalConstraints, task.getProcessTargetDate());
     }
 
     private double getAlegroConstrainedTargetFlow(final AlegroFlows toConstrain) throws IOException {
-        final double maxFlow = getCommonLimit(alegroData, getAlegroExternalConstraints());
+        final double maxFlow = getCommonFlowLimit(alegroData, getAlegroExternalConstraints());
         return alegroData.isInOutage() ? 0 : Math.clamp(toConstrain.getTargetFlow(), -maxFlow, maxFlow);
     }
 
     private void computeBci() throws IOException {
-        final BciComputation computation = new BciComputation(regionConfiguration, referenceProgram);
+        final BciComputation computation = new BciComputation(regionConfiguration, referenceProgram, regionFeasibilityRanges);
         boolean isMergingWithAlegro = alegroData != null;
 
         final double alDeToCeFlow;
@@ -158,8 +154,7 @@ public class BciProcess {
             alBeToCeFlow = 0;
         }
 
-        final BciComputationResult bciResults = computation.run(regionFeasibilityRanges,
-                                                                initialRegionNetPositions,
+        final BciComputationResult bciResults = computation.run(initialRegionNetPositions,
                                                                 alBeToCeFlow,
                                                                 alDeToCeFlow);
 
@@ -170,7 +165,7 @@ public class BciProcess {
                                              getBciAlegroData());
     }
 
-    private BciAlegroData getBciAlegroData() throws IOException {
+    private BciAlegroData getBciAlegroData() {
 
         if (alegroData.isInOutage()) {
             return null;
@@ -238,18 +233,18 @@ public class BciProcess {
 
     }
 
-    private double getCommonLimit(final AlegroData bciAlegroData,
-                                  final Map<String, Interval> alegroExternalConstraints) {
+    private double getCommonFlowLimit(final AlegroData bciAlegroData,
+                                      final Map<String, Interval> alegroExternalConstraints) {
 
         final Interval alDeConstraints = alegroExternalConstraints.get(ALEGRO_DE_NODE_NAME);
         final Interval alBeConstraints = alegroExternalConstraints.get(ALEGRO_BE_NODE_NAME);
 
         final boolean flowsToGermany = bciAlegroData.getAlBeFlows().getTargetFlow() < 0;
 
-        final double maxAtOrigin = Math.abs((flowsToGermany ? alBeConstraints : alDeConstraints).getMaxValue());
-        // because min < 0
-        final double maxAtDestination = Math.abs((flowsToGermany ? alDeConstraints : alBeConstraints).getMinValue());
+        final Interval constraintsAtOrigin = flowsToGermany ? alBeConstraints : alDeConstraints;
+        final Interval constraintsAtDestination = flowsToGermany ? alDeConstraints : alBeConstraints;
 
-        return Math.min(maxAtOrigin, maxAtDestination);
+        return Math.min(Math.abs(constraintsAtOrigin.getMaxValue()),
+                        Math.abs(constraintsAtDestination.getMinValue()));
     }
 }
