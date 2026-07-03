@@ -47,12 +47,12 @@ public class DKRenamingService {
         SavedFile d1File = task.getInputs().getIgm(DK_COUNTRY_CODE).getIgmFile();
         try (InputStream inputStream = new FileInputStream(d1File.getPath())) {
             String dkHvdcXnodes = String.join(",", task.getConfigurations().getDkHvdcXnodes());
-            Network network = Network.read(d1File.getOriginalName(), inputStream);
+            Network danishNetwork = Network.read(d1File.getOriginalName(), inputStream);
             Properties properties = buildExportProperties(dkHvdcXnodes);
             if (dkHvdcXnodes != null) {
-                network.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes);
+                danishNetwork.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes);
             }
-            saveInArtifacts(network, task, properties);
+            saveInArtifacts(danishNetwork, task, properties);
         } catch (Exception e) {
             String errorMessage = String.format("Denmark Renaming strategy failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
             LOGGER.error(errorMessage);

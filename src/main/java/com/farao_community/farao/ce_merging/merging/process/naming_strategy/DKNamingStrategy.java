@@ -16,6 +16,7 @@ import com.powsybl.ucte.converter.UcteException;
 import com.powsybl.ucte.network.UcteCountryCode;
 import com.powsybl.ucte.network.UcteElementId;
 import com.powsybl.ucte.network.UcteNodeCode;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -34,7 +35,7 @@ public class DKNamingStrategy implements NamingStrategy {
     @Override
     public void initializeNetwork(Network network) {
         String raw = network.getProperty(DK_HVDC_XNODES_PROPERTY);
-        if (raw != null && !raw.isEmpty()) {
+        if (StringUtils.isNotBlank(raw)) {
             dkHvdcXnodes = Arrays.asList(raw.split(","));
         }
     }
