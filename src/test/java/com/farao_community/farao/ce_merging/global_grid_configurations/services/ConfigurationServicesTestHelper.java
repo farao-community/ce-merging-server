@@ -45,13 +45,6 @@ final class ConfigurationServicesTestHelper<T extends AbstractGridConfigurationR
         shouldThrowIfRepoErrorWhenPublishing();
     }
 
-    public void testAllExceptPublish() throws IOException {
-        shouldGetDefaultConfig();
-        shouldGetJsonConfig();
-        shouldThrowIfEmptyFile();
-        shouldThrowIfRepoErrorWhenPublishing();
-    }
-
     private void shouldGetJsonConfig() throws IOException {
 
         when(repo.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(

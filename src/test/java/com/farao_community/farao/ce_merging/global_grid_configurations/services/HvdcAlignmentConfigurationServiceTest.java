@@ -10,35 +10,34 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.HvdcAlignmentConfigurationRecord;
-import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.VirtualHubsConfigurationRecord;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
-import test_utils.CeTestUtils;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.BEGINNING_OF_2000;
+import static test_utils.CeTestUtils.byteContentOf;
 import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 class HvdcAlignmentConfigurationServiceTest {
 
     private final GridConfigurationRepository<HvdcAlignmentConfigurationRecord> repository = mock(GridConfigurationRepository.class);
-    private final VirtualHubsConfigurationService vhService = mock(VirtualHubsConfigurationService.class);
+    private final GridConfigurationRepository<VirtualHubsConfigurationRecord> vhRepo = mock(GridConfigurationRepository.class);
+    private final VirtualHubsConfigurationService vhService = new VirtualHubsConfigurationService(vhRepo);
     private final HvdcAlignmentConfigurationService service = new HvdcAlignmentConfigurationService(vhService, repository);
 
     @Test
     void shouldThrowIfCoupleNotInVirtualHubs() throws IOException {
 
         when(repository.save(any())).thenReturn(new HvdcAlignmentConfigurationRecord());
-        when(vhService.getConfiguration(any())).thenReturn(new VirtualHubsConfiguration());
 
         assertThatThrownBy(() -> service.publish(
-            new MockMultipartFile(
-                "testfile",
-                CeTestUtils.byteContentOf("gridDefaultConfigurations/hvdc-xnode-alignment-configuration_not_empty.json")),
+            new MockMultipartFile("testfile", byteContentOf("gridDefaultConfigurations/hvdc-xnode-alignment-configuration_invalid.json")),
             BEGINNING_OF_2000, BEGINNING_OF_2000)
         ).isValidServiceException()
             .hasCauseExactlyInstanceOf(CeMergingException.class);
@@ -47,11 +46,11 @@ class HvdcAlignmentConfigurationServiceTest {
 
     @Test
     void shouldHaveCommonMethodsWorking() throws IOException {
-        when(vhService.getConfiguration(any())).thenReturn(new VirtualHubsConfiguration());
+        when(vhRepo.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
+            any(LocalDateTime.class), any(LocalDateTime.class))
+        ).thenReturn(null);
 
-        new ConfigurationServicesTestHelper<>(service,
-                                              new HvdcAlignmentConfigurationRecord(),
-                                              JsonHvdcAlignmentConfiguration.class)
-            .testAllExceptPublish();
+        new ConfigurationServicesTestHelper<>(service, new HvdcAlignmentConfigurationRecord(), JsonHvdcAlignmentConfiguration.class)
+            .testAllAbstractMethods();
     }
 }

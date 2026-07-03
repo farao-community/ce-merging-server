@@ -1,8 +1,8 @@
 {
   "hvdcXNodeAlignment": [
     {
-      "referenceXNode": "XAR_GA1I",
-      "recessiveXNode": "XAR_GA1G"
+      "referenceXNode": "X0R_GA1I",
+      "recessiveXNode": "X0R_GA1G"
     }
   ],
   "setZeroFlowNodes": [
