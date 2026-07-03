@@ -32,6 +32,7 @@ public final class CeMergingConstants {
     public static final String DAILY_OUTPUTS_DIR = "daily-outputs";
     public static final String DAILY_INPUTS_DIR = "daily-inputs";
     public static final String ARTIFACTS_DIR = "artifacts";
+    public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";
     public static final String MERGING_SUPERVISOR_TAG  = "Merging supervisor";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
@@ -40,6 +41,7 @@ public final class CeMergingConstants {
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
     public static final String DK_HVDC_XNODES_PROPERTY = "dk.hvdc.xnodes";
     public static final String DK_NAMING_STRATEGY = "DKNamingStrategy";
+    public static final String INPUTS_TAG = "Inputs";
     public static final String GLOBAL_CONFIGURATIONS_TAG = "Global Configurations";
     public static final String TASK_CONFIGURATIONS_TAG = "Task Configurations";
     public static final String ID = "id";
