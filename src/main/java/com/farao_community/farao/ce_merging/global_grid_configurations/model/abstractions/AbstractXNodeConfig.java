@@ -6,6 +6,9 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
 import jakarta.persistence.MappedSuperclass;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @MappedSuperclass
 public abstract class AbstractXNodeConfig {
@@ -53,5 +56,20 @@ public abstract class AbstractXNodeConfig {
 
     public void setSubarea2(final String subarea2) {
         this.subarea2 = subarea2;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return EqualsBuilder.reflectionEquals(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

@@ -154,7 +154,6 @@ public class GlobalGridConfigurationService {
         task.getConfigurations().setRegionConfiguration(
             regionConfigurationMapper.mapToRegionConfiguration(jsonConfig.getRegionConfiguration())
         );
-        repository.save(task);
         LOGGER.info("Region EIC configuration is set on task configuration");
     }
 

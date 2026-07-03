@@ -47,9 +47,9 @@ public class Configurations implements Serializable {
     private List<XnodeConfig> xnodeList = new ArrayList<>();
     @OneToOne(cascade = ALL)
     private SavedFile recessivityParameters = new SavedFile();
-    @OneToMany(cascade = ALL)
+    @OneToMany(cascade = ALL, orphanRemoval = true)
     private List<BecByBoundary> becMatrixConfig = new ArrayList<>();
-    @OneToOne(cascade = ALL)
+    @OneToOne(cascade = ALL, orphanRemoval = true)
     private RegionConfiguration regionConfiguration;
     @ElementCollection(fetch = LAZY)
     private List<VirtualHubsAlignmentCouple> virtualHubsAlignmentCouples = new ArrayList<>();

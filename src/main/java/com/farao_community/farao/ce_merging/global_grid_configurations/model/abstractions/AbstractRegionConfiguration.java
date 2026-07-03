@@ -6,11 +6,13 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.TsoInfos;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.OneToMany;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +20,7 @@ import java.util.Map;
 import static jakarta.persistence.FetchType.LAZY;
 
 @MappedSuperclass
-public abstract class AbstractRegionConfiguration {
+public abstract class AbstractRegionConfiguration<T extends AbstractTsoInfos> {
 
     protected String id;
     protected String name;
@@ -27,7 +29,7 @@ public abstract class AbstractRegionConfiguration {
     @ElementCollection(fetch = LAZY)
     protected Map<String, String> areasOut;
     @OneToMany
-    protected Map<String, TsoInfos> germanyZone;
+    protected Map<String, T> germanyZone;
 
     @JsonIgnore
     public Map<String, String> getAreasAll() {
@@ -69,11 +71,26 @@ public abstract class AbstractRegionConfiguration {
         this.areasOut = areasOut;
     }
 
-    public Map<String, TsoInfos> getGermanyZone() {
+    public Map<String, T> getGermanyZone() {
         return germanyZone;
     }
 
-    public void setGermanyZone(final Map<String, TsoInfos> germanyZone) {
+    public void setGermanyZone(final Map<String, T> germanyZone) {
         this.germanyZone = germanyZone;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return EqualsBuilder.reflectionEquals(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

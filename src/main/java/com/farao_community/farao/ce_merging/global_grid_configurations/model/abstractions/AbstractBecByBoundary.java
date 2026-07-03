@@ -9,6 +9,9 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model.ab
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.MappedSuperclass;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
@@ -35,5 +38,20 @@ public abstract class AbstractBecByBoundary<T extends AbstractBecCoefficients> {
 
     public void setCoefficientByCountry(final List<T> coefficientByCountry) {
         this.coefficientByCountry = coefficientByCountry;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return EqualsBuilder.reflectionEquals(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

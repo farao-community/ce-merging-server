@@ -26,7 +26,7 @@ import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
 @Table(name = "regionconfigurationdto")
-public class RegionConfigurationDto extends AbstractRegionConfiguration {
+public class RegionConfigurationDto extends AbstractRegionConfiguration<TsoInfosDto> {
     @Id
     @GeneratedValue(strategy = AUTO)
     private Long ref;

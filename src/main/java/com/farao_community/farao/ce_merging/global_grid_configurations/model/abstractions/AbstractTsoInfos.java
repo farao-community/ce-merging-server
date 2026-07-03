@@ -35,12 +35,12 @@ public abstract class AbstractTsoInfos {
 
     @Override
     public boolean equals(final Object o) {
-        return EqualsBuilder.reflectionEquals(this, o, "ref");
+        return EqualsBuilder.reflectionEquals(this, o);
     }
 
     @Override
     public int hashCode() {
-        return HashCodeBuilder.reflectionHashCode(this, "ref");
+        return HashCodeBuilder.reflectionHashCode(this);
     }
 
     @Override

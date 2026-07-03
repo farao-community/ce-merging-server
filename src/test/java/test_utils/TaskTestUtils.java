@@ -10,8 +10,8 @@ import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
@@ -21,12 +21,9 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.xsd.Xnodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.powsybl.loadflow.LoadFlowParameters;
-import com.powsybl.loadflow.json.JsonLoadFlowParameters;
 import com.powsybl.openrao.virtualhubs.BorderDirection;
 import com.powsybl.openrao.virtualhubs.VirtualHub;
 import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
-import com.powsybl.openrao.virtualhubs.xml.XmlVirtualHubsConfiguration;
 import org.springframework.core.io.ClassPathResource;
 
 import java.io.IOException;
@@ -35,10 +32,11 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapKsToXk;
+import static com.powsybl.openrao.virtualhubs.xml.XmlVirtualHubsConfiguration.importConfiguration;
 
 public final class TaskTestUtils {
 
-    public static void setTaskDefaultConfigurations(MergingTask task) {
+    public static void setTaskDefaultConfigurations(final MergingTask task) {
         try {
             setTaskVirtualHubsConfiguration(task);
             setTaskXnodesConfig(task);
@@ -49,9 +47,8 @@ public final class TaskTestUtils {
         }
     }
 
-    public static void setLoadflowParameters(MergingTask task, String loadflowParametersFile) throws IOException {
-        LoadFlowParameters loadFlowParameters = JsonLoadFlowParameters.read(new ClassPathResource(loadflowParametersFile).getInputStream());
-        task.getConfigurations().setLoadFlowParameters(loadFlowParameters);
+    private static InputStream getGridConfigStream(final String fileName) throws IOException {
+        return new ClassPathResource("gridDefaultConfigurations/%s".formatted(fileName)).getInputStream();
     }
 
     public static List<XnodeConfig> importXnodeConfiguration(final InputStream is) throws IOException {
@@ -64,80 +61,75 @@ public final class TaskTestUtils {
             .toList();
     }
 
-    private static void setTaskXnodesConfig(MergingTask task) throws IOException {
-        String xnodesConfigDefaultLocation = "gridDefaultConfigurations/cvg-xnodes-default-config.xml";
-        List<XnodeConfig> xnodes = importXnodeConfiguration(new ClassPathResource(xnodesConfigDefaultLocation).getInputStream());
+    private static void setTaskXnodesConfig(final MergingTask task) throws IOException {
+        List<XnodeConfig> xnodes = importXnodeConfiguration(getGridConfigStream("cvg-xnodes-default-config.xml"));
         task.getConfigurations().setXnodeList(xnodes);
     }
 
-    private static void setTaskVirtualHubsConfiguration(MergingTask task) throws IOException {
-        String virtualHubsDefaultConfigLocation = "gridDefaultConfigurations/virtual-hubs-default-config.xml";
-        VirtualHubsConfiguration virtualHubsDefaultConfiguration = XmlVirtualHubsConfiguration.importConfiguration(new ClassPathResource(virtualHubsDefaultConfigLocation).getInputStream());
-        List<VirtualHubRecord> virtualHubRecords = mapToVirtualHubRecords(virtualHubsDefaultConfiguration.getVirtualHubs());
+    private static void setTaskVirtualHubsConfiguration(final MergingTask task) throws IOException {
+        final VirtualHubsConfiguration cfg = importConfiguration(getGridConfigStream("virtual-hubs-default-config.xml"));
+        final List<VirtualHubRecord> virtualHubRecords = mapToVirtualHubRecords(cfg.getVirtualHubs());
         adaptCountryCodeForVirtualHub(virtualHubRecords);
         task.getConfigurations().setVirtualHubList(virtualHubRecords);
 
-        List<BorderDirectionRecord> borderDirectionRecords = mapToBorderDirectionRecords(virtualHubsDefaultConfiguration.getBorderDirections());
+        final List<BorderDirectionRecord> borderDirectionRecords = mapToBorderDirectionRecords(cfg.getBorderDirections());
         adaptCountryCodeForBorderDirection(borderDirectionRecords);
         task.getConfigurations().setBorderDirectionRecords(borderDirectionRecords);
     }
 
-    private static void setTaskRegionConfiguration(MergingTask task) throws IOException {
-        String jsonConfig = new String(new ClassPathResource("gridDefaultConfigurations/region_configuration.json").getInputStream().readAllBytes());
-        ObjectMapper objectMapper = new ObjectMapper();
-        RegionConfiguration regionConfiguration = objectMapper.readValue(jsonConfig, RegionConfiguration.class);
+    private static void setTaskRegionConfiguration(final MergingTask task) throws IOException {
+        final String jsonConfig = new String(getGridConfigStream("region_configuration.json").readAllBytes());
+        final RegionConfiguration regionConfiguration = new ObjectMapper().readValue(jsonConfig, RegionConfiguration.class);
         task.getConfigurations().setRegionConfiguration(regionConfiguration);
     }
 
-    private static void setHvdcXNodeAlignmentConfiguration(MergingTask taskEntity) throws IOException {
-        JsonHvdcAlignmentConfiguration jsonHvdcAlignmentConfiguration = JsonUtils.read(JsonHvdcAlignmentConfiguration.class, new ClassPathResource("gridDefaultConfigurations/hvdc-xnode-alignment-configuration.json").getInputStream());
+    private static void setHvdcXNodeAlignmentConfiguration(final MergingTask task) throws IOException {
+        final JsonHvdcAlignmentConfiguration cfg = JsonUtils.read(JsonHvdcAlignmentConfiguration.class,
+                                                                  getGridConfigStream("hvdc-xnode-alignment-configuration.json"));
 
-        Configurations configurations = taskEntity.getConfigurations();
+        final Configurations configurations = task.getConfigurations();
 
-        List<VirtualHubsAlignmentCoupleDto> virtualHubsAlignmentCouplesDtos = jsonHvdcAlignmentConfiguration.getHvdcXNodeAlignment();
-        List<VirtualHubsAlignmentCouple> virtualHubsAlignmentCouples = mapToHvdcAlignmentXNodeCouples(virtualHubsAlignmentCouplesDtos);
-        configurations.setVirtualHubsAlignmentCouples(virtualHubsAlignmentCouples);
+        final List<VirtualHubsAlignmentCoupleDto> couplesDto = cfg.getHvdcXNodeAlignment();
+        final List<VirtualHubsAlignmentCouple> couples = mapToHvdcAlignmentXNodeCouples(couplesDto);
+        configurations.setVirtualHubsAlignmentCouples(couples);
 
-        List<ZeroFlowNodeDto> zeroFlowNodeDtos = jsonHvdcAlignmentConfiguration.getSetZeroFlowNodes();
-        List<ZeroFlowNode> zeroFlowNodes = mapToZeroFlowNodes(zeroFlowNodeDtos);
+        final List<ZeroFlowNodeDto> zeroFlowNodeDtos = cfg.getSetZeroFlowNodes();
+        final List<ZeroFlowNode> zeroFlowNodes = mapToZeroFlowNodes(zeroFlowNodeDtos);
         configurations.setZeroFlowNodes(zeroFlowNodes);
 
-        List<String> dkHvdcXnodes = jsonHvdcAlignmentConfiguration.getDkHvdcXnodes();
-        configurations.setDkHvdcXnodes(dkHvdcXnodes);
-
-        String defaultSlackNode = jsonHvdcAlignmentConfiguration.getDefaultSlackNode();
-        configurations.setDefaultSlackNode(defaultSlackNode);
+        configurations.setDkHvdcXnodes(cfg.getDkHvdcXnodes());
+        configurations.setDefaultSlackNode(cfg.getDefaultSlackNode());
     }
 
-    private static List<VirtualHubRecord> mapToVirtualHubRecords(List<VirtualHub> virtualHubs) {
+    private static List<VirtualHubRecord> mapToVirtualHubRecords(final List<VirtualHub> virtualHubs) {
         return virtualHubs.stream()
             .map(virtualHub -> new VirtualHubRecord(virtualHub.code(), virtualHub.eic(), virtualHub.nodeName(), virtualHub.relatedMa().code(), virtualHub.relatedMa().eic()))
             .toList();
     }
 
-    private static List<BorderDirectionRecord> mapToBorderDirectionRecords(List<BorderDirection> borderDirections) {
+    private static List<BorderDirectionRecord> mapToBorderDirectionRecords(final List<BorderDirection> borderDirections) {
         return borderDirections.stream()
             .map(borderDirection -> new BorderDirectionRecord(borderDirection.from(), borderDirection.to()))
             .toList();
     }
 
-    private static List<VirtualHubsAlignmentCouple> mapToHvdcAlignmentXNodeCouples(List<VirtualHubsAlignmentCoupleDto> virtualHubsAlignmentCouplesDtos) {
-        return virtualHubsAlignmentCouplesDtos.stream()
-            .map(hvdcAlignmentXNodeCoupleDto -> new VirtualHubsAlignmentCouple(hvdcAlignmentXNodeCoupleDto.getReferenceXNode(), hvdcAlignmentXNodeCoupleDto.getRecessiveXNode()))
+    private static List<VirtualHubsAlignmentCouple> mapToHvdcAlignmentXNodeCouples(final List<VirtualHubsAlignmentCoupleDto> couplesDto) {
+        return couplesDto.stream()
+            .map(coupleDto -> new VirtualHubsAlignmentCouple(coupleDto.getReferenceXNode(), coupleDto.getRecessiveXNode()))
             .toList();
     }
 
-    private static List<ZeroFlowNode> mapToZeroFlowNodes(List<ZeroFlowNodeDto> zeroFlowNodeDtos) {
+    private static List<ZeroFlowNode> mapToZeroFlowNodes(final List<ZeroFlowNodeDto> zeroFlowNodeDtos) {
         return zeroFlowNodeDtos.stream()
             .map(zeroFlowNodeDto -> new ZeroFlowNode(zeroFlowNodeDto.getXnode(), zeroFlowNodeDto.getCountryCode()))
             .toList();
     }
 
-    private static void adaptCountryCodeForVirtualHub(List<VirtualHubRecord> virtualHubList) {
+    private static void adaptCountryCodeForVirtualHub(final List<VirtualHubRecord> virtualHubList) {
         virtualHubList.forEach(virtualHubRecord -> virtualHubRecord.setRelatedMaCode(mapKsToXk(virtualHubRecord.getRelatedMaCode())));
     }
 
-    private static void adaptCountryCodeForBorderDirection(List<BorderDirectionRecord> borderDirectionRecords) {
+    private static void adaptCountryCodeForBorderDirection(final List<BorderDirectionRecord> borderDirectionRecords) {
         borderDirectionRecords.forEach(borderDirectionRecord -> {
             borderDirectionRecord.setBorderFrom(mapKsToXk(borderDirectionRecord.getBorderFrom()));
             borderDirectionRecord.setBorderTo(mapKsToXk(borderDirectionRecord.getBorderTo()));

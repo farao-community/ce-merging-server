@@ -32,7 +32,7 @@ import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
 @Table(name = "regionconfiguration")
-public class RegionConfiguration extends AbstractRegionConfiguration implements Serializable {
+public class RegionConfiguration extends AbstractRegionConfiguration<TsoInfos> implements Serializable {
     private static final Logger LOGGER = LoggerFactory.getLogger(RegionConfiguration.class);
     @Id
     @GeneratedValue(strategy = AUTO)
@@ -45,17 +45,17 @@ public class RegionConfiguration extends AbstractRegionConfiguration implements 
     private String id;
 
     @ElementCollection
-    @CollectionTable(name = "regionconfiguration_ariasin_code_mapping",
+    @CollectionTable(name = "regionconfiguration_areasin_code_mapping",
         joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
-    @MapKeyColumn(name = "ariasin_name")
-    @Column(name = "ariasin_eic")
+    @MapKeyColumn(name = "areasin_name")
+    @Column(name = "areasin_eic")
     protected Map<String, String> areasIn;
 
     @ElementCollection
-    @CollectionTable(name = "regionconfiguration_ariasout_code_mapping",
+    @CollectionTable(name = "regionconfiguration_areasout_code_mapping",
         joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
-    @MapKeyColumn(name = "ariasout_name")
-    @Column(name = "ariasout_eic")
+    @MapKeyColumn(name = "areasout_name")
+    @Column(name = "areasout_eic")
     protected Map<String, String> areasOut;
 
     @OneToMany(cascade = ALL)
