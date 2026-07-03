@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_ALEGRO_THRESHOLD;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_REQUEST_OFFSET;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_WINTER_OFFSET;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.EAGER;
 
@@ -53,6 +53,8 @@ public class Inputs implements Serializable {
     private SavedFile feasibilityRanges = new SavedFile();
     @OneToOne(cascade = ALL)
     private SavedFile netPositionForecast = new SavedFile();
+    @OneToOne(cascade = ALL)
+    private SavedFile dcLinks = new SavedFile();
 
     public IgmData getIgm(final String country) {
         return igms.stream()
@@ -64,7 +66,7 @@ public class Inputs implements Serializable {
 
     public ZoneOffset getRealOffset() {
         return Optional.ofNullable(realOffset)
-            .orElse(DEFAULT_REQUEST_OFFSET);
+            .orElse(PARIS_WINTER_OFFSET);
     }
 
     public Boolean getMergingWithInternalHvdc() {
@@ -93,6 +95,10 @@ public class Inputs implements Serializable {
 
     public void setNetPositionForecastFilePath(final String filePath) {
         netPositionForecast.feedPathAndName(filePath);
+    }
+
+    public void setDcLinksFilePath(final String filePath) {
+        dcLinks.feedPathAndName(filePath);
     }
 
     public List<IgmData> getIgms() {
@@ -153,5 +159,13 @@ public class Inputs implements Serializable {
 
     public void setNetPositionForecast(final SavedFile netPositionForecast) {
         this.netPositionForecast = netPositionForecast;
+    }
+
+    public SavedFile getDcLinks() {
+        return dcLinks;
+    }
+
+    public void setDcLinks(final SavedFile dcLinks) {
+        this.dcLinks = dcLinks;
     }
 }
