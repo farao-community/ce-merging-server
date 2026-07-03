@@ -34,6 +34,9 @@ public class DKNamingStrategy implements NamingStrategy {
 
     @Override
     public void initializeNetwork(Network network) {
+        ucteNodeIds.clear();
+        ucteElementIds.clear();
+        dkHvdcXnodes = Collections.emptyList();
         String raw = network.getProperty(DK_HVDC_XNODES_PROPERTY);
         if (StringUtils.isNotBlank(raw)) {
             dkHvdcXnodes = Arrays.asList(raw.split(","));

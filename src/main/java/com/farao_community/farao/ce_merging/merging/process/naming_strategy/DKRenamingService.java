@@ -22,8 +22,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_COUNTRY_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_NAMING_STRATEGY;
@@ -46,12 +49,13 @@ public class DKRenamingService {
     public void renameDkCountry(MergingTask task) {
         SavedFile d1File = task.getInputs().getIgm(DK_COUNTRY_CODE).getIgmFile();
         try (InputStream inputStream = new FileInputStream(d1File.getPath())) {
-            String dkHvdcXnodes = String.join(",", task.getConfigurations().getDkHvdcXnodes());
+            String dkHvdcXnodes = Optional.ofNullable(task.getConfigurations().getDkHvdcXnodes())
+                    .orElseGet(Collections::emptyList)
+                    .stream()
+                    .collect(Collectors.joining(","));
             Network danishNetwork = Network.read(d1File.getOriginalName(), inputStream);
             Properties properties = buildExportProperties(dkHvdcXnodes);
-            if (dkHvdcXnodes != null) {
-                danishNetwork.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes);
-            }
+            danishNetwork.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes);
             saveInArtifacts(danishNetwork, task, properties);
         } catch (Exception e) {
             String errorMessage = String.format("Denmark Renaming strategy failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
