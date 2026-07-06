@@ -39,10 +39,10 @@ public class RegionConfiguration extends AbstractRegionConfiguration<TsoInfos> i
     private Long ref;
 
     @Column(name = "name")
-    private String name;
+    protected String name;
 
     @Column(name = "id")
-    private String id;
+    protected String id;
 
     @ElementCollection
     @CollectionTable(name = "regionconfiguration_areasin_code_mapping",
@@ -60,7 +60,7 @@ public class RegionConfiguration extends AbstractRegionConfiguration<TsoInfos> i
 
     @OneToMany(cascade = ALL)
     @JsonProperty(value = "germanyZones")
-    private Map<String, TsoInfos> germanyZone;
+    protected Map<String, TsoInfos> germanyZone;
 
     @Override
     public String toString() {
