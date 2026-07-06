@@ -52,4 +52,23 @@ public class BecByBoundary extends AbstractBecByBoundary<BecCoefficients, Border
         this.id = id;
     }
 
+    @Override
+    public Border getBorder() {
+        return border;
+    }
+
+    @Override
+    public void setBorder(final Border border) {
+        this.border = border;
+    }
+
+    @Override
+    public List<BecCoefficients> getCoefficientByCountry() {
+        return coefficientByCountry;
+    }
+
+    @Override
+    public void setCoefficientByCountry(final List<BecCoefficients> coefficientByCountry) {
+        this.coefficientByCountry = coefficientByCountry;
+    }
 }

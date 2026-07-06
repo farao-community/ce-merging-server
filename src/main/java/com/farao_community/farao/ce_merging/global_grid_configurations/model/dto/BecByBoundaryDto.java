@@ -53,4 +53,24 @@ public class BecByBoundaryDto extends AbstractBecByBoundary<BecCoefficientsDto, 
     public void setId(final Long id) {
         this.id = id;
     }
+
+    @Override
+    public BorderDto getBorder() {
+        return border;
+    }
+
+    @Override
+    public void setBorder(final BorderDto border) {
+        this.border = border;
+    }
+
+    @Override
+    public List<BecCoefficientsDto> getCoefficientByCountry() {
+        return coefficientByCountry;
+    }
+
+    @Override
+    public void setCoefficientByCountry(final List<BecCoefficientsDto> coefficientByCountry) {
+        this.coefficientByCountry = coefficientByCountry;
+    }
 }
