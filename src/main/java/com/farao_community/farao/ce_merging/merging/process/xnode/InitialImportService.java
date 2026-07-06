@@ -33,13 +33,13 @@ public class InitialImportService {
 
     private void importIgm(final Map<String, Network> networkByTsoMap, final IgmData igmData) {
         final SavedFile igmFile = igmData.getIgmFile();
-        try {
-            LOGGER.info("Importing network file: {}", igmData.getIgmFile().getOriginalName());
-            final Network network = Network.read(igmFile.getOriginalName(), new FileInputStream(igmFile.getPath()));
+        try (FileInputStream inputStream = new FileInputStream(igmFile.getPath())) {
+            LOGGER.info("Importing network file: {}", igmFile.getOriginalName());
+            final Network network = Network.read(igmFile.getOriginalName(), inputStream);
             networkByTsoMap.put(igmData.getCountry(), network);
 
-        } catch (final Exception e) {
-            final String errorMessage = "Network file: " + igmData.getIgmFile().getOriginalName() + " cannot be imported, cause: " + e.getMessage();
+        } catch (Exception e) {
+            final String errorMessage = "Network file: " + igmFile.getOriginalName() + " cannot be imported, cause: " + e.getMessage();
             LOGGER.error(errorMessage, e);
             throw new CeMergingException(errorMessage, e);
         }

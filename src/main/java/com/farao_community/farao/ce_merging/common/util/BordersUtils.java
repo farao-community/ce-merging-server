@@ -23,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public final class BordersUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(BordersUtils.class);
@@ -34,8 +33,10 @@ public final class BordersUtils {
     }
 
     public static boolean isVirtualHubDanglingLine(final DanglingLine danglingLine, final List<VirtualHubRecord> virtualHubList) {
-        final List<String> virtualHubsNodeNames = virtualHubList.stream().map(VirtualHubRecord::getNodeName).collect(Collectors.toList());
-        return virtualHubsNodeNames.contains(danglingLine.getPairingKey().substring(0, 8));
+        final String nodeName = danglingLine.getPairingKey().substring(0, 8);
+        return virtualHubList.stream()
+                .map(VirtualHubRecord::getNodeName)
+                .anyMatch(nodeName::equals);
     }
 
     public static double getBorderFlow(final DanglingLine danglingLine, final LoadFlowParameters.ComponentMode componentModeLfParameter) {
@@ -76,6 +77,7 @@ public final class BordersUtils {
         final double flowSide1 = hvdcLine.getConverterStation1().getTerminal().isConnected() ? zeroIfNan(hvdcLine.getConverterStation1().getTerminal().getP()) : 0;
         final double flowSide2 = hvdcLine.getConverterStation2().getTerminal().isConnected() ? zeroIfNan(hvdcLine.getConverterStation2().getTerminal().getP()) : 0;
         final double directFlow = (flowSide1 - flowSide2) / 2;
+        // Copied from core-merging. Is the false fallback for a missing/invalid country intentional?
         return country.equals(hvdcLine.getConverterStation1().getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)) ? directFlow : -directFlow;
     }
 
@@ -103,6 +105,9 @@ public final class BordersUtils {
     }
 
     private static boolean isBorderOfZone(final String lineId, final String zone) {
+        if (lineId.length() < 17) {
+            throw new CeMergingException("Invalid line ID: " + lineId);
+        }
         final String nodeFrom = lineId.substring(0, 8);
         final String nodeTo = lineId.substring(9, 17);
         return nodeFrom.startsWith(zone) != nodeTo.startsWith(zone);

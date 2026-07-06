@@ -17,7 +17,7 @@ public class XnodesCheck {
     private final Map<String, XnodeInformation> xnodeInformationMap;
 
     @JsonCreator
-    public XnodesCheck(@JsonProperty("XnodeInformationMap") Map<String, XnodeInformation> xnodeInformationMap) {
+    public XnodesCheck(@JsonProperty("xnodeInformationMap") Map<String, XnodeInformation> xnodeInformationMap) {
         this.xnodeInformationMap = xnodeInformationMap;
     }
 

@@ -44,11 +44,12 @@ public class XnodesCalculation {
 
     public void fillXnodesInformation(final Network network, final String tso, final Map<String, XnodeInformation> xnodeInformationMap, final List<VirtualHubRecord> virtualHubList, final List<Xnode> xnodes, final boolean germanMode) {
         final Set<String> xnodesArea1 = xnodes.stream()
-                .filter(xnode -> germanMode ? xnode.getArea1().equals(GERMAN_COUNTRY_CODE) && tso.equals(xnode.getSubarea1()) : xnode.getArea1().equals(tso))
+                .filter(xnode -> matchesArea1(xnode, tso, germanMode))
                 .map(Xnode::getName)
                 .collect(Collectors.toSet());
 
-        final Set<String> xnodesArea2 = xnodes.stream().filter(xnode -> germanMode ? xnode.getArea2().equals(GERMAN_COUNTRY_CODE) && tso.equals(xnode.getSubarea2()) : xnode.getArea2().equals(tso))
+        final Set<String> xnodesArea2 = xnodes.stream()
+                .filter(xnode -> matchesArea2(xnode, tso, germanMode))
                 .map(Xnode::getName)
                 .collect(Collectors.toSet());
 
@@ -60,15 +61,7 @@ public class XnodesCalculation {
         processDanglingLines(network, xnodesArea2, virtualHubList, alegroVirtualHub, xnodeInformationMap, 2, tsoOpt);
     }
 
-    private void processDanglingLines(final Network network, final Set<String> xnodes, final List<VirtualHubRecord> virtualHubList, final String virtualHubException, final Map<String, XnodeInformation> xnodeInformationMap, final int areaNumber, Optional<String> tsoOpt) {
-        network.getDanglingLineStream()
-                .filter(dl -> xnodes.contains(dl.getPairingKey()))
-                .filter(dl -> !BordersUtils.isVirtualHubDanglingLine(dl, virtualHubList) ||
-                         dl.getPairingKey().equals(virtualHubException))
-                .forEach(dl -> addAreaInformation(xnodeInformationMap, dl, areaNumber, tsoOpt));
-    }
-
-    public void checkAllXnodesInNetworkArePresentInConfigList(final Network network, final List<VirtualHubRecord> virtualHubList, final List<Xnode> xnodes) {
+    public void checkXnodesConfigConsistency(final Network network, final List<VirtualHubRecord> virtualHubList, final List<Xnode> xnodes) {
         final List<String> allXnodesConfig = Stream.concat(xnodes.stream().map(Xnode::getName), virtualHubList.stream().map(VirtualHubRecord::getNodeName)).distinct().collect(Collectors.toList());
         network.getDanglingLineStream().map(DanglingLine::getPairingKey).forEach(xnodeCode -> {
             if (!allXnodesConfig.contains(xnodeCode)) {
@@ -248,6 +241,26 @@ public class XnodesCalculation {
         final AreaInformation area2Information = xnodeInformation.getArea2Information();
         return area1Information != null && getCountry(area1Information).equals(Country.DE)
                 && area2Information != null && getCountry(area2Information).equals(Country.DE);
+    }
+
+    private boolean matchesArea1(Xnode xnode, String tso, boolean germanMode) {
+        return germanMode
+                ? GERMAN_COUNTRY_CODE.equals(xnode.getArea1()) && tso.equals(xnode.getSubarea1())
+                : tso.equals(xnode.getArea1());
+    }
+
+    private boolean matchesArea2(Xnode xnode, String tso, boolean germanMode) {
+        return germanMode
+                ? GERMAN_COUNTRY_CODE.equals(xnode.getArea2()) && tso.equals(xnode.getSubarea2())
+                : tso.equals(xnode.getArea2());
+    }
+
+    private void processDanglingLines(final Network network, final Set<String> xnodes, final List<VirtualHubRecord> virtualHubList, final String virtualHubException, final Map<String, XnodeInformation> xnodeInformationMap, final int areaNumber, Optional<String> tsoOpt) {
+        network.getDanglingLineStream()
+                .filter(dl -> xnodes.contains(dl.getPairingKey()))
+                .filter(dl -> !BordersUtils.isVirtualHubDanglingLine(dl, virtualHubList) ||
+                        dl.getPairingKey().equals(virtualHubException))
+                .forEach(dl -> addAreaInformation(xnodeInformationMap, dl, areaNumber, tsoOpt));
     }
 
 }

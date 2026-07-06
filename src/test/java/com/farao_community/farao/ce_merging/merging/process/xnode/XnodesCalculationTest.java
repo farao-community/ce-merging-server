@@ -37,7 +37,7 @@ class XnodesCalculationTest {
     //TODO Add TU with fake file
 
     @Test
-    void checkAllXnodesInNetworkArePresentInConfigListTest() {
+    void checkXnodesConfigConsistencyTest() {
         final Network network = mock(Network.class);
         final DanglingLine dl = mock(DanglingLine.class);
         final Xnode xnode = mock(Xnode.class);
@@ -46,7 +46,7 @@ class XnodesCalculationTest {
         when(network.getNameOrId()).thenReturn(NETWORK_NAME);
         when(xnode.getName()).thenReturn(XNODE_NAME);
 
-        assertDoesNotThrow(() -> calculation.checkAllXnodesInNetworkArePresentInConfigList(network, Collections.emptyList(), List.of(xnode)));
+        assertDoesNotThrow(() -> calculation.checkXnodesConfigConsistency(network, Collections.emptyList(), List.of(xnode)));
     }
 
     @Test
@@ -58,6 +58,6 @@ class XnodesCalculationTest {
         when(network.getDanglingLineStream()).thenReturn(Stream.of(dl));
         when(network.getNameOrId()).thenReturn(NETWORK_NAME);
 
-        assertThrows(CeMergingException.class, () -> calculation.checkAllXnodesInNetworkArePresentInConfigList(network, Collections.emptyList(), Collections.emptyList()));
+        assertThrows(CeMergingException.class, () -> calculation.checkXnodesConfigConsistency(network, Collections.emptyList(), Collections.emptyList()));
     }
 }

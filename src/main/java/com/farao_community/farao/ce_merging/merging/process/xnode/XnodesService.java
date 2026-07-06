@@ -52,7 +52,7 @@ public class XnodesService {
         List<VirtualHubRecord> virtualHubList = task.getConfigurations().getVirtualHubList();
         List<Xnode> xnodesConfigList = task.getConfigurations().getXnodeList();
         networkByTsoMap.forEach((tso, network) -> {
-            xnodesCalculation.checkAllXnodesInNetworkArePresentInConfigList(network, virtualHubList, xnodesConfigList);
+            xnodesCalculation.checkXnodesConfigConsistency(network, virtualHubList, xnodesConfigList);
             xnodesCalculation.fillXnodesInformation(network, tso, xnodeInformationMap, virtualHubList, xnodesConfigList, isGermanOrDanishTso(tso));
         });
         saveXnodesInformationFileInArtifacts(xnodeInformationMap, task);
