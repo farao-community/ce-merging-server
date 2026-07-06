@@ -62,7 +62,7 @@ public class XnodesCalculation {
     }
 
     public void checkXnodesConfigConsistency(final Network network, final List<VirtualHubRecord> virtualHubList, final List<Xnode> xnodes) {
-        final List<String> allXnodesConfig = Stream.concat(xnodes.stream().map(Xnode::getName), virtualHubList.stream().map(VirtualHubRecord::getNodeName)).distinct().collect(Collectors.toList());
+        final List<String> allXnodesConfig = Stream.concat(xnodes.stream().map(Xnode::getName), virtualHubList.stream().map(VirtualHubRecord::getNodeName)).distinct().toList();
         network.getDanglingLineStream().map(DanglingLine::getPairingKey).forEach(xnodeCode -> {
             if (!allXnodesConfig.contains(xnodeCode)) {
                 LOGGER.error("Xnode {} present in network {} is not found in the xnodes config list nor in the virtual hubs list", xnodeCode, network.getNameOrId());
@@ -112,24 +112,27 @@ public class XnodesCalculation {
 
     public Map<String, XnodeInformation> completeXnodeMergedInformation(final Network network, final Map<String, XnodeInformation> xnodeInformationMap) {
         xnodeInformationMap.entrySet().stream().filter(e -> e.getValue().getArea1Information() != null && e.getValue().getArea2Information() != null)
-                .forEach(e -> {
-                    if (!isGermanInternalNode(e.getValue())) {
-                        final Optional<Branch> branchOpt = network.getBranchStream().filter(branch -> branch.getId().contains(e.getKey().substring(0, 8))).findFirst();
-                        branchOpt.ifPresent(branch -> addMergedInformation(branch, e.getValue()));
-                    } else {
-                        // for german internal node are renamed in germany premerge step: begin with "D" not "X"
-                        final List<Branch> branches = network.getBranchStream().filter(branch -> branch.getId().contains(e.getKey().substring(1, 8))).collect(Collectors.toList());
-                        if (branches.size() == 1) {
-                            addMergedInformation(branches.get(0), e.getValue());
-                        } else if (branches.size() == 2) {
-                            final Branch branchFrom = findCorrectBranch(branches, e.getKey(), e.getValue().getArea1Information().getCountry());
-                            final Branch branchTo = findCorrectBranch(branches, e.getKey(), e.getValue().getArea2Information().getCountry());
-                            addMergedInformationForGermanNode(branchFrom, branchTo, e.getValue());
-                        }
-                    }
-                });
-
+                .forEach(e -> processXnodeEntry(network, e));
         return xnodeInformationMap;
+    }
+
+    private void processXnodeEntry(Network network, Map.Entry<String, XnodeInformation> e) {
+        final String nodeId = e.getKey();
+        final XnodeInformation xnodeInformation = e.getValue();
+        if (!isGermanInternalNode(xnodeInformation)) {
+            final Optional<Branch> branchOpt = network.getBranchStream().filter(branch -> branch.getId().contains(nodeId.substring(0, 8))).findFirst();
+            branchOpt.ifPresent(branch -> addMergedInformation(branch, xnodeInformation));
+        } else {
+            // for german internal node that were renamed in germany premerge step: begin with "D" not "X"
+            final List<Branch> branches = network.getBranchStream().filter(branch -> branch.getId().contains(nodeId.substring(1, 8))).collect(Collectors.toList());
+            if (branches.size() == 1) {
+                addMergedInformation(branches.getFirst(), xnodeInformation);
+            } else if (branches.size() == 2) {
+                final Branch branchFrom = findCorrectBranch(branches, nodeId, xnodeInformation.getArea1Information().getCountry());
+                final Branch branchTo = findCorrectBranch(branches, nodeId, xnodeInformation.getArea2Information().getCountry());
+                addMergedInformationForGermanNode(branchFrom, branchTo, xnodeInformation);
+            }
+        }
     }
 
     private void addMergedInformation(Branch branch, XnodeInformation xnodeInformation) {
