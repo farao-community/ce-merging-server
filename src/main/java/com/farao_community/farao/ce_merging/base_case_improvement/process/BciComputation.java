@@ -6,13 +6,14 @@
  */
 package com.farao_community.farao.ce_merging.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.base_case_improvement.RegionConfiguration;
-import com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.Interval;
-import com.farao_community.farao.ce_merging.base_case_improvement.forecast_netpositions.ReferenceProgram;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.result.BciAreaResults;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.result.BciComputationResult;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.result.GlobalNetPositions;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.result.InRegionNetPositions;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.FlowByAreaMap;
+import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.Interval;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.ReferenceProgram;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.result.BciAreaResults;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.result.BciComputationResult;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.result.GlobalNetPositions;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.result.InRegionNetPositions;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -35,7 +36,7 @@ public class BciComputation {
     private static final BigDecimal EPSILON = BigDecimal.valueOf(0.01);
     private static final Logger LOGGER = LoggerFactory.getLogger(BciComputation.class);
 
-    private final RegionConfiguration regionConfiguration;
+    private final IRegionConfiguration regionConfiguration;
     private final ReferenceProgram referenceProgram;
     private final Map<String, Interval> feasibilityRanges;
     private FlowByAreaMap inRegionNpfByArea = new FlowByAreaMap();
@@ -45,7 +46,7 @@ public class BciComputation {
     private FlowByAreaMap violationsByArea = new FlowByAreaMap();
     private final Map<String, Boolean> bciAppliedByArea = new HashMap<>();
 
-    BciComputation(final RegionConfiguration regionConfiguration,
+    BciComputation(final IRegionConfiguration regionConfiguration,
                    final ReferenceProgram referenceProgram,
                    final Map<String, Interval> feasibilityRanges) {
         this.regionConfiguration = regionConfiguration;
@@ -109,8 +110,8 @@ public class BciComputation {
         // BCI process should not take Alegro flows into account.
         // inRegionNpfByArea = BE-CE from NPF file which alreadycontains ALBE-CE flow
         // That's why we must subtract by ALBE-CE flow to have only the AC target flow as the BCI target flow.
-        final String belgium = regionConfiguration.getAreasIn().get("BE");
-        final String germany = regionConfiguration.getAreasIn().get("DE");
+        final String belgium = regionConfiguration.getAreaInEic("BE");
+        final String germany = regionConfiguration.getAreaInEic("DE");
 
         globalNpfByArea.shiftFlow(belgium, alBeToCeFlow);
         inRegionNpfByArea.shiftFlow(belgium, alBeToCeFlow);

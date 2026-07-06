@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.base_case_improvement.repository;
 
-import com.farao_community.farao.ce_merging.base_case_improvement.task.BciTask;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciTask;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;

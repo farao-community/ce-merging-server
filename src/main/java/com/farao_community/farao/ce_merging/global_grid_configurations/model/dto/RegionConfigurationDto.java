@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
+import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CollectionTable;
@@ -27,7 +28,7 @@ import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
 @Table(name = "regionconfigurationdto")
-public class RegionConfigurationDto {
+public class RegionConfigurationDto implements IRegionConfiguration {
 
     @Id
     @GeneratedValue(strategy = AUTO)

@@ -6,19 +6,20 @@
  */
 package com.farao_community.farao.ce_merging.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.base_case_improvement.RegionConfiguration;
-import com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.Interval;
-import com.farao_community.farao.ce_merging.base_case_improvement.forecast_netpositions.ReferenceProgram;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.data.AlegroData;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.data.AlegroFlows;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.data.BciAlegroData;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.data.BciAlegroFlows;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.result.BciComputationResult;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.result.BciProcessResult;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.result.JsonBciResult;
-import com.farao_community.farao.ce_merging.base_case_improvement.process.result.OutRegionResults;
-import com.farao_community.farao.ce_merging.base_case_improvement.task.BciOutput;
-import com.farao_community.farao.ce_merging.base_case_improvement.task.BciTask;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.FlowByAreaMap;
+import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.Interval;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.ReferenceProgram;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.alegro.AlegroData;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.alegro.AlegroFlows;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.alegro.BciAlegroData;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.alegro.BciAlegroFlows;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.result.BciComputationResult;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.result.BciProcessResult;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.result.JsonBciResult;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.result.OutRegionResults;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciOutput;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciTask;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.FileUtils;
@@ -34,8 +35,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import static com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.ExternalConstraintsImporter.calculateConstraintsForAlegro;
-import static com.farao_community.farao.ce_merging.base_case_improvement.initial_netpositions.InitialNetPositionsImporter.getGlobalNetPosition;
+import static com.farao_community.farao.ce_merging.base_case_improvement.process.ExternalConstraintsImporter.calculateConstraintsForAlegro;
+import static com.farao_community.farao.ce_merging.base_case_improvement.process.InitialNetPositionsImporter.getGlobalNetPosition;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.readBytesFromPath;
@@ -47,7 +48,7 @@ public class BciProcess {
     private static final Logger LOGGER = LoggerFactory.getLogger(BciProcess.class);
     private static final String BCI_OUTPUT_FILE_NAME = "bciOutput.json";
     private final BciTask task;
-    private final RegionConfiguration regionConfiguration;
+    private final IRegionConfiguration regionConfiguration;
     private final CeMergingConfiguration configuration;
     private BciProcessResult processResult;
     private final FlowByAreaMap initialRegionNetPositions = new FlowByAreaMap();
@@ -59,7 +60,7 @@ public class BciProcess {
 
     public BciProcess(final BciTask task,
                       final CeMergingConfiguration configuration,
-                      final RegionConfiguration regionConfiguration) {
+                      final IRegionConfiguration regionConfiguration) {
         this.task = task;
         this.alegroData = Optional.ofNullable(task.getBciInputs().getAlegroNetPositionsPath())
             .map(path -> JsonUtils.read(AlegroData.class, path))
@@ -124,7 +125,7 @@ public class BciProcess {
                                                final AlegroFlows flows) throws IOException {
         final double alHubToCeFlow = getAlegroConstrainedTargetFlow(flows);
         final double countryAlegroGap = alHubToCeFlow - flows.getInitialFlow();
-        final String countryEic = regionConfiguration.getAreasIn().get(countryCode);
+        final String countryEic = regionConfiguration.getAreaInEic(countryCode);
 
         initialRegionNetPositions.shiftFlow(countryEic, countryAlegroGap);
     }

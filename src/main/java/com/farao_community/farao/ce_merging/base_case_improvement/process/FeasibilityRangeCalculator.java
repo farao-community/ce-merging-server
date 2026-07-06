@@ -6,9 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.base_case_improvement.RegionConfiguration;
-import com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.ExternalConstraintsImporter;
-import com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.Interval;
+import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.Interval;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.xsd.FeasibilityRangeConstraint;
 import com.farao_community.farao.ce_merging.xsd.FeasibilityRangeDocument;
@@ -25,14 +24,14 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.Interval.infinity;
+import static com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.Interval.infinity;
 
 public class FeasibilityRangeCalculator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FeasibilityRangeCalculator.class);
-    private final RegionConfiguration regionConfiguration;
+    private final IRegionConfiguration regionConfiguration;
 
-    public FeasibilityRangeCalculator(final RegionConfiguration regionConfiguration) {
+    public FeasibilityRangeCalculator(final IRegionConfiguration regionConfiguration) {
         this.regionConfiguration = regionConfiguration;
     }
 

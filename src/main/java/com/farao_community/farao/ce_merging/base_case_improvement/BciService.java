@@ -8,13 +8,13 @@ package com.farao_community.farao.ce_merging.base_case_improvement;
 
 import com.farao_community.farao.ce_merging.base_case_improvement.process.BciProcess;
 import com.farao_community.farao.ce_merging.base_case_improvement.repository.BciTaskRepository;
-import com.farao_community.farao.ce_merging.base_case_improvement.task.BciInputs;
-import com.farao_community.farao.ce_merging.base_case_improvement.task.BciTask;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciInputs;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciTask;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotFoundException;
-import com.farao_community.farao.ce_merging.common.exception.task.TaskNotRunException;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -34,8 +34,8 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 
-import static com.farao_community.farao.ce_merging.common.task.TaskStatus.CREATED;
 import static com.farao_community.farao.ce_merging.common.task.TaskStatus.ERROR;
 import static com.farao_community.farao.ce_merging.common.task.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.common.task.TaskStatus.SUCCESS;
@@ -93,28 +93,29 @@ public class BciService {
             final File ecFile = transferToInputs(externalConstraints, bciTask);
 
             final BciInputs inputs = new BciInputs(npForecastFile.getPath(), ecFile.getPath());
-            if (feasibilityRange.isPresent()) {
-                final File feasibilityRangeFile = transferToInputs(feasibilityRange.get(), bciTask);
-                inputs.setFeasibilityRangePath(feasibilityRangeFile.getPath());
-            }
-            if (initialNetPositions.isPresent()) {
-                final File initialNetPositionsFile = transferToInputs(initialNetPositions.get(), bciTask);
-                inputs.setInitialNetPositionsPath(initialNetPositionsFile.getPath());
-            }
-            if (alegroNetPositions.isPresent()) {
-                final File alegroFile = transferToInputs(alegroNetPositions.get(), bciTask);
-                inputs.setAlegroNetPositionsPath(alegroFile.getPath());
-            }
+
+            transferAndSetPathIfPresent(feasibilityRange, bciTask, inputs::setFeasibilityRangePath);
+            transferAndSetPathIfPresent(initialNetPositions, bciTask, inputs::setInitialNetPositionsPath);
+            transferAndSetPathIfPresent(alegroNetPositions, bciTask, inputs::setAlegroNetPositionsPath);
 
             bciTask.setProcessTargetDate(targetDate);
             bciTask.setRealOffset(targetDate.getOffset());
             bciTask.setBciInputs(inputs);
-            bciTaskRepository.save(bciTask);
-            return bciTask;
+
+            return bciTaskRepository.save(bciTask);
         } catch (final Exception e) {
             bciTaskRepository.delete(bciTask);
             LOGGER.error("Error during BCI task creation due to invalid data", e);
             throw new TaskNotValidException("Error during BCI task creation due to invalid data", e);
+        }
+    }
+
+    private void transferAndSetPathIfPresent(final Optional<MultipartFile> multipartFile,
+                                             final BciTask bciTask,
+                                             final Consumer<String> pathSetter) throws IOException {
+        if (multipartFile.isPresent()) {
+            final File file = transferToInputs(multipartFile.get(), bciTask);
+            pathSetter.accept(file.getPath());
         }
     }
 
@@ -163,21 +164,13 @@ public class BciService {
 
     public byte[] getBciOutputs(final Long taskId) {
         final BciTask bciTask = getBciTask(taskId);
-        checkIfRun(bciTask);
+        bciTask.assertFinished();
         try {
             return Files.readAllBytes(Paths.get(ceMergingConfiguration.getOutputsDirectoryPath(bciTask),
                                                 "bciOutput.json"));
         } catch (final IOException e) {
             LOGGER.error("IO exception while reading BCI outputs of task '{}'", taskId, e);
             throw new ServiceIOException(String.format("IO exception while reading BCI outputs of task '%d'", taskId), e);
-        }
-    }
-
-    private void checkIfRun(final BciTask task) {
-        if (task.getStatus() == CREATED) {
-            throw new TaskNotRunException(String.format("Task %d on BCI server has not been run", task.getId()));
-        } else if (task.getStatus() == RUNNING) {
-            throw new TaskNotRunException(String.format("Task %d on BCI server currently running", task.getId()));
         }
     }
 
@@ -211,11 +204,12 @@ public class BciService {
         return file;
     }
 
-    private RegionConfiguration regionConfigFromContent(final String content) {
+    //TODO with real class
+    private IRegionConfiguration regionConfigFromContent(final String content) {
         try {
             return new ObjectMapper()
                 .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .readValue(content, RegionConfiguration.class);
+                .readValue(content, IRegionConfiguration.class);
         } catch (final JsonProcessingException e) {
             LOGGER.error("Error in Base Case Improvement {}", e.getMessage());
             throw new CeMergingException("Error in Base Case Improvement ", e);
