@@ -7,7 +7,9 @@
 package com.farao_community.farao.ce_merging.merging.process.xnode;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,18 +27,21 @@ public class InitialImportService {
 
         final Map<String, Network> networkByTsoMap = new HashMap<>();
 
-        taskEntity.getInputs().getIgms().forEach(igmData -> {
-            try {
-                LOGGER.info("Importing network file: {}", igmData.getIgmFile().getOriginalName());
-                final Network network = Network.read(igmData.getIgmFile().getOriginalName(), new FileInputStream(igmData.getIgmFile().getPath()));
-                networkByTsoMap.put(igmData.getCountry(), network);
-
-            } catch (final Exception e) {
-                final String errorMessage = "Network file: " + igmData.getIgmFile().getOriginalName() + " cannot be imported, cause: " + e.getMessage();
-                LOGGER.error(errorMessage, e);
-                throw new CeMergingException(errorMessage, e);
-            }
-        });
+        taskEntity.getInputs().getIgms().forEach(igmData -> importIgm(networkByTsoMap, igmData));
         return networkByTsoMap;
+    }
+
+    private void importIgm(final Map<String, Network> networkByTsoMap, final IgmData igmData) {
+        final SavedFile igmFile = igmData.getIgmFile();
+        try {
+            LOGGER.info("Importing network file: {}", igmData.getIgmFile().getOriginalName());
+            final Network network = Network.read(igmFile.getOriginalName(), new FileInputStream(igmFile.getPath()));
+            networkByTsoMap.put(igmData.getCountry(), network);
+
+        } catch (final Exception e) {
+            final String errorMessage = "Network file: " + igmData.getIgmFile().getOriginalName() + " cannot be imported, cause: " + e.getMessage();
+            LOGGER.error(errorMessage, e);
+            throw new CeMergingException(errorMessage, e);
+        }
     }
 }

@@ -9,7 +9,7 @@ package com.farao_community.farao.ce_merging.merging.process.xnode;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MergedInformation {
+public class MergedXnodeInformation {
     private XnodeStatus status;
     private double p;
     private double q;
@@ -17,7 +17,7 @@ public class MergedInformation {
     private double v2;
 
     @JsonCreator
-    public MergedInformation(@JsonProperty("status") XnodeStatus status, @JsonProperty("p") double p, @JsonProperty("q") double q, @JsonProperty("v1") double v1, @JsonProperty("v2") double v2) {
+    public MergedXnodeInformation(@JsonProperty("status") XnodeStatus status, @JsonProperty("p") double p, @JsonProperty("q") double q, @JsonProperty("v1") double v1, @JsonProperty("v2") double v2) {
         this.status = status;
         this.p = p;
         this.q = q;

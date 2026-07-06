@@ -15,13 +15,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class XnodeInformation {
     private AreaInformation area1Information;
     private AreaInformation area2Information;
-    private MergedInformation mergedInformation;
+    private MergedXnodeInformation mergedXnodeInformation;
 
     @JsonCreator
-    public XnodeInformation(@JsonProperty("area1Information") AreaInformation area1Information, @JsonProperty("area2Information") AreaInformation area2Information, @JsonProperty("mergedInformation") MergedInformation mergedInformation) {
+    public XnodeInformation(@JsonProperty("area1Information") AreaInformation area1Information, @JsonProperty("area2Information") AreaInformation area2Information, @JsonProperty("mergedInformation") MergedXnodeInformation mergedXnodeInformation) {
         this.area1Information = area1Information;
         this.area2Information = area2Information;
-        this.mergedInformation = mergedInformation;
+        this.mergedXnodeInformation = mergedXnodeInformation;
     }
 
     public XnodeInformation(AreaInformation area1Information, AreaInformation area2Information) {
@@ -48,12 +48,12 @@ public class XnodeInformation {
         this.area2Information = area2Information;
     }
 
-    public MergedInformation getMergedInformation() {
-        return mergedInformation;
+    public MergedXnodeInformation getMergedInformation() {
+        return mergedXnodeInformation;
     }
 
-    public void setMergedInformation(MergedInformation mergedInformation) {
-        this.mergedInformation = mergedInformation;
+    public void setMergedInformation(MergedXnodeInformation mergedXnodeInformation) {
+        this.mergedXnodeInformation = mergedXnodeInformation;
     }
 
     @JsonIgnore

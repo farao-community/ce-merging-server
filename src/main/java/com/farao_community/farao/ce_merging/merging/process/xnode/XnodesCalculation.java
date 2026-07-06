@@ -12,6 +12,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubReco
 import com.farao_community.farao.ce_merging.merging.task.entities.Xnode;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
@@ -20,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.Map;
@@ -35,6 +35,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DENMARK_COUNTRY_CODE;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.zeroIfNan;
 
 @Service
 public class XnodesCalculation {
@@ -60,18 +61,16 @@ public class XnodesCalculation {
     }
 
     private void processDanglingLines(final Network network, final Set<String> xnodes, final List<VirtualHubRecord> virtualHubList, final String virtualHubException, final Map<String, XnodeInformation> xnodeInformationMap, final int areaNumber, Optional<String> tsoOpt) {
-
         network.getDanglingLineStream()
                 .filter(dl -> xnodes.contains(dl.getPairingKey()))
                 .filter(dl -> !BordersUtils.isVirtualHubDanglingLine(dl, virtualHubList) ||
                          dl.getPairingKey().equals(virtualHubException))
-                .forEach(dl -> addAreaInformation(dl, xnodeInformationMap, areaNumber, tsoOpt));
+                .forEach(dl -> addAreaInformation(xnodeInformationMap, dl, areaNumber, tsoOpt));
     }
 
     public void checkAllXnodesInNetworkArePresentInConfigList(final Network network, final List<VirtualHubRecord> virtualHubList, final List<Xnode> xnodes) {
-        final List<String> allXnodesInNetwork = network.getDanglingLineStream().map(DanglingLine::getPairingKey).collect(Collectors.toList());
         final List<String> allXnodesConfig = Stream.concat(xnodes.stream().map(Xnode::getName), virtualHubList.stream().map(VirtualHubRecord::getNodeName)).distinct().collect(Collectors.toList());
-        allXnodesInNetwork.forEach(xnodeCode -> {
+        network.getDanglingLineStream().map(DanglingLine::getPairingKey).forEach(xnodeCode -> {
             if (!allXnodesConfig.contains(xnodeCode)) {
                 LOGGER.error("Xnode {} present in network {} is not found in the xnodes config list nor in the virtual hubs list", xnodeCode, network.getNameOrId());
                 throw new CeMergingException("Xnode " + xnodeCode + " present in network " + network.getNameOrId() + " is not found in the xnodes config list and in the virtual hubs list");
@@ -79,8 +78,8 @@ public class XnodesCalculation {
         });
     }
 
-    private void addAreaInformation(final DanglingLine danglingLine, final Map<String, XnodeInformation> xnodeInformationMap, final int areaNumber, final Optional<String> tsoOpt) {
-        String xnodeCode = danglingLine.getPairingKey();
+    private void addAreaInformation(final Map<String, XnodeInformation> xnodeInformationMap, final DanglingLine danglingLine, final int areaNumber, final Optional<String> tsoOpt) {
+        final String xnodeCode = danglingLine.getPairingKey();
         switch (areaNumber) {
             case 1:
                 if (xnodeInformationMap.containsKey(xnodeCode)) {
@@ -102,44 +101,48 @@ public class XnodesCalculation {
     }
 
     private AreaInformation fillAreaInformation(final DanglingLine danglingLine, final Optional<String> tsoOpt) {
-        XnodeStatus status = danglingLine.getTerminal().isConnected() ? XnodeStatus.CLOSE : XnodeStatus.OPEN;
-        String country = tsoOpt.orElseGet(() -> BordersUtils.getCountry(danglingLine).toString());
+        final XnodeStatus status = danglingLine.getTerminal().isConnected() ? XnodeStatus.CLOSE : XnodeStatus.OPEN;
+        final String country = tsoOpt.orElseGet(() -> BordersUtils.getCountry(danglingLine).toString());
         double v = 0;
-        final double p = danglingLine.getGeneration() == null ? danglingLine.getP0() : danglingLine.getP0() - danglingLine.getGeneration().getTargetP();
+        final DanglingLine.Generation generation = danglingLine.getGeneration();
+        final double p0 = danglingLine.getP0();
+        final double q0 = danglingLine.getQ0();
+        final double p = generation == null ? p0 : p0 - generation.getTargetP();
         final String nodeId = danglingLine.getTerminal().getVoltageLevel().getId();
-        final double q = danglingLine.getGeneration() == null ? danglingLine.getQ0() : danglingLine.getQ0() - danglingLine.getGeneration().getTargetQ();
-        if (danglingLine.getTerminal().getBusBreakerView().getBus() != null && !Double.isNaN(danglingLine.getTerminal().getBusBreakerView().getBus().getV())) {
-            v = danglingLine.getTerminal().getBusBreakerView().getBus().getV(); //Always NaN because no loadflow run before
+        final double q = generation == null ? q0 : q0 - generation.getTargetQ();
+        final Bus bus = danglingLine.getTerminal().getBusBreakerView().getBus();
+        if (bus != null && !Double.isNaN(bus.getV())) {
+            v = bus.getV(); //Always NaN because no loadflow run before
         }
         return new AreaInformation(country, status, nodeId, p, q, v);
     }
 
     public Map<String, XnodeInformation> completeXnodeMergedInformation(final Network network, final Map<String, XnodeInformation> xnodeInformationMap) {
-        for (Map.Entry<String, XnodeInformation> e : xnodeInformationMap.entrySet()) {
-            if (e.getValue().getArea1Information() != null && e.getValue().getArea2Information() != null) {
-                if (!isGermanInternalNode(e.getValue())) {
-                    final Optional<Branch> branchOpt = network.getBranchStream().filter(branch -> branch.getId().contains(e.getKey().substring(0, 8))).findFirst();
-                    branchOpt.ifPresent(branch -> addMergedInformation(branch, e.getValue()));
-                } else {
-                    // for german internal node are renamed in germany premerge step: begin with "D" not "X"
-                    final List<Branch> branches = network.getBranchStream().filter(branch -> branch.getId().contains(e.getKey().substring(1, 8))).collect(Collectors.toList());
-                    if (branches.size() == 1) {
-                        addMergedInformation(branches.get(0), e.getValue());
-                    } else if (branches.size() == 2) { // should be always 2 for internal german nodes
-                        final Branch branchFrom = findCorrectBranch(branches, e.getKey(), e.getValue().getArea1Information().getCountry());
-                        final Branch branchTo = findCorrectBranch(branches, e.getKey(), e.getValue().getArea2Information().getCountry());
-                        addMergedInformationForGermanNode(branchFrom, branchTo, e.getValue());
+        xnodeInformationMap.entrySet().stream().filter(e -> e.getValue().getArea1Information() != null && e.getValue().getArea2Information() != null)
+                .forEach(e -> {
+                    if (!isGermanInternalNode(e.getValue())) {
+                        final Optional<Branch> branchOpt = network.getBranchStream().filter(branch -> branch.getId().contains(e.getKey().substring(0, 8))).findFirst();
+                        branchOpt.ifPresent(branch -> addMergedInformation(branch, e.getValue()));
+                    } else {
+                        // for german internal node are renamed in germany premerge step: begin with "D" not "X"
+                        final List<Branch> branches = network.getBranchStream().filter(branch -> branch.getId().contains(e.getKey().substring(1, 8))).collect(Collectors.toList());
+                        if (branches.size() == 1) {
+                            addMergedInformation(branches.get(0), e.getValue());
+                        } else if (branches.size() == 2) {
+                            final Branch branchFrom = findCorrectBranch(branches, e.getKey(), e.getValue().getArea1Information().getCountry());
+                            final Branch branchTo = findCorrectBranch(branches, e.getKey(), e.getValue().getArea2Information().getCountry());
+                            addMergedInformationForGermanNode(branchFrom, branchTo, e.getValue());
+                        }
                     }
-                }
-            }
-        }
+                });
+
         return xnodeInformationMap;
     }
 
     private void addMergedInformation(Branch branch, XnodeInformation xnodeInformation) {
         boolean isConnected = isConnected(branch);
         XnodeStatus status = isConnected ? XnodeStatus.CLOSE : XnodeStatus.OPEN;
-        MergedInformation mergedInformation = new MergedInformation(status, 0, 0, 0, 0);
+        MergedXnodeInformation mergedXnodeInformation = new MergedXnodeInformation(status, 0, 0, 0, 0);
         if (isConnected) {
             final Country country1 = getCountry(xnodeInformation.getArea1Information());
             final boolean country1IsSideOne = country1.equals(BordersUtils.getCountrySide(branch, TwoSides.ONE));
@@ -147,13 +150,13 @@ public class XnodesCalculation {
             final Terminal terminalFrom = country1IsSideOne ? branch.getTerminal1() : branch.getTerminal2();
             final Terminal terminalTo = country1IsSideOne ? branch.getTerminal2() : branch.getTerminal1();
             if (terminalFrom.isConnected() && terminalTo.isConnected()) {
-                mergedInformation.setP((getP(terminalFrom) - getP(terminalTo)) / 2);
-                mergedInformation.setQ((getQ(terminalFrom) - getQ(terminalTo)) / 2);
-                mergedInformation.setV1(getV(terminalFrom));
-                mergedInformation.setV2(getV(terminalTo));
+                mergedXnodeInformation.setP((getP(terminalFrom) - getP(terminalTo)) / 2);
+                mergedXnodeInformation.setQ((getQ(terminalFrom) - getQ(terminalTo)) / 2);
+                mergedXnodeInformation.setV1(getV(terminalFrom));
+                mergedXnodeInformation.setV2(getV(terminalTo));
             }
         }
-        xnodeInformation.setMergedInformation(mergedInformation);
+        xnodeInformation.setMergedInformation(mergedXnodeInformation);
     }
 
     private boolean isConnected(final Branch branch) {
@@ -170,22 +173,22 @@ public class XnodesCalculation {
 
         if (isConnected) {
             //We take the xnode flow in the direction branch 1 to branch 2
-            final List<Double> mergedValues1 = getMergedValuesFromGermanBranch(branch1, xnodeInformation.getArea1Information().getCountry());
-            final List<Double> mergedValues2 = getMergedValuesFromGermanBranch(branch2, xnodeInformation.getArea2Information().getCountry());
+            final MergedXnodeInformation mergedInformation1 = getMergedValuesFromGermanBranch(branch1, xnodeInformation.getArea1Information().getCountry());
+            final MergedXnodeInformation mergedInformation2 = getMergedValuesFromGermanBranch(branch2, xnodeInformation.getArea2Information().getCountry());
 
-            p = (mergedValues1.get(0) - mergedValues2.get(0)) / 2;
-            q = (mergedValues1.get(1) - mergedValues2.get(1)) / 2;
-            v1 = mergedValues1.get(2);
-            v2 = mergedValues2.get(2);
+            p = (mergedInformation1.getP() - mergedInformation2.getP()) / 2;
+            q = (mergedInformation1.getQ() - mergedInformation2.getQ()) / 2;
+            v1 = mergedInformation1.getV1();
+            v2 = mergedInformation2.getV2();
         }
-        xnodeInformation.setMergedInformation(new MergedInformation(status, p, q, v1, v2));
+        xnodeInformation.setMergedInformation(new MergedXnodeInformation(status, p, q, v1, v2));
     }
 
-    private Branch findCorrectBranch(List<Branch> branches, String nodeId, String countryName) {
+    private Branch findCorrectBranch(final List<Branch> branches, final String nodeId, final String countryName) {
         if (nodeId == null || nodeId.length() < 7) {
             throw new CeMergingException("Invalid nodeId: " + nodeId);
         }
-        for (Branch branch : branches) {
+        for (final Branch branch : branches) {
             final String voltageLevel1 = branch.getTerminal1().getVoltageLevel().getId();
             final String voltageLevel2 = branch.getTerminal2().getVoltageLevel().getId();
             final String internalNodeId = nodeId.substring(1, 7);
@@ -197,39 +200,40 @@ public class XnodesCalculation {
         return null;
     }
 
-    private List<Double> getMergedValuesFromGermanBranch(Branch branch, String tsoName) {
-        //We take the average between the two flow side to compensate the losses of the line
-        List<Double> mergedValues = new ArrayList<>();
+    private MergedXnodeInformation getMergedValuesFromGermanBranch(final Branch branch, final String tsoName) {
         double p = 0;
         double q = 0;
         double v = 0;
 
-        Terminal terminalFrom = branch.getTerminal1().getVoltageLevel().getId().startsWith(tsoName) ? branch.getTerminal1() : branch.getTerminal2();
-        Terminal terminalTo = branch.getTerminal1().getVoltageLevel().getId().startsWith(tsoName) ? branch.getTerminal2() : branch.getTerminal1();
+        final Terminal terminalFrom = isTerminal1MatchingTso(branch, tsoName) ? branch.getTerminal1() : branch.getTerminal2();
+        final Terminal terminalTo = isTerminal1MatchingTso(branch, tsoName) ? branch.getTerminal2() : branch.getTerminal1();
+
         if (terminalFrom.isConnected() && terminalTo.isConnected()) {
             p = (getP(terminalFrom) - getP(terminalTo)) / 2;
             q = (getQ(terminalFrom) - getQ(terminalTo)) / 2;
             v = getV(terminalFrom);
         }
-        mergedValues.add(p);
-        mergedValues.add(q);
-        mergedValues.add(v);
-        return mergedValues;
+
+        return new MergedXnodeInformation(null, p, q, v, 0);
     }
 
-    private double getV(Terminal terminal) {
+    private boolean isTerminal1MatchingTso(final Branch branch, final String tsoName) {
+        return branch.getTerminal1().getVoltageLevel().getId().startsWith(tsoName);
+    }
+
+    private double getV(final Terminal terminal) {
         return (terminal.getBusBreakerView().getBus() != null && !Double.isNaN(terminal.getBusBreakerView().getBus().getV())) ? terminal.getBusBreakerView().getBus().getV() : 0;
     }
 
-    private double getQ(Terminal terminal) {
-        return Double.isNaN(terminal.getQ()) ? 0 : terminal.getQ();
+    private double getQ(final Terminal terminal) {
+        return zeroIfNan(terminal.getQ());
     }
 
-    private double getP(Terminal terminal) {
-        return Double.isNaN(terminal.getP()) ? 0 : terminal.getP();
+    private double getP(final Terminal terminal) {
+        return zeroIfNan(terminal.getP());
     }
 
-    private Country getCountry(AreaInformation xnodeAreaInformation) {
+    private Country getCountry(final AreaInformation xnodeAreaInformation) {
         if (GERMAN_TSO.contains(xnodeAreaInformation.getCountry())) {
             return Country.valueOf(GERMAN_COUNTRY_CODE);
         } else if (DANISH_TSO.equals(xnodeAreaInformation.getCountry())) {
@@ -239,9 +243,9 @@ public class XnodesCalculation {
         }
     }
 
-    private boolean isGermanInternalNode(XnodeInformation xnodeInformation) {
-        AreaInformation area1Information = xnodeInformation.getArea1Information();
-        AreaInformation area2Information = xnodeInformation.getArea2Information();
+    private boolean isGermanInternalNode(final XnodeInformation xnodeInformation) {
+        final AreaInformation area1Information = xnodeInformation.getArea1Information();
+        final AreaInformation area2Information = xnodeInformation.getArea2Information();
         return area1Information != null && getCountry(area1Information).equals(Country.DE)
                 && area2Information != null && getCountry(area2Information).equals(Country.DE);
     }

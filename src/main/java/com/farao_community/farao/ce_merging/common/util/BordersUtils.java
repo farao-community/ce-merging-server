@@ -8,15 +8,16 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.HvdcLine;
-import com.powsybl.iidm.network.TwoSides;
+import com.powsybl.iidm.network.Branch;
+import com.powsybl.iidm.network.Injection;
+import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Substation;
-import com.powsybl.iidm.network.Load;
-import com.powsybl.iidm.network.Generator;
+import com.powsybl.iidm.network.Terminal;
+import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,12 +33,12 @@ public final class BordersUtils {
         throw new AssertionError("Utility class should not be constructed");
     }
 
-    public static boolean isVirtualHubDanglingLine(DanglingLine danglingLine, List<VirtualHubRecord> virtualHubList) {
-        List<String> virtualHubsNodeNames = virtualHubList.stream().map(VirtualHubRecord::getNodeName).collect(Collectors.toList());
+    public static boolean isVirtualHubDanglingLine(final DanglingLine danglingLine, final List<VirtualHubRecord> virtualHubList) {
+        final List<String> virtualHubsNodeNames = virtualHubList.stream().map(VirtualHubRecord::getNodeName).collect(Collectors.toList());
         return virtualHubsNodeNames.contains(danglingLine.getPairingKey().substring(0, 8));
     }
 
-    public static double getBorderFlow(DanglingLine danglingLine, LoadFlowParameters.ComponentMode componentModeLfParameter) {
+    public static double getBorderFlow(final DanglingLine danglingLine, final LoadFlowParameters.ComponentMode componentModeLfParameter) {
         return switch (componentModeLfParameter) {
             case MAIN_CONNECTED -> // Loadflow computed only on main connected component
                     danglingLine.getTerminal().getBusBreakerView().getConnectableBus().isInMainConnectedComponent() ? getLeavingFlow(danglingLine) : 0.;
@@ -50,99 +51,78 @@ public final class BordersUtils {
         };
     }
 
-    private static double getLeavingFlow(DanglingLine danglingLine) {
+    private static double getLeavingFlow(final DanglingLine danglingLine) {
         // Should correspond to CountryArea.getLeavingFlow(danglingLine)
         return danglingLine.getTerminal().isConnected() ? zeroIfNan(-danglingLine.getBoundary().getP()) : 0;
     }
 
-    private static double zeroIfNan(double value) {
+    public static double zeroIfNan(final double value) {
         return Double.isNaN(value) ? 0 : value;
     }
 
-    public static double getBorderFlow(Line line, Country country) {
+    public static double getBorderFlow(final Line line, final Country country) {
         // Should correspond to CountryArea.getLeavingFlow(line)
-        double flowSide1 = line.getTerminal1().isConnected() ? zeroIfNan(line.getTerminal1().getP()) : 0;
-        double flowSide2 = line.getTerminal2().isConnected() ? zeroIfNan(line.getTerminal2().getP()) : 0;
-        double directFlow = (flowSide1 - flowSide2) / 2;
+        final double directFlow = getDirectFlow(line);
         return country.equals(getCountrySide(line, TwoSides.ONE)) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(Line line, String zone) {
-        double flowSide1 = line.getTerminal1().isConnected() ? zeroIfNan(line.getTerminal1().getP()) : 0;
-        double flowSide2 = line.getTerminal2().isConnected() ? zeroIfNan(line.getTerminal2().getP()) : 0;
-        double directFlow = (flowSide1 - flowSide2) / 2;
+    public static double getBorderFlow(final Line line, final String zone) {
+        final double directFlow = getDirectFlow(line);
         return line.getTerminal(TwoSides.ONE).getVoltageLevel().getId().startsWith(zone) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(HvdcLine hvdcLine, Country country) {
+    public static double getBorderFlow(final HvdcLine hvdcLine, final Country country) {
         // Should correspond to CountryArea.getLeavingFlow(hvdcLine)
-        double flowSide1 = hvdcLine.getConverterStation1().getTerminal().isConnected() ? zeroIfNan(hvdcLine.getConverterStation1().getTerminal().getP()) : 0;
-        double flowSide2 = hvdcLine.getConverterStation2().getTerminal().isConnected() ? zeroIfNan(hvdcLine.getConverterStation2().getTerminal().getP()) : 0;
-        double directFlow = (flowSide1 - flowSide2) / 2;
+        final double flowSide1 = hvdcLine.getConverterStation1().getTerminal().isConnected() ? zeroIfNan(hvdcLine.getConverterStation1().getTerminal().getP()) : 0;
+        final double flowSide2 = hvdcLine.getConverterStation2().getTerminal().isConnected() ? zeroIfNan(hvdcLine.getConverterStation2().getTerminal().getP()) : 0;
+        final double directFlow = (flowSide1 - flowSide2) / 2;
         return country.equals(hvdcLine.getConverterStation1().getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)) ? directFlow : -directFlow;
     }
 
-    public static boolean isBorderOfCountry(DanglingLine danglingLine, Country country) {
+    public static boolean isBorderOfCountry(final DanglingLine danglingLine, final Country country) {
         Country sideCountry = getCountry(danglingLine);
         return sideCountry == country;
     }
 
-    public static boolean isBorderOfCountry(Branch branch, Country country) {
-        Country side1Country = getCountrySide(branch, TwoSides.ONE);
-        Country side2Country = getCountrySide(branch, TwoSides.TWO);
+    public static boolean isBorderOfCountry(final Branch branch, final Country country) {
+        final Country side1Country = getCountrySide(branch, TwoSides.ONE);
+        final Country side2Country = getCountrySide(branch, TwoSides.TWO);
         return side1Country == country && side2Country != country ||
                 side1Country != country && side2Country == country;
     }
 
-    public static boolean isBorderOfCountry(HvdcLine hvdcLine, Country country) {
-        Country side1Country = getCountrySide(hvdcLine, TwoSides.ONE);
-        Country side2Country = getCountrySide(hvdcLine, TwoSides.TWO);
+    public static boolean isBorderOfCountry(final HvdcLine hvdcLine, final Country country) {
+        final Country side1Country = getCountrySide(hvdcLine, TwoSides.ONE);
+        final Country side2Country = getCountrySide(hvdcLine, TwoSides.TWO);
         return side1Country == country && side2Country != country ||
                 side1Country != country && side2Country == country;
     }
 
-    public static boolean isBorderOfZone(DanglingLine danglingLine, String zone) {
-        return isBorderOfZone(danglingLine.getId(), zone);
+    public static boolean isBorderOfZone(final Identifiable<?> identifiable, final String zone) {
+        return isBorderOfZone(identifiable.getId(), zone);
     }
 
-    public static boolean isBorderOfZone(Line line, String zone) {
-        return isBorderOfZone(line.getId(), zone);
+    private static boolean isBorderOfZone(final String lineId, final String zone) {
+        final String nodeFrom = lineId.substring(0, 8);
+        final String nodeTo = lineId.substring(9, 17);
+        return nodeFrom.startsWith(zone) != nodeTo.startsWith(zone);
     }
 
-    private static boolean isBorderOfZone(String lineId, String zone) {
-        String nodeFrom = lineId.substring(0, 8);
-        String nodeTo = lineId.substring(9, 17);
-        return nodeFrom.startsWith(zone) && !nodeTo.startsWith(zone) || !nodeFrom.startsWith(zone) && nodeTo.startsWith(zone);
+    public static Country getCountrySide(final Branch branch, final TwoSides side) {
+        return getCountry(branch.getTerminal(side), "branch", branch.getId(), side);
     }
 
-    public static Country getCountrySide(Branch branch, TwoSides side) {
-        return branch.getTerminal(side).getVoltageLevel().getSubstation()
-                .orElseThrow(() -> new CeMergingException(String.format("Could not find substation of branch : '%s' .", branch.getId()))).getCountry()
-                .orElseThrow(() -> new CeMergingException(String.format("Could not find country in side %s of branch : '%s' .", side, branch.getId())));
-
+    public static Country getCountrySide(final HvdcLine hvdcLine, final TwoSides side) {
+        return getCountry(hvdcLine.getConverterStation(side).getTerminal(), "hvdc", hvdcLine.getId(), side);
     }
 
-    public static Country getCountrySide(HvdcLine hvdcLine, TwoSides side) {
-        return hvdcLine.getConverterStation(side).getTerminal().getVoltageLevel().getSubstation()
-                .orElseThrow(() -> new CeMergingException(String.format("Could not find substation of hvdc : '%s' .", hvdcLine.getId()))).getCountry()
-                .orElseThrow(() -> new CeMergingException(String.format("Could not find country in side %s of hvdc : '%s' .", side, hvdcLine.getId())));
-    }
-
-    public static Country getCountry(DanglingLine danglingLine) {
-        return danglingLine.getTerminal().getVoltageLevel().getSubstation().isPresent() ? danglingLine.getTerminal().getVoltageLevel().getSubstation().get().getNullableCountry() : null;
-    }
-
-    public static Country getCountry(Generator generator) {
-        return generator.getTerminal().getVoltageLevel().getSubstation().isPresent() ? generator.getTerminal().getVoltageLevel().getSubstation().get().getNullableCountry() : null;
-    }
-
-    public static Country getCountry(Load load) {
-        return load.getTerminal().getVoltageLevel().getSubstation().isPresent() ? load.getTerminal().getVoltageLevel().getSubstation().get().getNullableCountry() : null;
+    public static Country getCountry(final Injection<?> injection) {
+        return injection.getTerminal().getVoltageLevel().getSubstation().isPresent() ? injection.getTerminal().getVoltageLevel().getSubstation().get().getNullableCountry() : null;
     }
 
     public static Country getCountryOnBorder(Line line, Country country) {
-        Country side1Country = BordersUtils.getCountrySide(line, TwoSides.ONE);
-        Country side2Country = BordersUtils.getCountrySide(line, TwoSides.TWO);
+        final Country side1Country = BordersUtils.getCountrySide(line, TwoSides.ONE);
+        final Country side2Country = BordersUtils.getCountrySide(line, TwoSides.TWO);
         return country == side1Country ? side2Country : side1Country;
     }
 
@@ -150,5 +130,18 @@ public final class BordersUtils {
         Country side1Country = BordersUtils.getCountrySide(hvdcLine, TwoSides.ONE);
         Country side2Country = BordersUtils.getCountrySide(hvdcLine, TwoSides.TWO);
         return country == side1Country ? side2Country : side1Country;
+    }
+
+    private static double getDirectFlow(final Line line) {
+        final double flowSide1 = line.getTerminal1().isConnected() ? zeroIfNan(line.getTerminal1().getP()) : 0;
+        final double flowSide2 = line.getTerminal2().isConnected() ? zeroIfNan(line.getTerminal2().getP()) : 0;
+        return (flowSide1 - flowSide2) / 2;
+    }
+
+    private static Country getCountry(final Terminal terminal, final String equipmentType, final String equipmentId, final TwoSides side) {
+        return terminal.getVoltageLevel().getSubstation()
+                .orElseThrow(() -> new CeMergingException("Could not find substation of " + equipmentType + " '" + equipmentId + "'."))
+                .getCountry()
+                .orElseThrow(() -> new CeMergingException("Could not find country in side " + side + " of " + equipmentType + " '" + equipmentId + "'."));
     }
 }
