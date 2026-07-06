@@ -57,5 +57,4 @@ public final class CeMergingConstants {
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
     public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
-    public static final ZoneOffset DEFAULT_REQUEST_OFFSET = ZoneOffset.of("+01:00");
 }

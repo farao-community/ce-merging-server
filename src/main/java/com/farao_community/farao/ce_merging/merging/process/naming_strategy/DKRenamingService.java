@@ -55,7 +55,7 @@ public class DKRenamingService {
                     .collect(Collectors.joining(","));
             Network danishNetwork = Network.read(d1File.getOriginalName(), inputStream);
             Properties properties = buildExportProperties(dkHvdcXnodes);
-            danishNetwork.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes);
+            // danishNetwork.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes); : copied from core-merging todo check if this set is mondotary or network.write(UCTE_FORMAT, properties, filePath);
             saveInArtifacts(danishNetwork, task, properties);
         } catch (Exception e) {
             String errorMessage = String.format("Denmark Renaming strategy failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
