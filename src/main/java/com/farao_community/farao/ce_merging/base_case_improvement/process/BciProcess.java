@@ -7,13 +7,12 @@
 package com.farao_community.farao.ce_merging.base_case_improvement.process;
 
 import com.farao_community.farao.ce_merging.base_case_improvement.data.FlowByAreaMap;
-import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
-import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.Interval;
-import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.alegro.AlegroData;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.alegro.AlegroFlows;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.alegro.BciAlegroData;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.alegro.BciAlegroFlows;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.Interval;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.result.BciComputationResult;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.result.BciProcessResult;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.result.JsonBciResult;
@@ -21,6 +20,7 @@ import com.farao_community.farao.ce_merging.base_case_improvement.data.result.Ou
 import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciOutput;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciTask;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.FileUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
@@ -87,7 +87,7 @@ public class BciProcess {
     }
 
     private String getExternalConstraintsPath() {
-        return task.getBciInputs().getAlegroNetPositionsPath();
+        return task.getBciInputs().getExternalConstraintsPath();
     }
 
     private String getFeasibilityRangePath() {
@@ -117,8 +117,8 @@ public class BciProcess {
         if (alegroData == null) {
             return;
         }
-        updateAlegroRegionNetPosition("BE", alegroData.getAlBeFlows());
-        updateAlegroRegionNetPosition("DE", alegroData.getAlDeFlows());
+        updateAlegroRegionNetPosition("BE", alegroData.getAlbeFlows());
+        updateAlegroRegionNetPosition("DE", alegroData.getAldeFlows());
     }
 
     private void updateAlegroRegionNetPosition(final String countryCode,
@@ -136,7 +136,7 @@ public class BciProcess {
     }
 
     private double getAlegroConstrainedTargetFlow(final AlegroFlows toConstrain) throws IOException {
-        if (alegroData == null || alegroData.isInOutage()) {
+        if (alegroData.isAlegroInOutage()) {
             return 0;
         }
         final double maxAlegroFlow = getCommonFlowLimit(alegroData, getAlegroExternalConstraints());
@@ -146,8 +146,8 @@ public class BciProcess {
     private void computeBci() throws IOException {
         final BciComputation computation = new BciComputation(regionConfiguration, referenceProgram, regionFeasibilityRanges);
 
-        final double alDeToCeFlow = getAlegroConstrainedTargetFlow(alegroData.getAlDeFlows());
-        final double alBeToCeFlow = getAlegroConstrainedTargetFlow(alegroData.getAlBeFlows());
+        final double alDeToCeFlow = shouldIgnoreAlegro() ? 0 : getAlegroConstrainedTargetFlow(alegroData.getAldeFlows());
+        final double alBeToCeFlow = shouldIgnoreAlegro() ? 0 : getAlegroConstrainedTargetFlow(alegroData.getAlbeFlows());
 
         final BciComputationResult bciResults = computation.run(initialRegionNetPositions,
                                                                 alBeToCeFlow,
@@ -162,7 +162,7 @@ public class BciProcess {
 
     private BciAlegroData getBciAlegroData() {
 
-        if (alegroData.isInOutage()) {
+        if (shouldIgnoreAlegro()) {
             return null;
         }
 
@@ -171,8 +171,8 @@ public class BciProcess {
         final Interval alDeConstraints = alegroEc.get(ALEGRO_DE_NODE_NAME);
         final Interval alBeConstraints = alegroEc.get(ALEGRO_BE_NODE_NAME);
 
-        final BciAlegroFlows alDeFlows = new BciAlegroFlows(alegroData.getAlDeFlows().getTargetFlow(), alDeConstraints);
-        final BciAlegroFlows alBeFlows = new BciAlegroFlows(alegroData.getAlBeFlows().getTargetFlow(), alBeConstraints);
+        final BciAlegroFlows alDeFlows = new BciAlegroFlows(alegroData.getAldeFlows().getTargetFlow(), alDeConstraints);
+        final BciAlegroFlows alBeFlows = new BciAlegroFlows(alegroData.getAlbeFlows().getTargetFlow(), alBeConstraints);
 
         return new BciAlegroData(alDeFlows, alBeFlows);
     }
@@ -218,12 +218,16 @@ public class BciProcess {
         final Interval alDeConstraints = alegroExternalConstraints.get(ALEGRO_DE_NODE_NAME);
         final Interval alBeConstraints = alegroExternalConstraints.get(ALEGRO_BE_NODE_NAME);
 
-        final boolean flowsToGermany = bciAlegroData.getAlBeFlows().getTargetFlow() < 0;
+        final boolean flowsToGermany = bciAlegroData.getAlbeFlows().getTargetFlow() < 0;
 
         final Interval atOrigin = flowsToGermany ? alBeConstraints : alDeConstraints;
         final Interval atDestination = flowsToGermany ? alDeConstraints : alBeConstraints;
 
         return min(abs(atOrigin.getMaxValue()),
                    abs(atDestination.getMinValue()));
+    }
+
+    private boolean shouldIgnoreAlegro() {
+        return alegroData == null || alegroData.isAlegroInOutage();
     }
 }

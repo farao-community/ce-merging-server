@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.ce_merging.base_case_improvement.data;
 
 import java.util.HashMap;
@@ -40,8 +46,8 @@ public class FlowByAreaMap extends HashMap<String, Double> {
         return this.values().stream().mapToDouble(Double::doubleValue).sum();
     }
 
-    public static <T, K, U> Collector<T, ?, FlowByAreaMap> toFlowByAreaMap(final Function<? super T, ? extends K> keyMapper,
-                                                                           final Function<? super T, ? extends U> valueMapper) {
-        return collectingAndThen(toMap(keyMapper, valueMapper), FlowByAreaMap.class::cast);
+    public static <T> Collector<T, ?, FlowByAreaMap> toFlowByAreaMap(final Function<? super T, String> keyMapper,
+                                                                     final Function<? super T, Double> valueMapper) {
+        return collectingAndThen(toMap(keyMapper, valueMapper), FlowByAreaMap::new);
     }
 }

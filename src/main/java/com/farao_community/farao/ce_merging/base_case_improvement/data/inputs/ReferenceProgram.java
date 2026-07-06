@@ -33,23 +33,23 @@ public class ReferenceProgram implements Serializable {
     @JsonSerialize(using = OffsetDateTimeSerializer.class)
     @JsonDeserialize(using = OffsetDateTimeDeserializer.class)
     private OffsetDateTime targetDateTime;
-    private List<ReferenceExchangeData> referenceExchanges;
+    private List<ReferenceExchangeData> referenceExchangeDataList;
 
     @JsonCreator
     public ReferenceProgram(@JsonProperty("timeInterval") final String dailyTimeInterval,
                             @JsonProperty("targetDateTime") final OffsetDateTime targetDateTime,
-                            @JsonProperty("referenceExchangeData") final List<ReferenceExchangeData> referenceExchanges) {
+                            @JsonProperty("referenceExchangeData") final List<ReferenceExchangeData> referenceExchangeDataList) {
         this.dailyTimeInterval = dailyTimeInterval;
         this.targetDateTime = targetDateTime;
-        this.referenceExchanges = referenceExchanges;
+        this.referenceExchangeDataList = referenceExchangeDataList;
     }
 
     public FlowByAreaMap computeGlobalNetPositionsForOutAreas(final IRegionConfiguration region) {
         final Predicate<String> isNotRegionOrItsAreasIn = areaId -> !region.getId().equals(areaId)
                                                                   && !region.getAreasIn().containsValue(areaId);
         return Stream
-            .concat(referenceExchanges.stream().map(ReferenceExchangeData::getAreaInId),
-                    referenceExchanges.stream().map(ReferenceExchangeData::getAreaOutId))
+            .concat(referenceExchangeDataList.stream().map(ReferenceExchangeData::getAreaInId),
+                    referenceExchangeDataList.stream().map(ReferenceExchangeData::getAreaOutId))
             .distinct()
             .filter(isNotRegionOrItsAreasIn)
             .collect(toFlowByAreaMap(identity(), this::getAreaGlobalNetPosition));
@@ -67,20 +67,20 @@ public class ReferenceProgram implements Serializable {
         return computeForAllAreasIn(region, this::getAreaGlobalNetPosition);
     }
 
-    private double getAreaGlobalNetPosition(final String areaId) {
+    double getAreaGlobalNetPosition(final String areaId) {
         final double leavingArea = sumFlowsGiven(exc -> exc.comesFrom(areaId));
         final double enteringArea = sumFlowsGiven(exc -> exc.goesTo(areaId));
         return leavingArea - enteringArea;
     }
 
-    private double getAreaNetPositionInRegion(final String areaId, final IRegionConfiguration region) {
+    double getAreaNetPositionInRegion(final String areaId, final IRegionConfiguration region) {
         // compute the netPosition of an area relative to a region
         final double enteringRegion = sumFlowsGiven(exc -> exc.flowsBetween(areaId, region.getId()));
         final double leavingRegion = sumFlowsGiven(exc -> exc.flowsBetween(region.getId(), areaId));
         return enteringRegion - leavingRegion;
     }
 
-    private double getAreaNetPositionOutRegion(final String areaId, final IRegionConfiguration region) {
+    double getAreaNetPositionOutRegion(final String areaId, final IRegionConfiguration region) {
         // compute the exchange of an area out of region
         final double outOfAreaToElsewhere = sumFlowsGiven(exc -> exc.comesFrom(areaId)
                                                                  && !exc.goesTo(region.getId()));
@@ -91,7 +91,7 @@ public class ReferenceProgram implements Serializable {
     }
 
     private double sumFlowsGiven(final Predicate<ReferenceExchangeData> condition) {
-        return referenceExchanges.stream()
+        return referenceExchangeDataList.stream()
             .filter(condition)
             .mapToDouble(ReferenceExchangeData::getFlow)
             .sum();
@@ -123,15 +123,15 @@ public class ReferenceProgram implements Serializable {
         this.targetDateTime = targetDateTime;
     }
 
-    public ReferenceProgram(final List<ReferenceExchangeData> referenceExchanges) {
-        this(null, null, referenceExchanges);
+    public ReferenceProgram(final List<ReferenceExchangeData> referenceExchangeDataList) {
+        this(null, null, referenceExchangeDataList);
     }
 
-    public List<ReferenceExchangeData> getReferenceExchanges() {
-        return referenceExchanges;
+    public List<ReferenceExchangeData> getReferenceExchangeDataList() {
+        return referenceExchangeDataList;
     }
 
-    public void setReferenceExchanges(final List<ReferenceExchangeData> referenceExchanges) {
-        this.referenceExchanges = referenceExchanges;
+    public void setReferenceExchangeDataList(final List<ReferenceExchangeData> referenceExchangeDataList) {
+        this.referenceExchangeDataList = referenceExchangeDataList;
     }
 }

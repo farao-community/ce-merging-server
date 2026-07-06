@@ -17,7 +17,7 @@ public interface Task {
     void setName(String name);
 
     void setStatus(TaskStatus status);
-    
+
     default void assertFinished() {
         if (this.getStatus() == CREATED) {
             throw new TaskNotRunException(String.format("Task %d has not been run", this.getId()));

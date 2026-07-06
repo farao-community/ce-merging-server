@@ -29,6 +29,9 @@ public class CeMergingConfiguration {
     @Value("${ce-merging-server.filesystem.root-daily}")
     private String dailyMergingRoot;
 
+    @Value("${ce-merging-server.filesystem.root-bci}")
+    private String bciRoot;
+
     public String getCeMergingRoot() {
         return ceMergingRoot;
     }
@@ -91,4 +94,11 @@ public class CeMergingConfiguration {
             .toString();
     }
 
+    public String getBciRoot() {
+        return bciRoot;
+    }
+
+    public void setBciRoot(final String bciRoot) {
+        this.bciRoot = bciRoot;
+    }
 }

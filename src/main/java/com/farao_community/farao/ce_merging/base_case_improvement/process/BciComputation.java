@@ -74,12 +74,12 @@ public class BciComputation {
         shiftNpfWithAlegro(alBeToCeFlow, alDeToCeFlow);
 
         final FlowByAreaMap outNetPositionByArea = referenceProgram.computeAllNetPositionsOutRegion(regionConfiguration);
-
+        targetInRegionNpByArea = inRegionNpfByArea;
+        targetGlobalNpByArea = globalNpfByArea;
         // check net position in feasibility ranges
         if (isNpfValid()) {
             LOGGER.info("All forecast net positions are in the feasibility ranges, BCI is not applied");
-            targetInRegionNpByArea = inRegionNpfByArea;
-            targetGlobalNpByArea = globalNpfByArea;
+
             results = createResults(initialRegionNetPositions);
             results.values().forEach(result -> result.setBciApplied(FALSE));
             return new BciComputationResult(false, false, results);
@@ -144,6 +144,7 @@ public class BciComputation {
     }
 
     private Pair<Boolean, FlowByAreaMap> applyBci() {
+        targetInRegionNpByArea = inRegionNpfByArea;
         solveContraryViolations();
         solveMainViolations();
 
