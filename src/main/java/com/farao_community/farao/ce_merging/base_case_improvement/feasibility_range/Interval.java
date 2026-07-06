@@ -53,7 +53,7 @@ public class Interval {
                             min(maxValue, interval.getMaxValue()));
     }
 
-    public boolean containsValue(final Double value) {
+    public boolean hasWithinBounds(final Double value) {
         return value >= minValue && value <= maxValue;
     }
 

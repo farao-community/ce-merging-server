@@ -18,26 +18,30 @@ public class FlowByAreaMap extends HashMap<String, Double> {
         super(other);
     }
 
-    public void shift(final String key, final Double shift) {
-        this.computeIfPresent(key, (k, np) -> np + shift);
+    public void shiftFlow(final String area, final Double shift) {
+        this.computeIfPresent(area, (a, np) -> np + shift);
     }
 
-    public void shiftAllBy(final ToDoubleFunction<String> shift) {
-        this.replaceAll((k, np) -> np + shift.applyAsDouble(k));
+    public void shiftAllFlowsUsing(final ToDoubleFunction<String> areaOperator) {
+        this.replaceAll((k, np) -> np + areaOperator.applyAsDouble(k));
     }
 
-    public FlowByAreaMap withValuesShiftedBy(final ToDoubleFunction<String> shift) {
+    public FlowByAreaMap withValuesShiftedBy(final ToDoubleFunction<String> areaOperator) {
         final FlowByAreaMap shiftedMap = new FlowByAreaMap(this);
-        shiftedMap.shiftAllBy(shift);
+        shiftedMap.shiftAllFlowsUsing(areaOperator);
         return shiftedMap;
+    }
+
+    public Double getOrZero(final String area) {
+        return this.getOrDefault(area, 0.);
     }
 
     public Double getTotal() {
         return this.values().stream().mapToDouble(Double::doubleValue).sum();
     }
 
-    public static <T, K, U> Collector<T, ?, FlowByAreaMap> toNetPositionsMap(final Function<? super T, ? extends K> keyMapper,
-                                                                             final Function<? super T, ? extends U> valueMapper) {
+    public static <T, K, U> Collector<T, ?, FlowByAreaMap> toFlowByAreaMap(final Function<? super T, ? extends K> keyMapper,
+                                                                           final Function<? super T, ? extends U> valueMapper) {
         return collectingAndThen(toMap(keyMapper, valueMapper), FlowByAreaMap.class::cast);
     }
 }

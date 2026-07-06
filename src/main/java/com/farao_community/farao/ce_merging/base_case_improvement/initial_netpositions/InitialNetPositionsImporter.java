@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.farao_community.farao.ce_merging.base_case_improvement.process.FlowByAreaMap.toNetPositionsMap;
+import static com.farao_community.farao.ce_merging.base_case_improvement.process.FlowByAreaMap.toFlowByAreaMap;
 import static com.powsybl.commons.json.JsonUtil.createObjectMapper;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -60,7 +60,7 @@ public final class InitialNetPositionsImporter {
             .entrySet()
             .stream()
             .filter(entry -> areasIdByCountry.containsKey(entry.getKey()))
-            .collect(toNetPositionsMap(entry -> areasIdByCountry.get(entry.getKey()),
+            .collect(toFlowByAreaMap(entry -> areasIdByCountry.get(entry.getKey()),
                                        entry -> npGetter.apply(entry.getValue()).getWithoutVirtualHubs()));
     }
 

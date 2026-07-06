@@ -23,7 +23,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.base_case_improvement.process.FlowByAreaMap.toNetPositionsMap;
+import static com.farao_community.farao.ce_merging.base_case_improvement.process.FlowByAreaMap.toFlowByAreaMap;
 import static java.util.function.Function.identity;
 
 public class ReferenceProgram implements Serializable {
@@ -52,7 +52,7 @@ public class ReferenceProgram implements Serializable {
                     referenceExchanges.stream().map(ReferenceExchangeData::getAreaOutId))
             .distinct()
             .filter(isNotRegionOrItsAreasIn)
-            .collect(toNetPositionsMap(identity(), this::getAreaGlobalNetPosition));
+            .collect(toFlowByAreaMap(identity(), this::getAreaGlobalNetPosition));
     }
 
     public FlowByAreaMap computeAllNetPositionsInRegion(final RegionConfiguration region) {
@@ -101,7 +101,7 @@ public class ReferenceProgram implements Serializable {
                                                final Function<String, Double> areaToNetPosition) {
         return region.getAreasIn().values()
             .stream()
-            .collect(toNetPositionsMap(identity(), areaToNetPosition));
+            .collect(toFlowByAreaMap(identity(), areaToNetPosition));
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-

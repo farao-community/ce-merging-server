@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.base_case_improvement.process.data;
 
+import com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.Interval;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class BciAlegroFlows {
@@ -19,6 +20,13 @@ public class BciAlegroFlows {
         this.targetFlow = targetFlow;
         this.minEc = minEc;
         this.maxEc = maxEc;
+    }
+
+    public BciAlegroFlows(final double targetFlow,
+                         final Interval interval) {
+        this.targetFlow = targetFlow;
+        this.minEc = interval.getMinValue();
+        this.maxEc = interval.getMaxValue();
     }
 
     public double getTargetFlow() {

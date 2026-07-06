@@ -33,15 +33,15 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.function.Function;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
 import static com.farao_community.farao.ce_merging.base_case_improvement.feasibility_range.ExternalConstraintsImporter.calculateConstraintsForAlegro;
 import static com.farao_community.farao.ce_merging.base_case_improvement.initial_netpositions.InitialNetPositionsImporter.getGlobalNetPosition;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.readBytesFromPath;
+import static java.lang.Math.abs;
+import static java.lang.Math.min;
+import static java.util.stream.Collectors.toMap;
 
 public class BciProcess {
     private static final Logger LOGGER = LoggerFactory.getLogger(BciProcess.class);
@@ -108,8 +108,7 @@ public class BciProcess {
     private void computeInRegionNetPositions() {
         final FlowByAreaMap outRegionNetPositions = referenceProgram.computeAllNetPositionsOutRegion(regionConfiguration);
         initialRegionNetPositions.putAll(
-            initialGlobalNetPositions.withValuesShiftedBy(region -> -outRegionNetPositions
-                .getOrDefault(region, 0.))
+            initialGlobalNetPositions.withValuesShiftedBy(region -> -outRegionNetPositions.getOrZero(region))
         );
     }
 
@@ -127,7 +126,7 @@ public class BciProcess {
         final double countryAlegroGap = alHubToCeFlow - flows.getInitialFlow();
         final String countryEic = regionConfiguration.getAreasIn().get(countryCode);
 
-        initialRegionNetPositions.shift(countryEic, countryAlegroGap);
+        initialRegionNetPositions.shiftFlow(countryEic, countryAlegroGap);
     }
 
     private Map<String, Interval> getAlegroExternalConstraints() throws IOException {
@@ -136,23 +135,18 @@ public class BciProcess {
     }
 
     private double getAlegroConstrainedTargetFlow(final AlegroFlows toConstrain) throws IOException {
-        final double maxFlow = getCommonFlowLimit(alegroData, getAlegroExternalConstraints());
-        return alegroData.isInOutage() ? 0 : Math.clamp(toConstrain.getTargetFlow(), -maxFlow, maxFlow);
+        if (alegroData == null || alegroData.isInOutage()) {
+            return 0;
+        }
+        final double maxAlegroFlow = getCommonFlowLimit(alegroData, getAlegroExternalConstraints());
+        return Math.clamp(toConstrain.getTargetFlow(), -maxAlegroFlow, maxAlegroFlow);
     }
 
     private void computeBci() throws IOException {
         final BciComputation computation = new BciComputation(regionConfiguration, referenceProgram, regionFeasibilityRanges);
-        boolean isMergingWithAlegro = alegroData != null;
 
-        final double alDeToCeFlow;
-        final double alBeToCeFlow;
-        if (isMergingWithAlegro) {
-            alDeToCeFlow = getAlegroConstrainedTargetFlow(alegroData.getAlDeFlows());
-            alBeToCeFlow = getAlegroConstrainedTargetFlow(alegroData.getAlBeFlows());
-        } else {
-            alDeToCeFlow = 0;
-            alBeToCeFlow = 0;
-        }
+        final double alDeToCeFlow = getAlegroConstrainedTargetFlow(alegroData.getAlDeFlows());
+        final double alBeToCeFlow = getAlegroConstrainedTargetFlow(alegroData.getAlBeFlows());
 
         final BciComputationResult bciResults = computation.run(initialRegionNetPositions,
                                                                 alBeToCeFlow,
@@ -172,46 +166,30 @@ public class BciProcess {
         }
 
         final byte[] externalConstraints = readBytesFromPath(getExternalConstraintsPath());
-        final Map<String, Interval> alegroEc = calculateConstraintsForAlegro(externalConstraints,
-                                                                             task.getProcessTargetDate());
+        final Map<String, Interval> alegroEc = calculateConstraintsForAlegro(externalConstraints, task.getProcessTargetDate());
         final Interval alDeConstraints = alegroEc.get(ALEGRO_DE_NODE_NAME);
         final Interval alBeConstraints = alegroEc.get(ALEGRO_BE_NODE_NAME);
 
-        final BciAlegroFlows alDeFlows = new BciAlegroFlows(alegroData.getAlDeFlows().getTargetFlow(),
-                                                            alDeConstraints.getMinValue(),
-                                                            alDeConstraints.getMaxValue());
-
-        final BciAlegroFlows alBeFlows = new BciAlegroFlows(alegroData.getAlBeFlows().getTargetFlow(),
-                                                            alBeConstraints.getMinValue(),
-                                                            alBeConstraints.getMaxValue());
+        final BciAlegroFlows alDeFlows = new BciAlegroFlows(alegroData.getAlDeFlows().getTargetFlow(), alDeConstraints);
+        final BciAlegroFlows alBeFlows = new BciAlegroFlows(alegroData.getAlBeFlows().getTargetFlow(), alBeConstraints);
 
         return new BciAlegroData(alDeFlows, alBeFlows);
     }
 
     private OutRegionResults getOutRegionResults() {
-        final Map<String, Double> globalNetPositionsByAreaId = referenceProgram
+        final FlowByAreaMap globalNetPositionsByAreaId = referenceProgram
             .computeGlobalNetPositionsForOutAreas(regionConfiguration);
 
-        final Map<String, Double> globalNetPositionsByCountry = regionConfiguration
+        final Map<String, Double> globalNpByCountry = regionConfiguration
             .getAreasOut()
             .entrySet()
             .stream()
-            .collect(sameKeysValuesFrom(globalNetPositionsByAreaId));
+            .collect(toMap(Map.Entry::getKey,
+                           e -> globalNetPositionsByAreaId.getOrZero(e.getValue()),
+                           (o1, o2) -> o1,
+                           TreeMap::new));
 
-        return new OutRegionResults(globalNetPositionsByCountry);
-    }
-
-    private Collector<Map.Entry<String, String>, ?, TreeMap<String, Double>> sameKeysValuesFrom(
-        final Map<String, Double> globalNetPositionsByAreaId
-    ) {
-        return Collectors.toMap(Map.Entry::getKey,
-                                extractedFrom(globalNetPositionsByAreaId),
-                                (o1, o2) -> o1,
-                                TreeMap::new);
-    }
-
-    private Function<Map.Entry<String, String>, Double> extractedFrom(final Map<String, Double> globalNetPositionsByAreaId) {
-        return e -> globalNetPositionsByAreaId.getOrDefault(e.getValue(), 0.);
+        return new OutRegionResults(globalNpByCountry);
     }
 
     private void createBciOutput() throws FileNotFoundException {
@@ -241,10 +219,10 @@ public class BciProcess {
 
         final boolean flowsToGermany = bciAlegroData.getAlBeFlows().getTargetFlow() < 0;
 
-        final Interval constraintsAtOrigin = flowsToGermany ? alBeConstraints : alDeConstraints;
-        final Interval constraintsAtDestination = flowsToGermany ? alDeConstraints : alBeConstraints;
+        final Interval atOrigin = flowsToGermany ? alBeConstraints : alDeConstraints;
+        final Interval atDestination = flowsToGermany ? alDeConstraints : alBeConstraints;
 
-        return Math.min(Math.abs(constraintsAtOrigin.getMaxValue()),
-                        Math.abs(constraintsAtDestination.getMinValue()));
+        return min(abs(atOrigin.getMaxValue()),
+                   abs(atDestination.getMinValue()));
     }
 }
