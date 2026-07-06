@@ -7,8 +7,9 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.RegionConfigurationRecord;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,17 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC
 
 @Service
 public class RegionConfigurationService extends AbstractGridConfigurationService<RegionConfigurationRecord, JsonRegionConfiguration> {
+
+    private final GridConfigurationRepository<RegionConfigurationRecord> repository;
+
+    public RegionConfigurationService(final GridConfigurationRepository<RegionConfigurationRecord> repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    protected GridConfigurationRepository<RegionConfigurationRecord> getRepository() {
+        return repository;
+    }
 
     @Override
     protected JsonRegionConfiguration getDefaultJsonConfiguration(final OffsetDateTime targetDate) throws IOException {

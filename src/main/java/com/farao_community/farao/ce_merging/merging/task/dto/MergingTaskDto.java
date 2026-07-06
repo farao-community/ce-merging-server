@@ -17,9 +17,9 @@ public class MergingTaskDto implements JsonApiData {
 
     private static final String TYPE = "merging-task";
 
-    private Long taskId;
-    private String taskName;
-    private TaskStatus taskStatus;
+    private Long id;
+    private String name;
+    private TaskStatus status;
     private InputsDto inputs;
     private ConfigurationsDto configurations;
     private OutputsDto outputs;
@@ -27,7 +27,7 @@ public class MergingTaskDto implements JsonApiData {
 
     @Override
     public Long getId() {
-        return this.taskId;
+        return this.id;
     }
 
     @Override
@@ -35,28 +35,24 @@ public class MergingTaskDto implements JsonApiData {
         return TYPE;
     }
 
-    public TaskStatus getTaskStatus() {
-        return taskStatus;
+    public void setId(Long id) {
+        this.id = id;
     }
 
-    public void setTaskStatus(final TaskStatus taskStatus) {
-        this.taskStatus = taskStatus;
+    public String getName() {
+        return name;
     }
 
-    public Long getTaskId() {
-        return taskId;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setTaskId(final Long taskId) {
-        this.taskId = taskId;
+    public TaskStatus getStatus() {
+        return status;
     }
 
-    public String getTaskName() {
-        return taskName;
-    }
-
-    public void setTaskName(final String taskName) {
-        this.taskName = taskName;
+    public void setStatus(TaskStatus status) {
+        this.status = status;
     }
 
     public InputsDto getInputs() {

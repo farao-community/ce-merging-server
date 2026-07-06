@@ -44,14 +44,14 @@ public class RegionConfigurationDto {
             joinColumns = {@JoinColumn(name = "regionconfigurationdto_ref", referencedColumnName = "ref")})
     @MapKeyColumn(name = "areasin_name")
     @Column(name = "areasin_eic")
-    private Map<String, String> areasIn;
+    private Map<String, String> areasIn = new HashMap<>();
 
     @ElementCollection
     @CollectionTable(name = "regionconfigurationdto_areasout_code_mapping",
             joinColumns = {@JoinColumn(name = "regionconfigurationdto_ref", referencedColumnName = "ref")})
     @MapKeyColumn(name = "areasout_name")
     @Column(name = "areasout_eic")
-    private Map<String, String> areasOut;
+    private Map<String, String> areasOut = new HashMap<>();
 
     @OneToMany(cascade = ALL)
     @JsonProperty(value = "germanyZones")

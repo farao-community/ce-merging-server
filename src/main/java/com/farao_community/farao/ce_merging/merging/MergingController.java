@@ -69,7 +69,7 @@ public class MergingController {
                                                                       @Parameter(description = "JSON representation of the task")
                                                                       @RequestPart final String inputRequestMetadata) {
         final MergingTaskDto createdTask = taskManager.createNewTask(inputFilesArchive, inputRequestMetadata);
-        final long taskId = createdTask.getTaskId();
+        final long taskId = createdTask.getId();
         final UriComponents taskLocation = MvcUriComponentsBuilder.fromController(getClass())
                 .path("/tasks/{taskId}")
                 .buildAndExpand(taskId);
@@ -373,7 +373,7 @@ public class MergingController {
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     @GetMapping(value = "/tasks/{taskId}/configurations/dc-load-flow-parameters", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
-    @Operation(tags = TASK_MANAGEMENT_TAG,
+    @Operation(tags = TASK_CONFIGURATIONS_TAG,
             summary = "Get the DC load flow parameters of the merging task with given ID.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "The DC load flow parameters  returned successfully."),
