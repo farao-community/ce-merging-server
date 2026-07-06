@@ -33,8 +33,9 @@ public class CeThrowableAssert<T extends Throwable> extends AbstractThrowableAss
     }
 
     public CeThrowableAssert<T> isValidServiceException() {
-
-        if (actual instanceof AbstractServiceException abstractServiceException) {
+        if (actual == null) {
+            failWithMessage("No exception has been thrown");
+        } else if (actual instanceof AbstractServiceException abstractServiceException) {
             assertNotNull(abstractServiceException.getTitle());
             assertNotNull(abstractServiceException.getCode());
             assertNotNull(abstractServiceException.getStatus());

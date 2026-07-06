@@ -6,8 +6,11 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -22,7 +25,8 @@ class BECKeyConfigurationServiceTest {
 
     private final RegionConfigurationService rcService = mock(RegionConfigurationService.class);
 
-    private BECKeyConfigurationService service = new BECKeyConfigurationService(rcService);
+    private GridConfigurationRepository<BECKeyConfigurationRecord> repository = mock(GridConfigurationRepository.class);
+    private final BECKeyConfigurationService service = new BECKeyConfigurationService(rcService, repository);
 
     @Test
     void shouldThrowWhenParsingEmptyFile() throws IOException {
@@ -33,5 +37,16 @@ class BECKeyConfigurationServiceTest {
         assertThatThrownBy(() -> service.parseBecSharingKeys(BEGINNING_OF_2000, null))
             .isValidServiceException()
             .hasMessage("Could not parse sharing keys BEC file from class resources");
+    }
+
+    @Test
+    void shouldHaveCommonMethodsWorking() throws IOException {
+        when(rcService.getConfiguration(any()))
+            .thenReturn(new JsonRegionConfiguration(new RegionConfigurationDto()));
+
+        new ConfigurationServicesTestHelper<>(service,
+                                              new BECKeyConfigurationRecord(),
+                                              JsonBecConfiguration.class)
+            .testAllAbstractMethods();
     }
 }

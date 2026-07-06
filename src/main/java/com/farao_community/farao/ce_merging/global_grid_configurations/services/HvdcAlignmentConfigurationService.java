@@ -8,7 +8,8 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.HvdcAlignmentConfigurationRecord;
 import com.powsybl.openrao.virtualhubs.VirtualHub;
@@ -27,9 +28,16 @@ import static java.util.function.Predicate.not;
 @Service
 public class HvdcAlignmentConfigurationService extends AbstractGridConfigurationService<HvdcAlignmentConfigurationRecord, JsonHvdcAlignmentConfiguration> {
     private final VirtualHubsConfigurationService virtualHubsConfigurationService;
+    private final GridConfigurationRepository<HvdcAlignmentConfigurationRecord> repository;
 
-    public HvdcAlignmentConfigurationService(final VirtualHubsConfigurationService virtualHubsConfigurationService) {
+    public HvdcAlignmentConfigurationService(final VirtualHubsConfigurationService virtualHubsConfigurationService, final GridConfigurationRepository<HvdcAlignmentConfigurationRecord> repository) {
         this.virtualHubsConfigurationService = virtualHubsConfigurationService;
+        this.repository = repository;
+    }
+
+    @Override
+    protected GridConfigurationRepository<HvdcAlignmentConfigurationRecord> getRepository() {
+        return repository;
     }
 
     @Override
@@ -51,9 +59,9 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
                                                                               final OffsetDateTime validTo) throws IOException {
 
         final JsonHvdcAlignmentConfiguration alignmentConfiguration = JsonUtils.read(JsonHvdcAlignmentConfiguration.class,
-                                                                  configurationFile);
+                                                                                     configurationFile);
 
-        final List<VirtualHubsAlignmentCoupleDto> xNodeCouples = alignmentConfiguration.getHvdcXNodeAlignment();
+        final List<HvdcAlignmentXNodeCoupleDto> xNodeCouples = alignmentConfiguration.getHvdcXNodeAlignment();
         assertXNodesArePresentInVirtualHubs(validFrom, xNodeCouples);
 
         return new HvdcAlignmentConfigurationRecord(
@@ -68,7 +76,7 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
     }
 
     private void assertXNodesArePresentInVirtualHubs(final OffsetDateTime targetDate,
-                                                     final List<VirtualHubsAlignmentCoupleDto> couples) throws IOException {
+                                                     final List<HvdcAlignmentXNodeCoupleDto> couples) throws IOException {
         final List<VirtualHub> virtualHubs = virtualHubsConfigurationService
             .getConfiguration(targetDate)
             .getVirtualHubs();
@@ -76,7 +84,7 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
         couples.forEach(couple -> assertCoupleInHubs(couple, virtualHubs));
     }
 
-    private static void assertCoupleInHubs(final VirtualHubsAlignmentCoupleDto couple,
+    private static void assertCoupleInHubs(final HvdcAlignmentXNodeCoupleDto couple,
                                            final List<VirtualHub> virtualHubs) {
         if (isNotInVirtualHubs(couple, virtualHubs)) {
             throw new CeMergingException("XNode couple (%s,%s) should be present in the virtual hubs configuration"
@@ -84,9 +92,9 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
         }
     }
 
-    private static boolean isNotInVirtualHubs(final VirtualHubsAlignmentCoupleDto couple,
+    private static boolean isNotInVirtualHubs(final HvdcAlignmentXNodeCoupleDto couple,
                                               final List<VirtualHub> virtualHubs) {
-        return virtualHubs.stream()
+        return virtualHubs.isEmpty() || virtualHubs.stream()
             .map(VirtualHub::nodeName)
             .filter(Objects::nonNull)
             .filter(not(String::isBlank))

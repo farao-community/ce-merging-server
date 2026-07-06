@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecCoefficientsDto;
@@ -35,9 +36,16 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC
 public class BECKeyConfigurationService extends AbstractGridConfigurationService<BECKeyConfigurationRecord, JsonBecConfiguration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(BECKeyConfigurationService.class);
     private final RegionConfigurationService regionConfigurationService;
+    private final GridConfigurationRepository<BECKeyConfigurationRecord> repository;
 
-    public BECKeyConfigurationService(final RegionConfigurationService regionConfigurationService) {
+    public BECKeyConfigurationService(final RegionConfigurationService regionConfigurationService, final GridConfigurationRepository<BECKeyConfigurationRecord> repository) {
         this.regionConfigurationService = regionConfigurationService;
+        this.repository = repository;
+    }
+
+    @Override
+    protected GridConfigurationRepository<BECKeyConfigurationRecord> getRepository() {
+        return repository;
     }
 
     @Override

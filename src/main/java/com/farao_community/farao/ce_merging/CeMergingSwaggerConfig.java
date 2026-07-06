@@ -1,0 +1,27 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package com.farao_community.farao.ce_merging;
+
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TAG_VERSION;
+
+@Configuration
+public class CeMergingSwaggerConfig {
+
+    @Bean
+    public OpenAPI springShopOpenAPI() {
+        return new OpenAPI()
+                .info(new Info().title("CE merging tasks management API")
+                        .description("This REST API manages CE merging tasks.")
+                        .version(TAG_VERSION));
+    }
+
+}

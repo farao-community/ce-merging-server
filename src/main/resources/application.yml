@@ -5,6 +5,14 @@ spring:
     multipart:
       max-file-size: 100MB # NOSONAR no DoS risk because it is to be deployed internally
       max-request-size: 100MB # NOSONAR no DoS risk because it is to be deployed internally
+  datasource:
+    url: jdbc:h2:file:${HOME}/ce-merging/database
+    driverClassName: org.h2.Driver
+    username: ce
+    password: ce
+  h2:
+    console:
+      enabled: true
   jpa:
     properties:
       hibernate:

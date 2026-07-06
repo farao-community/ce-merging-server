@@ -34,9 +34,9 @@ public class CeTaskAssert extends AbstractAssert<CeTaskAssert, MergingTask> {
 
     @CanIgnoreReturnValue
     public CeTaskAssert isSameTaskAs(final MergingTaskDto dto) {
-        if (!actual.getId().equals(dto.getTaskId())
-            || actual.getStatus() != dto.getTaskStatus()
-            || !Objects.equals(actual.getName(), dto.getTaskName())) {
+        if (!actual.getId().equals(dto.getId())
+            || actual.getStatus() != dto.getStatus()
+            || !Objects.equals(actual.getName(), dto.getName())) {
             failWithMessage(
                 "Tasks are different. Actual: %s, expected: %s",
                 actual,
