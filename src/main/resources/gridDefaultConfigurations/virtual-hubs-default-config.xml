@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Created="2026-03-16T14:11:07Z" xsi:noNamespaceSchemaLocation="configuration-23.xsd">
+    <DocumentIdentification v="17XTSO-CS------W-20260318F326v1"/>
+    <Sender Code="CORE" Eic="17XTSO-CS------W" Type="CCO"/>
+    <Receiver Code="CORESO" Eic="22XCORESO------S" Type="RSC"/>
+    <MarketAreas>
+        <MarketArea Code="GBNI" Eic="10Y1001A1001A016" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="EE" Eic="10Y1001A1001A39I" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="SE1" Eic="10Y1001A1001A44P" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="SE2" Eic="10Y1001A1001A45N" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="SE3" Eic="10Y1001A1001A46L" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="SE4" Eic="10Y1001A1001A47J" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="NO5" Eic="10Y1001A1001A48H" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="LB" Eic="10Y1001A1001A55K" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="LTBE" Eic="10Y1001A1001A56I" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="GB1" Eic="10Y1001A1001A57G" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="GB2" Eic="10Y1001A1001A58E" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="NOIA" Eic="10Y1001A1001A64J" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="IGRE" Eic="10Y1001A1001A66F" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ITSI" Eic="10Y1001A1001A67D" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ITCH" Eic="10Y1001A1001A68B" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ICNO" Eic="10Y1001A1001A70O" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ICSO" Eic="10Y1001A1001A71M" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="INOR" Eic="10Y1001A1001A73I" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ISAR" Eic="10Y1001A1001A74G" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ISIC" Eic="10Y1001A1001A75E" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ISOU" Eic="10Y1001A1001A788" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ITAT" Eic="10Y1001A1001A80L" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ITFR" Eic="10Y1001A1001A81J" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="IMAL" Eic="10Y1001A1001A877" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ISAA" Eic="10Y1001A1001A885" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ISAD" Eic="10Y1001A1001A893" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="MD" Eic="10Y1001A1001A990" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="UA" Eic="10Y1001C--00003F" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="IMON" Eic="10Y1001C--000611" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ICAL" Eic="10Y1001C--00096J" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="KS" Eic="10Y1001C--00100H" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="NO2A" Eic="10Y1001C--001219" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="AT" Eic="10YAT-APG------L" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="BA" Eic="10YBA-JPCC-----D" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="BE" Eic="10YBE----------2" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="BG" Eic="10YCA-BULGARIA-R" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="AL" Eic="10YCB-ALBANIA--1" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="DE" Eic="10YCB-GERMANY--8" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="GR" Eic="10YCB-GREECE---2" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="CH" Eic="10YCB-SWITZERL-D" MCParticipant="false" AHC="false" techCounterparty="true" SDAC="false"/>
+        <MarketArea Code="TR" Eic="10YCB-TURKEY---V" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ME" Eic="10YCS-CG-TSO---S" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="RS" Eic="10YCS-SERBIATSOV" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="CZ" Eic="10YCZ-CEPS-----N" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="DK1" Eic="10YDK-1--------W" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="DK1A" Eic="10YDK-1-------AA" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="DK2" Eic="10YDK-2--------M" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ES" Eic="10YES-REE------0" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="FI1" Eic="10YFI-1--------U" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="FR" Eic="10YFR-RTE------C" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="GRE" Eic="10YGR-HTSO-----Y" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="HR" Eic="10YHR-HEP------M" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="HU" Eic="10YHU-MAVIR----U" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="IE" Eic="10YIE-1001A00010" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="IT" Eic="10YIT-GRTN-----B" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="LT" Eic="10YLT-1001A0008Q" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="LV" Eic="10YLV-1001A00074" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="MA" Eic="10YMA-ONE------O" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="MK" Eic="10YMK-MEPSO----8" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="NL" Eic="10YNL----------L" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="NO1" Eic="10YNO-1--------2" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="NO2" Eic="10YNO-2--------T" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="NO3" Eic="10YNO-3--------J" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="NO4" Eic="10YNO-4--------9" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="PL" Eic="10YPL-AREA-----S" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="PT" Eic="10YPT-REN------W" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="RO" Eic="10YRO-TEL------P" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="SI" Eic="10YSI-ELES-----O" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="SK" Eic="10YSK-SEPS-----K" MCParticipant="true" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="ERI" Eic="38YNPSRUIMP----S" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="LRE" Eic="43YLRE-------008" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="LRI" Eic="43YLRI--------04" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="FI_EL" Eic="44Y-00000000161I" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+        <MarketArea Code="SE4_NB" Eic="46Y000000000004S" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
+    </MarketAreas>
+    <ControlAreas>
+        <ControlArea Code="SE4" Eic="10Y1001A1001A47J" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="GB1" Eic="10Y1001A1001A57G" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="GB2" Eic="10Y1001A1001A58E" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="MD" Eic="10Y1001A1001A990" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="UA" Eic="10Y1001C--00003F" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="KS" Eic="10Y1001C--00100H" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="NO2A" Eic="10Y1001C--001219" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="AT" Eic="10YAT-APG------L" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="BA" Eic="10YBA-JPCC-----D" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="BE" Eic="10YBE----------2" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="BG" Eic="10YCA-BULGARIA-R" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="AL" Eic="10YCB-ALBANIA--1" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="GR" Eic="10YCB-GREECE---2" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="CH" Eic="10YCB-SWITZERL-D" MCParticipant="false" techCounterparty="true" SDAC="false"/>
+        <ControlArea Code="TR" Eic="10YCB-TURKEY---V" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="ME" Eic="10YCS-CG-TSO---S" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="RS" Eic="10YCS-SERBIATSOV" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="CZ" Eic="10YCZ-CEPS-----N" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="D4" Eic="10YDE-ENBW-----N" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="D2" Eic="10YDE-EON------1" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="D7" Eic="10YDE-RWENET---I" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="D8" Eic="10YDE-VE-------2" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="DK1" Eic="10YDK-1--------W" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="DK2" Eic="10YDK-2--------M" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="ES" Eic="10YES-REE------0" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="FR" Eic="10YFR-RTE------C" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="HR" Eic="10YHR-HEP------M" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="HU" Eic="10YHU-MAVIR----U" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="IT" Eic="10YIT-GRTN-----B" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="LT" Eic="10YLT-1001A0008Q" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="MK" Eic="10YMK-MEPSO----8" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="NL" Eic="10YNL----------L" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="NO2" Eic="10YNO-2--------T" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="PL" Eic="10YPL-AREA-----S" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="PT" Eic="10YPT-REN------W" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="RO" Eic="10YRO-TEL------P" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="SI" Eic="10YSI-ELES-----O" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="SK" Eic="10YSK-SEPS-----K" MCParticipant="true" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="FI_EL" Eic="44Y-00000000161I" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+        <ControlArea Code="SE4_NB" Eic="46Y000000000004S" MCParticipant="false" techCounterparty="false" SDAC="false"/>
+    </ControlAreas>
+    <VirtualHubs>
+        <VirtualHub Eic="10YDOM-1010A0108" Code="GR_GrIt" RelatedMA="IT" MCParticipant="false" NodeName="XAR_GA1I" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17Y000000930809C" Code="UK_IFA2000_link1" RelatedMA="FR" MCParticipant="false" NodeName="XMA_SE11" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17Y000000930811P" Code="UK_IFA2000_link2" RelatedMA="FR" MCParticipant="false" NodeName="XMA_SE13" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17Y000000930813L" Code="UK_Eleclink" RelatedMA="FR" MCParticipant="false" NodeName="XMA_SE15" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17Y000000930815H" Code="UK_IFA2" RelatedMA="FR" MCParticipant="false" NodeName="XTO_CH11" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAJ" Code="UA_Dobrotwor" RelatedMA="PL" MCParticipant="false" NodeName="XZA_DO21" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAK" Code="SE_Kontiskan1" RelatedMA="DK1" MCParticipant="false" NodeName="XVH_L11K" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAL" Code="SE_Kontiskan2" RelatedMA="DK1" MCParticipant="false" NodeName="XVH_L21K" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAM" Code="DK2_GreatBelt" RelatedMA="DK1" MCParticipant="false" NodeName="XFG_HK11" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAN" Code="NO_Skagerrak1" RelatedMA="DK1" MCParticipant="false" NodeName="XTJ_K13K" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAO" Code="NO_Skagerrak2" RelatedMA="DK1" MCParticipant="false" NodeName="XTJ_K23K" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAP" Code="NO_Skagerrak3" RelatedMA="DK1" MCParticipant="false" NodeName="XTJ_K31K" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAQ" Code="NO_Skagerrak4" RelatedMA="DK1" MCParticipant="false" NodeName="XTJ_K41K" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAR" Code="IT_MONITA2" RelatedMA="ME" MCParticipant="false" OppositeHub="ME_MONITA2" NodeName="XKOTR220" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAS" Code="ME_MONITA1" RelatedMA="IT" MCParticipant="false" OppositeHub="IT_MONITA1" NodeName="XCEPR120" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAT" Code="IT_MONITA1" RelatedMA="ME" MCParticipant="false" OppositeHub="ME_MONITA1" NodeName="XKOTR120" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAU" Code="IT_GrIt" RelatedMA="GR" MCParticipant="false" NodeName="XAR_GA1G" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAV" Code="MA_ESMA_link1" RelatedMA="ES" MCParticipant="false" NodeName="XTA_FA11" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAW" Code="MA_ESMA_link2" RelatedMA="ES" MCParticipant="false" NodeName="XTA_FA12" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAX" Code="ME_MONITA2" RelatedMA="IT" MCParticipant="false" OppositeHub="IT_MONITA2" NodeName="XCEPR220" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAY" Code="UK_Viking1" RelatedMA="DK1" MCParticipant="false" NodeName="XBI_R11K" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAZ" Code="UK_Viking2" RelatedMA="DK1" MCParticipant="false" NodeName="XBI_R21K" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="22Y201903144---9" Code="BE_AL" RelatedMA="BE" MCParticipant="true" OppositeHub="DE_AL" NodeName="XLI_OB1B" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="22Y201903145---4" Code="DE_AL" RelatedMA="DE" MCParticipant="true" OppositeHub="BE_AL" NodeName="XLI_OB1A" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="22Y20191008----W" Code="UK_Nemolink" RelatedMA="BE" MCParticipant="false" NodeName="XBE_GB1B" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="49Y000000000001Q" Code="UK_BritNed" RelatedMA="NL" MCParticipant="false" NodeName="XGR_MA1N" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="49Y000000000004K" Code="NL_NO2_NorNed" RelatedMA="NL" MCParticipant="false" NodeName="XEE_FE1N" AHC="true" SDAC="false"/>
+        <VirtualHub Eic="50Y73EMZ34CQL9AJ" Code="NO2_NL_NorNed" RelatedMA="NO2" MCParticipant="false" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="49Y000000000003M" Code="NL_DK1_COBRA" RelatedMA="NL" MCParticipant="false" NodeName="XED_EE1D" AHC="true" SDAC="false"/>
+        <VirtualHub Eic="45Y0000000000046" Code="DK1_NL_COBRA" RelatedMA="DK1" MCParticipant="false" NodeName="XED_EE1N" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="10Y1001C--00154V" Code="PL_SE4_SwePol" RelatedMA="PL" MCParticipant="false" NodeName="XSL_SW11" AHC="true" SDAC="false"/>
+        <VirtualHub Eic="46Y000000000003U" Code="SE4_PL_SwePol" RelatedMA="SE4" MCParticipant="false" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAH" Code="LT_LitPol1" RelatedMA="PL" MCParticipant="false" NodeName="XEL_AL11" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAI" Code="LT_LitPol2" RelatedMA="PL" MCParticipant="false" NodeName="XEL_AL12" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="10Y1001C--00158N" Code="RO_BG_VH" RelatedMA="RO" MCParticipant="false" AliasFor="BG" AHC="true" SDAC="false"/>
+        <VirtualHub Eic="10Y1001C--00082U" Code="NO_Nordlink_link1" RelatedMA="DE" MCParticipant="false" NodeName="XWI_ET11" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="10Y1001C--00094N" Code="NO_Nordlink_link2" RelatedMA="DE" MCParticipant="false" NodeName="XWI_ET12" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="50YNBFFTWZRAHA3P" Code="NO2_DE_Nordlink" RelatedMA="NO2" MCParticipant="false" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="10YDK1-DE-10010E" Code="DE_DK1_VH" RelatedMA="DE" MCParticipant="false" AliasFor="DK1" AHC="true" SDAC="false"/>
+        <VirtualHub Eic="45Y0000000000054" Code="DK1_DE_VH" RelatedMA="DK1" MCParticipant="false" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAC" Code="DK2_Kontek" RelatedMA="DE" MCParticipant="false" NodeName="XBW_BJ1D" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAE" Code="DK2_CGS" RelatedMA="DE" MCParticipant="false" NodeName="D8BWW_25" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="45Y0000000000070" Code="DK2_DE_VH" RelatedMA="DK2" MCParticipant="false" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="10YDE-SE4-VBZ-01" Code="DE_SE4_Baltic" RelatedMA="DE" MCParticipant="false" NodeName="D2HWKR1D" AHC="true" SDAC="false"/>
+        <VirtualHub Eic="46Y000000000005Q" Code="SE4_DE_Baltic" RelatedMA="SE4" MCParticipant="false" AHC="false" SDAC="false"/>
+    </VirtualHubs>
+    <BorderDirections>
+        <BorderDirection From="BE" To="NL" SDAC="false"/>
+        <BorderDirection From="FR" To="BE" SDAC="false"/>
+        <BorderDirection From="DE" To="NL" SDAC="false"/>
+        <BorderDirection From="FR" To="DE" SDAC="false"/>
+        <BorderDirection From="DE" To="PL" SDAC="false"/>
+        <BorderDirection From="DE" To="CZ" SDAC="false"/>
+        <BorderDirection From="DE" To="AT" SDAC="false"/>
+        <BorderDirection From="PL" To="CZ" SDAC="false"/>
+        <BorderDirection From="PL" To="SK" SDAC="false"/>
+        <BorderDirection From="AT" To="CZ" SDAC="false"/>
+        <BorderDirection From="AT" To="SI" SDAC="false"/>
+        <BorderDirection From="DK1" To="UK_Viking1" SDAC="false"/>
+        <BorderDirection From="DK1" To="UK_Viking2" SDAC="false"/>
+        <BorderDirection From="HR" To="SI" SDAC="false"/>
+        <BorderDirection From="AT" To="HU" SDAC="false"/>
+        <BorderDirection From="CZ" To="SK" SDAC="false"/>
+        <BorderDirection From="SK" To="HU" SDAC="false"/>
+        <BorderDirection From="HR" To="HU" SDAC="false"/>
+        <BorderDirection From="RO" To="HU" SDAC="false"/>
+        <BorderDirection From="DE" To="DK1" SDAC="false"/>
+        <BorderDirection From="UA" To="SK" SDAC="false"/>
+        <BorderDirection From="UA" To="HU" SDAC="false"/>
+        <BorderDirection From="UA" To="RO" SDAC="false"/>
+        <BorderDirection From="CH" To="DE" SDAC="false"/>
+        <BorderDirection From="CH" To="AT" SDAC="false"/>
+        <BorderDirection From="CH" To="FR" SDAC="false"/>
+        <BorderDirection From="CH" To="IT" SDAC="false"/>
+        <BorderDirection From="FR" To="ES" SDAC="false"/>
+        <BorderDirection From="ES" To="PT" SDAC="false"/>
+        <BorderDirection From="IT" To="SI" SDAC="false"/>
+        <BorderDirection From="RS" To="BG" SDAC="false"/>
+        <BorderDirection From="RS" To="RO" SDAC="false"/>
+        <BorderDirection From="RO" To="BG" SDAC="false"/>
+        <BorderDirection From="RS" To="HU" SDAC="false"/>
+        <BorderDirection From="RS" To="HR" SDAC="false"/>
+        <BorderDirection From="RS" To="BA" SDAC="false"/>
+        <BorderDirection From="RS" To="ME" SDAC="false"/>
+        <BorderDirection From="RS" To="MK" SDAC="false"/>
+        <BorderDirection From="MK" To="BG" SDAC="false"/>
+        <BorderDirection From="GR" To="MK" SDAC="false"/>
+        <BorderDirection From="GR" To="BG" SDAC="false"/>
+        <BorderDirection From="GR" To="TR" SDAC="false"/>
+        <BorderDirection From="GR" To="AL" SDAC="false"/>
+        <BorderDirection From="ME" To="BA" SDAC="false"/>
+        <BorderDirection From="ME" To="AL" SDAC="false"/>
+        <BorderDirection From="BA" To="HR" SDAC="false"/>
+        <BorderDirection From="FR" To="IT" SDAC="false"/>
+        <BorderDirection From="IT" To="AT" SDAC="false"/>
+        <BorderDirection From="BG" To="TR" SDAC="false"/>
+        <BorderDirection From="NL" To="UK_BritNed" SDAC="false"/>
+        <BorderDirection From="BE" To="UK_Nemolink" SDAC="false"/>
+        <BorderDirection From="FR" To="UK_IFA2000_link1" SDAC="false"/>
+        <BorderDirection From="FR" To="UK_IFA2000_link2" SDAC="false"/>
+        <BorderDirection From="DE" To="DK2_Kontek" SDAC="false"/>
+        <BorderDirection From="PL" To="LT_LitPol1" SDAC="false"/>
+        <BorderDirection From="PL" To="LT_LitPol2" SDAC="false"/>
+        <BorderDirection From="PL" To="UA_Dobrotwor" SDAC="false"/>
+        <BorderDirection From="PL" To="UA" SDAC="false"/>
+        <BorderDirection From="DK1" To="SE_Kontiskan1" SDAC="false"/>
+        <BorderDirection From="DK1" To="SE_Kontiskan2" SDAC="false"/>
+        <BorderDirection From="DK1" To="DK2_GreatBelt" SDAC="false"/>
+        <BorderDirection From="DK1" To="NO_Skagerrak1" SDAC="false"/>
+        <BorderDirection From="DK1" To="NO_Skagerrak2" SDAC="false"/>
+        <BorderDirection From="IT" To="GR_GrIt" SDAC="false"/>
+        <BorderDirection From="GR" To="IT_GrIt" SDAC="false"/>
+        <BorderDirection From="IT" To="ME_MONITA1" SDAC="false"/>
+        <BorderDirection From="ME" To="IT_MONITA1" SDAC="false"/>
+        <BorderDirection From="DE" To="NO_Nordlink_link1" SDAC="false"/>
+        <BorderDirection From="DE" To="NO_Nordlink_link2" SDAC="false"/>
+        <BorderDirection From="FR" To="UK_IFA2" SDAC="false"/>
+        <BorderDirection From="DK1" To="NO_Skagerrak3" SDAC="false"/>
+        <BorderDirection From="DK1" To="NO_Skagerrak4" SDAC="false"/>
+        <BorderDirection From="RO" To="MD" SDAC="false"/>
+        <BorderDirection From="UA" To="MD" SDAC="false"/>
+        <BorderDirection From="DE" To="DK2_CGS" SDAC="false"/>
+        <BorderDirection From="FR" To="UK_Eleclink" SDAC="false"/>
+        <BorderDirection From="RS" To="KS" SDAC="false"/>
+        <BorderDirection From="MK" To="KS" SDAC="false"/>
+        <BorderDirection From="KS" To="ME" SDAC="false"/>
+        <BorderDirection From="KS" To="AL" SDAC="false"/>
+        <BorderDirection From="BE" To="BE_AL" SDAC="false"/>
+        <BorderDirection From="DE" To="DE_AL" SDAC="false"/>
+        <BorderDirection From="SI" To="HU" SDAC="false"/>
+        <BorderDirection From="IT" To="ME_MONITA2" SDAC="false"/>
+        <BorderDirection From="ME" To="IT_MONITA2" SDAC="false"/>
+        <BorderDirection From="ES" To="MA_ESMA_link1" SDAC="false"/>
+        <BorderDirection From="ES" To="MA_ESMA_link2" SDAC="false"/>
+        <BorderDirection From="DE" To="DE_SE4_Baltic" SDAC="false"/>
+        <BorderDirection From="NL" To="NL_NO2_NorNed" SDAC="false"/>
+        <BorderDirection From="DK1" To="DK1_NL_COBRA" SDAC="false"/>
+        <BorderDirection From="NL" To="NL_DK1_COBRA" SDAC="false"/>
+        <BorderDirection From="PL" To="PL_SE4_SwePol" SDAC="false"/>
+    </BorderDirections>
+</Configuration>

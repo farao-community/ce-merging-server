@@ -7,13 +7,13 @@
 package com.farao_community.farao.ce_merging.common.json_api;
 
 public class JsonApiTestResources {
-    public static final String JSON_DOC_ONE_TASK = "{\"data\":[{\"taskId\":null,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
-                                                   "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":null,\"type\":\"merging-task\"}]}";
+    public static final String JSON_DOC_ONE_TASK = "{\"data\":[{\"id\":null,\"name\":null,\"status\":null,\"inputs\":null," +
+                                                   "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"type\":\"merging-task\"}]}";
 
-    public static final String JSON_DOC_TWO_TASKS = "{\"data\":[{\"taskId\":null,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
-                                                    "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":null,\"type\":\"merging-task\"}," +
-                                                    "{\"taskId\":null,\"taskName\":null,\"taskStatus\":null,\"inputs\":null," +
-                                                    "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"id\":null,\"type\":\"merging-task\"}]}";
+    public static final String JSON_DOC_TWO_TASKS = "{\"data\":[{\"id\":null,\"name\":null,\"status\":null,\"inputs\":null," +
+                                                    "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"type\":\"merging-task\"}," +
+                                                    "{\"id\":null,\"name\":null,\"status\":null,\"inputs\":null," +
+                                                    "\"configurations\":null,\"outputs\":null,\"artifacts\":null,\"type\":\"merging-task\"}]}";
 
     public static final String JSON_DOC_TEST_EXCEPTION = "{\"errors\":[{\"status\":\"500\",\"code\":\"Test\"," +
                                                          "\"title\":\"TEST\",\"detail\":\"Test\"}]}";
