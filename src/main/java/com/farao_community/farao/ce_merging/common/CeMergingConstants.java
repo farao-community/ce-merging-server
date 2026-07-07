@@ -36,6 +36,11 @@ public final class CeMergingConstants {
     public static final String OUTPUTS_TAG = "Outputs";
     public static final String MERGING_SUPERVISOR_TAG  = "Merging supervisor";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
+    public static final String UCTE_FORMAT = "UCTE";
+    public static final String DK_COUNTRY_CODE = "D1";
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
+    public static final String DK_HVDC_XNODES_PROPERTY = "dk.hvdc.xnodes";
+    public static final String DK_NAMING_STRATEGY = "DKNamingStrategy";
     public static final String INPUTS_TAG = "Inputs";
     public static final String GLOBAL_CONFIGURATIONS_TAG = "Global Configurations";
     public static final String TASK_CONFIGURATIONS_TAG = "Task Configurations";
