@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.entity;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractBecByBoundary;
 import jakarta.persistence.Basic;
@@ -15,35 +15,33 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import java.io.Serializable;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ID;
 import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-public class BecByBoundaryDto extends AbstractBecByBoundary<BecCoefficientsDto, BorderDto> {
+public class BecByBoundary extends AbstractBecByBoundary<BecCoefficients, Border> implements Serializable {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
     @Basic(optional = false)
-    @Column(name = ID, unique = true, nullable = false)
+    @Column(name = "id", unique = true, nullable = false)
     private Long id;
 
     @Embedded
-    private BorderDto border;
+    private Border border;
 
     @ElementCollection(fetch = LAZY)
-    private List<BecCoefficientsDto> coefficientByCountry;
+    private List<BecCoefficients> coefficientByCountry;
 
-    public BecByBoundaryDto(final BorderDto border,
-                            final List<BecCoefficientsDto> coefficientByCountry) {
+    public BecByBoundary(final Border border, final List<BecCoefficients> coefficientByCountry) {
         this.border = border;
         this.coefficientByCountry = coefficientByCountry;
     }
 
-    public BecByBoundaryDto() {
-
+    public BecByBoundary() {
     }
 
     public Long getId() {
@@ -55,22 +53,22 @@ public class BecByBoundaryDto extends AbstractBecByBoundary<BecCoefficientsDto, 
     }
 
     @Override
-    public BorderDto getBorder() {
+    public Border getBorder() {
         return border;
     }
 
     @Override
-    public void setBorder(final BorderDto border) {
+    public void setBorder(final Border border) {
         this.border = border;
     }
 
     @Override
-    public List<BecCoefficientsDto> getCoefficientByCountry() {
+    public List<BecCoefficients> getCoefficientByCountry() {
         return coefficientByCountry;
     }
 
     @Override
-    public void setCoefficientByCountry(final List<BecCoefficientsDto> coefficientByCountry) {
+    public void setCoefficientByCountry(final List<BecCoefficients> coefficientByCountry) {
         this.coefficientByCountry = coefficientByCountry;
     }
 }

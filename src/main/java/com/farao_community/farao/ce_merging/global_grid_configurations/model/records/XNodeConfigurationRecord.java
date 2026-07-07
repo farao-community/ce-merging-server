@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 
@@ -19,13 +19,13 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 public class XNodeConfigurationRecord extends AbstractGridConfigurationRecord {
     @ElementCollection(fetch = LAZY)
-    private List<XnodeDto> xNodeList = new ArrayList<>();
+    private List<XnodeConfigDto> xNodeList = new ArrayList<>();
 
     public XNodeConfigurationRecord(final String id,
                                     final LocalDateTime validFrom,
                                     final LocalDateTime validTo,
                                     final LocalDateTime publishedOn,
-                                    final List<XnodeDto> xNodeList) {
+                                    final List<XnodeConfigDto> xNodeList) {
         super(id, validFrom, validTo, publishedOn);
         this.xNodeList = xNodeList;
     }
@@ -34,11 +34,11 @@ public class XNodeConfigurationRecord extends AbstractGridConfigurationRecord {
 
     }
 
-    public List<XnodeDto> getXNodeList() {
+    public List<XnodeConfigDto> getXNodeList() {
         return xNodeList;
     }
 
-    public void setXNodeList(final List<XnodeDto> xNodeList) {
+    public void setXNodeList(final List<XnodeConfigDto> xNodeList) {
         this.xNodeList = xNodeList;
     }
 }

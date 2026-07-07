@@ -6,26 +6,17 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractXNodeCouple;
 import jakarta.persistence.Embeddable;
 
 @Embeddable
-public class HvdcAlignmentXNodeCoupleDto {
-    private String referenceXNode;
-    private String recessiveXNode;
+public class VirtualHubsAlignmentCoupleDto extends AbstractXNodeCouple {
 
-    public String getReferenceXNode() {
-        return referenceXNode;
-    }
-
-    public void setReferenceXNode(final String referenceXNode) {
+    public VirtualHubsAlignmentCoupleDto(final String referenceXNode, final String recessiveXNode) {
         this.referenceXNode = referenceXNode;
-    }
-
-    public String getRecessiveXNode() {
-        return recessiveXNode;
-    }
-
-    public void setRecessiveXNode(final String recessiveXNode) {
         this.recessiveXNode = recessiveXNode;
+    }
+
+    public VirtualHubsAlignmentCoupleDto() {
     }
 }

@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -20,7 +20,7 @@ import static jakarta.persistence.FetchType.LAZY;
 @Entity
 public class HvdcAlignmentConfigurationRecord extends AbstractGridConfigurationRecord {
     @ElementCollection(fetch = LAZY)
-    private List<HvdcAlignmentXNodeCoupleDto> hvdcXNodeAlignmentCouplesDto = new ArrayList<>();
+    private List<VirtualHubsAlignmentCoupleDto> hvdcXNodeAlignmentCouplesDto = new ArrayList<>();
 
     @ElementCollection(fetch = LAZY)
     private List<ZeroFlowNodeDto> zeroFlowNodeDtos = new ArrayList<>();
@@ -34,7 +34,7 @@ public class HvdcAlignmentConfigurationRecord extends AbstractGridConfigurationR
                                             final LocalDateTime validFrom,
                                             final LocalDateTime validTo,
                                             final LocalDateTime publishedOn,
-                                            final List<HvdcAlignmentXNodeCoupleDto> hvdcXNodeAlignmentCouplesDto,
+                                            final List<VirtualHubsAlignmentCoupleDto> hvdcXNodeAlignmentCouplesDto,
                                             final List<ZeroFlowNodeDto> zeroFlowNodeDtos,
                                             final List<String> dkHvdcXnodes,
                                             final String defaultSlackNode) {
@@ -56,11 +56,11 @@ public class HvdcAlignmentConfigurationRecord extends AbstractGridConfigurationR
         this.defaultSlackNode = defaultSlackNode;
     }
 
-    public List<HvdcAlignmentXNodeCoupleDto> getHvdcXNodeAlignmentCouplesDto() {
+    public List<VirtualHubsAlignmentCoupleDto> getHvdcXNodeAlignmentCouplesDto() {
         return new ArrayList<>(hvdcXNodeAlignmentCouplesDto);
     }
 
-    public void setHvdcXNodeAlignmentCouplesDto(final List<HvdcAlignmentXNodeCoupleDto> hvdcXNodeAlignmentCouplesDto) {
+    public void setHvdcXNodeAlignmentCouplesDto(final List<VirtualHubsAlignmentCoupleDto> hvdcXNodeAlignmentCouplesDto) {
         this.hvdcXNodeAlignmentCouplesDto = new ArrayList<>(hvdcXNodeAlignmentCouplesDto);
     }
 

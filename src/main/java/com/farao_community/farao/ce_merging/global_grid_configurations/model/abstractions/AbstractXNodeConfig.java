@@ -4,30 +4,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
+package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
+import jakarta.persistence.MappedSuperclass;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import com.farao_community.farao.ce_merging.xsd.Xnode;
-import jakarta.persistence.Embeddable;
-
-import java.io.Serializable;
-
-@Embeddable
-public class XnodeDto implements Serializable {
-    private String name;
-    private String area1;
-    private String area2;
-    private String subarea1;
-    private String subarea2;
-
-    public static XnodeDto fromXNodeEntity(final Xnode xnode) {
-        final XnodeDto dto = new XnodeDto();
-        dto.setName(xnode.getName());
-        dto.setArea1(xnode.getArea1());
-        dto.setArea2(xnode.getArea2());
-        dto.setSubarea1(xnode.getSubarea1());
-        dto.setSubarea2(xnode.getSubarea2());
-        return dto;
-    }
+@MappedSuperclass
+public abstract class AbstractXNodeConfig {
+    protected String name;
+    protected String area1;
+    protected String area2;
+    protected String subarea1;
+    protected String subarea2;
 
     public String getName() {
         return name;
@@ -67,5 +56,20 @@ public class XnodeDto implements Serializable {
 
     public void setSubarea2(final String subarea2) {
         this.subarea2 = subarea2;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return EqualsBuilder.reflectionEquals(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

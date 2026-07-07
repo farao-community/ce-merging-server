@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.json;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,13 +17,13 @@ import java.util.Optional;
 
 public class JsonHvdcAlignmentConfiguration {
 
-    private List<HvdcAlignmentXNodeCoupleDto> hvdcXNodeAlignment;
+    private List<VirtualHubsAlignmentCoupleDto> hvdcXNodeAlignment;
     private List<ZeroFlowNodeDto> setZeroFlowNodes;
     private List<String> dkHvdcXnodes;
     private String defaultSlackNode;
 
     @JsonCreator
-    public JsonHvdcAlignmentConfiguration(@JsonProperty("hvdcXNodeAlignment") List<HvdcAlignmentXNodeCoupleDto> hvdcXNodeAlignment,
+    public JsonHvdcAlignmentConfiguration(@JsonProperty("hvdcXNodeAlignment") List<VirtualHubsAlignmentCoupleDto> hvdcXNodeAlignment,
                                           @JsonProperty("setZeroFlowNodes") List<ZeroFlowNodeDto> setZeroFlowNodes,
                                           @JsonProperty("dkHvdcXnodes") List<String> dkHvdcXnodes,
                                           @JsonProperty("defaultSlackNode") String defaultSlackNode) {
@@ -36,11 +36,11 @@ public class JsonHvdcAlignmentConfiguration {
     public JsonHvdcAlignmentConfiguration() {
     }
 
-    public List<HvdcAlignmentXNodeCoupleDto> getHvdcXNodeAlignment() {
+    public List<VirtualHubsAlignmentCoupleDto> getHvdcXNodeAlignment() {
         return hvdcXNodeAlignment;
     }
 
-    public void setHvdcXNodeAlignment(final List<HvdcAlignmentXNodeCoupleDto> hvdcXNodeAlignment) {
+    public void setHvdcXNodeAlignment(final List<VirtualHubsAlignmentCoupleDto> hvdcXNodeAlignment) {
         this.hvdcXNodeAlignment = hvdcXNodeAlignment;
     }
 
