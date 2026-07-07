@@ -15,7 +15,6 @@ import com.farao_community.farao.ce_merging.base_case_improvement.data.result.Gl
 import com.farao_community.farao.ce_merging.base_case_improvement.data.result.InRegionNetPositions;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,23 +73,20 @@ public class BciComputation {
         shiftNpfWithAlegro(alBeToCeFlow, alDeToCeFlow);
 
         final FlowByAreaMap outNetPositionByArea = referenceProgram.computeAllNetPositionsOutRegion(regionConfiguration);
-        targetInRegionNpByArea = inRegionNpfByArea;
-        targetGlobalNpByArea = globalNpfByArea;
-        // check net position in feasibility ranges
-        if (isNpfValid()) {
-            LOGGER.info("All forecast net positions are in the feasibility ranges, BCI is not applied");
 
+        targetInRegionNpByArea = inRegionNpfByArea.copy();
+        if (npfIsInFeasibilityRanges()) {
+            LOGGER.info("All forecast net positions are in the feasibility ranges, BCI is not applied");
+            targetGlobalNpByArea = globalNpfByArea.copy();
             results = createResults(initialRegionNetPositions);
             results.values().forEach(result -> result.setBciApplied(FALSE));
             return new BciComputationResult(false, false, results);
         } else {
             LOGGER.info("Not all forecast net positions are in the feasibility ranges, BCI will be applied");
-            final Pair<Boolean, FlowByAreaMap> resultBci = applyBci();
-            targetInRegionNpByArea = resultBci.getRight();
+            final boolean hasExtendedRanges = applyBci();
             targetGlobalNpByArea = targetInRegionNpByArea.withValuesShiftedBy(outNetPositionByArea::get);
-
             results = createResults(initialRegionNetPositions);
-            return new BciComputationResult(true, resultBci.getLeft(), results);
+            return new BciComputationResult(true, hasExtendedRanges, results);
         }
     }
 
@@ -143,8 +139,9 @@ public class BciComputation {
         return new BciAreaResults(inRegionResults, globalResults, isBciApplied);
     }
 
-    private Pair<Boolean, FlowByAreaMap> applyBci() {
-        targetInRegionNpByArea = inRegionNpfByArea;
+    private boolean applyBci() {
+        inRegionNpfByArea.keySet().forEach(areaId -> bciAppliedByArea.put(areaId, FALSE));
+        computeViolations();
         solveContraryViolations();
         solveMainViolations();
 
@@ -153,12 +150,10 @@ public class BciComputation {
             compensateRemainingImbalances();
         }
 
-        return Pair.of(extendedRange, targetInRegionNpByArea);
+        return extendedRange;
     }
 
     private void solveContraryViolations() {
-        violationsByArea = targetInRegionNpByArea.withValuesShiftedBy(this::getDistanceFromFeasibility);
-
         if (isNegligible(getTotalContraryViolations())) {
             return;
         }
@@ -170,6 +165,8 @@ public class BciComputation {
         violationsByArea.forEach(
             (area, violation) -> solveContraryViolation(area, violation, shiftAvailable)
         );
+
+        computeViolations();
     }
 
     private void solveContraryViolation(final String areaId,
@@ -187,7 +184,6 @@ public class BciComputation {
     }
 
     private void solveMainViolations() {
-        violationsByArea = targetInRegionNpByArea.withValuesShiftedBy(this::getDistanceFromFeasibility);
         final double totalViolations = violationsByArea.getTotal();
 
         if (isNegligible(totalViolations)) {
@@ -234,23 +230,25 @@ public class BciComputation {
 
     }
 
+    private void computeViolations() {
+        violationsByArea = targetInRegionNpByArea.withValuesShiftedBy(
+            area -> -Math.clamp(targetInRegionNpByArea.get(area),
+                                getMinConstraintOfArea(area),
+                                getMaxConstraintOfArea(area))
+        );
+    }
+
      /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
          these do not modify class members
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-    private Double getDistanceFromFeasibility(final String areaId) {
-        double netPosition = targetInRegionNpByArea.get(areaId);
-        Interval interval = feasibilityRanges.get(areaId);
-        return -Math.clamp(netPosition, interval.getMinValue(), interval.getMaxValue());
-    }
-
-    private boolean isNpfValid() {
+    private boolean npfIsInFeasibilityRanges() {
         return inRegionNpfByArea.entrySet().stream()
             .allMatch(e -> feasibilityRanges.get(e.getKey()).hasWithinBounds(e.getValue()));
     }
 
     private static boolean isNegligible(final double value) {
-        return BigDecimal.valueOf(value).abs().compareTo(EPSILON) == 0;
+        return BigDecimal.valueOf(value).abs().compareTo(EPSILON) <= 0;
     }
 
     private double getMaxOrMinConstraint(final String areaId, final boolean maxIfTrue) {
@@ -271,7 +269,7 @@ public class BciComputation {
 
     private double getTotalContraryViolations() {
         final double totalViolations = violationsByArea.getTotal();
-        final ToDoubleFunction<Double> toContraryViolation = v -> totalViolations < 0 ? max(v, .0) : min(v, .0);
+        final ToDoubleFunction<Double> toContraryViolation = v -> totalViolations < 0 ? max(v, 0.0) : min(v, 0.0);
 
         return violationsByArea.values().stream().mapToDouble(toContraryViolation).sum();
     }
@@ -298,12 +296,14 @@ public class BciComputation {
 
     private boolean isInContraryViolation(final double violation) {
         final double totalViolations = violationsByArea.getTotal();
-        return isInViolation(violation) && totalViolations * violation <= 0;
+        return totalViolations >= 0 && violation < 0
+               || totalViolations < 0 && violation > 0;
     }
 
     private boolean isInMainViolation(final double violation) {
         final double totalViolations = violationsByArea.getTotal();
-        return isInViolation(violation) && totalViolations * violation >= 0;
+        return totalViolations >= 0 && violation > 0
+               || totalViolations < 0 && violation < 0;
     }
 
     private static boolean isInViolation(final double violation) {

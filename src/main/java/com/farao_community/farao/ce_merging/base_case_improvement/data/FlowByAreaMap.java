@@ -24,6 +24,10 @@ public class FlowByAreaMap extends HashMap<String, Double> {
         super(other);
     }
 
+    public FlowByAreaMap copy() {
+        return new FlowByAreaMap(this);
+    }
+
     public void shiftFlow(final String area, final Double shift) {
         this.computeIfPresent(area, (a, np) -> np + shift);
     }
