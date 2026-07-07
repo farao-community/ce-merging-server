@@ -6,12 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.base_case_improvement;
 
-import com.farao_community.farao.ce_merging.base_case_improvement.process.BciProcess;
-import com.farao_community.farao.ce_merging.base_case_improvement.repository.BciTaskRepository;
+import com.farao_community.farao.ce_merging.base_case_improvement.data.RegionConfiguration;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciInputs;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciTask;
+import com.farao_community.farao.ce_merging.base_case_improvement.process.BciProcess;
+import com.farao_community.farao.ce_merging.base_case_improvement.repository.BciTaskRepository;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotFoundException;
@@ -200,16 +200,15 @@ public class BciService {
         File file = new File(
             Paths.get(ceMergingConfiguration.getInputsDirectoryPath(task), multipartFile.getName()).toString()
         );
-        multipartFile.transferTo(file);
+        multipartFile.transferTo(file); // NOSONAR directories are used safely here
         return file;
     }
 
-    //TODO with real class
-    private IRegionConfiguration regionConfigFromContent(final String content) {
+    private RegionConfiguration regionConfigFromContent(final String content) {
         try {
             return new ObjectMapper()
                 .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
-                .readValue(content, IRegionConfiguration.class);
+                .readValue(content, RegionConfiguration.class);
         } catch (final JsonProcessingException e) {
             LOGGER.error("Error in Base Case Improvement {}", e.getMessage());
             throw new CeMergingException("Error in Base Case Improvement ", e);

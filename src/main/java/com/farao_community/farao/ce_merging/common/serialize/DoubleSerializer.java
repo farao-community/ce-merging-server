@@ -9,7 +9,8 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
+
+import static java.math.RoundingMode.HALF_UP;
 
 /**
  * @author Oualid Aloui {@literal <oualid.aloui at rte-france.com>}
@@ -19,6 +20,6 @@ public class DoubleSerializer extends JsonSerializer<Double> {
 
     @Override
     public void serialize(Double value, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-        jsonGenerator.writeNumber(new BigDecimal(value).setScale(2, RoundingMode.HALF_UP).doubleValue());
+        jsonGenerator.writeNumber(BigDecimal.valueOf(value).setScale(2, HALF_UP).doubleValue());
     }
 }
