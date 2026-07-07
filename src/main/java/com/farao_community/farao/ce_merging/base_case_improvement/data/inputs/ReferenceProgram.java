@@ -6,10 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.base_case_improvement.data.inputs;
 
-import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeDeserializer;
 import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeSerializer;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -44,7 +44,7 @@ public class ReferenceProgram implements Serializable {
         this.referenceExchangeDataList = referenceExchangeDataList;
     }
 
-    public FlowByAreaMap computeGlobalNetPositionsForOutAreas(final IRegionConfiguration region) {
+    public FlowByAreaMap computeGlobalNetPositionsForOutAreas(final RegionConfiguration region) {
         final Predicate<String> isNotRegionOrItsAreasIn = areaId -> !region.getId().equals(areaId)
                                                                   && !region.getAreasIn().containsValue(areaId);
         return Stream
@@ -55,15 +55,15 @@ public class ReferenceProgram implements Serializable {
             .collect(toFlowByAreaMap(identity(), this::getAreaGlobalNetPosition));
     }
 
-    public FlowByAreaMap computeAllNetPositionsInRegion(final IRegionConfiguration region) {
+    public FlowByAreaMap computeAllNetPositionsInRegion(final RegionConfiguration region) {
         return computeForAllAreasIn(region, areaId -> getAreaNetPositionInRegion(areaId, region));
     }
 
-    public FlowByAreaMap computeAllNetPositionsOutRegion(final IRegionConfiguration region) {
+    public FlowByAreaMap computeAllNetPositionsOutRegion(final RegionConfiguration region) {
         return computeForAllAreasIn(region, areaId -> getAreaNetPositionOutRegion(areaId, region));
     }
 
-    public FlowByAreaMap computeAllGlobalNetPositions(final IRegionConfiguration region) {
+    public FlowByAreaMap computeAllGlobalNetPositions(final RegionConfiguration region) {
         return computeForAllAreasIn(region, this::getAreaGlobalNetPosition);
     }
 
@@ -73,14 +73,14 @@ public class ReferenceProgram implements Serializable {
         return leavingArea - enteringArea;
     }
 
-    double getAreaNetPositionInRegion(final String areaId, final IRegionConfiguration region) {
+    double getAreaNetPositionInRegion(final String areaId, final RegionConfiguration region) {
         // compute the netPosition of an area relative to a region
         final double enteringRegion = sumFlowsGiven(exc -> exc.flowsBetween(areaId, region.getId()));
         final double leavingRegion = sumFlowsGiven(exc -> exc.flowsBetween(region.getId(), areaId));
         return enteringRegion - leavingRegion;
     }
 
-    double getAreaNetPositionOutRegion(final String areaId, final IRegionConfiguration region) {
+    double getAreaNetPositionOutRegion(final String areaId, final RegionConfiguration region) {
         // compute the exchange of an area out of region
         final double outOfAreaToElsewhere = sumFlowsGiven(exc -> exc.comesFrom(areaId)
                                                                  && !exc.goesTo(region.getId()));
@@ -97,7 +97,7 @@ public class ReferenceProgram implements Serializable {
             .sum();
     }
 
-    private FlowByAreaMap computeForAllAreasIn(final IRegionConfiguration region,
+    private FlowByAreaMap computeForAllAreasIn(final RegionConfiguration region,
                                                final Function<String, Double> areaToNetPosition) {
         return region.getAreasIn().values()
             .stream()

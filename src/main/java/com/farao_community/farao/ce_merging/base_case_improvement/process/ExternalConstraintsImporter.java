@@ -8,8 +8,8 @@ package com.farao_community.farao.ce_merging.base_case_improvement.process;
 
 import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.ExternalConstraintsInputs;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.Interval;
-import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.xsd.FlowBasedExternalConstraintDocument;
 import com.farao_community.farao.ce_merging.xsd.NetPositionConstraint;
 import com.google.common.io.ByteSource;
@@ -41,7 +41,7 @@ public final class ExternalConstraintsImporter {
     }
 
     public static Map<String, Interval> calculateConstraints(final byte[] externalConstraints,
-                                                             final IRegionConfiguration regionConfiguration,
+                                                             final RegionConfiguration regionConfiguration,
                                                              final OffsetDateTime targetDate) {
         final Map<String, String> regionAreasIdByCountry = regionConfiguration.getAreasIn();
 

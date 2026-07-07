@@ -93,4 +93,9 @@ public abstract class AbstractRegionConfiguration<T extends AbstractTsoInfos> {
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
     }
+
+    @JsonIgnore
+    public String getAreaInEic(final String eic) {
+        return areasIn.get(eic);
+    }
 }

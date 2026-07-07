@@ -7,11 +7,11 @@
 package com.farao_community.farao.ce_merging.base_case_improvement.process;
 
 import com.farao_community.farao.ce_merging.base_case_improvement.data.FlowByAreaMap;
-import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.netpositions.CountryNetPositions;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.netpositions.InitialNetPositions;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.netpositions.NetPosition;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +35,13 @@ public final class InitialNetPositionsImporter {
     }
 
     static FlowByAreaMap getInRegionNetPositions(final InputStream initialNpFile,
-                                                 final IRegionConfiguration region) {
+                                                 final RegionConfiguration region) {
         return getNetPositionsWithoutVirtualHubs(initialNpFile, region,
                                                  CountryNetPositions::getInRegionNetPosition);
     }
 
     public static FlowByAreaMap getGlobalNetPosition(final String netPosFilePath,
-                                                     final IRegionConfiguration region) throws FileNotFoundException {
+                                                     final RegionConfiguration region) throws FileNotFoundException {
 
         if (isBlank(netPosFilePath)) {
             return new FlowByAreaMap();
@@ -52,7 +52,7 @@ public final class InitialNetPositionsImporter {
     }
 
     private static FlowByAreaMap getNetPositionsWithoutVirtualHubs(final InputStream initialNpFile,
-                                                                   final IRegionConfiguration region,
+                                                                   final RegionConfiguration region,
                                                                    final Function<CountryNetPositions, NetPosition> npGetter) {
         final Map<String, String> areasIdByCountry = getAreasIdByCountry(region);
 
@@ -64,7 +64,7 @@ public final class InitialNetPositionsImporter {
                                        entry -> npGetter.apply(entry.getValue()).getWithoutVirtualHubs()));
     }
 
-    private static Map<String, String> getAreasIdByCountry(final IRegionConfiguration region) {
+    private static Map<String, String> getAreasIdByCountry(final RegionConfiguration region) {
         final Map<String, String> allAreas = new HashMap<>();
         allAreas.putAll(region.getAreasIn());
         allAreas.putAll(region.getAreasOut());

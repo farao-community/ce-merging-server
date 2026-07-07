@@ -7,7 +7,6 @@
 package com.farao_community.farao.ce_merging.base_case_improvement.process;
 
 import com.farao_community.farao.ce_merging.base_case_improvement.data.FlowByAreaMap;
-import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.Interval;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.result.BciAreaResults;
@@ -15,6 +14,7 @@ import com.farao_community.farao.ce_merging.base_case_improvement.data.result.Bc
 import com.farao_community.farao.ce_merging.base_case_improvement.data.result.GlobalNetPositions;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.result.InRegionNetPositions;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class BciComputation {
     private static final BigDecimal EPSILON = BigDecimal.valueOf(0.01);
     private static final Logger LOGGER = LoggerFactory.getLogger(BciComputation.class);
 
-    private final IRegionConfiguration regionConfiguration;
+    private final RegionConfiguration regionConfiguration;
     private final ReferenceProgram referenceProgram;
     private final Map<String, Interval> feasibilityRanges;
     private FlowByAreaMap inRegionNpfByArea = new FlowByAreaMap();
@@ -46,7 +46,7 @@ public class BciComputation {
     private FlowByAreaMap violationsByArea = new FlowByAreaMap();
     private final Map<String, Boolean> bciAppliedByArea = new HashMap<>();
 
-    BciComputation(final IRegionConfiguration regionConfiguration,
+    BciComputation(final RegionConfiguration regionConfiguration,
                    final ReferenceProgram referenceProgram,
                    final Map<String, Interval> feasibilityRanges) {
         this.regionConfiguration = regionConfiguration;

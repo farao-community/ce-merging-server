@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.xnode;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.merging.task.entities.Xnode;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +40,7 @@ class XnodesCalculationTest {
     void checkXnodesConfigConsistencyTest() {
         final Network network = mock(Network.class);
         final DanglingLine dl = mock(DanglingLine.class);
-        final Xnode xnode = mock(Xnode.class);
+        final XnodeConfig xnode = mock(XnodeConfig.class);
         when(dl.getPairingKey()).thenReturn(XNODE_NAME);
         when(network.getDanglingLineStream()).thenReturn(Stream.of(dl));
         when(network.getNameOrId()).thenReturn(NETWORK_NAME);

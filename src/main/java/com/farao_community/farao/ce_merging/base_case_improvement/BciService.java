@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.base_case_improvement;
 
-import com.farao_community.farao.ce_merging.base_case_improvement.data.RegionConfiguration;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciInputs;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciTask;
 import com.farao_community.farao.ce_merging.base_case_improvement.process.BciProcess;
@@ -17,6 +16,7 @@ import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotFoundException;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;

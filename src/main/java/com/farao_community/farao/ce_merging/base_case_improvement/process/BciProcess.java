@@ -20,10 +20,10 @@ import com.farao_community.farao.ce_merging.base_case_improvement.data.result.Ou
 import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciOutput;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.task.BciTask;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.FileUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class BciProcess {
     private static final Logger LOGGER = LoggerFactory.getLogger(BciProcess.class);
     private static final String BCI_OUTPUT_FILE_NAME = "bciOutput.json";
     private final BciTask task;
-    private final IRegionConfiguration regionConfiguration;
+    private final RegionConfiguration regionConfiguration;
     private final CeMergingConfiguration configuration;
     private BciProcessResult processResult;
     private final FlowByAreaMap initialRegionNetPositions = new FlowByAreaMap();
@@ -60,7 +60,7 @@ public class BciProcess {
 
     public BciProcess(final BciTask task,
                       final CeMergingConfiguration configuration,
-                      final IRegionConfiguration regionConfiguration) {
+                      final RegionConfiguration regionConfiguration) {
         this.task = task;
         this.alegroData = Optional.ofNullable(task.getBciInputs().getAlegroNetPositionsPath())
             .map(path -> JsonUtils.read(AlegroData.class, path))

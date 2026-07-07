@@ -6,9 +6,9 @@
  */
 package com.farao_community.farao.ce_merging.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.common.config.IRegionConfiguration;
 import com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.Interval;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.xsd.FeasibilityRangeConstraint;
 import com.farao_community.farao.ce_merging.xsd.FeasibilityRangeDocument;
 import com.google.common.io.ByteSource;
@@ -25,20 +25,21 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.farao_community.farao.ce_merging.base_case_improvement.data.inputs.Interval.infinity;
+import static com.farao_community.farao.ce_merging.base_case_improvement.process.ExternalConstraintsImporter.calculateConstraints;
 
 public class FeasibilityRangeCalculator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FeasibilityRangeCalculator.class);
-    private final IRegionConfiguration regionConfiguration;
+    private final RegionConfiguration regionConfiguration;
 
-    public FeasibilityRangeCalculator(final IRegionConfiguration regionConfiguration) {
+    public FeasibilityRangeCalculator(final RegionConfiguration regionConfiguration) {
         this.regionConfiguration = regionConfiguration;
     }
 
     public Map<String, Interval> getRegionFeasibilityRanges(byte[] externalConstraints, OffsetDateTime targetDate, Map<String, Double> netPositionsMap, byte[] feasibilityRange) {
 
         try {
-            Map<String, Interval> extConstraintsMap = ExternalConstraintsImporter.calculateConstraints(externalConstraints, regionConfiguration, targetDate);
+            Map<String, Interval> extConstraintsMap = calculateConstraints(externalConstraints, regionConfiguration, targetDate);
             if (!ArrayUtils.isEmpty(feasibilityRange)) {
                 Map<String, Interval> feasibilityRangeMap = importFeasibilityRangesFile(feasibilityRange, netPositionsMap);
                 return computeFinalConstraints(extConstraintsMap, feasibilityRangeMap);
