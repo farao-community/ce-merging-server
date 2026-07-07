@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonXNodeConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.XNodeConfigurationRecord;
 import com.farao_community.farao.ce_merging.xsd.Xnodes;
@@ -52,7 +52,7 @@ public class XNodeConfigurationService extends AbstractGridConfigurationService<
                                                                       final OffsetDateTime validFrom,
                                                                       final OffsetDateTime validTo) throws IOException {
         final Xnodes xnodes = JaxbUtils.readFromBytes(Xnodes.class, configurationFile.getInputStream().readAllBytes());
-        final List<XnodeDto> xNodeList = fromXnodeEntityToDtoList(xnodes);
+        final List<XnodeConfigDto> xNodeList = fromXnodeEntityToDtoList(xnodes);
         return new XNodeConfigurationRecord(generateUuidString(),
                                             validFrom.toLocalDateTime(),
                                             validTo.toLocalDateTime(),
@@ -60,11 +60,11 @@ public class XNodeConfigurationService extends AbstractGridConfigurationService<
                                             xNodeList);
     }
 
-    private List<XnodeDto> fromXnodeEntityToDtoList(final Xnodes xnodes) {
+    private List<XnodeConfigDto> fromXnodeEntityToDtoList(final Xnodes xnodes) {
         return xnodes
             .getXnode()
             .stream()
-            .map(XnodeDto::fromXNodeEntity)
+            .map(XnodeConfigDto::fromXNodeEntity)
             .toList();
     }
 }

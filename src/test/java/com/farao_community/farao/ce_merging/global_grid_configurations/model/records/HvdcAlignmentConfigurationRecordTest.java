@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.HvdcAlignmentXNodeCoupleDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
 import org.junit.jupiter.api.Test;
 import test_utils.GetterSetterVerifier;
@@ -27,14 +27,14 @@ class HvdcAlignmentConfigurationRecordTest {
 
         final HvdcAlignmentConfigurationRecord configurationRecord = new HvdcAlignmentConfigurationRecord();
         final List<String> dkHvdcNodes = new ArrayList<>(List.of("a"));
-        final List<HvdcAlignmentXNodeCoupleDto> couples = new ArrayList<>(List.of(new HvdcAlignmentXNodeCoupleDto()));
+        final List<VirtualHubsAlignmentCoupleDto> couples = new ArrayList<>(List.of(new VirtualHubsAlignmentCoupleDto()));
         final List<ZeroFlowNodeDto> zeroFlowNodes = new ArrayList<>(List.of(new ZeroFlowNodeDto()));
         configurationRecord.setDkHvdcXnodes(dkHvdcNodes);
         configurationRecord.setHvdcXNodeAlignmentCouplesDto(couples);
         configurationRecord.setZeroFlowNodeDtos(zeroFlowNodes);
 
         dkHvdcNodes.add("b");
-        couples.add(new HvdcAlignmentXNodeCoupleDto());
+        couples.add(new VirtualHubsAlignmentCoupleDto());
         zeroFlowNodes.add(new ZeroFlowNodeDto());
 
         List.of(configurationRecord.getDkHvdcXnodes(),
