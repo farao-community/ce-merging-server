@@ -32,6 +32,8 @@ public final class CeMergingConstants {
     public static final String OUTPUTS_DIR = "outputs";
     public static final String DAILY_OUTPUTS_DIR = "daily-outputs";
     public static final String DAILY_INPUTS_DIR = "daily-inputs";
+    public static final String BCI_OUTPUTS_DIR = "bci-outputs";
+    public static final String BCI_INPUTS_DIR = "bci-inputs";
     public static final String ARTIFACTS_DIR = "artifacts";
     public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";

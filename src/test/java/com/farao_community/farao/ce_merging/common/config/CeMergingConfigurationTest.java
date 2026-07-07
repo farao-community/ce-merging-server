@@ -30,13 +30,12 @@ class CeMergingConfigurationTest {
         final CeMergingConfiguration copy = new CeMergingConfiguration();
         copy.setCeMergingRoot(configuration.getCeMergingRoot());
         copy.setDailyMergingRoot(configuration.getDailyMergingRoot());
+        copy.setBciRoot(configuration.getBciRoot());
         final MergingTask task = taskWithIdAndStatus(1, TaskStatus.CREATED);
 
+        // HOURLY
         assertEquals(Path.of("/tmp/testFiles"),
                      Path.of(copy.getCeMergingRoot()));
-
-        assertEquals(Path.of("/tmp/testFiles/daily"),
-                     Path.of(copy.getDailyMergingRoot()));
 
         assertEquals(Path.of("/tmp/testFiles/1/artifacts"),
                      Path.of(copy.getArtifactsDirectoryPath(task)));
@@ -49,6 +48,10 @@ class CeMergingConfigurationTest {
         assertEquals(Path.of("/another/root/1/inputs"),
                      Path.of(copy.getInputsDirectoryPath(task)));
 
+        // DAILY
+        assertEquals(Path.of("/tmp/testFiles/daily"),
+                     Path.of(copy.getDailyMergingRoot()));
+
         assertEquals(Path.of("/tmp/testFiles/daily/1/daily-outputs"),
                      Path.of(copy.getDailyOutputsDirectoryPath(task)));
 
@@ -56,5 +59,18 @@ class CeMergingConfigurationTest {
 
         assertEquals(Path.of("/a/new/path/1/daily-inputs"),
                      Path.of(copy.getDailyInputsDirectoryPath(task)));
+
+        //  BCI
+        assertEquals(Path.of("/tmp/testFiles/bci"),
+                     Path.of(copy.getBciRoot()));
+
+        assertEquals(Path.of("/tmp/testFiles/bci/1/bci-outputs"),
+                     Path.of(copy.getBciOutputsDirectoryPath(task)));
+
+        copy.setBciRoot("/a/new/path");
+
+        assertEquals(Path.of("/a/new/path/1/bci-inputs"),
+                     Path.of(copy.getBciInputsDirectoryPath(task)));
+
     }
 }

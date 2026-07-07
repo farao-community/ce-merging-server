@@ -194,7 +194,7 @@ public class BciProcess {
     }
 
     private void createBciOutput() throws FileNotFoundException {
-        final String outputPath = configuration.getOutputsDirectoryPath(task) + File.separator + BCI_OUTPUT_FILE_NAME;
+        final String outputPath = configuration.getBciOutputsDirectoryPath(task) + File.separator + BCI_OUTPUT_FILE_NAME;
         JsonBciResult.write(processResult, new FileOutputStream(outputPath));
         bciOutput = new BciOutput(outputPath);
     }

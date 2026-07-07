@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 import java.nio.file.Path;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ARTIFACTS_DIR;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BCI_INPUTS_DIR;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BCI_OUTPUTS_DIR;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_INPUTS_DIR;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_OUTPUTS_DIR;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INPUTS_DIR;
@@ -32,6 +34,22 @@ public class CeMergingConfiguration {
     @Value("${ce-merging-server.filesystem.root-bci}")
     private String bciRoot;
 
+    /**
+     *
+     * @param task : each task has it own directory
+     * @param directory : each type of file (in, out, ...) has its subdirectory inside
+     * @return /path/to/root/task_id/directory
+     */
+    private String resolveTaskDirInRoot(final Task task, final String directory, final String root) {
+        return Path.of(root + separator + task.getId())
+            .resolve(directory)
+            .toString();
+    }
+
+    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                HOURLY MERGING
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
     public String getCeMergingRoot() {
         return ceMergingRoot;
     }
@@ -40,24 +58,8 @@ public class CeMergingConfiguration {
         this.ceMergingRoot = ceMergingRoot;
     }
 
-    public String getDailyMergingRoot() {
-        return dailyMergingRoot;
-    }
-
-    public void setDailyMergingRoot(final String dailyMergingRoot) {
-        this.dailyMergingRoot = dailyMergingRoot;
-    }
-
     public String getInputsDirectoryPath(final Task task) {
         return getDirectoryPath(task, INPUTS_DIR);
-    }
-
-    public String getDailyInputsDirectoryPath(final Task task) {
-        return getDailyDirectoryPath(task, DAILY_INPUTS_DIR);
-    }
-
-    public String getDailyOutputsDirectoryPath(final Task task) {
-        return getDailyDirectoryPath(task, DAILY_OUTPUTS_DIR);
     }
 
     public String getOutputsDirectoryPath(final Task task) {
@@ -72,27 +74,39 @@ public class CeMergingConfiguration {
         return resolveTaskDirInRoot(task, directory, ceMergingRoot);
     }
 
-    public String getDailyDirectoryPath(final Task task, final String directory) {
-        return resolveTaskDirInRoot(task, directory, dailyMergingRoot);
-    }
-
     public String getTaskDirectoryPath(final MergingTask task) {
         return Path.of(ceMergingRoot)
             .resolve(task.getId().toString())
             .toString();
     }
 
-    /**
-     *
-     * @param task : each task has it own directory
-     * @param directory : each type of file (in, out, ...) has its subdirectory inside
-     * @return /path/to/root/task_id/directory
-     */
-    private String resolveTaskDirInRoot(final Task task, final String directory, final String root) {
-        return Path.of(root + separator + task.getId())
-            .resolve(directory)
-            .toString();
+    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                DAILY MERGING
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
+    public String getDailyMergingRoot() {
+        return dailyMergingRoot;
     }
+
+    public void setDailyMergingRoot(final String dailyMergingRoot) {
+        this.dailyMergingRoot = dailyMergingRoot;
+    }
+
+    public String getDailyInputsDirectoryPath(final Task task) {
+        return getDailyDirectoryPath(task, DAILY_INPUTS_DIR);
+    }
+
+    public String getDailyOutputsDirectoryPath(final Task task) {
+        return getDailyDirectoryPath(task, DAILY_OUTPUTS_DIR);
+    }
+
+    public String getDailyDirectoryPath(final Task task, final String directory) {
+        return resolveTaskDirInRoot(task, directory, dailyMergingRoot);
+    }
+
+    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+             BASECASE IMPROVEMENT
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     public String getBciRoot() {
         return bciRoot;
@@ -100,5 +114,17 @@ public class CeMergingConfiguration {
 
     public void setBciRoot(final String bciRoot) {
         this.bciRoot = bciRoot;
+    }
+
+    public String getBciInputsDirectoryPath(final Task task) {
+        return getBciDirectoryPath(task, BCI_INPUTS_DIR);
+    }
+
+    public String getBciOutputsDirectoryPath(final Task task) {
+        return getBciDirectoryPath(task, BCI_OUTPUTS_DIR);
+    }
+
+    public String getBciDirectoryPath(final Task task, final String directory) {
+        return resolveTaskDirInRoot(task, directory, bciRoot);
     }
 }

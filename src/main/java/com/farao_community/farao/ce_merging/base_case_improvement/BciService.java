@@ -50,13 +50,12 @@ import static java.util.UUID.randomUUID;
 public class BciService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BciService.class);
+    private static final String EIC_CODES_DEFAULT_CONFIGURATION = "defaultConfiguration/region_configuration.json";
     private final CeMergingConfiguration ceMergingConfiguration;
-
     private final BciTaskRepository bciTaskRepository;
 
-    private static final String EIC_CODES_DEFAULT_CONFIGURATION = "defaultConfiguration/region_configuration.json";
-
-    public BciService(CeMergingConfiguration ceMergingConfiguration, BciTaskRepository bciTaskRepository) {
+    public BciService(final CeMergingConfiguration ceMergingConfiguration,
+                      final BciTaskRepository bciTaskRepository) {
         this.ceMergingConfiguration = ceMergingConfiguration;
         this.bciTaskRepository = bciTaskRepository;
     }
@@ -86,8 +85,8 @@ public class BciService {
 
             bciTask.setRegionConfiguration(content);
 
-            createDirectories(Paths.get(ceMergingConfiguration.getInputsDirectoryPath(bciTask)));
-            createDirectories(Paths.get(ceMergingConfiguration.getOutputsDirectoryPath(bciTask))); // Prepare output directory
+            createDirectories(Paths.get(ceMergingConfiguration.getBciInputsDirectoryPath(bciTask)));
+            createDirectories(Paths.get(ceMergingConfiguration.getBciOutputsDirectoryPath(bciTask)));
 
             final File npForecastFile = transferToInputs(netPositionsForecast, bciTask);
             final File ecFile = transferToInputs(externalConstraints, bciTask);
@@ -166,7 +165,7 @@ public class BciService {
         final BciTask bciTask = getBciTask(taskId);
         bciTask.assertFinished();
         try {
-            return Files.readAllBytes(Paths.get(ceMergingConfiguration.getOutputsDirectoryPath(bciTask),
+            return Files.readAllBytes(Paths.get(ceMergingConfiguration.getBciOutputsDirectoryPath(bciTask),
                                                 "bciOutput.json"));
         } catch (final IOException e) {
             LOGGER.error("IO exception while reading BCI outputs of task '{}'", taskId, e);
@@ -178,7 +177,7 @@ public class BciService {
         BciTask task = getBciTask(taskId);
         // Delete created files in its internal database
         try {
-            FileSystemUtils.deleteRecursively(Paths.get(ceMergingConfiguration.getOutputsDirectoryPath(task)));
+            FileSystemUtils.deleteRecursively(Paths.get(ceMergingConfiguration.getBciOutputsDirectoryPath(task)));
             bciTaskRepository.deleteById(taskId);
         } catch (IOException e) {
             LOGGER.error("IO exception while deleting BCI task '{}'", taskId, e);
@@ -193,12 +192,12 @@ public class BciService {
     }
 
     public byte[] getInputZip(final Long taskId) {
-        return ZipUtils.zipDirectory(ceMergingConfiguration.getInputsDirectoryPath(getBciTask(taskId)));
+        return ZipUtils.zipDirectory(ceMergingConfiguration.getBciInputsDirectoryPath(getBciTask(taskId)));
     }
 
     private File transferToInputs(final MultipartFile multipartFile, final BciTask task) throws IOException {
-        File file = new File(
-            Paths.get(ceMergingConfiguration.getInputsDirectoryPath(task), multipartFile.getName()).toString()
+        final File file = new File(
+            Paths.get(ceMergingConfiguration.getBciInputsDirectoryPath(task), multipartFile.getName()).toString()
         );
         multipartFile.transferTo(file); // NOSONAR directories are used safely here
         return file;
