@@ -35,3 +35,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
+      - name: Build and publish Docker image
+        uses: elgohr/Publish-Docker-Github-Action@1c2f28ccd9476e8a936ac9a1f287405504c93304
+        with:
+          name: farao/ce-merging-server
+          username: farao
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
