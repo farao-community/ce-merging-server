@@ -9,11 +9,11 @@ package com.farao_community.farao.ce_merging.merging.process.xnode;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.farao_community.farao.ce_merging.merging.task.entities.Xnode;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
@@ -23,7 +23,9 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Map;
+import java.util.List;
+import java.util.TreeMap;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_AND_DANISH_TSO;
 
@@ -50,7 +52,7 @@ public class XnodesService {
         Map<String, Network> networkByTsoMap = initialImportService.importInitialIgms(task);
         Map<String, XnodeInformation> xnodeInformationMap = new TreeMap<>();
         List<VirtualHubRecord> virtualHubList = task.getConfigurations().getVirtualHubList();
-        List<Xnode> xnodesConfigList = task.getConfigurations().getXnodeList();
+        List<XnodeConfig> xnodesConfigList = task.getConfigurations().getXnodeList();
         networkByTsoMap.forEach((tso, network) -> {
             xnodesCalculation.checkXnodesConfigConsistency(network, virtualHubList, xnodesConfigList);
             xnodesCalculation.fillXnodesInformation(network, tso, xnodeInformationMap, virtualHubList, xnodesConfigList, isGermanOrDanishTso(tso));

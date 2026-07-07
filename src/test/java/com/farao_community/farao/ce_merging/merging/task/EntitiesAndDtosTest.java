@@ -19,7 +19,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.farao_community.farao.ce_merging.merging.task.entities.Xnode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 import test_utils.GetterSetterVerifier;
@@ -40,8 +39,7 @@ class EntitiesAndDtosTest {
                                              MergingTask.class,
                                              Outputs.class,
                                              SavedFile.class,
-                                             VirtualHubRecord.class,
-                                             Xnode.class);
+                                             VirtualHubRecord.class);
 
     @ParameterizedTest
     @FieldSource("entities")

@@ -8,8 +8,8 @@ package com.farao_community.farao.ce_merging.merging.process.xnode;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.BordersUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.farao_community.farao.ce_merging.merging.task.entities.Xnode;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Bus;
@@ -42,15 +42,15 @@ public class XnodesCalculation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XnodesCalculation.class);
 
-    public void fillXnodesInformation(final Network network, final String tso, final Map<String, XnodeInformation> xnodeInformationMap, final List<VirtualHubRecord> virtualHubList, final List<Xnode> xnodes, final boolean germanMode) {
+    public void fillXnodesInformation(final Network network, final String tso, final Map<String, XnodeInformation> xnodeInformationMap, final List<VirtualHubRecord> virtualHubList, final List<XnodeConfig> xnodes, final boolean germanMode) {
         final Set<String> xnodesArea1 = xnodes.stream()
                 .filter(xnode -> matchesArea1(xnode, tso, germanMode))
-                .map(Xnode::getName)
+                .map(XnodeConfig::getName)
                 .collect(Collectors.toSet());
 
         final Set<String> xnodesArea2 = xnodes.stream()
                 .filter(xnode -> matchesArea2(xnode, tso, germanMode))
-                .map(Xnode::getName)
+                .map(XnodeConfig::getName)
                 .collect(Collectors.toSet());
 
         final String alegroVirtualHub = germanMode ? VIRTUAL_HUB_ALEGRO_DE_NODE_NAME : VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
@@ -61,8 +61,8 @@ public class XnodesCalculation {
         processDanglingLines(network, xnodesArea2, virtualHubList, alegroVirtualHub, xnodeInformationMap, 2, tsoOpt);
     }
 
-    public void checkXnodesConfigConsistency(final Network network, final List<VirtualHubRecord> virtualHubList, final List<Xnode> xnodes) {
-        final List<String> allXnodesConfig = Stream.concat(xnodes.stream().map(Xnode::getName), virtualHubList.stream().map(VirtualHubRecord::getNodeName)).distinct().toList();
+    public void checkXnodesConfigConsistency(final Network network, final List<VirtualHubRecord> virtualHubList, final List<XnodeConfig> xnodes) {
+        final List<String> allXnodesConfig = Stream.concat(xnodes.stream().map(XnodeConfig::getName), virtualHubList.stream().map(VirtualHubRecord::getNodeName)).distinct().toList();
         network.getDanglingLineStream().map(DanglingLine::getPairingKey).forEach(xnodeCode -> {
             if (!allXnodesConfig.contains(xnodeCode)) {
                 LOGGER.error("Xnode {} present in network {} is not found in the xnodes config list nor in the virtual hubs list", xnodeCode, network.getNameOrId());
@@ -246,13 +246,13 @@ public class XnodesCalculation {
                 && area2Information != null && getCountry(area2Information).equals(Country.DE);
     }
 
-    private boolean matchesArea1(Xnode xnode, String tso, boolean germanMode) {
+    private boolean matchesArea1(XnodeConfig xnode, String tso, boolean germanMode) {
         return germanMode
                 ? GERMAN_COUNTRY_CODE.equals(xnode.getArea1()) && tso.equals(xnode.getSubarea1())
                 : tso.equals(xnode.getArea1());
     }
 
-    private boolean matchesArea2(Xnode xnode, String tso, boolean germanMode) {
+    private boolean matchesArea2(XnodeConfig xnode, String tso, boolean germanMode) {
         return germanMode
                 ? GERMAN_COUNTRY_CODE.equals(xnode.getArea2()) && tso.equals(xnode.getSubarea2())
                 : tso.equals(xnode.getArea2());
