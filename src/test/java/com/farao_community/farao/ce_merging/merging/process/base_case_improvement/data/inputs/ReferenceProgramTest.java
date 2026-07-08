@@ -23,17 +23,17 @@ class ReferenceProgramTest {
     @BeforeEach
     void setUp() {
         refProgram = ReferenceProgramTestData.createReferenceProgram();
-        final RegionConfiguration regionConfiguration = new RegionConfiguration();
+        final RegionConfiguration cfg = new RegionConfiguration();
         final Map<String, String> areasId = new HashMap<>();
         areasId.put("N1", "ONE");
         areasId.put("N12", "TWELVE");
         areasId.put("N8", "EIGHT");
         areasId.put("N0", "ZERO");
         areasId.put("N25", "TWENTYFIVE");
-        regionConfiguration.setId("CE");
-        regionConfiguration.setName("CE");
-        regionConfiguration.setAreasIn(areasId);
-        this.regionConfiguration = regionConfiguration;
+        cfg.setId("CE");
+        cfg.setName("CE");
+        cfg.setAreasIn(areasId);
+        this.regionConfiguration = cfg;
     }
 
     @Test

@@ -9,7 +9,6 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model.ab
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.OneToMany;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -28,7 +27,7 @@ public abstract class AbstractRegionConfiguration<T extends AbstractTsoInfos> {
     protected Map<String, String> areasIn;
     @ElementCollection(fetch = LAZY)
     protected Map<String, String> areasOut;
-    @OneToMany
+    @ElementCollection(fetch = LAZY)
     protected Map<String, T> germanyZone;
 
     @JsonIgnore

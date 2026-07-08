@@ -9,7 +9,6 @@ package com.farao_community.farao.ce_merging.merging.process.base_case_improveme
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.xml.bind.JAXBException;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -81,7 +80,7 @@ class FeasibilityRangeCalculatorTest {
     }
 
     @Test
-    void calculateFeasibilityRangeWithNetPosition() throws JAXBException, IOException {
+    void calculateFeasibilityRangeWithNetPosition() throws IOException {
         bciFeasibilityRange = getBciTestFile("bciFeasibilityRange.xml");
         final Map<String, Interval> frs = feasibilityRangeCalculator.importFeasibilityRangesFile(bciFeasibilityRange, netPositionsMap);
 

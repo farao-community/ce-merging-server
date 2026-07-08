@@ -12,7 +12,6 @@ import com.farao_community.farao.ce_merging.merging.process.base_case_improvemen
 import com.farao_community.farao.ce_merging.xsd.FlowBasedExternalConstraintDocument;
 import com.farao_community.farao.ce_merging.xsd.NetPositionConstraint;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.xml.bind.JAXBException;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,7 +58,7 @@ class ExternalConstraintsImporterTest {
     }
 
     @Test
-    void checkExternalConstraintValues() throws JAXBException {
+    void checkExternalConstraintValues() {
         final FlowBasedExternalConstraintDocument ecFile = JaxbUtils.readFromPath(FlowBasedExternalConstraintDocument.class,
                                                                                   correctAlegroFilePath);
         List<NetPositionConstraint> cts = ecFile.getConstraints().getNetPositionConstraint();
