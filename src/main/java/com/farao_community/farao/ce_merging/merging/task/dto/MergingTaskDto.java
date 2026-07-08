@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.task.dto;
 
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiData;
-import com.farao_community.farao.ce_merging.common.task.TaskStatus;
+import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 
 /**
  * WARNING: this class is used by the merging supervisor (EMERGE).

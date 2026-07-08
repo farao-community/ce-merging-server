@@ -1,6 +1,6 @@
 package test_utils.assertions;
 
-import com.farao_community.farao.ce_merging.base_case_improvement.data.result.BciAreaResults;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAreaResults;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.util.CanIgnoreReturnValue;
 
@@ -24,7 +24,7 @@ public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, B
         if (actual.getInRegionNetPositions() == null) {
             failWithMessage("No inRegion net positions found");
         }
-        assertEquals(expected, actual.getInRegionNetPositions().getForecast(), EPSILON);
+        assertEquals(expected, actual.getInRegionNetPositions().forecast(), EPSILON);
         return this;
     }
 
@@ -33,7 +33,7 @@ public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, B
         if (actual.getGlobalNetPositions() == null) {
             failWithMessage("No global net positions found");
         }
-        assertEquals(expected, actual.getGlobalNetPositions().getForecast(), EPSILON);
+        assertEquals(expected, actual.getGlobalNetPositions().forecast(), EPSILON);
         return this;
     }
 
@@ -42,7 +42,7 @@ public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, B
         if (actual.getInRegionNetPositions() == null) {
             failWithMessage("No inRegion net positions found");
         }
-        assertEquals(expected, actual.getInRegionNetPositions().getTarget(), EPSILON);
+        assertEquals(expected, actual.getInRegionNetPositions().target(), EPSILON);
         return this;
     }
 
@@ -51,7 +51,7 @@ public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, B
         if (actual.getGlobalNetPositions() == null) {
             failWithMessage("No global net positions found");
         }
-        assertEquals(expected, actual.getGlobalNetPositions().getTarget(), EPSILON);
+        assertEquals(expected, actual.getGlobalNetPositions().target(), EPSILON);
         return this;
     }
 
@@ -72,7 +72,7 @@ public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, B
         if (actual.getInRegionNetPositions() == null) {
             failWithMessage("No inRegion net positions found");
         }
-        assertEquals(expected, actual.getInRegionNetPositions().getInitialMin(), EPSILON);
+        assertEquals(expected, actual.getInRegionNetPositions().initialMin(), EPSILON);
         return this;
     }
 
@@ -81,7 +81,7 @@ public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, B
         if (actual.getInRegionNetPositions() == null) {
             failWithMessage("No inRegion net positions found");
         }
-        assertEquals(expected, actual.getInRegionNetPositions().getInitialMax(), EPSILON);
+        assertEquals(expected, actual.getInRegionNetPositions().initialMax(), EPSILON);
         return this;
     }
 
@@ -90,7 +90,7 @@ public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, B
         if (actual.getInRegionNetPositions() == null) {
             failWithMessage("No inRegion net positions found");
         }
-        assertEquals(expected, actual.getInRegionNetPositions().getFinalMin(), EPSILON);
+        assertEquals(expected, actual.getInRegionNetPositions().finalMin(), EPSILON);
         return this;
     }
 
@@ -99,7 +99,7 @@ public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, B
         if (actual.getInRegionNetPositions() == null) {
             failWithMessage("No inRegion net positions found");
         }
-        assertEquals(expected, actual.getInRegionNetPositions().getFinalMax(), EPSILON);
+        assertEquals(expected, actual.getInRegionNetPositions().finalMax(), EPSILON);
         return this;
     }
 

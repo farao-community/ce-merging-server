@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.common.config;
 
-import com.farao_community.farao.ce_merging.common.task.Task;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -14,8 +13,6 @@ import org.springframework.context.annotation.Configuration;
 import java.nio.file.Path;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ARTIFACTS_DIR;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BCI_INPUTS_DIR;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BCI_OUTPUTS_DIR;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_INPUTS_DIR;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_OUTPUTS_DIR;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INPUTS_DIR;
@@ -31,16 +28,13 @@ public class CeMergingConfiguration {
     @Value("${ce-merging-server.filesystem.root-daily}")
     private String dailyMergingRoot;
 
-    @Value("${ce-merging-server.filesystem.root-bci}")
-    private String bciRoot;
-
     /**
      *
      * @param task : each task has it own directory
      * @param directory : each type of file (in, out, ...) has its subdirectory inside
      * @return /path/to/root/task_id/directory
      */
-    private String resolveTaskDirInRoot(final Task task, final String directory, final String root) {
+    private String resolveMergingTaskDirInRoot(final MergingTask task, final String directory, final String root) {
         return Path.of(root + separator + task.getId())
             .resolve(directory)
             .toString();
@@ -58,20 +52,20 @@ public class CeMergingConfiguration {
         this.ceMergingRoot = ceMergingRoot;
     }
 
-    public String getInputsDirectoryPath(final Task task) {
+    public String getInputsDirectoryPath(final MergingTask task) {
         return getDirectoryPath(task, INPUTS_DIR);
     }
 
-    public String getOutputsDirectoryPath(final Task task) {
+    public String getOutputsDirectoryPath(final MergingTask task) {
         return getDirectoryPath(task, OUTPUTS_DIR);
     }
 
-    public String getArtifactsDirectoryPath(final Task task) {
+    public String getArtifactsDirectoryPath(final MergingTask task) {
         return getDirectoryPath(task, ARTIFACTS_DIR);
     }
 
-    public String getDirectoryPath(final Task task, final String directory) {
-        return resolveTaskDirInRoot(task, directory, ceMergingRoot);
+    public String getDirectoryPath(final MergingTask task, final String directory) {
+        return resolveMergingTaskDirInRoot(task, directory, ceMergingRoot);
     }
 
     public String getTaskDirectoryPath(final MergingTask task) {
@@ -92,39 +86,16 @@ public class CeMergingConfiguration {
         this.dailyMergingRoot = dailyMergingRoot;
     }
 
-    public String getDailyInputsDirectoryPath(final Task task) {
+    public String getDailyInputsDirectoryPath(final MergingTask task) {
         return getDailyDirectoryPath(task, DAILY_INPUTS_DIR);
     }
 
-    public String getDailyOutputsDirectoryPath(final Task task) {
+    public String getDailyOutputsDirectoryPath(final MergingTask task) {
         return getDailyDirectoryPath(task, DAILY_OUTPUTS_DIR);
     }
 
-    public String getDailyDirectoryPath(final Task task, final String directory) {
-        return resolveTaskDirInRoot(task, directory, dailyMergingRoot);
+    public String getDailyDirectoryPath(final MergingTask task, final String directory) {
+        return resolveMergingTaskDirInRoot(task, directory, dailyMergingRoot);
     }
 
-    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-             BASECASE IMPROVEMENT
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-
-    public String getBciRoot() {
-        return bciRoot;
-    }
-
-    public void setBciRoot(final String bciRoot) {
-        this.bciRoot = bciRoot;
-    }
-
-    public String getBciInputsDirectoryPath(final Task task) {
-        return getBciDirectoryPath(task, BCI_INPUTS_DIR);
-    }
-
-    public String getBciOutputsDirectoryPath(final Task task) {
-        return getBciDirectoryPath(task, BCI_OUTPUTS_DIR);
-    }
-
-    public String getBciDirectoryPath(final Task task, final String directory) {
-        return resolveTaskDirInRoot(task, directory, bciRoot);
-    }
 }

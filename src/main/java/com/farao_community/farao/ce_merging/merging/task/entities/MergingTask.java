@@ -6,8 +6,9 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
-import com.farao_community.farao.ce_merging.common.task.Task;
-import com.farao_community.farao.ce_merging.common.task.TaskStatus;
+import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -16,6 +17,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
 import java.io.Serializable;
+import java.time.OffsetDateTime;
+import java.util.Optional;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.AUTO;
@@ -25,7 +28,7 @@ import static jakarta.persistence.GenerationType.AUTO;
  * Please contact them to check compatibility if any modification is needed
  */
 @Entity
-public class MergingTask implements Serializable, Task {
+public class MergingTask implements Serializable {
     @Id
     @GeneratedValue(strategy = AUTO)
     private Long id;
@@ -114,6 +117,21 @@ public class MergingTask implements Serializable, Task {
 
     public void setOutputs(final Outputs outputs) {
         this.outputs = outputs;
+    }
+
+    public String getArtifactPath(final ArtifactType artifactType) {
+        return Optional.ofNullable(artifacts.getFile(artifactType))
+            .map(SavedFile::getPath)
+            .orElse(null);
+    }
+
+    public void setArtifact(final ArtifactType artifactType, final SavedFile artifact) {
+        artifacts.putFile(artifactType, artifact);
+    }
+
+    @JsonIgnore
+    public OffsetDateTime getTargetDate() {
+        return inputs.getTargetDate();
     }
 
 }

@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.common.config;
 
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.common.task.TaskStatus;
+import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,7 +30,6 @@ class CeMergingConfigurationTest {
         final CeMergingConfiguration copy = new CeMergingConfiguration();
         copy.setCeMergingRoot(configuration.getCeMergingRoot());
         copy.setDailyMergingRoot(configuration.getDailyMergingRoot());
-        copy.setBciRoot(configuration.getBciRoot());
         final MergingTask task = taskWithIdAndStatus(1, TaskStatus.CREATED);
 
         // HOURLY
@@ -59,18 +58,6 @@ class CeMergingConfigurationTest {
 
         assertEquals(Path.of("/a/new/path/1/daily-inputs"),
                      Path.of(copy.getDailyInputsDirectoryPath(task)));
-
-        //  BCI
-        assertEquals(Path.of("/tmp/testFiles/bci"),
-                     Path.of(copy.getBciRoot()));
-
-        assertEquals(Path.of("/tmp/testFiles/bci/1/bci-outputs"),
-                     Path.of(copy.getBciOutputsDirectoryPath(task)));
-
-        copy.setBciRoot("/a/new/path");
-
-        assertEquals(Path.of("/a/new/path/1/bci-inputs"),
-                     Path.of(copy.getBciInputsDirectoryPath(task)));
 
     }
 }

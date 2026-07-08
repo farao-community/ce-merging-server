@@ -61,4 +61,3 @@ ce-merging-server:
   filesystem:
     root: ${HOME}/ce-merging-server/filesystem
     root-daily: ${HOME}/ce-merging-server/filesystem-daily-merging
-    root-bci: ${HOME}/ce-merging-server/filesystem-bci
