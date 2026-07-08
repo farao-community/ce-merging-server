@@ -11,8 +11,8 @@ import com.farao_community.farao.ce_merging.common.util.BordersUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
@@ -22,18 +22,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DENMARK_COUNTRY_CODE;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_COUNTRY_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_TSO;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_COUNTRY_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DENMARK_COUNTRY_CODE;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.zeroIfNan;
 
 @Service
@@ -41,12 +42,7 @@ public class XnodesCalculation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XnodesCalculation.class);
 
-    public void fillXnodesInformation(final Network network,
-                                      final String tso,
-                                      final Map<String, XnodeInformation> xnodeInformationMap,
-                                      final List<VirtualHubRecord> virtualHubList,
-                                      final List<XnodeConfig> xnodes,
-                                      final boolean germanMode) {
+    public void fillXnodesInformation(final Network network, final String tso, final Map<String, XnodeInformation> xnodeInformationMap, final List<VirtualHubRecord> virtualHubList, final List<XnodeConfig> xnodes, final boolean germanMode) {
         final Set<String> xnodesArea1 = xnodes.stream()
                 .filter(xnode -> matchesArea1(xnode, tso, germanMode))
                 .map(XnodeConfig::getName)

@@ -23,8 +23,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 import java.util.TreeMap;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_AND_DANISH_TSO;
