@@ -6,15 +6,15 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAreaResults;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciComputationResult;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.GlobalNetPositions;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.InRegionNetPositions;
-import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAreaResults;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciComputationResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,13 +31,14 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.util.stream.Collectors.toMap;
 
-public class BciComputation {
+public class BciComputer {
     private static final BigDecimal EPSILON = BigDecimal.valueOf(0.01);
-    private static final Logger LOGGER = LoggerFactory.getLogger(BciComputation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BciComputer.class);
 
-    private final RegionConfiguration regionConfiguration;
+    private final RegionConfiguration regions;
     private final ReferenceProgram referenceProgram;
     private final Map<String, Interval> feasibilityRanges;
+
     private FlowByAreaMap inRegionNpfByArea = new FlowByAreaMap();
     private FlowByAreaMap targetInRegionNpByArea = new FlowByAreaMap();
     private FlowByAreaMap globalNpfByArea = new FlowByAreaMap();
@@ -45,18 +46,19 @@ public class BciComputation {
     private FlowByAreaMap violationsByArea = new FlowByAreaMap();
     private final Map<String, Boolean> bciAppliedByArea = new HashMap<>();
 
-    public BciComputation(final RegionConfiguration regionConfiguration,
-                          final ReferenceProgram referenceProgram,
-                          final Map<String, Interval> feasibilityRanges) {
-        this.regionConfiguration = regionConfiguration;
+    public BciComputer(final RegionConfiguration regions,
+                       final ReferenceProgram referenceProgram,
+                       final Map<String, Interval> feasibilityRanges) {
+        this.regions = regions;
         this.referenceProgram = referenceProgram;
 
         // if every defined areaIn has a corresponding range
-        if (feasibilityRanges.keySet().containsAll(regionConfiguration.getAreasIn().values())) {
+        if (feasibilityRanges.keySet().containsAll(regions.getAreasIn().values())) {
             this.feasibilityRanges = feasibilityRanges;
         } else {
-            LOGGER.error("The feasibility ranges are not valid");
-            throw new CeMergingException("The feasibility ranges are not valid");
+            final String errorMessage = "The feasibility ranges are invalid";
+            LOGGER.error(errorMessage);
+            throw new CeMergingException(errorMessage);
         }
 
     }
@@ -65,23 +67,20 @@ public class BciComputation {
                                     final double alBeToCeFlow,
                                     final double alDeToCeFlow) {
         final Map<String, BciAreaResults> results;
-
-        inRegionNpfByArea = referenceProgram.computeAllNetPositionsInRegion(regionConfiguration);
-        globalNpfByArea = referenceProgram.computeAllGlobalNetPositions(regionConfiguration);
-
+        inRegionNpfByArea = referenceProgram.computeAllNetPositionsInRegion(regions);
+        globalNpfByArea = referenceProgram.computeAllGlobalNetPositions(regions);
         shiftNpfWithAlegro(alBeToCeFlow, alDeToCeFlow);
-
-        final FlowByAreaMap outNetPositionByArea = referenceProgram.computeAllNetPositionsOutRegion(regionConfiguration);
-
+        final FlowByAreaMap outNetPositionByArea = referenceProgram.computeAllNetPositionsOutRegion(regions);
         targetInRegionNpByArea = inRegionNpfByArea.copy();
-        if (npfIsInFeasibilityRanges()) {
-            LOGGER.info("All forecast net positions are in the feasibility ranges, BCI is not applied");
+
+        if (isNpfInFeasibilityRanges()) {
+            LOGGER.info("All forecast net positions are in the feasibility ranges, BCI will not be applied");
             targetGlobalNpByArea = globalNpfByArea.copy();
             results = createResults(initialRegionNetPositions);
             results.values().forEach(result -> result.setBciApplied(FALSE));
             return new BciComputationResult(false, false, results);
         } else {
-            LOGGER.info("Not all forecast net positions are in the feasibility ranges, BCI will be applied");
+            LOGGER.info("There are forecast net positions outside feasibility ranges, BCI will be applied");
             final boolean hasExtendedRanges = applyBci();
             targetGlobalNpByArea = targetInRegionNpByArea.withValuesShiftedBy(outNetPositionByArea::getOrZero);
             results = createResults(initialRegionNetPositions);
@@ -90,14 +89,13 @@ public class BciComputation {
     }
 
     private Map<String, BciAreaResults> createResults(final FlowByAreaMap initialInRegionNpByArea) {
-        return regionConfiguration
+        return regions
             .getAreasIn()
             .entrySet()
             .stream()
-            .collect(toMap(Entry::getKey,
-                           entry -> this.createBciAreaResult(entry.getValue(),
-                                                             initialInRegionNpByArea,
-                                                             bciAppliedByArea)));
+            .collect(toMap(Entry::getKey, e -> createBciAreaResult(e.getValue(),
+                                                                   initialInRegionNpByArea,
+                                                                   bciAppliedByArea)));
     }
 
     private void shiftNpfWithAlegro(final double alBeToCeFlow,
@@ -105,8 +103,8 @@ public class BciComputation {
         // BCI process should not take Alegro flows into account.
         // inRegionNpfByArea = BE-CE from NPF file which alreadycontains ALBE-CE flow
         // That's why we must subtract by ALBE-CE flow to have only the AC target flow as the BCI target flow.
-        final String belgium = regionConfiguration.getAreaInEic("BE");
-        final String germany = regionConfiguration.getAreaInEic("DE");
+        final String belgium = regions.getAreaInEic("BE");
+        final String germany = regions.getAreaInEic("DE");
 
         globalNpfByArea.shiftFlow(belgium, alBeToCeFlow);
         inRegionNpfByArea.shiftFlow(belgium, alBeToCeFlow);
@@ -118,8 +116,8 @@ public class BciComputation {
                                                final FlowByAreaMap initialRegionNpByArea,
                                                final Map<String, Boolean> bciAppliedByArea) {
         final double targetRegionNp = targetInRegionNpByArea.get(areaId);
-        final double regionMinFeasible = getMinConstraintOfArea(areaId);
-        final double regionMaxFeasible = getMaxConstraintOfArea(areaId);
+        final double regionMinFeasible = getMinConstraint(areaId);
+        final double regionMaxFeasible = getMaxConstraint(areaId);
 
         final InRegionNetPositions inRegionResults = new InRegionNetPositions(
             initialRegionNpByArea.getOrZero(areaId),
@@ -144,12 +142,12 @@ public class BciComputation {
         solveContraryViolations();
         solveMainViolations();
 
-        boolean extendedRange = !isNegligible(targetInRegionNpByArea.getTotalFlow());
-        if (extendedRange) {
+        if (!isNegligible(targetInRegionNpByArea.getTotalFlow())) {
             compensateRemainingImbalances();
+            return true;
         }
 
-        return extendedRange;
+        return false;
     }
 
     private void solveContraryViolations() {
@@ -161,9 +159,7 @@ public class BciComputation {
             this::getAvailableShiftWithContraryViolation
         );
 
-        violationsByArea.forEach(
-            (area, violation) -> solveContraryViolation(area, violation, shiftAvailable)
-        );
+        violationsByArea.forEach((area, violation) -> solveContraryViolation(area, violation, shiftAvailable));
 
         computeViolations();
     }
@@ -197,9 +193,10 @@ public class BciComputation {
         final double totalShiftToApply = totalViolations < 0 ?
             max(shiftAvailable, totalViolations) : min(shiftAvailable, totalViolations);
 
-        violationsByArea.forEach(
-            (area, violation) -> solveMainViolation(area, violation, shiftAvailable, totalShiftToApply)
-        );
+        violationsByArea.forEach((area, violation) -> solveMainViolation(area,
+                                                                         violation,
+                                                                         shiftAvailable,
+                                                                         totalShiftToApply));
     }
 
     private void solveMainViolation(final String areaId,
@@ -223,17 +220,15 @@ public class BciComputation {
             .mapToDouble(Interval::getRange)
             .sum();
 
-        targetInRegionNpByArea.shiftAllFlowsUsing(areaId -> -totalImbalance
-                                                            * feasibilityRanges.get(areaId).getRange()
-                                                            / totalFeasibilityRanges);
+        targetInRegionNpByArea.shiftAllFlowsWith(areaId -> -totalImbalance
+                                                           * feasibilityRanges.get(areaId).getRange()
+                                                           / totalFeasibilityRanges);
 
     }
 
     private void computeViolations() {
         violationsByArea = targetInRegionNpByArea.withValuesShiftedBy(
-            area -> -Math.clamp(targetInRegionNpByArea.get(area),
-                                getMinConstraintOfArea(area),
-                                getMaxConstraintOfArea(area))
+            area -> -Math.clamp(targetInRegionNpByArea.get(area), getMinConstraint(area), getMaxConstraint(area))
         );
     }
 
@@ -241,28 +236,28 @@ public class BciComputation {
          these do not modify class members
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-    private boolean npfIsInFeasibilityRanges() {
+    private boolean isNpfInFeasibilityRanges() {
         return inRegionNpfByArea.entrySet().stream()
             .allMatch(e -> feasibilityRanges.get(e.getKey()).hasWithinBounds(e.getValue()));
     }
 
-    private static boolean isNegligible(final double value) {
-        return BigDecimal.valueOf(value).abs().compareTo(EPSILON) <= 0;
+    private static boolean isNegligible(final double flowInMW) {
+        return BigDecimal.valueOf(flowInMW).abs().compareTo(EPSILON) <= 0;
     }
 
     private double getMaxOrMinConstraint(final String areaId, final boolean maxIfTrue) {
         if (maxIfTrue) {
-            return getMaxConstraintOfArea(areaId);
+            return getMaxConstraint(areaId);
         } else {
-            return getMinConstraintOfArea(areaId);
+            return getMinConstraint(areaId);
         }
     }
 
-    private double getMinConstraintOfArea(final String areaId) {
+    private double getMinConstraint(final String areaId) {
         return feasibilityRanges.get(areaId).getMinValue();
     }
 
-    private double getMaxConstraintOfArea(final String areaId) {
+    private double getMaxConstraint(final String areaId) {
         return feasibilityRanges.get(areaId).getMaxValue();
     }
 

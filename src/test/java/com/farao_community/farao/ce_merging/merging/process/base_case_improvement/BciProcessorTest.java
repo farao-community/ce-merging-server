@@ -46,8 +46,8 @@ import static test_utils.assertions.BciAreaResultsAssert.assertThat;
 import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 @SpringBootTest
-class BciProcessTest {
-    private BciProcess bciProcess;
+class BciProcessorTest {
+    private BciProcessor bciProcessor;
 
     private String correctNpfPath;
     private String correctEcPath;
@@ -101,8 +101,8 @@ class BciProcessTest {
                                              null,
                                              null);
 
-        bciProcess = new BciProcess(task, configuration);
-        bciProcess.run();
+        bciProcessor = new BciProcessor(task, configuration);
+        bciProcessor.run();
 
         final BciProcessResult result = getResult(task);
         assertEquals("CE", result.regionName());
@@ -122,8 +122,8 @@ class BciProcessTest {
                                              correctFeasibilityRangePathAbsolute,
                                              null);
 
-        bciProcess = new BciProcess(task, configuration);
-        bciProcess.run();
+        bciProcessor = new BciProcessor(task, configuration);
+        bciProcessor.run();
 
         final BciProcessResult result = getResult(task);
         assertEquals("CE", result.regionName());
@@ -143,8 +143,8 @@ class BciProcessTest {
                                              correctFeasibilityRangePath,
                                              correctInitialNetPositionsPath);
 
-        bciProcess = new BciProcess(task, configuration);
-        bciProcess.run();
+        bciProcessor = new BciProcessor(task, configuration);
+        bciProcessor.run();
 
         final BciProcessResult result = getResult(task);
         assertEquals("CE", result.regionName());
@@ -165,8 +165,8 @@ class BciProcessTest {
         final MergingTask task = prepareTask(0L, npfWithAlegroXnodesPath, ecWithAlegroXnodesPath, alegroDataPath, null, initialNetPositionsPath);
 
         task.getInputs().setTargetDate(OffsetDateTime.parse("2020-06-07T22:30Z"));
-        bciProcess = new BciProcess(task, configuration);
-        bciProcess.run();
+        bciProcessor = new BciProcessor(task, configuration);
+        bciProcessor.run();
 
         final BciProcessResult result = getResult(task);
         final BciAlegroFlows albeFlows = result.bciAlegroData().albeFlows();

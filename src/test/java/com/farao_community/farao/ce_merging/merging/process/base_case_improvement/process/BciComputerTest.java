@@ -43,7 +43,7 @@ import static test_utils.assertions.BciAreaResultsAssert.assertThat;
 
 @SpringBootTest
 @ActiveProfiles({"BciComputationTest"})
-class BciComputationTest {
+class BciComputerTest {
     private static final double EPSILON = 0.01;
 
     @Configuration
@@ -72,9 +72,9 @@ class BciComputationTest {
     void computeBciCase1() {
         ReferenceProgram referenceProgram = createReferenceProgramCase1();
         Map<String, Interval> feasibilityRange = createFeasibilityRangeCase123();
-        BciComputation bciComputation = new BciComputation(regionConfiguration, referenceProgram, feasibilityRange);
+        BciComputer bciComputer = new BciComputer(regionConfiguration, referenceProgram, feasibilityRange);
 
-        BciComputationResult result = bciComputation.run(new FlowByAreaMap(), 0, 0);
+        BciComputationResult result = bciComputer.run(new FlowByAreaMap(), 0, 0);
         assertFalse(result.bciActive());
         assertFalse(result.bciFeasibilityRangesExtended());
         Map<String, BciAreaResults> results = result.bciResults();
@@ -114,9 +114,9 @@ class BciComputationTest {
     void computeBciCase2() {
         ReferenceProgram referenceProgram = createReferenceProgramCase2();
         Map<String, Interval> feasibilityRange = createFeasibilityRangeCase123();
-        BciComputation bciComputation = new BciComputation(regionConfiguration, referenceProgram, feasibilityRange);
+        BciComputer bciComputer = new BciComputer(regionConfiguration, referenceProgram, feasibilityRange);
 
-        BciComputationResult result = bciComputation.run(new FlowByAreaMap(), 0, 0);
+        BciComputationResult result = bciComputer.run(new FlowByAreaMap(), 0, 0);
         assertTrue(result.bciActive());
         assertFalse(result.bciFeasibilityRangesExtended());
         Map<String, BciAreaResults> results = result.bciResults();
@@ -156,9 +156,9 @@ class BciComputationTest {
     void computeBciCase3() {
         ReferenceProgram referenceProgram = createReferenceProgramCase3();
         Map<String, Interval> feasibilityRange = createFeasibilityRangeCase123();
-        BciComputation bciComputation = new BciComputation(regionConfiguration, referenceProgram, feasibilityRange);
+        BciComputer bciComputer = new BciComputer(regionConfiguration, referenceProgram, feasibilityRange);
 
-        BciComputationResult result = bciComputation.run(new FlowByAreaMap(), 0, 0);
+        BciComputationResult result = bciComputer.run(new FlowByAreaMap(), 0, 0);
         assertTrue(result.bciActive());
         assertFalse(result.bciFeasibilityRangesExtended());
         Map<String, BciAreaResults> results = result.bciResults();
@@ -198,9 +198,9 @@ class BciComputationTest {
     void computeBciCase4() {
         ReferenceProgram referenceProgram = createReferenceProgramCase4();
         Map<String, Interval> feasibilityRange = createFeasibilityRangeCase4();
-        BciComputation bciComputation = new BciComputation(regionConfiguration, referenceProgram, feasibilityRange);
+        BciComputer bciComputer = new BciComputer(regionConfiguration, referenceProgram, feasibilityRange);
 
-        BciComputationResult result = bciComputation.run(new FlowByAreaMap(), 0, 0);
+        BciComputationResult result = bciComputer.run(new FlowByAreaMap(), 0, 0);
         assertTrue(result.bciActive());
         assertFalse(result.bciFeasibilityRangesExtended());
         Map<String, BciAreaResults> results = result.bciResults();
@@ -240,9 +240,9 @@ class BciComputationTest {
     void computeBciCase5() {
         ReferenceProgram referenceProgram = createReferenceProgramCase5();
         Map<String, Interval> feasibilityRange = createFeasibilityRangeCase5();
-        BciComputation bciComputation = new BciComputation(regionConfiguration, referenceProgram, feasibilityRange);
+        BciComputer bciComputer = new BciComputer(regionConfiguration, referenceProgram, feasibilityRange);
 
-        BciComputationResult result = bciComputation.run(new FlowByAreaMap(), 0, 0);
+        BciComputationResult result = bciComputer.run(new FlowByAreaMap(), 0, 0);
         assertTrue(result.bciActive());
         assertTrue(result.bciFeasibilityRangesExtended());
         Map<String, BciAreaResults> results = result.bciResults();
@@ -282,9 +282,9 @@ class BciComputationTest {
     void computeBciCase6() {
         ReferenceProgram referenceProgram = createReferenceProgramCase6();
         Map<String, Interval> feasibilityRange = createFeasibilityRangeCase6();
-        BciComputation bciComputation = new BciComputation(regionConfiguration, referenceProgram, feasibilityRange);
+        BciComputer bciComputer = new BciComputer(regionConfiguration, referenceProgram, feasibilityRange);
 
-        BciComputationResult result = bciComputation.run(new FlowByAreaMap(), 0, 0);
+        BciComputationResult result = bciComputer.run(new FlowByAreaMap(), 0, 0);
         assertTrue(result.bciActive());
         assertFalse(result.bciFeasibilityRangesExtended());
         Map<String, BciAreaResults> results = result.bciResults();
@@ -324,9 +324,9 @@ class BciComputationTest {
     void computeBciCase7() {
         ReferenceProgram referenceProgram = createReferenceProgramCase7();
         Map<String, Interval> feasibilityRange = createFeasibilityRangeCase7();
-        BciComputation bciComputation = new BciComputation(regionConfiguration, referenceProgram, feasibilityRange);
+        BciComputer bciComputer = new BciComputer(regionConfiguration, referenceProgram, feasibilityRange);
 
-        BciComputationResult result = bciComputation.run(new FlowByAreaMap(), 0, 0);
+        BciComputationResult result = bciComputer.run(new FlowByAreaMap(), 0, 0);
         assertTrue(result.bciActive());
         assertTrue(result.bciFeasibilityRangesExtended());
         Map<String, BciAreaResults> results = result.bciResults();

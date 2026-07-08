@@ -41,7 +41,7 @@ public class FlowByAreaMap extends HashMap<String, Double> {
      * Used to shift all values of this given an operator (for example, add the value from another map by area)
      * @param areaOperator operator that applies on the key (=areaId)
      */
-    public void shiftAllFlowsUsing(final ToDoubleFunction<String> areaOperator) {
+    public void shiftAllFlowsWith(final ToDoubleFunction<String> areaOperator) {
         this.replaceAll((k, np) -> np + areaOperator.applyAsDouble(k));
     }
 
@@ -51,7 +51,7 @@ public class FlowByAreaMap extends HashMap<String, Double> {
      */
     public FlowByAreaMap withValuesShiftedBy(final ToDoubleFunction<String> areaOperator) {
         final FlowByAreaMap shiftedMap = new FlowByAreaMap(this);
-        shiftedMap.shiftAllFlowsUsing(areaOperator);
+        shiftedMap.shiftAllFlowsWith(areaOperator);
         return shiftedMap;
     }
 
