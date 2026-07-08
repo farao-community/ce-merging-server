@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.Interval;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.xsd.FlowBasedExternalConstraintDocument;
 import com.farao_community.farao.ce_merging.xsd.NetPositionConstraint;
@@ -67,13 +67,13 @@ class ExternalConstraintsImporterTest {
         List<NetPositionConstraint> cts = ecFile.getConstraints().getNetPositionConstraint();
         assertEquals(10, cts.size());
 
-        assertEquals("BE_ALEGrO", cts.get(6).getHub());
+        assertEquals("BE_AL", cts.get(6).getHub());
         assertEquals(11285, cts.get(6).getValue().intValue());
         assertEquals("ABSOLUTE", cts.get(6).getType());
         assertEquals("1", cts.get(6).getId());
         assertEquals("IMPORT", cts.get(6).getDirection());
 
-        assertEquals("BE_ALEGrO", cts.get(7).getHub());
+        assertEquals("BE_AL", cts.get(7).getHub());
         assertEquals(11285, cts.get(7).getValue().intValue());
         assertEquals("ABSOLUTE", cts.get(7).getType());
         assertEquals("25", cts.get(7).getId());

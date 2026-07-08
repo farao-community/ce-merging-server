@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs;
+package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,11 +21,7 @@ public class Interval {
     public Interval(final double minValue, final double maxValue) {
         this.minValue = minValue;
         this.maxValue = maxValue;
-        if (minValue > maxValue) {
-            final String errorMessage = "Min value of feasibility range should be lower than max value";
-            LOGGER.error(errorMessage);
-            throw new ArithmeticException(errorMessage);
-        }
+        assertIsConsistent();
     }
 
     public double getMinValue() {
@@ -34,6 +30,7 @@ public class Interval {
 
     public void setMinValue(final double minValue) {
         this.minValue = minValue;
+        assertIsConsistent();
     }
 
     public double getMaxValue() {
@@ -42,6 +39,7 @@ public class Interval {
 
     public void setMaxValue(final double maxValue) {
         this.maxValue = maxValue;
+        assertIsConsistent();
     }
 
     public static Interval infinity() {
@@ -59,6 +57,14 @@ public class Interval {
 
     public double getRange() {
         return maxValue - minValue;
+    }
+
+    private void assertIsConsistent() {
+        if (minValue > maxValue) {
+            final String errorMessage = "Min value of feasibility range should be lower than max value";
+            LOGGER.error(errorMessage);
+            throw new ArithmeticException(errorMessage);
+        }
     }
 
     public String toString() {

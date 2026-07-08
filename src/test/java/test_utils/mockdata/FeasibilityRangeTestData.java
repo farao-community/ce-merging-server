@@ -6,7 +6,7 @@
  */
 package test_utils.mockdata;
 
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.Interval;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -9,7 +9,7 @@ package com.farao_community.farao.ce_merging.merging.process.base_case_improveme
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.AbstractServiceException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.alegro.BciAlegroFlows;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAlegroFlows;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAreaResults;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciProcessResult;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.BciResultUtil;
@@ -42,6 +42,7 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.readAllBytes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static test_utils.CeTestUtils.stringPathOf;
 import static test_utils.assertions.BciAreaResultsAssert.assertThat;
 
@@ -88,7 +89,7 @@ class BciProcessTest {
     }
 
     @AfterEach
-    void teardown()  {
+    void teardown() {
         FileSystemUtils.deleteRecursively(new File(configuration.getCeMergingRoot()));
     }
 
@@ -155,18 +156,12 @@ class BciProcessTest {
     }
 
     @Test
-    void errorWithBlankArgs() throws IOException {
-
-        try {
-            final MergingTask task = prepareTask(1L,
-                                                 "",
-                                                 "",
-                                                 "",
-                                                 "",
-                                                 "");
-        } catch (AbstractServiceException e) {
-            //should throw exception
-        }
+    void errorWithBlankArgs() {
+        assertThrows(AbstractServiceException.class, () -> prepareTask(1L, "",
+                                                                       "",
+                                                                       "",
+                                                                       "",
+                                                                       ""));
     }
 
     @Test

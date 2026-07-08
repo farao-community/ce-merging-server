@@ -7,12 +7,12 @@
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.Interval;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAreaResults;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciComputationResult;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.GlobalNetPositions;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.InRegionNetPositions;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.GlobalNetPositions;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.InRegionNetPositions;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import org.slf4j.Logger;

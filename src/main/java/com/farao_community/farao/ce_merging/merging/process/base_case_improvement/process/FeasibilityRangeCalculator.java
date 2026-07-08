@@ -6,26 +6,24 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.Interval;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.xsd.FeasibilityRangeConstraint;
 import com.farao_community.farao.ce_merging.xsd.FeasibilityRangeDocument;
-import com.google.common.io.ByteSource;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
-import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
-import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.Interval.infinity;
+import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval.infinity;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.ExternalConstraintsImporter.calculateConstraints;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.ArrayUtils.isEmpty;
 
 public class FeasibilityRangeCalculator {
 
@@ -36,50 +34,56 @@ public class FeasibilityRangeCalculator {
         this.regionConfiguration = regionConfiguration;
     }
 
-    public Map<String, Interval> getRegionFeasibilityRanges(byte[] externalConstraints, OffsetDateTime targetDate, Map<String, Double> netPositionsMap, byte[] feasibilityRange) {
+    public Map<String, Interval> getRegionFeasibilityRanges(final byte[] externalConstraints,
+                                                            final OffsetDateTime targetDate,
+                                                            final Map<String, Double> netPositions,
+                                                            final byte[] feasibilityRange) {
 
-        try {
-            Map<String, Interval> extConstraintsMap = calculateConstraints(externalConstraints, regionConfiguration, targetDate);
-            if (!ArrayUtils.isEmpty(feasibilityRange)) {
-                Map<String, Interval> feasibilityRangeMap = importFeasibilityRangesFile(feasibilityRange, netPositionsMap);
-                return computeFinalConstraints(extConstraintsMap, feasibilityRangeMap);
-            } else {
-                return extConstraintsMap;
-            }
-        } catch (Exception e) {
-            String errorMessage = "Error during calculation feasibility ranges, cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage);
+        final Map<String, Interval> extConstraintsMap = calculateConstraints(externalConstraints,
+                                                                             regionConfiguration,
+                                                                             targetDate);
+        if (isEmpty(feasibilityRange)) {
+            return extConstraintsMap;
+        } else {
+            final Map<String, Interval> feasibilityRangeMap = importFeasibilityRangesFile(feasibilityRange,
+                                                                                          netPositions);
+            return computeFinalConstraints(extConstraintsMap, feasibilityRangeMap);
         }
     }
 
-    private Map<String, Interval> computeFinalConstraints(Map<String, Interval> extConstraintsMap, Map<String, Interval> feasibilityRangeMap) {
-        Map<String, Interval> finalContraintsMap = new HashMap<>();
-        for (Map.Entry<String, Interval> entry : extConstraintsMap.entrySet()) {
-            try {
-                Interval finalInterval = entry.getValue().join(feasibilityRangeMap.getOrDefault(entry.getKey(), infinity()));
-                finalContraintsMap.put(entry.getKey(), finalInterval);
-            } catch (ArithmeticException e) {
-                LOGGER.error("Impossible to join intervals for area '{}' ", entry.getKey(), e);
-                throw new CeMergingException("Error during calculation feasibility ranges : Impossible to join intervals for area " + entry.getKey(), e);
-            }
-        }
-        return finalContraintsMap;
+    private static Map<String, Interval> computeFinalConstraints(final Map<String, Interval> extConstraints,
+                                                                 final Map<String, Interval> feasibilityRanges) {
+        return extConstraints
+            .entrySet()
+            .stream()
+            .collect(toMap(Map.Entry::getKey, joinedWithFeasibilityRange(feasibilityRanges)));
     }
 
-    public Map<String, Interval> importFeasibilityRangesFile(byte[] feasibilityRange, Map<String, Double> netPositionMap) throws JAXBException, IOException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(FeasibilityRangeDocument.class);
-        Unmarshaller jaxbMarshaller = jaxbContext.createUnmarshaller();
-        FeasibilityRangeDocument document = (FeasibilityRangeDocument) jaxbMarshaller.unmarshal(ByteSource.wrap(feasibilityRange).openStream());
+    private static Function<Map.Entry<String, Interval>, Interval> joinedWithFeasibilityRange(final Map<String, Interval> ranges) {
+        return extCt -> extCt.getValue().join(ranges.getOrDefault(extCt.getKey(), infinity()));
+    }
 
-        Map<String, Interval> feasibilityRangesMap = new HashMap<>();
-        Map<String, String> regionAreasIdByCountry = regionConfiguration.getAreasIn();
-        regionAreasIdByCountry.values().forEach(v -> feasibilityRangesMap.put(v, infinity()));
+    public Map<String, Interval> importFeasibilityRangesFile(byte[] feasibilityRange,
+                                                             Map<String, Double> netPositionMap) {
 
-        document.getConstraints().getFeasibilityRangeConstraint().forEach(feasibilityRangeConstraint -> {
-            Interval newInterval = computeIntervalForFeasibilityRangeConstraint(feasibilityRangeConstraint, netPositionMap);
-            feasibilityRangesMap.put(feasibilityRangeConstraint.getArea().getV(), newInterval);
-        });
+        final FeasibilityRangeDocument document = JaxbUtils.readFromBytes(FeasibilityRangeDocument.class,
+                                                                          feasibilityRange);
+
+        final Map<String, Interval> feasibilityRangesMap = regionConfiguration
+            .getAreasIn()
+            .values()
+            .stream()
+            .collect(toMap(identity(), v -> infinity()));
+
+        final Map<String, Interval> fromDocument = document
+            .getConstraints()
+            .getFeasibilityRangeConstraint()
+            .stream()
+            .collect(toMap(frc -> frc.getArea().getV(),
+                           frc -> computeIntervalWithNetPositions(frc, netPositionMap)));
+
+        feasibilityRangesMap.putAll(fromDocument);
+
         return feasibilityRangesMap;
     }
 
@@ -88,24 +92,26 @@ public class FeasibilityRangeCalculator {
         RELATIVE
     }
 
-    private Interval computeIntervalForFeasibilityRangeConstraint(FeasibilityRangeConstraint feasibilityRangeConstraint, Map<String, Double> netPositionMap) {
-        double max = feasibilityRangeConstraint.getMax().getV().doubleValue();
-        double min = feasibilityRangeConstraint.getMin().getV().doubleValue();
-        switch (Type.valueOf(feasibilityRangeConstraint.getType().getV())) {
+    private static Interval computeIntervalWithNetPositions(final FeasibilityRangeConstraint feasibilityRange,
+                                                            final Map<String, Double> netPositionMap) {
+        double max = feasibilityRange.getMax().getV().doubleValue();
+        double min = feasibilityRange.getMin().getV().doubleValue();
+        final String type = feasibilityRange.getType().getV();
+        switch (Type.valueOf(type)) {
             case ABSOLUTE:
                 return new Interval(min, max);
             case RELATIVE:
-                String areaFeasibilityRange = feasibilityRangeConstraint.getArea().getV();
-                if (!netPositionMap.containsKey(areaFeasibilityRange)) {
-                    throw new CeMergingException("Error in feasibility range computation: Initial net position not found for area " + areaFeasibilityRange);
+                final String area = feasibilityRange.getArea().getV();
+                if (!netPositionMap.containsKey(area)) {
+                    throw new CeMergingException("Error in feasibility range computation: Initial net position not found for area " + area);
                 }
-                double initialNetPosition = netPositionMap.get(areaFeasibilityRange);
+                final double initialNetPosition = netPositionMap.get(area);
                 max += initialNetPosition;
                 min += initialNetPosition;
                 return new Interval(min, max);
             default:
-                LOGGER.error("Feasibility range constraints type {} is not acceptable", feasibilityRangeConstraint.getType().getV());
-                throw new CeMergingException("Feasibility range constraints type " + feasibilityRangeConstraint.getType().getV() + " is not acceptable");
+                LOGGER.error("Feasibility range constraints type {} is not acceptable", type);
+                throw new CeMergingException("Feasibility range constraints type " + type + " is not acceptable");
         }
     }
 }

@@ -36,11 +36,11 @@
 			<timeInterval v="2019-03-01T23:00Z/2019-03-02T23:00Z"/>
 			<tsoOrigin>N26</tsoOrigin>
 		</netPositionConstraint>
-		<netPositionConstraint direction="IMPORT" hub="BE_ALEGrO" id="1" name="BE_ALEGrO_import" type="ABSOLUTE" value="11285" version="0">
+		<netPositionConstraint direction="IMPORT" hub="BE_AL" id="1" name="BE_AL_import" type="ABSOLUTE" value="11285" version="0">
 			<timeInterval v="2019-03-01T23:00Z/2019-03-02T23:00Z"/>
 			<tsoOrigin>N12</tsoOrigin>
 		</netPositionConstraint>
-		<netPositionConstraint direction="EXPORT" hub="BE_ALEGrO" id="25" name="BE_ALEGrO_export" type="ABSOLUTE" value="11285" version="0">
+		<netPositionConstraint direction="EXPORT" hub="BE_AL" id="25" name="BE_AL_export" type="ABSOLUTE" value="11285" version="0">
 			<timeInterval v="2019-03-01T23:00Z/2019-03-02T23:00Z"/>
 			<tsoOrigin>N12</tsoOrigin>
 		</netPositionConstraint>

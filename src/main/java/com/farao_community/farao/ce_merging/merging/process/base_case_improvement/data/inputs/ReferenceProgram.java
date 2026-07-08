@@ -6,10 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs;
 
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeDeserializer;
 import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeSerializer;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -18,7 +18,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -41,7 +43,7 @@ public class ReferenceProgram implements Serializable {
                             @JsonProperty("referenceExchangeData") final List<ReferenceExchangeData> referenceExchangeDataList) {
         this.dailyTimeInterval = dailyTimeInterval;
         this.targetDateTime = targetDateTime;
-        this.referenceExchangeDataList = referenceExchangeDataList;
+        this.referenceExchangeDataList = Optional.ofNullable(referenceExchangeDataList).orElse(new ArrayList<>());
     }
 
     public ReferenceProgram(final List<ReferenceExchangeData> referenceExchangeDataList) {

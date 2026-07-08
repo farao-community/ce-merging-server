@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result;
 
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.GlobalNetPositions;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.InRegionNetPositions;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 

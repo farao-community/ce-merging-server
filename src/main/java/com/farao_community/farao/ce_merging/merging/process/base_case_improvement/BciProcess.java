@@ -12,11 +12,11 @@ import com.farao_community.farao.ce_merging.common.util.FileUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.alegro.AlegroData;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.alegro.AlegroFlows;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.alegro.BciAlegroData;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.alegro.BciAlegroFlows;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.Interval;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroData;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroFlows;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAlegroData;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAlegroFlows;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciComputationResult;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciProcessResult;
@@ -55,6 +55,8 @@ public class BciProcess {
     private final RegionConfiguration regionConfiguration;
     private final CeMergingConfiguration configuration;
     private final FlowByAreaMap initialRegionNetPositions = new FlowByAreaMap();
+    private final byte[] externalConstraintsBytes;
+    private final byte[] feasibilityRangesBytes;
     private BciProcessResult processResult;
     private FlowByAreaMap initialGlobalNetPositions;
     private Map<String, Interval> regionFeasibilityRanges;
@@ -69,6 +71,11 @@ public class BciProcess {
             .map(path -> JsonUtils.read(AlegroData.class, path))
             .orElse(null);
         this.configuration = configuration;
+        this.externalConstraintsBytes = readBytesFromPath(getExternalConstraintsPath());
+        this.feasibilityRangesBytes =  Optional.ofNullable(getFeasibilityRangePath())
+            .map(FileUtils::readBytesFromPath)
+            .orElse(new byte[0]);
+
     }
 
     public void run() {
@@ -132,8 +139,7 @@ public class BciProcess {
     }
 
     private Map<String, Interval> getAlegroExternalConstraints() {
-        final byte[] externalConstraints = readBytesFromPath(getExternalConstraintsPath());
-        return calculateConstraintsForAlegro(externalConstraints, task.getTargetDate());
+        return calculateConstraintsForAlegro(externalConstraintsBytes, task.getTargetDate());
     }
 
     private double getAlegroConstrainedTargetFlow(final AlegroFlows toConstrain) throws IOException {
@@ -195,15 +201,11 @@ public class BciProcess {
     }
 
     private Map<String, Interval> calculateRegionFeasibilityRanges() {
-        final byte[] feasibilityRange = Optional.ofNullable(getFeasibilityRangePath())
-            .map(FileUtils::readBytesFromPath)
-            .orElse(new byte[0]);
-
         return new FeasibilityRangeCalculator(regionConfiguration)
             .getRegionFeasibilityRanges(readBytesFromPath(getExternalConstraintsPath()),
                                         task.getTargetDate(),
                                         initialRegionNetPositions,
-                                        feasibilityRange);
+                                        feasibilityRangesBytes);
 
     }
 

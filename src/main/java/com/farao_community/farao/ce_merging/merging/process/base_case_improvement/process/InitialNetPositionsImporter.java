@@ -6,17 +6,16 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
+import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.CountryNetPositions;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.InitialNetPositions;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.NetPosition;
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -41,14 +40,19 @@ public final class InitialNetPositionsImporter {
     }
 
     public static FlowByAreaMap getGlobalNetPosition(final String netPosFilePath,
-                                                     final RegionConfiguration region) throws FileNotFoundException {
+                                                     final RegionConfiguration region) throws IOException {
 
         if (isBlank(netPosFilePath)) {
             return new FlowByAreaMap();
         }
+        final FileInputStream netPosFis = new FileInputStream(netPosFilePath);
+        final FlowByAreaMap globalNp = getNetPositionsWithoutVirtualHubs(netPosFis,
+                                                                         region,
+                                                                         CountryNetPositions::globalNetPosition);
 
-        return getNetPositionsWithoutVirtualHubs(new FileInputStream(netPosFilePath), region,
-                                                 CountryNetPositions::globalNetPosition);
+        netPosFis.close();
+
+        return globalNp;
     }
 
     private static FlowByAreaMap getNetPositionsWithoutVirtualHubs(final InputStream initialNpFile,

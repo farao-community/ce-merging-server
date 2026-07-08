@@ -1,6 +1,6 @@
 package test_utils.assertions;
 
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.Interval;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.util.CanIgnoreReturnValue;
 

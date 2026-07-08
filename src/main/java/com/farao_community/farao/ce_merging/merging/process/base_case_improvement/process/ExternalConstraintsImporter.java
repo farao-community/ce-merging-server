@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ExternalConstraintsInputs;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.Interval;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.xsd.FlowBasedExternalConstraintDocument;
@@ -22,10 +22,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ExternalConstraintsInputs.fromNetPositionConstraint;
-import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.Interval.infinity;
+import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval.infinity;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
@@ -47,12 +48,8 @@ public final class ExternalConstraintsImporter {
 
         final List<ExternalConstraintsInputs> externalConstraintsTmp = getNetPositionConstraints(externalConstraints, targetDate)
             .stream()
-            .filter(not(constrainsAlegro()))
-            .map(npc -> {
-                final ExternalConstraintsInputs eci = fromNetPositionConstraint(npc);
-                eci.setAreaId(regionAreasIdByCountry.get(npc.getTsoOrigin()));
-                return eci;
-            })
+            .filter(not(isOnAlegro()))
+            .map(npc -> fromNetPositionConstraintWithRegion(npc, regionConfiguration))
             .toList();
 
         final Map<String, Interval> externalConstraintsMap = regionAreasIdByCountry.values()
@@ -63,12 +60,20 @@ public final class ExternalConstraintsImporter {
         return externalConstraintsMap;
     }
 
+    private static ExternalConstraintsInputs fromNetPositionConstraintWithRegion(final NetPositionConstraint npc,
+                                                                          final RegionConfiguration regionConfiguration) {
+        final ExternalConstraintsInputs eci = fromNetPositionConstraint(npc);
+        final String originEic = regionConfiguration.getAreaInEic(npc.getTsoOrigin());
+        eci.setAreaId(Optional.ofNullable(originEic).orElseThrow());
+        return eci;
+    }
+
     public static Map<String, Interval> calculateConstraintsForAlegro(final byte[] externalConstraints,
                                                                       final OffsetDateTime targetDate) {
 
         final List<ExternalConstraintsInputs> externalConstraintsTmp = getNetPositionConstraints(externalConstraints, targetDate)
             .stream()
-            .filter(constrainsAlegro())
+            .filter(isOnAlegro())
             .map(ExternalConstraintsInputs::fromNetPositionConstraint)
             .toList();
 
@@ -83,7 +88,7 @@ public final class ExternalConstraintsImporter {
         return alegroConstraints;
     }
 
-    static Predicate<NetPositionConstraint> constrainsAlegro() {
+    static Predicate<NetPositionConstraint> isOnAlegro() {
         return npc -> npc.getHub().equalsIgnoreCase(ALEGRO_BE_NODE_NAME)
                       || npc.getHub().equalsIgnoreCase(ALEGRO_DE_NODE_NAME);
     }

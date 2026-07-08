@@ -8,7 +8,6 @@ package com.farao_community.farao.ce_merging.merging.process.base_case_improveme
 
 import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeDeserializer;
 import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeSerializer;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.alegro.BciAlegroData;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
