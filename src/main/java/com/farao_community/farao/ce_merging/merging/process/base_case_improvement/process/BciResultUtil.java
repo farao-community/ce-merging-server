@@ -21,33 +21,30 @@ import static com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS
 
 public final class BciResultUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(BciResultUtil.class);
+    private static final ObjectMapper OBJECT_MAPPER = JsonUtil.createObjectMapper();
 
     private BciResultUtil() {
     }
 
     public static void write(final BciProcessResult result, final OutputStream os) {
         try {
-            createObjectMapper()
-                .configure(WRITE_DATES_AS_TIMESTAMPS, false)
+            OBJECT_MAPPER.configure(WRITE_DATES_AS_TIMESTAMPS, false)
                 .writerWithDefaultPrettyPrinter()
                 .writeValue(os, result);
 
         } catch (final IOException e) {
-            LOGGER.error("Error during write result of '{}' region", result.regionName(), e);
-            throw new ServiceIOException(String.format("Error during write result of '%s' region", result.regionName()), e);
+            LOGGER.error("Error while writing result of '{}' region", result.regionName(), e);
+            throw new ServiceIOException(String.format("Error while writing result of '%s' region", result.regionName()), e);
         }
     }
 
     public static BciProcessResult read(final InputStream is) {
         try {
-            return createObjectMapper().readValue(is, BciProcessResult.class);
+            return OBJECT_MAPPER.readValue(is, BciProcessResult.class);
         } catch (final IOException e) {
-            LOGGER.error("Error during read result", e);
-            throw new ServiceIOException("Error during read result", e);
+            LOGGER.error("Error while reading result", e);
+            throw new ServiceIOException("Error while reading result", e);
         }
     }
 
-    private static ObjectMapper createObjectMapper() {
-        return JsonUtil.createObjectMapper();
-    }
 }

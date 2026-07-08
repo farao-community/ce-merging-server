@@ -36,9 +36,4 @@ public record BciProcessResult(String regionName,
         this.outRegionResults = outRegionResults;
         this.bciAlegroData = bciAlegroData;
     }
-
-    @Override
-    public OffsetDateTime processDateTime() {
-        return processDateTime;
-    }
 }

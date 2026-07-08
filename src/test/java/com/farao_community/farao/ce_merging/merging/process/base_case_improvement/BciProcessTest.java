@@ -7,7 +7,6 @@
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.exception.AbstractServiceException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAlegroFlows;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAreaResults;
@@ -42,9 +41,9 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.readAllBytes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static test_utils.CeTestUtils.stringPathOf;
 import static test_utils.assertions.BciAreaResultsAssert.assertThat;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
 @SpringBootTest
 class BciProcessTest {
@@ -157,11 +156,8 @@ class BciProcessTest {
 
     @Test
     void errorWithBlankArgs() {
-        assertThrows(AbstractServiceException.class, () -> prepareTask(1L, "",
-                                                                       "",
-                                                                       "",
-                                                                       "",
-                                                                       ""));
+        assertThatThrownBy(() -> prepareTask(1L, "", "", "", "", ""))
+            .isValidServiceException();
     }
 
     @Test

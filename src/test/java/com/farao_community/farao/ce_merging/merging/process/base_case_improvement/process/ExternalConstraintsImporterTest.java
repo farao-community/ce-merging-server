@@ -6,20 +6,18 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.xsd.FlowBasedExternalConstraintDocument;
 import com.farao_community.farao.ce_merging.xsd.NetPositionConstraint;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Unmarshaller;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import test_utils.CeTestUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -27,7 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import static java.lang.Double.MAX_VALUE;
+import static java.nio.file.Files.readAllBytes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.pathOf;
 import static test_utils.assertions.IntervalAssert.assertThat;
 
 class ExternalConstraintsImporterTest {
@@ -35,18 +35,15 @@ class ExternalConstraintsImporterTest {
     private static final OffsetDateTime TARGET_DATE = OffsetDateTime.parse("2019-06-18T06:00Z", DateTimeFormatter.ISO_DATE_TIME);
     private String correctAlegroFilePath;
     private byte[] externalConstraints;
-    private byte[] externalConstraintsAlegro;
     private RegionConfiguration regionConfiguration;
 
     @BeforeEach
     void setUp() throws IOException {
-        externalConstraints = IOUtils.toByteArray(getClass().getResourceAsStream("/bci/20190618_MergedEC.xml"));
+        externalConstraints = getBciTestFile("20190618_MergedEC.xml");
         correctAlegroFilePath = CeTestUtils.stringPathOf("bci/F229-MergedECs_v01_Alegro.xml");
-        externalConstraintsAlegro = IOUtils.toByteArray(getClass().getResourceAsStream("/bci/F229-MergedECs_v01_Alegro.xml"));
 
         ObjectMapper objectMapper = new ObjectMapper();
-        File resourceRegion = CeTestUtils.pathOf("bci/region_configuration.json").toFile();
-        String jsonConfig = new String(java.nio.file.Files.readAllBytes(resourceRegion.toPath()));
+        String jsonConfig = new String(readAllBytes(pathOf("bci/region_configuration.json")));
         regionConfiguration = objectMapper.readValue(jsonConfig, RegionConfiguration.class);
     }
 
@@ -63,7 +60,8 @@ class ExternalConstraintsImporterTest {
 
     @Test
     void checkExternalConstraintValues() throws JAXBException {
-        final FlowBasedExternalConstraintDocument ecFile = getECFile(correctAlegroFilePath);
+        final FlowBasedExternalConstraintDocument ecFile = JaxbUtils.readFromPath(FlowBasedExternalConstraintDocument.class,
+                                                                                  correctAlegroFilePath);
         List<NetPositionConstraint> cts = ecFile.getConstraints().getNetPositionConstraint();
         assertEquals(10, cts.size());
 
@@ -92,10 +90,7 @@ class ExternalConstraintsImporterTest {
         assertEquals("EXPORT", cts.get(9).getDirection());
     }
 
-    private FlowBasedExternalConstraintDocument getECFile(String path) throws JAXBException {
-        JAXBContext jaxbContext = JAXBContext.newInstance(FlowBasedExternalConstraintDocument.class);
-        Unmarshaller jaxbMarshaller = jaxbContext.createUnmarshaller();
-        FlowBasedExternalConstraintDocument document = (FlowBasedExternalConstraintDocument) jaxbMarshaller.unmarshal(new File(path));
-        return document;
+    private byte[] getBciTestFile(final String name) throws IOException {
+        return IOUtils.toByteArray(getClass().getResourceAsStream("/bci/%s".formatted(name)));
     }
 }

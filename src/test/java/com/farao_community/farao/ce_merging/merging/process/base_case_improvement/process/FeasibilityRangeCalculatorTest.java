@@ -6,18 +6,14 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
-import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.xml.bind.JAXBException;
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import test_utils.CeTestUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
@@ -25,12 +21,10 @@ import java.util.Map;
 
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.ExternalConstraintsImporter.calculateConstraints;
 import static java.lang.Double.MAX_VALUE;
-import static java.nio.file.Files.readAllBytes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 import static test_utils.assertions.IntervalAssert.assertThat;
 
-@SpringBootTest
 class FeasibilityRangeCalculatorTest {
     private static final OffsetDateTime TARGET_DATE = OffsetDateTime.parse("2019-03-01T23:00Z");
     private final Map<String, Double> netPositionsMap = new HashMap<>();
@@ -39,6 +33,7 @@ class FeasibilityRangeCalculatorTest {
     private static final byte[] EMPTY_FEASIBILITY_RANGE = new byte[0];
     private static final Map<String, Double> EMPTY_NETPOSITIONS_MAP = new HashMap<>();
     private RegionConfiguration regionConfiguration;
+    private FeasibilityRangeCalculator feasibilityRangeCalculator;
 
     @BeforeEach
     void setUp() throws IOException {
@@ -54,16 +49,15 @@ class FeasibilityRangeCalculatorTest {
         netPositionsMap.put("AREA_NUMBER23_EIC", 500.0);
         netPositionsMap.put("AREA_NUMBER25_EIC", 600.0);
 
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final File resourceRegion = CeTestUtils.pathOf("bci/region_configuration.json").toFile();
-        final String jsonConfig = new String(readAllBytes(resourceRegion.toPath()));
-        regionConfiguration = objectMapper.readValue(jsonConfig, RegionConfiguration.class);
+        final String jsonConfig = new String(getBciTestFile("region_configuration.json"));
+        regionConfiguration = new ObjectMapper().readValue(jsonConfig, RegionConfiguration.class);
+        feasibilityRangeCalculator = new FeasibilityRangeCalculator(regionConfiguration);
     }
 
     @Test
     void calculateExternalConstraintsTest() throws IOException {
-        externalConstraints = IOUtils.toByteArray(getClass().getResourceAsStream("/bci/externalConstraints.xml"));
-        final FeasibilityRangeCalculator feasibilityRangeCalculator = new FeasibilityRangeCalculator(regionConfiguration);
+        externalConstraints = getBciTestFile("externalConstraints.xml");
+
         final Map<String, Interval> ecs = calculateConstraints(externalConstraints, regionConfiguration, TARGET_DATE);
 
         assertEquals(12, ecs.size());
@@ -73,7 +67,10 @@ class FeasibilityRangeCalculatorTest {
         assertThat(ecs.get("AREA_NUMBER26_EIC")).rangeIs(0, 11285);
         assertThat(ecs.get("AREA_NUMBER2_EIC")).rangeIs(-MAX_VALUE, MAX_VALUE);
 
-        Map<String, Interval> frs = feasibilityRangeCalculator.getRegionFeasibilityRanges(externalConstraints, TARGET_DATE, EMPTY_NETPOSITIONS_MAP, EMPTY_FEASIBILITY_RANGE);
+        Map<String, Interval> frs = feasibilityRangeCalculator.getRegionFeasibilityRanges(externalConstraints,
+                                                                                          TARGET_DATE,
+                                                                                          EMPTY_NETPOSITIONS_MAP,
+                                                                                          EMPTY_FEASIBILITY_RANGE);
         assertEquals(12, frs.size());
 
         assertThat(frs.get("AREA_NUMBER12_EIC")).rangeIs(0, MAX_VALUE);
@@ -85,8 +82,7 @@ class FeasibilityRangeCalculatorTest {
 
     @Test
     void calculateFeasibilityRangeWithNetPosition() throws JAXBException, IOException {
-        bciFeasibilityRange = IOUtils.toByteArray(getClass().getResourceAsStream("/bci/bciFeasibilityRange.xml"));
-        final FeasibilityRangeCalculator feasibilityRangeCalculator = new FeasibilityRangeCalculator(regionConfiguration);
+        bciFeasibilityRange = getBciTestFile("bciFeasibilityRange.xml");
         final Map<String, Interval> frs = feasibilityRangeCalculator.importFeasibilityRangesFile(bciFeasibilityRange, netPositionsMap);
 
         assertEquals(12, frs.size());
@@ -106,23 +102,22 @@ class FeasibilityRangeCalculatorTest {
     }
 
     @Test
-    void calculateFeasibilityRangeWithoutNetPosition() throws JAXBException, IOException {
-        try {
-            bciFeasibilityRange = IOUtils.toByteArray(getClass().getResourceAsStream("/bci/bciFeasibilityRange.xml"));
-            FeasibilityRangeCalculator feasibilityRangeCalculator = new FeasibilityRangeCalculator(regionConfiguration);
-            feasibilityRangeCalculator.importFeasibilityRangesFile(bciFeasibilityRange, EMPTY_NETPOSITIONS_MAP);
-            fail();
-        } catch (CeMergingException e) {
-            //should throw exception
-        }
+    void calculateFeasibilityRangeWithoutNetPosition() throws IOException {
+        bciFeasibilityRange = getBciTestFile("bciFeasibilityRange.xml");
+
+        assertThatThrownBy(() -> feasibilityRangeCalculator.importFeasibilityRangesFile(bciFeasibilityRange,
+                                                                                        EMPTY_NETPOSITIONS_MAP))
+            .isValidServiceException();
     }
 
     @Test
     void getRegionFeasibilityRangesTest() throws IOException {
-        externalConstraints = IOUtils.toByteArray(getClass().getResourceAsStream("/bci/externalConstraints.xml"));
-        bciFeasibilityRange = IOUtils.toByteArray(getClass().getResourceAsStream("/bci/bciFeasibilityRange.xml"));
-        FeasibilityRangeCalculator feasibilityRangeCalculator = new FeasibilityRangeCalculator(regionConfiguration);
-        Map<String, Interval> frs = feasibilityRangeCalculator.getRegionFeasibilityRanges(externalConstraints, TARGET_DATE, netPositionsMap, bciFeasibilityRange);
+        externalConstraints = getBciTestFile("externalConstraints.xml");
+        bciFeasibilityRange = getBciTestFile("bciFeasibilityRange.xml");
+        Map<String, Interval> frs = feasibilityRangeCalculator.getRegionFeasibilityRanges(externalConstraints,
+                                                                                          TARGET_DATE,
+                                                                                          netPositionsMap,
+                                                                                          bciFeasibilityRange);
 
         assertThat(frs.get("AREA_NUMBER11_EIC")).rangeIs(-900, 1100);
         assertThat(frs.get("AREA_NUMBER2_EIC")).rangeIs(0, 400);
@@ -136,5 +131,9 @@ class FeasibilityRangeCalculatorTest {
         assertThat(frs.get("AREA_NUMBER5_EIC")).rangeIs(300, 500);
         assertThat(frs.get("AREA_NUMBER23_EIC")).rangeIs(300, 700);
         assertThat(frs.get("AREA_NUMBER25_EIC")).rangeIs(0, 2100);
+    }
+
+    private byte[] getBciTestFile(final String name) throws IOException {
+        return IOUtils.toByteArray(getClass().getResourceAsStream("/bci/%s".formatted(name)));
     }
 }

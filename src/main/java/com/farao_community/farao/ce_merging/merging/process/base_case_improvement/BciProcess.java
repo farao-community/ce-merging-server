@@ -173,8 +173,7 @@ public class BciProcess {
             return null;
         }
 
-        final byte[] externalConstraints = readBytesFromPath(getExternalConstraintsPath());
-        final Map<String, Interval> alegroEc = calculateConstraintsForAlegro(externalConstraints, task.getTargetDate());
+        final Map<String, Interval> alegroEc = getAlegroExternalConstraints();
         final Interval alDeConstraints = alegroEc.get(ALEGRO_DE_NODE_NAME);
         final Interval alBeConstraints = alegroEc.get(ALEGRO_BE_NODE_NAME);
 

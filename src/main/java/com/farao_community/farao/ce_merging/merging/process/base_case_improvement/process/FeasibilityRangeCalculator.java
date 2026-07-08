@@ -66,16 +66,14 @@ public class FeasibilityRangeCalculator {
     public Map<String, Interval> importFeasibilityRangesFile(byte[] feasibilityRange,
                                                              Map<String, Double> netPositionMap) {
 
-        final FeasibilityRangeDocument document = JaxbUtils.readFromBytes(FeasibilityRangeDocument.class,
-                                                                          feasibilityRange);
-
         final Map<String, Interval> feasibilityRangesMap = regionConfiguration
             .getAreasIn()
             .values()
             .stream()
             .collect(toMap(identity(), v -> infinity()));
 
-        final Map<String, Interval> fromDocument = document
+        final Map<String, Interval> fromDocument = JaxbUtils
+            .readFromBytes(FeasibilityRangeDocument.class, feasibilityRange)
             .getConstraints()
             .getFeasibilityRangeConstraint()
             .stream()

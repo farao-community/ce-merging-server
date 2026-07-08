@@ -83,7 +83,7 @@ public class BciComputation {
         } else {
             LOGGER.info("Not all forecast net positions are in the feasibility ranges, BCI will be applied");
             final boolean hasExtendedRanges = applyBci();
-            targetGlobalNpByArea = targetInRegionNpByArea.withValuesShiftedBy(outNetPositionByArea::get);
+            targetGlobalNpByArea = targetInRegionNpByArea.withValuesShiftedBy(outNetPositionByArea::getOrZero);
             results = createResults(initialRegionNetPositions);
             return new BciComputationResult(true, hasExtendedRanges, results);
         }

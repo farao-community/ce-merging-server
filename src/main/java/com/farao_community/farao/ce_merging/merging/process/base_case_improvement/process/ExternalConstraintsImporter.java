@@ -6,14 +6,13 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ExternalConstraintsInputs;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ExternalConstraintsInputs;
 import com.farao_community.farao.ce_merging.xsd.FlowBasedExternalConstraintDocument;
 import com.farao_community.farao.ce_merging.xsd.NetPositionConstraint;
-import com.google.common.io.ByteSource;
-import jakarta.xml.bind.JAXBContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,10 +24,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
-import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ExternalConstraintsInputs.fromNetPositionConstraint;
-import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval.infinity;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
+import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval.infinity;
+import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ExternalConstraintsInputs.fromNetPositionConstraint;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static java.util.function.Function.identity;
 import static java.util.function.Predicate.not;
@@ -61,7 +60,7 @@ public final class ExternalConstraintsImporter {
     }
 
     private static ExternalConstraintsInputs fromNetPositionConstraintWithRegion(final NetPositionConstraint npc,
-                                                                          final RegionConfiguration regionConfiguration) {
+                                                                                 final RegionConfiguration regionConfiguration) {
         final ExternalConstraintsInputs eci = fromNetPositionConstraint(npc);
         final String originEic = regionConfiguration.getAreaInEic(npc.getTsoOrigin());
         eci.setAreaId(Optional.ofNullable(originEic).orElseThrow());
@@ -95,33 +94,24 @@ public final class ExternalConstraintsImporter {
 
     private static List<NetPositionConstraint> getNetPositionConstraints(final byte[] externalConstraints,
                                                                          final OffsetDateTime targetDate) {
-        try {
-            LOGGER.info("Importing external constraints file");
-            final FlowBasedExternalConstraintDocument document = (FlowBasedExternalConstraintDocument) JAXBContext
-                .newInstance(FlowBasedExternalConstraintDocument.class)
-                .createUnmarshaller()
-                .unmarshal(ByteSource.wrap(externalConstraints).openStream());
+        LOGGER.info("Importing external constraints file");
+        final FlowBasedExternalConstraintDocument document = JaxbUtils.readFromBytes(FlowBasedExternalConstraintDocument.class,
+                                                                                     externalConstraints);
 
-            final String timeInterval = document.getExternalConstraintTimeInterval().getV();
+        final String timeInterval = document.getExternalConstraintTimeInterval().getV();
 
-            if (!isWithinRange(targetDate, timeInterval)) {
-                final String errorMessage = "External constraints time interval %s does not include the process target date %s "
-                    .formatted(timeInterval, targetDate);
-                LOGGER.error(errorMessage);
-                throw new CeMergingException(errorMessage);
-            }
-
-            return document.getConstraints()
-                .getNetPositionConstraint()
-                .stream()
-                .filter(ct -> isWithinRange(targetDate, ct.getTimeInterval().getV()))
-                .toList();
-
-        } catch (final Exception e) {
-            String errorMessage = "Couldn't import external constraints file";
+        if (!isWithinRange(targetDate, timeInterval)) {
+            final String errorMessage = "External constraints time interval %s does not include the process target date %s "
+                .formatted(timeInterval, targetDate);
             LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage, e);
+            throw new CeMergingException(errorMessage);
         }
+
+        return document.getConstraints()
+            .getNetPositionConstraint()
+            .stream()
+            .filter(ct -> isWithinRange(targetDate, ct.getTimeInterval().getV()))
+            .toList();
     }
 
     private static void updateExternalConstraintsIntervals(final List<ExternalConstraintsInputs> externalConstraintsTmp,
@@ -141,8 +131,6 @@ public final class ExternalConstraintsImporter {
                     LOGGER.error(errorMessage);
                     throw new CeMergingException(errorMessage);
             }
-
-            externalConstraintsMap.put(ec.getAreaId(), interval);
         });
     }
 
