@@ -32,9 +32,11 @@ class CeMergingConfigurationTest {
         copy.setDailyMergingRoot(configuration.getDailyMergingRoot());
         final MergingTask task = taskWithIdAndStatus(1, TaskStatus.CREATED);
 
-        // HOURLY
         assertEquals(Path.of("/tmp/testFiles"),
                      Path.of(copy.getCeMergingRoot()));
+
+        assertEquals(Path.of("/tmp/testFiles/daily"),
+                     Path.of(copy.getDailyMergingRoot()));
 
         assertEquals(Path.of("/tmp/testFiles/1/artifacts"),
                      Path.of(copy.getArtifactsDirectoryPath(task)));
@@ -47,10 +49,6 @@ class CeMergingConfigurationTest {
         assertEquals(Path.of("/another/root/1/inputs"),
                      Path.of(copy.getInputsDirectoryPath(task)));
 
-        // DAILY
-        assertEquals(Path.of("/tmp/testFiles/daily"),
-                     Path.of(copy.getDailyMergingRoot()));
-
         assertEquals(Path.of("/tmp/testFiles/daily/1/daily-outputs"),
                      Path.of(copy.getDailyOutputsDirectoryPath(task)));
 
@@ -58,6 +56,5 @@ class CeMergingConfigurationTest {
 
         assertEquals(Path.of("/a/new/path/1/daily-inputs"),
                      Path.of(copy.getDailyInputsDirectoryPath(task)));
-
     }
 }

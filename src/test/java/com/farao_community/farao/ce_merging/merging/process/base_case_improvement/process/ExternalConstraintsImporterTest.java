@@ -26,7 +26,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.Double.MAX_VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.assertions.IntervalAssert.assertThat;
 
 class ExternalConstraintsImporterTest {
 
@@ -52,14 +54,11 @@ class ExternalConstraintsImporterTest {
     void calculateConstraints() {
         final Map<String, Interval> ecs = ExternalConstraintsImporter.calculateConstraints(externalConstraints, regionConfiguration, TARGET_DATE);
         assertEquals(12, ecs.size());
-        assertEquals(-Double.MAX_VALUE, ecs.get("AREA_NUMBER1_EIC").getMinValue(), 0.);
-        assertEquals(Double.MAX_VALUE, ecs.get("AREA_NUMBER1_EIC").getMaxValue(), 0.);
-        assertEquals(-6500, ecs.get("AREA_NUMBER25_EIC").getMinValue(), 0.);
-        assertEquals(6500., ecs.get("AREA_NUMBER25_EIC").getMaxValue(), 0.);
-        assertEquals(-6500, ecs.get("AREA_NUMBER12_EIC").getMinValue(), 0.);
-        assertEquals(Double.MAX_VALUE, ecs.get("AREA_NUMBER12_EIC").getMaxValue(), 0.);
-        assertEquals(-6875, ecs.get("AREA_NUMBER26_EIC").getMinValue(), 0.);
-        assertEquals(0., ecs.get("AREA_NUMBER26_EIC").getMaxValue(), 0.);
+
+        assertThat(ecs.get("AREA_NUMBER12_EIC")).rangeIs(-6500, MAX_VALUE);
+        assertThat(ecs.get("AREA_NUMBER25_EIC")).rangeIs(-6500, 6500);
+        assertThat(ecs.get("AREA_NUMBER26_EIC")).rangeIs(-6875, 0);
+        assertThat(ecs.get("AREA_NUMBER1_EIC")).rangeIs(-MAX_VALUE, MAX_VALUE);
     }
 
     @Test

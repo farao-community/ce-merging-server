@@ -28,22 +28,6 @@ public class CeMergingConfiguration {
     @Value("${ce-merging-server.filesystem.root-daily}")
     private String dailyMergingRoot;
 
-    /**
-     *
-     * @param task : each task has it own directory
-     * @param directory : each type of file (in, out, ...) has its subdirectory inside
-     * @return /path/to/root/task_id/directory
-     */
-    private String resolveMergingTaskDirInRoot(final MergingTask task, final String directory, final String root) {
-        return Path.of(root + separator + task.getId())
-            .resolve(directory)
-            .toString();
-    }
-
-    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                HOURLY MERGING
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-
     public String getCeMergingRoot() {
         return ceMergingRoot;
     }
@@ -52,8 +36,24 @@ public class CeMergingConfiguration {
         this.ceMergingRoot = ceMergingRoot;
     }
 
+    public String getDailyMergingRoot() {
+        return dailyMergingRoot;
+    }
+
+    public void setDailyMergingRoot(final String dailyMergingRoot) {
+        this.dailyMergingRoot = dailyMergingRoot;
+    }
+
     public String getInputsDirectoryPath(final MergingTask task) {
         return getDirectoryPath(task, INPUTS_DIR);
+    }
+
+    public String getDailyInputsDirectoryPath(final MergingTask task) {
+        return getDailyDirectoryPath(task, DAILY_INPUTS_DIR);
+    }
+
+    public String getDailyOutputsDirectoryPath(final MergingTask task) {
+        return getDailyDirectoryPath(task, DAILY_OUTPUTS_DIR);
     }
 
     public String getOutputsDirectoryPath(final MergingTask task) {
@@ -65,37 +65,29 @@ public class CeMergingConfiguration {
     }
 
     public String getDirectoryPath(final MergingTask task, final String directory) {
-        return resolveMergingTaskDirInRoot(task, directory, ceMergingRoot);
+        return resolveTaskDirInRoot(task, directory, ceMergingRoot);
     }
 
     public String getTaskDirectoryPath(final MergingTask task) {
         return Path.of(ceMergingRoot)
-            .resolve(task.getId().toString())
+                .resolve(task.getId().toString())
+                .toString();
+    }
+
+    private String getDailyDirectoryPath(final MergingTask task, final String directory) {
+        return resolveTaskDirInRoot(task, directory, dailyMergingRoot);
+    }
+
+    /**
+     *
+     * @param task : each task has it own directory
+     * @param directory : each type of file (in, out, ...) has its subdirectory inside
+     * @return /path/to/root/task_id/directory
+     */
+    private String resolveTaskDirInRoot(final MergingTask task, final String directory, final String root) {
+        return Path.of(root + separator + task.getId())
+            .resolve(directory)
             .toString();
-    }
-
-    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                DAILY MERGING
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
-
-    public String getDailyMergingRoot() {
-        return dailyMergingRoot;
-    }
-
-    public void setDailyMergingRoot(final String dailyMergingRoot) {
-        this.dailyMergingRoot = dailyMergingRoot;
-    }
-
-    public String getDailyInputsDirectoryPath(final MergingTask task) {
-        return getDailyDirectoryPath(task, DAILY_INPUTS_DIR);
-    }
-
-    public String getDailyOutputsDirectoryPath(final MergingTask task) {
-        return getDailyDirectoryPath(task, DAILY_OUTPUTS_DIR);
-    }
-
-    public String getDailyDirectoryPath(final MergingTask task, final String directory) {
-        return resolveMergingTaskDirInRoot(task, directory, dailyMergingRoot);
     }
 
 }
