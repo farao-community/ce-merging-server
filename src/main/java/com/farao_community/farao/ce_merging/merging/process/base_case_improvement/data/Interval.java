@@ -63,7 +63,7 @@ public class Interval {
         if (minValue > maxValue) {
             final String errorMessage = "Min value of feasibility range should be lower than max value";
             LOGGER.error(errorMessage);
-            throw new ArithmeticException(errorMessage);
+            throw new IllegalArgumentException(errorMessage);
         }
     }
 

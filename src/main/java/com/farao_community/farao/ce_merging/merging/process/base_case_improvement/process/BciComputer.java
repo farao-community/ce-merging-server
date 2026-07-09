@@ -25,6 +25,8 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumProperty;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumPropertyFiltered;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Math.max;
@@ -216,13 +218,13 @@ public class BciComputer {
     private void compensateRemainingImbalances() {
         final double totalImbalance = targetInRegionNpByArea.getTotalFlow();
 
-        final double totalFeasibilityRanges = feasibilityRanges.values().stream()
-            .mapToDouble(Interval::getRange)
-            .sum();
+        final double totalFeasibilityRanges = sumProperty(feasibilityRanges.values(), Interval::getRange);
 
-        targetInRegionNpByArea.shiftAllFlowsWith(areaId -> -totalImbalance
-                                                           * feasibilityRanges.get(areaId).getRange()
-                                                           / totalFeasibilityRanges);
+        if (totalFeasibilityRanges != 0) {
+            targetInRegionNpByArea.shiftAllFlowsWith(areaId -> -totalImbalance
+                                                               * feasibilityRanges.get(areaId).getRange()
+                                                               / totalFeasibilityRanges);
+        }
 
     }
 
@@ -265,7 +267,7 @@ public class BciComputer {
         final double totalViolations = violationsByArea.getTotalFlow();
         final ToDoubleFunction<Double> toContraryViolation = v -> totalViolations < 0 ? max(v, 0.0) : min(v, 0.0);
 
-        return violationsByArea.values().stream().mapToDouble(toContraryViolation).sum();
+        return sumProperty(violationsByArea.values(), toContraryViolation);
     }
 
     private double getAvailableShiftWithContraryViolation(final String area) {
@@ -280,12 +282,10 @@ public class BciComputer {
         return getMaxOrMinConstraint(area, fromMaxIf) - targetInRegionNpByArea.get(area);
     }
 
-    private double computeTotalShiftAvailableFor(final Predicate<String> filterOnKey,
-                                                 final ToDoubleFunction<String> valueMapper) {
-        return targetInRegionNpByArea.keySet().stream()
-            .filter(filterOnKey)
-            .mapToDouble(valueMapper)
-            .sum();
+    private double computeTotalShiftAvailableFor(final Predicate<String> filterOnArea,
+                                                 final ToDoubleFunction<String> areaToShift) {
+
+        return sumPropertyFiltered(targetInRegionNpByArea.keySet(), areaToShift, filterOnArea);
     }
 
     private boolean isInContraryViolation(final double violation) {

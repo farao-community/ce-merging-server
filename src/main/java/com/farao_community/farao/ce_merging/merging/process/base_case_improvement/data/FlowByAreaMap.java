@@ -6,12 +6,15 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collector;
 
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumCollection;
+import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
 
@@ -60,11 +63,15 @@ public class FlowByAreaMap extends HashMap<String, Double> {
     }
 
     public Double getTotalFlow() {
-        return this.values().stream().mapToDouble(Double::doubleValue).sum();
+        return sumCollection(values());
     }
 
     public static <T> Collector<T, ?, FlowByAreaMap> toFlowByAreaMap(final Function<? super T, String> keyMapper,
                                                                      final Function<? super T, Double> valueMapper) {
         return collectingAndThen(toMap(keyMapper, valueMapper), FlowByAreaMap::new);
+    }
+
+    public static FlowByAreaMap fromAreas(final Collection<String> areas, final Function<String, Double> areaToFlow) {
+        return areas.stream().collect(toFlowByAreaMap(identity(), areaToFlow));
     }
 }

@@ -168,11 +168,11 @@ public class BciProcessor {
             return null;
         }
 
-        final Interval alDeConstraints = alegroConstraints.get(ALEGRO_DE_NODE_NAME);
-        final Interval alBeConstraints = alegroConstraints.get(ALEGRO_BE_NODE_NAME);
+        final Interval alDeConstraints = getGermanAlegroConstraint();
+        final Interval alBeConstraints = getBelgianAlegroConstraint();
 
-        final BciAlegroFlows alDeFlows = new BciAlegroFlows(alegroData.aldeFlows().targetFlow(), alDeConstraints);
-        final BciAlegroFlows alBeFlows = new BciAlegroFlows(alegroData.albeFlows().targetFlow(), alBeConstraints);
+        final BciAlegroFlows alDeFlows = new BciAlegroFlows(alegroData.aldeFlows(), alDeConstraints);
+        final BciAlegroFlows alBeFlows = new BciAlegroFlows(alegroData.albeFlows(), alBeConstraints);
 
         return new BciAlegroData(alDeFlows, alBeFlows);
     }
@@ -204,8 +204,8 @@ public class BciProcessor {
 
     private double getCommonFlowLimit() {
 
-        final Interval alDeConstraints = alegroConstraints.get(ALEGRO_DE_NODE_NAME);
-        final Interval alBeConstraints = alegroConstraints.get(ALEGRO_BE_NODE_NAME);
+        final Interval alDeConstraints = getGermanAlegroConstraint();
+        final Interval alBeConstraints = getBelgianAlegroConstraint();
 
         final boolean flowsToGermany = alegroData.albeFlows().targetFlow() < 0;
 
@@ -218,6 +218,14 @@ public class BciProcessor {
 
     private boolean shouldIgnoreAlegro() {
         return alegroData == null || alegroData.alegroInOutage();
+    }
+
+    private Interval getBelgianAlegroConstraint() {
+        return alegroConstraints.get(ALEGRO_BE_NODE_NAME);
+    }
+
+    private Interval getGermanAlegroConstraint() {
+        return alegroConstraints.get(ALEGRO_DE_NODE_NAME);
     }
 
     private void saveInArtifacts() {
