@@ -69,10 +69,9 @@ public class BciComputer {
                                     final double alBeToCeFlow,
                                     final double alDeToCeFlow) {
         final Map<String, BciAreaResults> results;
-        inRegionNpfByArea = referenceProgram.computeAllNetPositionsInRegion(regions);
-        globalNpfByArea = referenceProgram.computeAllGlobalNetPositions(regions);
+        inRegionNpfByArea = referenceProgram.getAllNetPositionsInRegion(regions);
+        globalNpfByArea = referenceProgram.getAllGlobalNetPositions(regions);
         shiftNpfWithAlegro(alBeToCeFlow, alDeToCeFlow);
-        final FlowByAreaMap outNetPositionByArea = referenceProgram.computeAllNetPositionsOutRegion(regions);
         targetInRegionNpByArea = inRegionNpfByArea.copy();
 
         if (isNpfInFeasibilityRanges()) {
@@ -84,6 +83,7 @@ public class BciComputer {
         } else {
             LOGGER.info("There are forecast net positions outside feasibility ranges, BCI will be applied");
             final boolean hasExtendedRanges = applyBci();
+            final FlowByAreaMap outNetPositionByArea = referenceProgram.getAllNetPositionsOutRegion(regions);
             targetGlobalNpByArea = targetInRegionNpByArea.withValuesShiftedBy(outNetPositionByArea::getOrZero);
             results = createResults(initialRegionNetPositions);
             return new BciComputationResult(true, hasExtendedRanges, results);

@@ -15,7 +15,7 @@ public record CountryNetPositions(NetPosition globalNetPosition,
                                @JsonProperty("inRegionNetPosition") final NetPosition inRegionNetPosition,
                                @JsonProperty("outBciNetPosition") final double outBciNetPosition,
                                @JsonProperty("virtualHubsExchanges") final FlowByAreaMap globalDetailedVirtualHubsExchanges,
-                               @JsonProperty("globalDetailedExchanges") FlowByAreaMap globalDetailedExchanges,
+                               @JsonProperty("globalDetailedExchanges") final FlowByAreaMap globalDetailedExchanges,
                                @JsonProperty("generationAndLoadQuantity") final GenerationAndLoadQuantity generationAndLoadQuantity) {
         this.globalNetPosition = globalNetPosition;
         this.inRegionNetPosition = inRegionNetPosition;

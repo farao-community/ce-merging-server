@@ -28,7 +28,6 @@ import test_utils.CeTestUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
@@ -180,10 +179,10 @@ class BciProcessorTest {
         assertEquals(-100, aldeFlows.minEc());
     }
 
-    private BciProcessResult getResult(final MergingTask task) throws FileNotFoundException {
-        return BciResultUtil.read(
-            new FileInputStream(task.getArtifactPath(BCI_OUTPUT_FILE))
-        );
+    private BciProcessResult getResult(final MergingTask task) throws IOException {
+        try (final FileInputStream fis = new FileInputStream(task.getArtifactPath(BCI_OUTPUT_FILE))) {
+            return BciResultUtil.read(fis);
+        }
     }
 
     private MergingTask prepareTask(final Long id,

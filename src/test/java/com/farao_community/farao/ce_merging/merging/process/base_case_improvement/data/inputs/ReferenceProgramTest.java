@@ -59,9 +59,9 @@ class ReferenceProgramTest {
 
     @Test
     void getNetPositionOfRegion() {
-        assertEquals(0., refProgram.computeAllNetPositionsInRegion(regionConfiguration).getTotalFlow());
-        assertEquals(-100, refProgram.computeAllGlobalNetPositions(regionConfiguration).getTotalFlow());
-        assertEquals(-100, refProgram.computeAllNetPositionsOutRegion(regionConfiguration).getTotalFlow());
+        assertEquals(0., refProgram.getAllNetPositionsInRegion(regionConfiguration).getTotalFlow());
+        assertEquals(-100, refProgram.getAllGlobalNetPositions(regionConfiguration).getTotalFlow());
+        assertEquals(-100, refProgram.getAllNetPositionsOutRegion(regionConfiguration).getTotalFlow());
     }
 
     @Test

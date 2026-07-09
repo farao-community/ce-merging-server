@@ -19,13 +19,13 @@ public record InRegionNetPositions(@JsonSerialize(using = DoubleSerializer.class
                                    @JsonSerialize(using = DoubleSerializer.class) double forecast,
                                    @JsonSerialize(using = DoubleSerializer.class) double target) {
     @JsonCreator
-    public InRegionNetPositions(@JsonProperty("initial") double initial,
-                                @JsonProperty("initialMin") double initialMin,
-                                @JsonProperty("initialMax") double initialMax,
-                                @JsonProperty("finalMin") double finalMin,
-                                @JsonProperty("finalMax") double finalMax,
-                                @JsonProperty("forecast") double forecast,
-                                @JsonProperty("target") double target) {
+    public InRegionNetPositions(@JsonProperty("initial") final double initial,
+                                @JsonProperty("initialMin") final double initialMin,
+                                @JsonProperty("initialMax") final double initialMax,
+                                @JsonProperty("finalMin") final double finalMin,
+                                @JsonProperty("finalMax") final double finalMax,
+                                @JsonProperty("forecast") final double forecast,
+                                @JsonProperty("target") final double target) {
         this.initial = initial;
         this.initialMin = initialMin;
         this.initialMax = initialMax;

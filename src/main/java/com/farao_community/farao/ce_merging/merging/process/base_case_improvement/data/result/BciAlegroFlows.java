@@ -13,10 +13,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public record BciAlegroFlows(@JsonProperty("targetFlow") double targetFlow,
                              @JsonProperty("minEc") double minEc,
                              @JsonProperty("maxEc") double maxEc) {
-    public BciAlegroFlows(final double targetFlow,
-                          final Interval interval) {
-        this(targetFlow, interval.getMinValue(), interval.getMaxValue());
-    }
 
     public BciAlegroFlows(final AlegroFlows alegroFlows,
                           final Interval interval) {

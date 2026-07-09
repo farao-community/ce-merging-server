@@ -14,7 +14,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public record GlobalNetPositions(@JsonSerialize(using = DoubleSerializer.class) double forecast,
                                  @JsonSerialize(using = DoubleSerializer.class) double target) {
     @JsonCreator
-    public GlobalNetPositions(@JsonProperty("forecast") double forecast, @JsonProperty("target") double target) {
+    public GlobalNetPositions(@JsonProperty("forecast") final double forecast,
+                              @JsonProperty("target") final double target) {
         this.forecast = forecast;
         this.target = target;
     }

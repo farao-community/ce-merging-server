@@ -116,7 +116,7 @@ public class BciProcessor {
     }
 
     private void computeInRegionNetPositions() {
-        final FlowByAreaMap outRegionNetPositions = referenceProgram.computeAllNetPositionsOutRegion(regionConfiguration);
+        final FlowByAreaMap outRegionNetPositions = referenceProgram.getAllNetPositionsOutRegion(regionConfiguration);
         initialRegionNetPositions.putAll(
             initialGlobalNetPositions.withValuesShiftedBy(region -> -outRegionNetPositions.getOrZero(region))
         );

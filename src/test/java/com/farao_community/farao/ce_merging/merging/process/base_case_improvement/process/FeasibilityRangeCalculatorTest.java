@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.io.IOUtils;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.ExternalConstraintsImporter.calculateConstraints;
@@ -26,11 +26,11 @@ import static test_utils.assertions.IntervalAssert.assertThat;
 
 class FeasibilityRangeCalculatorTest {
     private static final OffsetDateTime TARGET_DATE = OffsetDateTime.parse("2019-03-01T23:00Z");
-    private final Map<String, Double> netPositionsMap = new HashMap<>();
+    private final FlowByAreaMap netPositionsMap = new FlowByAreaMap();
     private byte[] externalConstraints;
     private byte[] bciFeasibilityRange;
     private static final byte[] EMPTY_FEASIBILITY_RANGE = new byte[0];
-    private static final Map<String, Double> EMPTY_NETPOSITIONS_MAP = new HashMap<>();
+    private static final FlowByAreaMap EMPTY_NETPOSITIONS_MAP = new FlowByAreaMap();
     private RegionConfiguration regionConfiguration;
     private FeasibilityRangeCalculator feasibilityRangeCalculator;
 

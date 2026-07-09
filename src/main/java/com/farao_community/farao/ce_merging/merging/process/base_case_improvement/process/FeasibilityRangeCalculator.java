@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.merging.process.base_case_improveme
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.xsd.FeasibilityRangeConstraint;
 import com.farao_community.farao.ce_merging.xsd.FeasibilityRangeDocument;
@@ -37,7 +38,7 @@ public class FeasibilityRangeCalculator {
 
     public Map<String, Interval> getRegionFeasibilityRanges(final byte[] externalConstraints,
                                                             final OffsetDateTime targetDate,
-                                                            final Map<String, Double> netPositions,
+                                                            final FlowByAreaMap netPositions,
                                                             final byte[] feasibilityRange) {
 
         final Map<String, Interval> extConstraintsMap = calculateConstraints(externalConstraints,
@@ -90,20 +91,15 @@ public class FeasibilityRangeCalculator {
         return frc -> frc.getArea().getV();
     }
 
-    private enum Type {
-        ABSOLUTE,
-        RELATIVE
-    }
-
     private static Interval computeIntervalWithNetPositions(final FeasibilityRangeConstraint feasibilityRange,
                                                             final Map<String, Double> netPositionMap) {
         double max = feasibilityRange.getMax().getV().doubleValue();
         double min = feasibilityRange.getMin().getV().doubleValue();
         final String type = feasibilityRange.getType().getV();
-        switch (Type.valueOf(type)) {
-            case ABSOLUTE:
+        switch (type) {
+            case "ABSOLUTE":
                 return new Interval(min, max);
-            case RELATIVE:
+            case "RELATIVE":
                 final String area = feasibilityRange.getArea().getV();
                 if (!netPositionMap.containsKey(area)) {
                     throw new CeMergingException("Error in feasibility range computation: Initial net position not found for area " + area);

@@ -51,25 +51,24 @@ public class ReferenceProgram implements Serializable {
     }
 
     public FlowByAreaMap computeGlobalNetPositionsForOutAreas(final RegionConfiguration region) {
-        final Predicate<String> isNotRegionOrItsAreasIn = areaId -> !region.getId().equals(areaId)
-                                                                    && !region.getAreasIn().containsValue(areaId);
-        return Stream
-            .concat(referenceExchangeDataList.stream().map(ReferenceExchangeData::getAreaInId),
-                    referenceExchangeDataList.stream().map(ReferenceExchangeData::getAreaOutId))
+        final Predicate<String> isNeitherRegionNorItsAreasIn = areaId -> !region.getId().equals(areaId)
+                                                                         && !region.getAreasIn().containsValue(areaId);
+        return Stream.concat(referenceExchangeDataList.stream().map(ReferenceExchangeData::getAreaInId),
+                             referenceExchangeDataList.stream().map(ReferenceExchangeData::getAreaOutId))
             .distinct()
-            .filter(isNotRegionOrItsAreasIn)
+            .filter(isNeitherRegionNorItsAreasIn)
             .collect(toFlowByAreaMap(identity(), this::getAreaGlobalNetPosition));
     }
 
-    public FlowByAreaMap computeAllNetPositionsInRegion(final RegionConfiguration region) {
+    public FlowByAreaMap getAllNetPositionsInRegion(final RegionConfiguration region) {
         return FlowByAreaMap.fromAreas(region.getAreasIn().values(), area -> getAreaNetPositionInRegion(area, region));
     }
 
-    public FlowByAreaMap computeAllNetPositionsOutRegion(final RegionConfiguration region) {
+    public FlowByAreaMap getAllNetPositionsOutRegion(final RegionConfiguration region) {
         return FlowByAreaMap.fromAreas(region.getAreasIn().values(), area -> getAreaNetPositionOutRegion(area, region));
     }
 
-    public FlowByAreaMap computeAllGlobalNetPositions(final RegionConfiguration region) {
+    public FlowByAreaMap getAllGlobalNetPositions(final RegionConfiguration region) {
         return FlowByAreaMap.fromAreas(region.getAreasIn().values(), this::getAreaGlobalNetPosition);
     }
 
