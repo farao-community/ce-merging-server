@@ -15,14 +15,16 @@ import com.farao_community.farao.ce_merging.xsd.glsk_fix.*;
 import com.powsybl.commons.report.ReportNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -34,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class GlskFixServiceTest {
 
     public static final String INVALID_TARGET_DATE = "2016-07-30T10:00:00Z";
@@ -47,7 +50,7 @@ class GlskFixServiceTest {
 
     private static final String TARGET_DATE = "2016-07-29T00:00:00Z";
     private static final String CREATION_DATE = "2026-01-01T00:00:00Z";
-    private static final String GLSK_FIX_RESOURCE_PATH = "src/test/resources/glskFix";
+    private static final String GLSK_FIX_RESOURCE_PATH = "glskFix";
 
     @BeforeEach
     void setUp() {
@@ -103,6 +106,13 @@ class GlskFixServiceTest {
     }
 
     private byte[] readGlskFile(final String filePath) throws IOException {
-        return Files.readAllBytes(Path.of(filePath));
+        try (final InputStream inputStream = getClass()
+                .getClassLoader()
+                .getResourceAsStream(filePath)) {
+            if (inputStream == null) {
+                throw new FileNotFoundException("Resource not found: " + filePath);
+            }
+            return inputStream.readAllBytes();
+        }
     }
 }
