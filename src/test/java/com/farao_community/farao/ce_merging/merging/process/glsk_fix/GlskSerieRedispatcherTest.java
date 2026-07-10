@@ -78,7 +78,7 @@ public class GlskSerieRedispatcherTest {
     }
 
     @Test
-    void shouldNotRedispatchWhenShareSumIs100() {
+    void shouldNotRedispatchWhenShareSumIs120() {
         final GSKSeriesType series1 = createGskSeries(TS_001);
         final GSKSeriesType series2 = createGskSeries(TS_002);
         final GSKDocument document = new GSKDocument();
