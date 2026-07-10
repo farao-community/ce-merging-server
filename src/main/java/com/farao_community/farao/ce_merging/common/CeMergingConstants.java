@@ -57,9 +57,17 @@ public final class CeMergingConstants {
     public static final String GERMAN_COUNTRY_CODE = "DE";
     public static final String DANISH_TSO = "D1";
     public static final String DENMARK_COUNTRY_CODE = "DK";
+    public static final String REPORT_NODE_AREA_NAME_KEY = "areaName";
+    public static final String REPORT_NODE_BALANCE_KEY = "balance";
+    public static final String REPORT_NODE_TARGET_KEY = "target";
+    public static final String REPORT_NODE_MISMATCH_KEY = "mismatch";
+    public static final String DC = "DC";
+    public static final String AC = "AC";
 
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
+    public static final double MAX_FICTITIOUS_P = 9999.;
+    public static final double MAX_FICTITIOUS_Q = 99999.;
 
     // Date management
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");
