@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<GSKDocument xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" DtdVersion="1" DtdRelease="0" xsi:noNamespaceSchemaLocation="gsk-document.xsd">
+	<DocumentIdentification v="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"/>
+	<DocumentVersion v="1"/>
+	<DocumentType v="Z02"/>
+	<ProcessType v="Z02"/>
+	<SenderIdentification v="XXXXXXXXXXX" codingScheme="A01"/>
+	<SenderRole v="A36"/>
+	<ReceiverIdentification v="XXXXXXXXXXX" codingScheme="A01"/>
+	<ReceiverRole v="A04"/>
+	<CreationDateTime v="2017-10-30T09:27:21Z"/>
+	<GSKTimeInterval v="2016-07-28T22:00Z/2016-07-29T22:00Z"/>
+	<Domain v="XXXXXXXXXXX" codingScheme="A01"/>
+	<GSKSeries>
+		<TimeSeriesIdentification v="2"/>
+		<BusinessType v="Z02" share="30"/>
+		<Area v="string" codingScheme="A01"/>
+		<AutoGSK_Block>
+			<GSK_Name v="XX"/>
+			<TimeInterval v="2016-07-28T22:00Z/2016-07-29T22:00Z"/>
+			<AutoNodes>
+				<NodeName v="ABA1BB1 "/>
+			</AutoNodes>
+		</AutoGSK_Block>
+	</GSKSeries>
+	<GSKSeries>
+		<TimeSeriesIdentification v="3"/>
+		<BusinessType v="Z05" share="70"/>
+		<Area v="string" codingScheme="A01"/>
+		<AutoGSK_Block>
+			<GSK_Name v="XX"/>
+			<TimeInterval v="2016-07-28T22:00Z/2016-07-29T22:00Z"/>
+			<AutoNodes>
+				<NodeName v="ABA1BB2 "/>
+			</AutoNodes>
+		</AutoGSK_Block>
+	</GSKSeries>
+	<GSKSeries>
+		<TimeSeriesIdentification v="4"/>
+		<BusinessType v="Z02" share="100"/>
+		<Area v="string2" codingScheme="A01"/>
+		<AutoGSK_Block>
+			<GSK_Name v="YY"/>
+			<TimeInterval v="2016-07-28T22:00Z/2016-07-28T23:00Z"/>
+			<AutoNodes>
+				<NodeName v="XXL1DD1 "/>
+			</AutoNodes>
+		</AutoGSK_Block>
+		<AutoGSK_Block>
+			<GSK_Name v="YY"/>
+			<TimeInterval v="2016-07-28T23:00Z/2016-07-29T22:00Z"/>
+			<AutoNodes>
+				<NodeName v="XXL1DD1"/>
+			</AutoNodes>
+			<AutoNodes>
+				<NodeName v="XXL1DD2"/>
+			</AutoNodes>
+		</AutoGSK_Block>
+	</GSKSeries>
+	<GSKSeries>
+		<TimeSeriesIdentification v="17"/>
+		<BusinessType share="100.000" v="Z02"/>
+		<Area v="area1" codingScheme="A01"/>
+		<ManualGSK_Block>
+			<GSK_Name v="DE_ALEGrO"/>
+			<TimeInterval v="2016-07-28T22:00Z/2016-07-29T22:00Z" />
+			<ManualNodes>
+				<NodeName v="TEST1"/>
+				<Factor v="1"/>
+			</ManualNodes>
+		</ManualGSK_Block>
+	</GSKSeries>
+	<GSKSeries>
+		<TimeSeriesIdentification v="18"/>
+		<BusinessType share="100.000" v="Z02"/>
+		<Area v="area2" codingScheme="A01"/>
+		<ManualGSK_Block>
+			<GSK_Name v="BE_ALEGrO"/>
+			<TimeInterval v="2016-07-28T22:00Z/2016-07-29T22:00Z" />
+			<ManualNodes>
+				<NodeName v="TEST2"/>
+				<Factor v="1"/>
+			</ManualNodes>
+		</ManualGSK_Block>
+	</GSKSeries>
+</GSKDocument>

@@ -54,9 +54,17 @@ public final class CeMergingConstants {
     public static final Set<String> GERMAN_TSO = Set.of("D2", "D4", "D6", "D7", "D8");
     public static final String VIRTUAL_HUB_ALEGRO_BE_NODE_NAME = "XLI_OB1B";
     public static final String VIRTUAL_HUB_ALEGRO_DE_NODE_NAME = "XLI_OB1A";
+    public static final String VIRTUAL_HUB_ALEGRO_BE_CODE = "BE_ALEGrO";
+    public static final String VIRTUAL_HUB_ALEGRO_DE_CODE = "DE_ALEGrO";
+    public static final String VIRTUAL_HUB_ALEGRO_BE_EIC = "22Y201903144---9";
+    public static final String VIRTUAL_HUB_ALEGRO_DE_EIC = "22Y201903145---4";
     public static final String GERMAN_COUNTRY_CODE = "DE";
     public static final String DANISH_TSO = "D1";
     public static final String DENMARK_COUNTRY_CODE = "DK";
+    public static final String REPORT_BASE_NAME = "i18n.reports";
+    public static final String SENDER_ID = "22XCORESO------S";
+    public static final String RECEIVER_ID = "17XTSO-CS------W";
+    public static final String CORE_REGION_ID = "10Y1001C--00059P";
 
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;

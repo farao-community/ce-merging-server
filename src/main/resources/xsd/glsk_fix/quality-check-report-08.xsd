@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ecc="etso-core-cmpts.xsd" elementFormDefault="qualified" attributeFormDefault="unqualified" ecc:VersionRelease="58.0">
+  <xsd:import namespace="etso-core-cmpts.xsd" schemaLocation="etso-core-cmpts.xsd"/>
+  <xsd:element name="QualityCheckReport">
+    <xsd:complexType>
+      <xsd:annotation>
+        <xsd:documentation/>
+      </xsd:annotation>
+      <xsd:sequence>
+        <xsd:element name="MessageIdentification" type="ecc:IdentificationType"/>
+        <xsd:element name="MessageVersion" type="ecc:VersionType"/>
+        <xsd:element name="MessageType" type="ecc:MessageType"/>
+        <xsd:element name="ProcessType" type="ecc:ProcessType"/>
+        <xsd:element name="SenderIdentification" type="ecc:PartyType"/>
+        <xsd:element name="SenderRole" type="ecc:RoleType"/>
+        <xsd:element name="ReceiverIdentification" type="ecc:PartyType"/>
+        <xsd:element name="ReceiverRole" type="ecc:RoleType"/>
+        <xsd:element name="MessageDateTime" type="ecc:MessageDateTimeType"/>
+        <xsd:element name="QualityCheckTimeInterval" type="ecc:TimeIntervalType"/>
+        <xsd:element name="Domain" type="ecc:AreaType" minOccurs="0"/>
+        <xsd:element name="QualityChecks" type="QualityChecks_Type" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="DtdVersion" type="xsd:string" use="required"/>
+      <xsd:attribute name="DtdRelease" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+  <xsd:complexType name="QualityChecks_Type">
+    <xsd:sequence>
+      <xsd:element name="QualityCheck" type="QualityCheck_Type" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+  <xsd:complexType name="QualityCheck_Type">
+    <xsd:sequence>
+      <xsd:element name="CheckType">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="GLSK"/>
+            <xsd:enumeration value="CB"/>
+            <xsd:enumeration value="RA"/>
+            <xsd:enumeration value="CO"/>
+            <xsd:enumeration value="CVA"/>
+            <xsd:enumeration value="IVA"/>
+            <xsd:enumeration value="IDATC"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="CheckId">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+            <xsd:maxLength value="100"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="Area" type="ecc:AreaType"/>
+      <xsd:element name="Severity">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="INFO"/>
+            <xsd:enumeration value="WARNING"/>
+            <xsd:enumeration value="ERROR"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="AssetId" minOccurs="0">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+            <xsd:maxLength value="100"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="TimeInterval" minOccurs="0">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:pattern
+              value="(((((20[0-9]{2})[\-](0[13578]|1[02])[\-](0[1-9]|[12][0-9]|3[01])|([0-9]{4})[\-]((0[469])|(11))[\-](0[1-9]|[12][0-9]|30))T(([01][0-9]|2[0-3]):[0-5][0-9])Z/)|(([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])[\-](02)[\-](0[1-9]|1[0-9]|2[0-9])T(([01][0-9]|2[0-3]):[0-5][0-9])Z/)|(([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])[\-](02)[\-](0[1-9]|1[0-9]|2[0-8])T(([01][0-9]|2[0-3]):[0-5][0-9])Z/))(((([0-9]{4})-(0[13578]|1[02])[\-](0[1-9]|[12][0-9]|3[01])|([0-9]{4})[\-]((0[469])|(11))[\-](0[1-9]|[12][0-9]|30))T(([01][0-9]|2[0-3]):[0-5][0-9])Z)|(([13579][26][02468][048]|[13579][01345789](0)[48]|[13579][01345789][2468][048]|[02468][048][02468][048]|[02468][1235679](0)[48]|[02468][1235679][2468][048]|[0-9][0-9][13579][26])[\-](02)[\-](0[1-9]|1[0-9]|2[0-9])T(([01][0-9]|2[0-3]):[0-5][0-9])Z)|(([13579][26][02468][1235679]|[13579][01345789](0)[01235679]|[13579][01345789][2468][1235679]|[02468][048][02468][1235679]|[02468][1235679](0)[01235679]|[02468][1235679][2468][1235679]|[0-9][0-9][13579][01345789])[\-](02)[\-](0[1-9]|1[0-9]|2[0-8])T(([01][0-9]|2[0-3]):[0-5][0-9])Z)))"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="Info">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:minLength value="1"/>
+            <xsd:maxLength value="1000"/>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="Properties" minOccurs="0">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Property" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:attribute name="key" type="xsd:string" use="required"/>
+						<xsd:attribute name="value" type="xsd:string" use="required"/>
+					</xsd:complexType>
+			    </xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+</xsd:schema>

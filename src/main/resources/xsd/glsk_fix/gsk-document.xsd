@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XML Spy v4.3 U (http://www.xmlspy.com) by baracchini (RTE) -->
+<xsd:schema xmlns:ecc="etso-core-cmpts.xsd" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:import namespace="etso-core-cmpts.xsd" schemaLocation="etso-core-cmpts.xsd"/>
+	<xsd:element name="GSKDocument">
+		<xsd:complexType>
+			<xsd:annotation>
+				<xsd:documentation/>
+			</xsd:annotation>
+			<xsd:sequence>
+				<xsd:element name="DocumentIdentification" type="ecc:IdentificationType"/>
+				<xsd:element name="DocumentVersion" type="ecc:VersionType"/>
+				<xsd:element name="DocumentType" type="ecc:MessageType"/>
+				<xsd:element name="ProcessType" type="ecc:ProcessType"/>
+				<xsd:element name="SenderIdentification" type="ecc:PartyType"/>
+				<xsd:element name="SenderRole" type="ecc:RoleType"/>
+				<xsd:element name="ReceiverIdentification" type="ecc:PartyType"/>
+				<xsd:element name="ReceiverRole" type="ecc:RoleType"/>
+				<xsd:element name="CreationDateTime" type="ecc:MessageDateTimeType"/>
+				<xsd:element name="GSKTimeInterval" type="ecc:TimeIntervalType"/>
+				<xsd:element name="Domain" type="ecc:AreaType"/>
+				<xsd:element name="GSKSeries" type="GSKSeries_Type" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="Reason" type="Reason_Type" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="DtdRelease" type="xsd:string" use="optional"/>
+			<xsd:attribute name="DtdVersion" type="xsd:string" use="optional"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="GSKSeries_Type">
+		<xsd:sequence>
+			<xsd:element name="TimeSeriesIdentification" type="ecc:IdentificationType"/>
+			<xsd:element name="BusinessType" type="ecc:BusinessType"/>
+			<xsd:element name="Area" type="ecc:AreaType"/>
+			<xsd:element name="ManualGSK_Block" type="ManualGSK_Block_Type" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="CountryGSK_Block" type="CountryGSK_Block_Type" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="AutoGSK_Block" type="AutoGSK_Block_Type" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ManualGSK_Block_Type">
+		<xsd:sequence>
+			<xsd:element name="GSK_Name" type="ecc:IdentificationType"/>
+			<xsd:element name="TimeInterval" type="ecc:TimeIntervalType"/>
+			<xsd:element name="ManualNodes" type="ManualNodes_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ManualNodes_Type">
+		<xsd:sequence>
+			<xsd:element name="NodeName" type="ecc:IdentificationType"/>
+			<xsd:element name="Factor" type="ecc:QuantityType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AutoGSK_Block_Type">
+		<xsd:sequence>
+			<xsd:element name="GSK_Name" type="ecc:IdentificationType"/>
+			<xsd:element name="TimeInterval" type="ecc:TimeIntervalType"/>
+			<xsd:element name="AutoNodes" type="AutoNodes_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AutoNodes_Type">
+		<xsd:sequence>
+			<xsd:element name="NodeName" type="ecc:IdentificationType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="CountryGSK_Block_Type">
+		<xsd:sequence>
+			<xsd:element name="GSK_Name" type="ecc:IdentificationType"/>
+			<xsd:element name="TimeInterval" type="ecc:TimeIntervalType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="Reason_Type">
+		<xsd:sequence>
+			<xsd:element name="ReasonCode" type="ecc:ReasonCodeType"/>
+			<xsd:element name="ReasonText" type="ecc:ReasonTextType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
