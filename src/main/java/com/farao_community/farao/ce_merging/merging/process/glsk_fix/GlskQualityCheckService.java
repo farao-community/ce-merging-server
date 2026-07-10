@@ -221,7 +221,7 @@ public class GlskQualityCheckService {
         task.getArtifacts().putFile(ArtifactType.GLSK_QUALITY_REPORT, savedFile);
     }
 
-    private QualityCheckReport exportQualityReport(ReportNode reporter, OffsetDateTime targetDateTime) throws DatatypeConfigurationException {
+    QualityCheckReport exportQualityReport(ReportNode reporter, OffsetDateTime targetDateTime) throws DatatypeConfigurationException {
         QualityCheckReport qualityCheckReport = new QualityCheckReport();
         fillHeader(qualityCheckReport, targetDateTime);
         fillQualityChecks(reporter, qualityCheckReport, targetDateTime);
@@ -241,16 +241,15 @@ public class GlskQualityCheckService {
 
     private QualityCheckType toQualityCheckType(ReportNode reportNode, OffsetDateTime targetDateTime) {
         final QualityCheckType qualityCheckType = new QualityCheckType();
-        qualityCheckType.setAssetId(reportNode.getValue(NODE_ID_KEY).get().toString());
+        qualityCheckType.setAssetId(getReportValue(reportNode, NODE_ID_KEY));
         qualityCheckType.setCheckId(reportNode.getMessageKey());
         qualityCheckType.setCheckType(GLSK);
-        qualityCheckType.setInfo(reportNode.getValue(TYPE_KEY).get() + " - " + reportNode.getMessage());
-        // all glsk quality report are warnings
+        qualityCheckType.setInfo(getReportValue(reportNode, TYPE_KEY) + " - " + reportNode.getMessage());
         qualityCheckType.setSeverity("WARNING");
         qualityCheckType.setTimeInterval(localDateToInterval(targetDateTime));
         final AreaType area = new AreaType();
         area.setCodingScheme(CodingSchemeType.A_01);
-        area.setV(reportNode.getValue(TSO_KEY).get().toString());
+        area.setV(getReportValue(reportNode, TSO_KEY));
         qualityCheckType.setArea(area);
         return qualityCheckType;
     }
@@ -309,6 +308,13 @@ public class GlskQualityCheckService {
         domain.setCodingScheme(CodingSchemeType.A_01);
         domain.setV(CORE_REGION_ID);
         qualityCheckReport.setDomain(domain);
+    }
+
+    private String getReportValue(ReportNode reportNode, String key) {
+        return reportNode.getValue(key)
+                .orElseThrow(() -> new IllegalArgumentException("Missing report value: " + key))
+                .getValue()
+                .toString();
     }
 
     private String localDateToInterval(final OffsetDateTime targetDateTime) {

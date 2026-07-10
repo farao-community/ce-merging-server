@@ -23,12 +23,12 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
 import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -109,6 +109,31 @@ public class GlskQualityCheckServiceTest {
         final Network network = createNetwork(true);
         glskQualityCheckService.checkAlegroGSKSeries(series, network, reportNode);
         assertTrue(reportNode.getChildren().isEmpty());
+    }
+
+    @Test
+    void shouldExportQualityReportFromReportNode() throws Exception {
+        final OffsetDateTime targetDateTime = OffsetDateTime.parse(VALID_DATE);
+        final ReportNode childReport = mock(ReportNode.class);
+        when(childReport.getValue(NODE_ID_KEY)).thenReturn(Optional.of(TypedValue.of("NODE_1", "TEST")));
+        when(childReport.getValue(TYPE_KEY)).thenReturn(Optional.of(TypedValue.of("INVALID_NODE", "TEST")));
+        when(childReport.getValue(TSO_KEY)).thenReturn(Optional.of(TypedValue.of("FR", "TEST")));
+        when(childReport.getMessageKey()).thenReturn("CHECK_001");
+        when(childReport.getMessage()).thenReturn("Invalid GLSK node");
+        final ReportNode reporter = mock(ReportNode.class);
+        when(reporter.getChildren()).thenReturn(List.of(childReport));
+        final QualityCheckReport result = glskQualityCheckService.exportQualityReport(reporter, targetDateTime);
+        assertNotNull(result);
+        assertEquals("0", result.getDtdVersion());
+        assertEquals("1", result.getDtdRelease());
+        assertEquals(targetDateTime.toString(), result.getMessageIdentification().getV());
+        assertEquals(MessageTypeList.A_16, result.getMessageType().getV());
+        final QualityCheckType qualityCheck = result.getQualityChecks()
+                .getFirst()
+                .getQualityCheck()
+                .getFirst();
+
+        assertEquals("WARNING", qualityCheck.getSeverity());
     }
 
     private Network createNetwork(final boolean connected) {
