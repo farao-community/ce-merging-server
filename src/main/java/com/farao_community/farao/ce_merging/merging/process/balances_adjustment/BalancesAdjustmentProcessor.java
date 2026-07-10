@@ -8,7 +8,6 @@ package com.farao_community.farao.ce_merging.merging.process.balances_adjustment
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.data.BalancesSummary;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.AreasManager;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.BalancesPreprocessing;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.TargetNetPositionsImporter;
@@ -32,7 +31,6 @@ import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
-import com.powsybl.iidm.network.Terminal;
 import com.powsybl.loadflow.LoadFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,24 +124,24 @@ public class BalancesAdjustmentProcessor {
         }
     }
 
-    private Map<String, InitGenerator> setPminPmaxToDefaultValue() {
-        Map<String, InitGenerator> initGenerators = new HashMap<>();
+    private Map<String, InitialBounds> setPminPmaxToDefaultValue() {
+        Map<String, InitialBounds> initialBounds = new HashMap<>();
         AreasManager.on(areas, network).apply(generator -> {
-            initGenerators.put(generator.getId(), new InitGenerator(generator.getMinP(), generator.getMaxP()));
+            initialBounds.put(generator.getId(), new InitialBounds(generator.getMinP(), generator.getMaxP()));
             generator.setMinP(DEFAULT_PMIN);
             generator.setMaxP(DEFAULT_PMAX);
         });
 
         LOGGER.info("Pmax and Pmin are set to default values. Pmax = {}, Pmin = {}", DEFAULT_PMAX, DEFAULT_PMIN);
-        return initGenerators;
+        return initialBounds;
     }
 
-    private void resetInitialPminPmax(final Map<String, InitGenerator> initGenerators) {
+    private void resetInitialPminPmax(final Map<String, InitialBounds> initialBoundsMap) {
         AreasManager.on(areas, network).apply(generator -> {
-            final InitGenerator initial = initGenerators.get(generator.getId());
+            final InitialBounds initialBounds = initialBoundsMap.get(generator.getId());
             final double targetP = generator.getTargetP();
-            generator.setMaxP(max(targetP, initial.pMax()));
-            generator.setMinP(min(targetP, initial.pMin()));
+            generator.setMaxP(max(targetP, initialBounds.pMax()));
+            generator.setMinP(min(targetP, initialBounds.pMin()));
         });
         LOGGER.info("Pmax and Pmin are reset to initial values.");
     }
@@ -216,8 +214,9 @@ public class BalancesAdjustmentProcessor {
         final List<Load> countryLoads = network.getLoadStream()
             .filter(isSynchronizedWithCountry(country))
             .toList();
-        // In case of loads with negative flow (means generating power), we should take absolute value.
-        // in this case if the shift for country is positive, loads with negative power will decrease (generation increase),
+        // In case of loads with negative flow (meaning power generation), we should take absolute value.
+        // If that's the case, if the shift for country is positive,
+        // loads with negative power will decrease (generation increase) and so on
         final double totalCountryP = countryLoads.stream()
             .map(Load::getP0)
             .mapToDouble(Math::abs)
@@ -237,21 +236,26 @@ public class BalancesAdjustmentProcessor {
 
     private static Predicate<Load> isSynchronizedWithCountry(final Country country) {
         return load -> load.getTerminal().isConnected()
-                       && Optional.ofNullable(load.getTerminal())
-                           .map(Terminal::getBusBreakerView)
-                           .map(Terminal.BusBreakerView::getConnectableBus)
-                           .map(Bus::isInMainSynchronousComponent)
-                           .orElse(false) // synchronized
-                       && load.getTerminal()
-                           .getVoltageLevel()
-                           .getSubstation()
-                           .map(Substation::getNullableCountry)
-                           .map(country::equals)
-                           .orElse(false); // in country
+                       && hasBusInMainSynchronousComponent(load)
+                       && isLoadInCountry(load, country);
+    }
+
+    private static boolean hasBusInMainSynchronousComponent(final Load load) {
+        final Bus bus = load.getTerminal().getBusBreakerView().getConnectableBus();
+        return bus != null && bus.isInMainSynchronousComponent();
+    }
+
+    private static boolean isLoadInCountry(final Load load, final Country country) {
+        return load.getTerminal()
+            .getVoltageLevel()
+            .getSubstation()
+            .map(Substation::getNullableCountry)
+            .map(country::equals)
+            .orElse(false);
     }
 
     private void balanceAreas() throws IOException {
-        final Map<String, InitGenerator> initGenerators = setPminPmaxToDefaultValue();
+        final Map<String, InitialBounds> initGenerators = setPminPmaxToDefaultValue();
 
         final BalanceComputation balanceComputation = new BalanceComputationFactoryImpl()
             .create(areas,
@@ -305,8 +309,8 @@ public class BalancesAdjustmentProcessor {
         int failedIterationNumber = result.getIterationCount();
 
         if (failedIterationNumber >= maxNumberIteration) {
-            BalancesSummary balancesSummary = new BalancesSummary(network, reportNode, maxNumberIteration);
-            balancesSummary.print();
+            final BalancesAdjustmentSummary balancesAdjustmentSummary = new BalancesAdjustmentSummary(network, reportNode, maxNumberIteration);
+            balancesAdjustmentSummary.print();
         }
 
         String failureMessage = getFailureMessage(DC, result);
@@ -336,9 +340,9 @@ public class BalancesAdjustmentProcessor {
         }
     }
 
-    void exportOutputs(final Map<String, InitGenerator> initGenerators,
+    void exportOutputs(final Map<String, InitialBounds> initialBounds,
                        final String loadflowMode,
-                       final BalanceComputationResult result) throws IOException {
+                       final BalanceComputationResult result) {
 
         LOGGER.info("BalanceComputation status is finished with success with {} Loadflow, iterations number is {}.",
                     loadflowMode, result.getIterationCount());
@@ -347,7 +351,7 @@ public class BalancesAdjustmentProcessor {
             LOGGER.info("Changing loadflow parameters to DC mode for task {}", task.getId());
         }
 
-        final File cgmFileAdjusted = createAdjustedCgm(initGenerators,
+        final File cgmFileAdjusted = createAdjustedCgm(initialBounds,
                                                        task.getArtifacts()
                                                                       .getFile(BALANCES_ADJUSTMENT_TARGET_FILE)
                                                                       .getOriginalName());
@@ -359,19 +363,19 @@ public class BalancesAdjustmentProcessor {
 
     }
 
-    private File createAdjustedCgm(Map<String, InitGenerator> initGenerators,
+    private File createAdjustedCgm(Map<String, InitialBounds> initialBounds,
                                    String cgmFileName) {
         final File cgmFileAdjusted = new File(configuration.getArtifactsDirectoryPath(task)
                                               + File.separator
                                               + cgmFileName
                                               + "_adjusted.xiidm");
 
-        resetInitialPminPmax(initGenerators);
+        resetInitialPminPmax(initialBounds);
         network.write("XIIDM", null, Paths.get(cgmFileAdjusted.getPath()));
         return cgmFileAdjusted;
     }
 
 
-    private record InitGenerator(double pMin, double pMax) {
+    private record InitialBounds(double pMin, double pMax) {
     }
 }
