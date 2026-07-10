@@ -61,7 +61,9 @@ public final class GlskBlockFix {
         if (isAlegroVirtualHub(block.getGSKName().getV())) {
             return true;
         }
-        if (isTargetDateOutsideBlockInterval(targetDate, block.getTimeInterval())) return true;
+        if (isTargetDateOutsideBlockInterval(targetDate, block.getTimeInterval())) {
+            return true;
+        }
         final List<ManualNodesType> invalidNodes = block.getManualNodes()
                 .stream()
                 .filter(node -> existsInReport(node, reportNodeList))
@@ -106,7 +108,9 @@ public final class GlskBlockFix {
         if (isAlegroVirtualHub(block.getGSKName().getV())) {
             return true;
         }
-        if (isTargetDateOutsideBlockInterval(targetDate, block.getTimeInterval())) return true;
+        if (isTargetDateOutsideBlockInterval(targetDate, block.getTimeInterval())) {
+            return true;
+        }
         removeInvalidAutoNodes(block, reportNodeList);
         return block.getAutoNodes().isEmpty();
     }

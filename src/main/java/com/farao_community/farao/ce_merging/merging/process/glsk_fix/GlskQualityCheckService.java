@@ -46,13 +46,13 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
 
 @Service
 public class GlskQualityCheckService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(GlskQualityCheckService.class);
-     static final String LOAD = "Load";
-     static final String GENERATOR = "Generator";
+    static final String LOAD = "Load";
+    static final String GENERATOR = "Generator";
     static final String NODE_ID_KEY = "NodeId";
     private static final String GLSK = "GLSK";
     static final String TYPE_KEY = "Type";
     static final String TSO_KEY = "TSO";
+    private static final Logger LOGGER = LoggerFactory.getLogger(GlskQualityCheckService.class);
     private static final String GLSK_QUALITY_REPORT_URL = "/tasks/%d/artifacts/glsk-quality-report";
     private static final String GLSK_QUALITY_REPORT_FILENAME = "%s_GLSK_QUALITY_CHECK.xml";
 
