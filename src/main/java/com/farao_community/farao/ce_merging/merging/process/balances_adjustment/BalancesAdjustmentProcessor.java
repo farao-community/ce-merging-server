@@ -221,8 +221,7 @@ public class BalancesAdjustmentProcessor {
             .filter(load -> isSynchronizedWithCountry(load.getTerminal(), country))
             .toList();
         // In case of loads with negative flow (meaning power generation), we should take absolute value.
-        // If that's the case, if the shift for country is positive,
-        // loads with negative power will decrease (generation increase) and so on
+        // meaning if a country's shift is positive,  loads with negative power will decrease (generation increase) and inversely
         final double totalCountryP = countryLoads.stream()
             .map(Load::getP0)
             .mapToDouble(Math::abs)
