@@ -4,15 +4,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.balances_adjustment_server;
+package com.farao_community.farao.ce_merging.merging.process.balances_adjustment;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
-import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentProcessor;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.openloadflow.OpenLoadFlowProvider;
@@ -31,17 +31,18 @@ import java.util.function.Supplier;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
+import static java.lang.Double.isNaN;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.stringPathOf;
 
 @SpringBootTest
-public class BalancesAdjustmentProcessorTest {
+class BalancesAdjustmentProcessorTest {
 
     private static final OffsetDateTime PROCESS_TARGET_DATE = OffsetDateTime.parse("2019-06-17T22:30Z");
 
     @Autowired
     private CeMergingConfiguration configuration;
-
-    private File targetFile;
 
     private MergingTask task;
     private final Supplier<LoadFlow.Runner> testLoadflowSupplier = this::getLoadFlowRunner;
@@ -68,7 +69,7 @@ public class BalancesAdjustmentProcessorTest {
         //inputsFile
         final File glskFile = new File(getClass().getResource("/balances/20210723-F226-v1.xml").getFile());
         final File networkFile = new File(getClass().getResource("/balances/20210723_0030_2D1_UC5_F100_CORESO.uct").getFile());
-        targetFile = new File(getClass().getResource("/balances/NetPositions.json").getFile());
+        final File targetFile = new File(getClass().getResource("/balances/NetPositions.json").getFile());
         final File bapFile = new File(getClass().getResource("/balances/balances-adjustment-parameters.json").getFile());
         final RegionConfiguration regionConfiguration = new ObjectMapper().readValue(
             Files.readString(Paths.get(getClass().getResource("/balances/region_configuration.json").getPath())),
@@ -102,6 +103,12 @@ public class BalancesAdjustmentProcessorTest {
     void runProcess() throws IOException {
         final BalancesAdjustmentProcessor processor = new BalancesAdjustmentProcessor(task, configuration, testLoadflowSupplier, testBalanceComputationParameters);
         assertDoesNotThrow(processor::run);
+        final Network result = Network.read(stringPathOf("balances/20210723_0030_2D1_UC5_F100_CORESO.uct"));
+        result.getGeneratorStream().forEach(generator -> {
+            if (!isNaN(generator.getTerminal().getP())) {
+                assertEquals(generator.getTargetP(), -generator.getTerminal().getP());
+            }
+        });
     }
 
 }
