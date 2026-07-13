@@ -76,9 +76,10 @@ public class GlskFixService {
             );
             if (isEmptyGlskSeries(glskSeries)) {
                 removeGskSeriesTypes.add(glskSeries);
-                storeSerieValue(context, glskSeries, false);
+                // strore incorrect why ?
             } else {
-                storeSerieValue(context, glskSeries, true);
+                storeSerieValue(context.getCorrectSerie(), glskSeries);
+                // strore incorrect why ?
             }
         });
 
@@ -86,15 +87,11 @@ public class GlskFixService {
         GlskSerieRedispatcher.redispatchShareValue(context.getCorrectSerie(), glskDocument);
     }
 
-    private void storeSerieValue(final GlskFixContext context, final GSKSeriesType glskSeries, final boolean correct) {
+    private void storeSerieValue(final Map<String, List<GlskRedispatchingEntity>> correctSeries, final GSKSeriesType glskSeries) {
         final String timeSeriesIdentification = glskSeries.getTimeSeriesIdentification().getV();
         final String area = glskSeries.getArea().getV();
         final double shareValue = glskSeries.getBusinessType().getShare().doubleValue();
-        GlskSerieRedispatcher.storeValue(
-                correct ? context.getCorrectSerie() : context.getIncorrectSerie(),
-                area,
-                timeSeriesIdentification,
-                shareValue);
+        GlskSerieRedispatcher.storeValue(correctSeries, area, timeSeriesIdentification, shareValue);
     }
 
     private void updateCreationDate(final GSKDocument glskDocument, final XMLGregorianCalendar fileCreationDate) {

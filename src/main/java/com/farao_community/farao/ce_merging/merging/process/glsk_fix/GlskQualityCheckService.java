@@ -193,12 +193,12 @@ public class GlskQualityCheckService {
 
     private boolean containsAlegro(final GSKSeriesType gskSeries, final Instant processTargetDate) {
         return gskSeries.getAutoGSKBlock().stream()
-                .anyMatch(block -> isAlegroBlock(block.getGSKName().getV(), block.getTimeInterval().getV(), processTargetDate))
+                .anyMatch(block -> isAlegroHubInInterval(block.getGSKName().getV(), block.getTimeInterval().getV(), processTargetDate))
                 || gskSeries.getManualGSKBlock().stream()
-                .anyMatch(block -> isAlegroBlock(block.getGSKName().getV(), block.getTimeInterval().getV(), processTargetDate));
+                .anyMatch(block -> isAlegroHubInInterval(block.getGSKName().getV(), block.getTimeInterval().getV(), processTargetDate));
     }
 
-    private boolean isAlegroBlock(final String gskName, final String timeInterval, final Instant processTargetDate) {
+    private boolean isAlegroHubInInterval(final String gskName, final String timeInterval, final Instant processTargetDate) {
         final boolean isAlegroName = VIRTUAL_HUB_ALEGRO_BE_CODE.equals(gskName) || VIRTUAL_HUB_ALEGRO_DE_CODE.equals(gskName);
         if (!isAlegroName) {
             return false;
