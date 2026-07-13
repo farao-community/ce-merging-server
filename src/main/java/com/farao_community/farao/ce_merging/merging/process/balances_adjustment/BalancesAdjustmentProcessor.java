@@ -331,7 +331,7 @@ public class BalancesAdjustmentProcessor {
             return "the maximum number of iterations (%s) was reached, but mismatch is still above threshold (%s)"
                 .formatted(maxIterations, balanceComputationParameters.getThresholdNetPosition());
         } else {
-            return "the load flow diverged at iteration n°%s ; maybe du to a shift demand much higher than initial net positions"
+            return "the load flow diverged at iteration n°%s ; maybe due to a shift demand much higher than initial net positions"
                 .formatted(failedIterationNumber);
         }
     }

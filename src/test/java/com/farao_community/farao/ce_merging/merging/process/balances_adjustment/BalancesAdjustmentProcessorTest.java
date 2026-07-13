@@ -34,6 +34,7 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static java.lang.Double.isNaN;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static test_utils.CeTestUtils.stringPathOf;
 
 @SpringBootTest
@@ -100,7 +101,7 @@ class BalancesAdjustmentProcessorTest {
     }
 
     @Test
-    void runProcess() throws IOException {
+    void shouldRunProcess() throws IOException {
         final BalancesAdjustmentProcessor processor = new BalancesAdjustmentProcessor(task, configuration, testLoadflowSupplier, testBalanceComputationParameters);
         assertDoesNotThrow(processor::run);
         final Network result = Network.read(stringPathOf("balances/20210723_0030_2D1_UC5_F100_CORESO.uct"));
@@ -109,6 +110,18 @@ class BalancesAdjustmentProcessorTest {
                 assertEquals(generator.getTargetP(), -generator.getTerminal().getP());
             }
         });
+    }
+
+    @Test
+    void shouldFail() throws IOException {
+        final File targetFile = new File(getClass().getResource("/balances/NetPositions_failed.json").getFile());
+        task.getArtifacts().putFile(BALANCES_ADJUSTMENT_TARGET_FILE, new SavedFile("target",
+                                                                                   targetFile.getPath(),
+                                                                                   "target"));
+
+        final BalancesAdjustmentProcessor processor = new BalancesAdjustmentProcessor(task, configuration, testLoadflowSupplier, testBalanceComputationParameters);
+        final Network result = Network.read(stringPathOf("balances/20210723_0030_2D1_UC5_F100_CORESO.uct"));
+        assertTrue(result.getGeneratorStream().anyMatch(g -> g.getTargetP() + g.getTerminal().getP() != 0));
     }
 
 }
