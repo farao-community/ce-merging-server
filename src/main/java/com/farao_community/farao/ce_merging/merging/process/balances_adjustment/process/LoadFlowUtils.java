@@ -43,10 +43,10 @@ public final class LoadFlowUtils {
             LOGGER.warn(getDivergenceMessage(id, isDc));
 
             Optional.ofNullable(result.getLogs())
-                .map(LoadFlowUtils::fromAsciiLogs)
+                .map(log -> new String(log.getBytes(US_ASCII)))
                 .ifPresent(LOGGER::error);
 
-            if (!isDc) {
+            if (!isDc) { //DC fallback
                 LOGGER.warn("Switching to DC mode for network {}", id);
                 loadFlowParameters.setDc(true);
                 result = loadFlowRunnerSupplier.get().run(network, loadFlowParameters);
@@ -66,10 +66,6 @@ public final class LoadFlowUtils {
     private static String getDivergenceMessage(final String networkId, final boolean isDc) {
         final String loadflowMode = isDc ? "DC" : "AC";
         return DIVERGENCE_MESSAGE.formatted(loadflowMode, networkId);
-    }
-
-    private static String fromAsciiLogs(final String logString) {
-        return new String(logString.getBytes(US_ASCII));
     }
 
     /**

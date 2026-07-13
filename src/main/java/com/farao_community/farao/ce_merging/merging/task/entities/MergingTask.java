@@ -16,7 +16,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import java.io.File;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
@@ -123,6 +125,10 @@ public class MergingTask implements Serializable {
         return Optional.ofNullable(artifacts.getFile(artifactType))
             .map(SavedFile::getPath)
             .orElse(null);
+    }
+
+    public File getArtifactFile(final ArtifactType artifactType) {
+        return Paths.get(getArtifactPath(artifactType)).toFile();
     }
 
     public void setArtifact(final ArtifactType artifactType, final SavedFile artifact) {

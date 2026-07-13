@@ -9,9 +9,6 @@ package com.farao_community.farao.ce_merging.merging.process.balances_adjustment
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.AreasManager;
-import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.BalancesPreprocessing;
-import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.TargetNetPositionsImporter;
-import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.ZonalDataImporter;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputation;
@@ -25,12 +22,13 @@ import com.powsybl.balances_adjustment.util.NetworkAreaFactory;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.computation.DefaultComputationManagerConfig;
 import com.powsybl.iidm.modification.scalable.Scalable;
-import com.powsybl.iidm.modification.scalable.ScalingParameters;
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
+import com.powsybl.iidm.network.Terminal;
 import com.powsybl.loadflow.LoadFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,17 +41,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.LoadFlowUtils.runLoadflow;
+import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile;
+import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.ZonalDataImporter.getZonalDataFromGlsk;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
+import static com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult.Status.SUCCESS;
+import static com.powsybl.iidm.modification.scalable.ScalingParameters.Priority.RESPECT_OF_VOLUME_ASKED;
 import static java.lang.Double.MAX_VALUE;
+import static java.lang.Double.isNaN;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
@@ -71,7 +73,7 @@ public class BalancesAdjustmentProcessor {
     private final MergingTask task;
     private final Network network;
     private final Map<String, Double> targetNetPositions;
-    private final Map<String, Scalable> countryToScalable;
+    private final Map<String, Scalable> loadShiftKeysByCountry;
     private Map<String, NetworkAreaFactory> networkAreas;
     private final List<BalanceComputationArea> areas;
     private final CeMergingConfiguration configuration;
@@ -84,38 +86,32 @@ public class BalancesAdjustmentProcessor {
         this.configuration = configuration;
         this.network = Network.read(Paths.get(task.getArtifactPath(TGM_FILE_AFTER_RECESSIVITY)));
         this.loadFlowRunnerSupplier = loadFlowRunnerSupplier;
-        this.balanceComputationParameters = Optional.ofNullable(
-                task.getConfigurations().getBalancesAdjustmentParameters().getPath()
-            ).map(Paths::get)
+        final String balanceConfigPath = task.getConfigurations().getBalancesAdjustmentParameters().getPath();
+        this.balanceComputationParameters = Optional.ofNullable(balanceConfigPath)
+            .map(Paths::get)
             .map(JsonBalanceComputationParameters::read)
             .orElse(balanceComputationParametersSupplier.get());
 
-        this.targetNetPositions = TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile(
-            Paths.get(task.getArtifactPath(BALANCES_ADJUSTMENT_TARGET_FILE)).toFile()
-        );
-
-        final Map<String, Scalable> eicScalable = ZonalDataImporter.getZonalDataFromGlsk(
-            Paths.get(task.getArtifactPath(GLSK_QUALITY_CORRECTED_FILE)).toFile(), network, task.getTargetDate()
-        );
+        this.targetNetPositions = getTargetNetPositionsAreasFromFile(task.getArtifactFile(BALANCES_ADJUSTMENT_TARGET_FILE));
+        final Map<String, Scalable> eicScalable = getZonalDataFromGlsk(task.getArtifactFile(GLSK_QUALITY_CORRECTED_FILE),
+                                                                       network, task.getTargetDate());
 
         // For proportional scalable, if some scalable are saturated the scaling will be dispatched on the other
-        balanceComputationParameters.getScalingParameters()
-            .setPriority(ScalingParameters.Priority.RESPECT_OF_VOLUME_ASKED);
+        balanceComputationParameters.getScalingParameters().setPriority(RESPECT_OF_VOLUME_ASKED);
 
-        final Map<String, String> countriesByEicCode = task.getConfigurations().getRegionConfiguration().getCountriesByEicCode();
-        this.countryToScalable = eicScalable.entrySet()
+        this.loadShiftKeysByCountry = eicScalable.entrySet()
             .stream()
-            .collect(toMap(v -> countriesByEicCode.get(v.getKey()),
+            .collect(toMap(v -> task.getConfigurations().getRegionConfiguration().getCountriesByEicCode().get(v.getKey()),
                            Map.Entry::getValue));
 
-        this.areas = generateBalanceComputationAreas();
+        this.areas = generateAreas();
 
     }
 
     public void run() {
         try {
-            BalancesPreprocessing.adjustGeneratorsPminWithTarget(network, areas);
-            BalancesPreprocessing.integrateCompensation(network);
+            AreasManager.on(areas, network).applyToGenerators(BalancesAdjustmentProcessor::updateToTrueMinP);
+            network.getGeneratorStream().forEach(BalancesAdjustmentProcessor::compensate);
             balanceAreas();
         } catch (final Exception e) {
             String errorMessage = "Error in Balance computation process, cause: " + e.getMessage();
@@ -124,9 +120,20 @@ public class BalancesAdjustmentProcessor {
         }
     }
 
-    private Map<String, InitialBounds> setPminPmaxToDefaultValue() {
+    private static void updateToTrueMinP(final Generator generator) {
+        generator.setMinP(min(generator.getMinP(), generator.getTargetP()));
+    }
+
+    private static void compensate(final Generator generator) {
+        final double terminalPower = generator.getTerminal().getP();
+        if (!isNaN(terminalPower)) {
+            generator.setTargetP(-terminalPower);
+        }
+    }
+
+    private Map<String, InitialBounds> swapWithDefaultMinMaxP() {
         Map<String, InitialBounds> initialBounds = new HashMap<>();
-        AreasManager.on(areas, network).apply(generator -> {
+        AreasManager.on(areas, network).applyToGenerators(generator -> {
             initialBounds.put(generator.getId(), new InitialBounds(generator.getMinP(), generator.getMaxP()));
             generator.setMinP(DEFAULT_PMIN);
             generator.setMaxP(DEFAULT_PMAX);
@@ -136,8 +143,8 @@ public class BalancesAdjustmentProcessor {
         return initialBounds;
     }
 
-    private void resetInitialPminPmax(final Map<String, InitialBounds> initialBoundsMap) {
-        AreasManager.on(areas, network).apply(generator -> {
+    private void swapBackValidInitialMinMaxP(final Map<String, InitialBounds> initialBoundsMap) {
+        AreasManager.on(areas, network).applyToGenerators(generator -> {
             final InitialBounds initialBounds = initialBoundsMap.get(generator.getId());
             final double targetP = generator.getTargetP();
             generator.setMaxP(max(targetP, initialBounds.pMax()));
@@ -146,24 +153,22 @@ public class BalancesAdjustmentProcessor {
         LOGGER.info("Pmax and Pmin are reset to initial values.");
     }
 
-    private List<BalanceComputationArea> generateBalanceComputationAreas() {
+    private List<BalanceComputationArea> generateAreas() {
         runLoadflow(network, loadFlowRunnerSupplier, balanceComputationParameters.getLoadFlowParameters());
 
-        this.networkAreas = network.getCountries()
-            .stream()
-            .collect(toMap(Country::toString, CountryAreaFactory::new));
+        this.networkAreas = network.getCountries().stream().collect(toMap(Country::toString, CountryAreaFactory::new));
 
-        completeInputMaps();
-        dispatchNetPositionsInconsistencies();
+        createMissingData();
+        distributeNetPositionsMismatch();
 
         return network
             .getCountries()
             .stream()
-            .map(this::createBalanceComputationArea)
+            .map(this::createArea)
             .toList();
     }
 
-    private void dispatchNetPositionsInconsistencies() {
+    private void distributeNetPositionsMismatch() {
         final double initialNetPositionSum = networkAreas.values().stream()
             .mapToDouble(networkArea -> networkArea.create(network).getNetPosition())
             .sum();
@@ -180,7 +185,8 @@ public class BalancesAdjustmentProcessor {
         LOGGER.warn("Important mismatch between initial total net positions ({}) and targeted ones ({}). a redispatch will occur on each area", initialNetPositionSum, targetNetPositionSum);
 
         final double absTargetNetPositionSum = networkAreas.keySet().stream()
-            .mapToDouble(country -> abs(targetNetPositions.get(country)))
+            .map(targetNetPositions::get)
+            .mapToDouble(Math::abs)
             .sum();
 
         networkAreas.forEach((country, areaFactory) -> {
@@ -191,28 +197,28 @@ public class BalancesAdjustmentProcessor {
         });
     }
 
-    private void completeInputMaps() {
+    private void createMissingData() {
         network.getCountries().forEach(country -> {
             final String countryCode = country.toString();
             final NetworkAreaFactory countryArea = networkAreas.get(countryCode);
             targetNetPositions.computeIfAbsent(countryCode, s -> countryArea.create(network).getNetPosition());
-            countryToScalable.computeIfAbsent(countryCode, s -> createCountryLsk(country));
+            loadShiftKeysByCountry.computeIfAbsent(countryCode, s -> createLoadShiftKey(country));
         });
     }
 
-    private BalanceComputationArea createBalanceComputationArea(final Country country) {
+    private BalanceComputationArea createArea(final Country country) {
         final String countryCode = country.toString();
         final NetworkAreaFactory networkArea = networkAreas.get(countryCode);
-        final Scalable scalable = countryToScalable.get(countryCode);
+        final Scalable lsk = loadShiftKeysByCountry.get(countryCode);
         final double targetNetPosition = targetNetPositions.get(countryCode);
-        return new BalanceComputationArea(country.getName(), networkArea, scalable, targetNetPosition);
+        return new BalanceComputationArea(country.getName(), networkArea, lsk, targetNetPosition);
     }
 
-    private Scalable createCountryLsk(final Country country) {
+    private Scalable createLoadShiftKey(final Country country) {
         LOGGER.info("No available shift for {}. Balance adjustment is performed proportionally on all loads.", country);
 
         final List<Load> countryLoads = network.getLoadStream()
-            .filter(isSynchronizedWithCountry(country))
+            .filter(load -> isSynchronizedWithCountry(load.getTerminal(), country))
             .toList();
         // In case of loads with negative flow (meaning power generation), we should take absolute value.
         // If that's the case, if the shift for country is positive,
@@ -222,45 +228,40 @@ public class BalancesAdjustmentProcessor {
             .mapToDouble(Math::abs)
             .sum();
 
-        final List<Scalable> scalables = new ArrayList<>();
+        final List<Scalable> lsks = new ArrayList<>();
         final List<Double> percentages = new ArrayList<>();
         countryLoads.forEach(load -> {
             final double percentage = 100 * abs(load.getP0()) / totalCountryP;
             percentages.add(percentage);
-            scalables.add(Scalable.onLoad(load.getId(), -MAX_VALUE, MAX_VALUE));
+            lsks.add(Scalable.onLoad(load.getId(), -MAX_VALUE, MAX_VALUE));
         });
 
-        return Scalable.proportional(percentages, scalables);
+        return Scalable.proportional(percentages, lsks);
 
     }
 
-    private static Predicate<Load> isSynchronizedWithCountry(final Country country) {
-        return load -> load.getTerminal().isConnected()
-                       && hasBusInMainSynchronousComponent(load)
-                       && isLoadInCountry(load, country);
+    private static boolean isSynchronizedWithCountry(final Terminal terminal, final Country country) {
+        return terminal.isConnected() && hasBusInMainSynchronousComponent(terminal) && isInCountry(terminal, country);
     }
 
-    private static boolean hasBusInMainSynchronousComponent(final Load load) {
-        final Bus bus = load.getTerminal().getBusBreakerView().getConnectableBus();
+    private static boolean hasBusInMainSynchronousComponent(final Terminal terminal) {
+        final Bus bus = terminal.getBusBreakerView().getConnectableBus();
         return bus != null && bus.isInMainSynchronousComponent();
     }
 
-    private static boolean isLoadInCountry(final Load load, final Country country) {
-        return load.getTerminal()
-            .getVoltageLevel()
+    private static boolean isInCountry(final Terminal terminal, final Country country) {
+        return terminal.getVoltageLevel()
             .getSubstation()
             .map(Substation::getNullableCountry)
             .map(country::equals)
             .orElse(false);
     }
 
-    private void balanceAreas() throws IOException {
-        final Map<String, InitialBounds> initGenerators = setPminPmaxToDefaultValue();
+    private void balanceAreas() {
+        final Map<String, InitialBounds> initGenerators = swapWithDefaultMinMaxP();
 
         final BalanceComputation balanceComputation = new BalanceComputationFactoryImpl()
-            .create(areas,
-                    loadFlowRunnerSupplier.get(),
-                    DefaultComputationManagerConfig.load().createShortTimeExecutionComputationManager());
+            .create(areas, loadFlowRunnerSupplier.get(), DefaultComputationManagerConfig.load().createShortTimeExecutionComputationManager());
 
         final String loadflowMode = balanceComputationParameters.getLoadFlowParameters().isDc() ? DC : AC;
 
@@ -273,7 +274,7 @@ public class BalancesAdjustmentProcessor {
             .run(network, getVariantId(), balanceComputationParameters, rootReportNode)
             .join();
 
-        if (isSuccessful(result)) {
+        if (result.getStatus() == SUCCESS) {
             exportOutputs(initGenerators, loadflowMode, result);
         } else { // DC Fallback
             final String detailMessage = getFailureMessage(loadflowMode, result);
@@ -287,16 +288,12 @@ public class BalancesAdjustmentProcessor {
             balanceComputationParameters.getLoadFlowParameters().setDc(true);
             result = balanceComputation.run(network, getVariantId(), balanceComputationParameters).join();
 
-            if (isSuccessful(result)) {
+            if (result.getStatus() == SUCCESS) {
                 exportOutputs(initGenerators, DC, result);
             } else {
                 handleComputationFailure(result, rootReportNode);
             }
         }
-    }
-
-    private boolean isSuccessful(final BalanceComputationResult result) {
-        return result.getStatus() == BalanceComputationResult.Status.SUCCESS;
     }
 
     private String getVariantId() {
@@ -306,9 +303,9 @@ public class BalancesAdjustmentProcessor {
     private void handleComputationFailure(final BalanceComputationResult result,
                                           final ReportNode reportNode) {
         int maxNumberIteration = balanceComputationParameters.getMaxNumberIterations();
-        int failedIterationNumber = result.getIterationCount();
+        int failedIteration = result.getIterationCount();
 
-        if (failedIterationNumber >= maxNumberIteration) {
+        if (failedIteration >= maxNumberIteration) {
             final BalancesAdjustmentSummary balancesAdjustmentSummary = new BalancesAdjustmentSummary(network, reportNode, maxNumberIteration);
             balancesAdjustmentSummary.print();
         }
@@ -353,8 +350,8 @@ public class BalancesAdjustmentProcessor {
 
         final File cgmFileAdjusted = createAdjustedCgm(initialBounds,
                                                        task.getArtifacts()
-                                                                      .getFile(BALANCES_ADJUSTMENT_TARGET_FILE)
-                                                                      .getOriginalName());
+                                                           .getFile(BALANCES_ADJUSTMENT_TARGET_FILE)
+                                                           .getOriginalName());
 
         task.setArtifact(BALANCED_CGM_FILE, new SavedFile(cgmFileAdjusted.getName(),
                                                           cgmFileAdjusted.getPath(),
@@ -363,14 +360,14 @@ public class BalancesAdjustmentProcessor {
 
     }
 
-    private File createAdjustedCgm(Map<String, InitialBounds> initialBounds,
-                                   String cgmFileName) {
+    private File createAdjustedCgm(final Map<String, InitialBounds> initialBounds,
+                                   final String cgmFileName) {
         final File cgmFileAdjusted = new File(configuration.getArtifactsDirectoryPath(task)
                                               + File.separator
                                               + cgmFileName
                                               + "_adjusted.xiidm");
 
-        resetInitialPminPmax(initialBounds);
+        swapBackValidInitialMinMaxP(initialBounds);
         network.write("XIIDM", null, Paths.get(cgmFileAdjusted.getPath()));
         return cgmFileAdjusted;
     }

@@ -22,7 +22,7 @@ public final class AreasManager {
         return new AreasManager(areas, network);
     }
 
-    public void apply(final Consumer<Generator> operator) {
+    public void applyToGenerators(final Consumer<Generator> operator) {
         areas.forEach(area -> getAreaGeneratorStream(area).forEach(operator));
     }
 
