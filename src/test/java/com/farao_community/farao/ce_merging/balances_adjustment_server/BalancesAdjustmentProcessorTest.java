@@ -47,10 +47,10 @@ public class BalancesAdjustmentProcessorTest {
     private final Supplier<LoadFlow.Runner> testLoadflowSupplier = this::getLoadFlowRunner;
     private final Supplier<BalanceComputationParameters> testBalanceComputationParameters = testBalanceComputationParameters();
 
-
     private LoadFlow.Runner getLoadFlowRunner() {
         return new LoadFlow.Runner(new OpenLoadFlowProvider());
     }
+
     private LoadFlowParameters getLoadFlowParameters() {
         LoadFlowParameters parameters = new LoadFlowParameters();
         parameters.setDc(true);
@@ -72,8 +72,8 @@ public class BalancesAdjustmentProcessorTest {
         final File bapFile = new File(getClass().getResource("/balances/balances-adjustment-parameters.json").getFile());
         final RegionConfiguration regionConfiguration = new ObjectMapper().readValue(
             Files.readString(Paths.get(getClass().getResource("/balances/region_configuration.json").getPath())),
-                             RegionConfiguration.class
-            );
+            RegionConfiguration.class
+        );
 
         task = new MergingTask();
         task.setId(0L);
@@ -90,9 +90,9 @@ public class BalancesAdjustmentProcessorTest {
                                                                                    "target"));
 
         task.getConfigurations().setRegionConfiguration(regionConfiguration);
-        task.getConfigurations().setBalancesAdjustmentParameters( new SavedFile("bap",
-                                                                                bapFile.getPath(),
-                                                                                "bap"));
+        task.getConfigurations().setBalancesAdjustmentParameters(new SavedFile("bap",
+                                                                               bapFile.getPath(),
+                                                                               "bap"));
 
         Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(task)));
 
@@ -103,6 +103,5 @@ public class BalancesAdjustmentProcessorTest {
         final BalancesAdjustmentProcessor processor = new BalancesAdjustmentProcessor(task, configuration, testLoadflowSupplier, testBalanceComputationParameters);
         assertDoesNotThrow(processor::run);
     }
-
 
 }
