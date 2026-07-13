@@ -70,7 +70,6 @@ public class HvdcXNodeAlignmentService {
         repository.save(task);
     }
 
-
     private void applyAlignment(final MergingTask task,
                                 final VirtualHubsAlignmentCouple couple,
                                 final List<VirtualHubRecord> virtualHubRecords,

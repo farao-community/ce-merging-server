@@ -70,7 +70,7 @@ public class HvdcXNodeAlignmentServiceTest {
 
         final Artifacts artifacts = new Artifacts();
         artifacts.putFile(ArtifactType.GERMAN_PRE_MERGED_IGM, igmDEFile);
-        artifacts.putFile(ArtifactType.DK_CONVERTED_FILE,igmDKFile);
+        artifacts.putFile(ArtifactType.DK_CONVERTED_FILE, igmDKFile);
         task.setInputs(inputs);
         task.setArtifacts(artifacts);
         TaskTestUtils.setTaskDefaultConfigurations(task);

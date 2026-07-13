@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
- public class HvdcXNodeAlignmentTest {
+public class HvdcXNodeAlignmentTest {
 
     private static final String RESOURCE_PATH = "/hvdc_alignment/";
     private static final String DK_X_NODE = "XXX_EE1D";
