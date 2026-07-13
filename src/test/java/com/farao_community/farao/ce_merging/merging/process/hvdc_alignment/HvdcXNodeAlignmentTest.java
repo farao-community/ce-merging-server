@@ -29,6 +29,7 @@ public class HvdcXNodeAlignmentTest {
         );
     }
 
+    @Test
     void shouldAlignRecessiveNodesWhenDkInOutage() {
         final Network network = readNetwork("dk_outage.uct");
         HvdcXNodeAlignment.on(network, network, alignmentCouples).apply();

@@ -21,7 +21,7 @@ import static com.powsybl.ucte.converter.util.UcteConverterConstants.IS_COUPLER_
 
 final class HvdcXNodeAlignment {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HvdcXNodeAlignmentService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HvdcXNodeAlignment.class);
     private static final List<UcteElementStatus> IN_OPERATION = Arrays.asList(UcteElementStatus.REAL_ELEMENT_IN_OPERATION, UcteElementStatus.EQUIVALENT_ELEMENT_IN_OPERATION, UcteElementStatus.BUSBAR_COUPLER_IN_OPERATION);
 
     private final Network referenceNetwork;
