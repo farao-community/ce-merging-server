@@ -172,9 +172,7 @@ public class BalancesAdjustmentProcessor {
         final double initialNetPositionSum = networkAreas.values().stream()
             .mapToDouble(networkArea -> networkArea.create(network).getNetPosition())
             .sum();
-        final double targetNetPositionSum = networkAreas.keySet().stream()
-            .mapToDouble(targetNetPositions::get)
-            .sum();
+        final double targetNetPositionSum = networkAreas.keySet().stream().mapToDouble(targetNetPositions::get).sum();
 
         final double netPositionMismatch = initialNetPositionSum - targetNetPositionSum;
 
@@ -188,6 +186,11 @@ public class BalancesAdjustmentProcessor {
             .map(targetNetPositions::get)
             .mapToDouble(Math::abs)
             .sum();
+
+        if (absTargetNetPositionSum == 0) {
+            LOGGER.warn("All net positions of area are 0");
+            return;
+        }
 
         networkAreas.forEach((country, areaFactory) -> {
             double initialTarget = targetNetPositions.get(country);
@@ -229,12 +232,15 @@ public class BalancesAdjustmentProcessor {
 
         final List<Scalable> lsks = new ArrayList<>();
         final List<Double> percentages = new ArrayList<>();
-        countryLoads.forEach(load -> {
-            final double percentage = 100 * abs(load.getP0()) / totalCountryP;
-            percentages.add(percentage);
-            lsks.add(Scalable.onLoad(load.getId(), -MAX_VALUE, MAX_VALUE));
-        });
-
+        if (totalCountryP != 0) {
+            countryLoads.forEach(load -> {
+                final double percentage = 100 * abs(load.getP0()) / totalCountryP;
+                percentages.add(percentage);
+                lsks.add(Scalable.onLoad(load.getId(), -MAX_VALUE, MAX_VALUE));
+            });
+        } else {
+            LOGGER.warn("Total country P is 0");
+        }
         return Scalable.proportional(percentages, lsks);
 
     }

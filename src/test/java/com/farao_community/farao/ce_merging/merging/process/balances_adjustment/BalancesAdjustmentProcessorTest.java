@@ -120,6 +120,7 @@ class BalancesAdjustmentProcessorTest {
                                                                                    "target"));
 
         final BalancesAdjustmentProcessor processor = new BalancesAdjustmentProcessor(task, configuration, testLoadflowSupplier, testBalanceComputationParameters);
+        assertDoesNotThrow(processor::run);
         final Network result = Network.read(stringPathOf("balances/20210723_0030_2D1_UC5_F100_CORESO.uct"));
         assertTrue(result.getGeneratorStream().anyMatch(g -> g.getTargetP() + g.getTerminal().getP() != 0));
     }

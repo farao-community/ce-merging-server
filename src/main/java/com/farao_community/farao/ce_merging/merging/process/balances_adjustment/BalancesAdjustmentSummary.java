@@ -56,7 +56,8 @@ public class BalancesAdjustmentSummary {
         return reportNode.getChildren()
             .stream()
             .collect(toMap(BalancesAdjustmentSummary::getCountry,
-                           childNode -> createSummaryForNode(childNode, network)));
+                           childNode -> createSummaryForNode(childNode, network),
+                           (existing, replacement) -> existing));
     }
 
     private static Optional<ReportNode> getLastIterationNode(final ReportNode reportNode,
