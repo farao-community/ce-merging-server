@@ -93,7 +93,6 @@ public class PstOutput implements Serializable {
         };
     }
 
-
     public Flow getFlowDivacaPadriciano() {
         return flowDivacaPadriciano;
     }
@@ -157,7 +156,6 @@ public class PstOutput implements Serializable {
     public Flow getFlowLipst() {
         return flowLipst;
     }
-
 
     public void setTapPstLienz(Tap tapPstLienz) {
         this.tapPstLienz = tapPstLienz;

@@ -59,11 +59,11 @@ public enum SpecialPst {
         return Arrays.stream(SpecialPst.values());
     }
 
-    public static <T> Map<SpecialPst,T> toPstMap(final Function<SpecialPst, T> valueMapper) {
-        return stream().collect(Collectors.toMap(identity(), valueMapper));
+    public static <T> Map<SpecialPst, T> toPstMap(final Function<SpecialPst, T> valueMapper) {
+        return Arrays.stream(SpecialPst.values()).collect(Collectors.toMap(identity(), valueMapper));
     }
 
     public static void forAllSpecialPst(final Consumer<SpecialPst> action) {
-        stream().forEach(action);
+        Arrays.stream(SpecialPst.values()).forEach(action);
     }
 }

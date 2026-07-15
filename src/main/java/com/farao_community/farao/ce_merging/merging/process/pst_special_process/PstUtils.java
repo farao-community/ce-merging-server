@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isIdentifiedBy;
+import static com.powsybl.iidm.network.PhaseTapChanger.RegulationMode.ACTIVE_POWER_CONTROL;
 import static java.lang.Double.isNaN;
 
 public final class PstUtils {
@@ -35,7 +36,7 @@ public final class PstUtils {
         applyIfHasTap(pst, phaseTapChanger -> {
             phaseTapChanger.setRegulationValue(targetFlow);
             phaseTapChanger.setRegulationTerminal(pst.getTerminal1());
-            phaseTapChanger.setRegulationMode(PhaseTapChanger.RegulationMode.ACTIVE_POWER_CONTROL);
+            phaseTapChanger.setRegulationMode(ACTIVE_POWER_CONTROL);
             phaseTapChanger.setTargetDeadband(0.0);
             phaseTapChanger.setRegulating(true);
         });
@@ -52,7 +53,7 @@ public final class PstUtils {
         );
     }
 
-    public static double getPstTarget(final TwoWindingsTransformer pst) {
+    public static double getTargetFlow(final TwoWindingsTransformer pst) {
         return pst.getPhaseTapChanger().getRegulationValue();
     }
 
@@ -60,11 +61,11 @@ public final class PstUtils {
         if (pst1.getPhaseTapChanger() == null || pst2.getPhaseTapChanger() == null) {
             return false;
         }
-        return pst1.getPhaseTapChanger().getRegulationValue() != pst2.getPhaseTapChanger().getRegulationValue();
+        return getTargetFlow(pst1) != getTargetFlow(pst2);
     }
 
     public static boolean hasTargetFlow(final TwoWindingsTransformer pst) {
-        return pst != null && pst.getPhaseTapChanger() != null && !isNaN(pst.getPhaseTapChanger().getRegulationValue());
+        return pst != null && pst.getPhaseTapChanger() != null && !isNaN(getTargetFlow(pst));
     }
 
     public static Branch getPstBranch(final SpecialPst pst, final Network network) {
@@ -96,7 +97,5 @@ public final class PstUtils {
             return danglingLine.getP0() - danglingLine.getGeneration().getTargetP();
         }
     }
-
-
 
 }

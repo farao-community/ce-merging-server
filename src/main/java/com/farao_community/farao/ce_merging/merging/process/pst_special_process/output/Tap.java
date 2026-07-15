@@ -29,7 +29,7 @@ public class Tap {
 
     @JsonIgnore
     public void setIgm(final TwoWindingsTransformer twt) {
-       this.tapIGM = getTapValue(twt);
+        this.tapIGM = getTapValue(twt);
     }
 
     @JsonIgnore
