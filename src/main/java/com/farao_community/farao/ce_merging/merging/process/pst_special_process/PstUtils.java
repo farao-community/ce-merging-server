@@ -32,7 +32,7 @@ public final class PstUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(PstUtils.class);
 
     public static void regulatePst(final TwoWindingsTransformer pst, final double targetFlow) {
-        applyIfHasTap(pst, phaseTapChanger ->  {
+        applyIfHasTap(pst, phaseTapChanger -> {
             phaseTapChanger.setRegulationValue(targetFlow);
             phaseTapChanger.setRegulationTerminal(pst.getTerminal1());
             phaseTapChanger.setRegulationMode(PhaseTapChanger.RegulationMode.ACTIVE_POWER_CONTROL);
@@ -42,7 +42,7 @@ public final class PstUtils {
     }
 
     public static void setPstRegulating(final TwoWindingsTransformer pst, final boolean regulating) {
-        applyIfHasTap(pst, phaseTapChanger ->  phaseTapChanger.setRegulating(regulating));
+        applyIfHasTap(pst, phaseTapChanger -> phaseTapChanger.setRegulating(regulating));
     }
 
     public static void applyIfHasTap(final TwoWindingsTransformer pst, final Consumer<PhaseTapChanger> action) {

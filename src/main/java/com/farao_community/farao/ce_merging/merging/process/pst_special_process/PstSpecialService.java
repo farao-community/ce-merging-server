@@ -41,12 +41,12 @@ import static com.farao_community.farao.ce_merging.merging.process.pst_special_p
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.NRPST21;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.NRPST22;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.PADRICIANO;
+import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.forAllSpecialPst;
+import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.toPstMap;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
 import static com.powsybl.iidm.network.Country.AT;
 import static com.powsybl.iidm.network.Country.SI;
 import static com.powsybl.iidm.network.util.Networks.applySolvedTapPositionAndSolvedSectionCount;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 @Service
 public class PstSpecialService {
@@ -68,6 +68,8 @@ public class PstSpecialService {
         this.loadFlowRunnerSupplier = loadFlowRunnerSupplier;
     }
 
+
+
     public void fixPst(final MergingTask task) {
         try {
             LoadFlowParameters loadFlowParametersForPst = task.getConfigurations().getLoadFlowParameters();
@@ -75,14 +77,8 @@ public class PstSpecialService {
             final Network cgm = Network.read(cgmFile.getPath());
             final PstOutput pstOutput = new PstOutput();
 
-            final Map<SpecialPst, TwoWindingsTransformer> pstsInIgms = SpecialPst.stream().collect(toMap(
-                identity(),
-                pst -> getTransformerFromIgm(pst, task)
-            ));
-            final Map<SpecialPst, String> pstIds = SpecialPst.stream().collect(toMap(
-                identity(),
-                pst -> Optional.ofNullable(pstsInIgms.get(pst)).map(TwoWindingsTransformer::getId).orElse("")
-            ));
+            final Map<SpecialPst, TwoWindingsTransformer> pstsInIgms = toPstMap(pst -> getTransformerFromIgm(pst, task));
+            final Map<SpecialPst, String> pstIds = toPstMap(pst -> Optional.ofNullable(pstsInIgms.get(pst)).map(TwoWindingsTransformer::getId).orElse(""));
 
             fillPstOutputsFromIgms(task, pstIds, pstOutput, loadFlowParametersForPst);
 
@@ -265,11 +261,11 @@ public class PstSpecialService {
         pstOutput.getFlowDivacaPadriciano().setFlowIGM(getBoundaryP(DIVACA_PADRICIANO_DANGLING_LINE, slovenia));
         pstOutput.getFlowDivacaRedipuglia().setFlowIGM(getBoundaryP(DIVACA_REDIPULGIA_DANGLING_LINE, slovenia));
 
-        pstOutput.getFlowLipst().setFlowIgmFrom(getPstBranch(LIENZ, austria));
-        pstOutput.getFlowNrpst21().setFlowIgmFrom(getPstBranch(NRPST21, austria));
-        pstOutput.getFlowNrpst22().setFlowIgmFrom(getPstBranch(NRPST22, austria));
+        pstOutput.getFlowLipst().setFromIgmBranch(getPstBranch(LIENZ, austria));
+        pstOutput.getFlowNrpst21().setFromIgmBranch(getPstBranch(NRPST21, austria));
+        pstOutput.getFlowNrpst22().setFromIgmBranch(getPstBranch(NRPST22, austria));
 
-        SpecialPst.stream().forEach(pst -> pstOutput.getTap(pst).setTapIgmFrom(
+        forAllSpecialPst(pst -> pstOutput.getTap(pst).setIgm(
             task.getIgm(pst.getCountry()).getTwoWindingsTransformer(pstIds.get(pst)))
         );
 
@@ -283,14 +279,14 @@ public class PstSpecialService {
         //LoadFlowUtils.runLoadFlow(network, loadFlowRunnerSupplier, loadFlowParameters);
         applySolvedTapPositionAndSolvedSectionCount(cgm);
 
-        pstOutput.getFlowDivacaPadriciano().setFlowCgmFrom(getPstTieLine(DIVACA_PADRICIANO_LINE, cgm));
-        pstOutput.getFlowDivacaRedipuglia().setFlowCgmFrom(getPstTieLine(DIVACA_REDIPULGIA_LINE, cgm));
+        pstOutput.getFlowDivacaPadriciano().setFromCgmBranch(getPstTieLine(DIVACA_PADRICIANO_LINE, cgm));
+        pstOutput.getFlowDivacaRedipuglia().setFromCgmBranch(getPstTieLine(DIVACA_REDIPULGIA_LINE, cgm));
 
-        pstOutput.getFlowLipst().setFlowCgmFrom(getPstBranch(LIENZ, cgm));
-        pstOutput.getFlowNrpst21().setFlowCgmFrom(getPstBranch(NRPST21, cgm));
-        pstOutput.getFlowNrpst22().setFlowCgmFrom(getPstBranch(NRPST22, cgm));
+        pstOutput.getFlowLipst().setFromCgmBranch(getPstBranch(LIENZ, cgm));
+        pstOutput.getFlowNrpst21().setFromCgmBranch(getPstBranch(NRPST21, cgm));
+        pstOutput.getFlowNrpst22().setFromCgmBranch(getPstBranch(NRPST22, cgm));
 
-        SpecialPst.stream().forEach(pst -> pstOutput.getTap(pst).setTapCgmFrom(
+        forAllSpecialPst(pst -> pstOutput.getTap(pst).setCgm(
             cgm.getTwoWindingsTransformer(pstIds.get(pst)))
         );
     }
