@@ -7,7 +7,8 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractXNodeConfig;
-import com.farao_community.farao.ce_merging.xsd.Xnode;
+
+import com.farao_community.farao.ce_merging.xsd.xnodes.Xnode;
 import jakarta.persistence.Embeddable;
 
 import java.io.Serializable;
