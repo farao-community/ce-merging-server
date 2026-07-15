@@ -48,16 +48,9 @@ public class HvdcXNodeAlignmentService {
         zeroFlowNodes.forEach(zeroFlowNode -> {
             final String nodeName = zeroFlowNode.getXnode();
             final String country = zeroFlowNode.getCountryCode();
-            getNetworkForCountry(task, country).ifPresentOrElse(network -> {
-                network.getDanglingLineStream()
-                        .filter(danglingLine -> danglingLine.getPairingKey().equals(nodeName))
-                        .findFirst()
-                        .ifPresentOrElse(danglingLine -> {
-                            setDanglingLineToZeroFlow(danglingLine);
-                            LOGGER.info("Set {} flow to 0.0", nodeName);
-                            saveNetworkInArtifacts(task, network, country, location);
-                        }, () -> LOGGER.warn("Could not update XNode flows, dangling line {} not found in {} network", nodeName, network.getNameOrId()));
-            }, () -> LOGGER.warn("Unable to find the IGM associated to the country {}, The xnode {} flow will not be set to 0", country, nodeName));
+            getNetworkForCountry(task, country).ifPresentOrElse(
+                    network -> updateDanglingLineFlow(task, network, nodeName, country, location),
+                    () -> LOGGER.warn("Unable to find the IGM associated to the country {}, The xnode {} flow will not be set to 0", country, nodeName));
         });
         repository.save(task);
     }
@@ -80,7 +73,7 @@ public class HvdcXNodeAlignmentService {
         final String recessiveCountry = getVirtualHubCountry(virtualHubRecords, recessiveXNode);
         final Network referenceNetwork = getNetworkOrThrow(task, referenceCountry, referenceXNode);
         final Network recessiveNetwork = getNetworkOrThrow(task, recessiveCountry, recessiveXNode);
-        HvdcXNodeAlignment.on(referenceNetwork, recessiveNetwork, couple).apply();
+        HvdcXNodeAlignment.on(referenceNetwork, recessiveNetwork, couple).align();
         saveNetworkInArtifacts(task, referenceNetwork, referenceCountry, location);
         saveNetworkInArtifacts(task, recessiveNetwork, recessiveCountry, location);
     }
@@ -112,19 +105,36 @@ public class HvdcXNodeAlignmentService {
         final String path = switch (country) {
             case GERMAN_COUNTRY_CODE -> task.getArtifacts().getFile(ArtifactType.GERMAN_PRE_MERGED_IGM).getPath();
             case DENMARK_COUNTRY_CODE -> task.getArtifacts().getFile(ArtifactType.DK_CONVERTED_FILE).getPath();
-            default -> task.getArtifacts().getPreTreatedIgmMap().containsKey(country) ?
-                    task.getArtifacts().getPreTreatedIgmMap().get(country).getPath() :
-                    getInputIgmPath(task, country);
+            default -> Optional.ofNullable(task.getArtifacts().getPreTreatedIgmMap().get(country))
+                    .orElseGet(() -> getInputIgmPath(task, country))
+                    .getPath();
         };
         return path != null ? Optional.of(Network.read(path)) : Optional.empty();
     }
 
-    private static String getInputIgmPath(final MergingTask task, final String country) {
+    private static SavedFile getInputIgmPath(final MergingTask task, final String country) {
         return task.getInputs().getIgms().stream()
                 .filter(igmData -> igmData.getCountry().equals(country))
                 .findFirst()
-                .map(igmData -> igmData.getIgmFile().getPath())
+                .map(igmData -> igmData.getIgmFile())
                 .orElse(null);
+    }
+
+    private void updateDanglingLineFlow(final MergingTask task, final Network network, final String nodeName, final String country, final String location) {
+        network.getDanglingLineStream()
+                .filter(danglingLine -> danglingLine.getPairingKey().equals(nodeName))
+                .findFirst()
+                .ifPresentOrElse(
+                        danglingLine -> {
+                            setDanglingLineToZeroFlow(danglingLine);
+                            LOGGER.info("Set {} flow to 0.0", nodeName);
+                            saveNetworkInArtifacts(task, network, country, location);
+                        },
+                        () -> LOGGER.warn(
+                                "Could not update XNode flows, dangling line {} not found in {} network",
+                                nodeName,
+                                network.getNameOrId()
+                        ));
     }
 
     private static void setDanglingLineToZeroFlow(final DanglingLine danglingLine) {

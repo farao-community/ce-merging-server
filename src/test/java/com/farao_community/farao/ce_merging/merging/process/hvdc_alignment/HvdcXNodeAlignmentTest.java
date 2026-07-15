@@ -24,7 +24,7 @@ public class HvdcXNodeAlignmentTest {
     @Test
     void shouldAlignRecessiveNodesWhenNlInOutage() {
         final Network network = readNetwork("nl_outage.uct");
-        HvdcXNodeAlignment.on(network, network, alignmentCouples).apply();
+        HvdcXNodeAlignment.on(network, network, alignmentCouples).align();
         assertDanglingLine(network, DK_X_NODE, 0., 0., 0., 0., UcteElementStatus.BUSBAR_COUPLER_OUT_OF_OPERATION
         );
     }
@@ -32,14 +32,14 @@ public class HvdcXNodeAlignmentTest {
     @Test
     void shouldAlignRecessiveNodesWhenDkInOutage() {
         final Network network = readNetwork("dk_outage.uct");
-        HvdcXNodeAlignment.on(network, network, alignmentCouples).apply();
+        HvdcXNodeAlignment.on(network, network, alignmentCouples).align();
         assertDanglingLine(network, DK_X_NODE, 106., 0., 3., 0., UcteElementStatus.EQUIVALENT_ELEMENT_IN_OPERATION);
     }
 
     @Test
     void shouldAlignRecessiveNodesWhenNoOutage() {
         final Network network = readNetwork("no_outage.uct");
-        HvdcXNodeAlignment.on(network, network, alignmentCouples).apply();
+        HvdcXNodeAlignment.on(network, network, alignmentCouples).align();
         assertDanglingLine(network, DK_X_NODE, -4., 11.1000, 6., 0.00324, UcteElementStatus.REAL_ELEMENT_IN_OPERATION);
     }
 
