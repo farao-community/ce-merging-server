@@ -129,7 +129,7 @@ public class HvdcXNodeAlignmentService {
 
     private static void setDanglingLineToZeroFlow(final DanglingLine danglingLine) {
         danglingLine.setP0(0.0);
-        danglingLine.getGeneration().setTargetP(0.0);
+        HvdcXNodeAlignment.requireGeneration(danglingLine, "dangling line").setTargetP(0.0);
     }
 
     private void saveNetworkInArtifacts(final MergingTask task,

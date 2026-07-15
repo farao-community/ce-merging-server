@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.hvdc_alignment;
 
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
@@ -82,21 +83,26 @@ final class HvdcXNodeAlignment {
         invertDanglingLineStatus(recessiveDanglingLine);
         recessiveDanglingLine.setP0(0);
         recessiveDanglingLine.setQ0(0);
-        recessiveDanglingLine.getGeneration().setTargetP(0);
-        recessiveDanglingLine.getGeneration().setTargetQ(0);
+        final DanglingLine.Generation generation = requireGeneration(recessiveDanglingLine, "recessive dangling line");
+        generation.setTargetP(0);
+        generation.setTargetQ(0);
     }
 
     private void applyRecessiveInOutageAlignment(final DanglingLine referenceDanglingLine, final DanglingLine recessiveDanglingLine) {
         invertDanglingLineStatus(recessiveDanglingLine);
+        final DanglingLine.Generation referenceGeneration = requireGeneration(referenceDanglingLine, "reference dangling line");
+        final DanglingLine.Generation recessiveGeneration = requireGeneration(recessiveDanglingLine, "recessive dangling line");
+        final double shiftPgen = referenceGeneration.getTargetP();
         final double shiftPload = referenceDanglingLine.getP0();
-        final double shiftPgen = referenceDanglingLine.getGeneration().getTargetP();
         recessiveDanglingLine.setP0(-shiftPload);
-        recessiveDanglingLine.getGeneration().setTargetP(-shiftPgen);
+        recessiveGeneration.setTargetP(-shiftPgen);
     }
 
     private void applyAlignment(final DanglingLine referenceDanglingLine, final DanglingLine recessiveDanglingLine) {
         recessiveDanglingLine.setP0(-referenceDanglingLine.getP0());
-        recessiveDanglingLine.getGeneration().setTargetP(-referenceDanglingLine.getGeneration().getTargetP());
+        final DanglingLine.Generation referenceGeneration = requireGeneration(referenceDanglingLine, "reference dangling line");
+        final DanglingLine.Generation  recessiveGeneration = requireGeneration(recessiveDanglingLine, "recessive dangling line");
+        recessiveGeneration.setTargetP(-referenceGeneration.getTargetP());
     }
 
     static UcteElementStatus getStatus(final DanglingLine danglingLine) {
@@ -116,5 +122,13 @@ final class HvdcXNodeAlignment {
         } else {
             danglingLine.getTerminal().connect();
         }
+    }
+
+    static DanglingLine.Generation requireGeneration(final DanglingLine danglingLine, final String role) {
+        final DanglingLine.Generation generation = danglingLine.getGeneration();
+        if (generation == null) {
+            throw new CeMergingException("Generation is missing for " + role + " " + danglingLine.getId());
+        }
+        return generation;
     }
 }
