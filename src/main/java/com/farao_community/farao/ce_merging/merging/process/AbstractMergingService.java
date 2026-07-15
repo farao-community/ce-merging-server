@@ -7,7 +7,6 @@
 package com.farao_community.farao.ce_merging.merging.process;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
@@ -17,8 +16,6 @@ import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.util.Properties;
 
@@ -43,48 +40,32 @@ public abstract class AbstractMergingService {
     protected <T> void saveArtifactFile(final ArtifactType fileType,
                                         final T businessObject,
                                         final MergingTask task) {
-        try {
-            // write actual file
-            final String fileName = getFileName(fileType, task);
-            final Path filePath = Paths.get(configuration.getArtifactsDirectoryPath(task), fileName);
-            JsonUtils.writeInPath((Class<T>) businessObject.getClass(), businessObject, filePath);
-            // put it in task data
-            final SavedFile artifactFile = new SavedFile(fileName, filePath.toString(), getArtifactLocation(fileType, task));
-            task.getArtifacts().putFile(fileType, artifactFile);
-            logSaved(fileName, task.getId());
-        } catch (final Exception e) {
-            handleSavingError(fileType, e);
-        }
+
+        final SavedFile artifactFile = FileStorageUtils.save(
+            configuration.getArtifactsDirectoryPath(task),
+            getFileName(fileType, task),
+            getArtifactLocation(fileType, task),
+            path -> JsonUtils.writeInPath((Class<T>) businessObject.getClass(), businessObject, path)
+        );
+
+        task.getArtifacts().putFile(fileType, artifactFile);
 
     }
 
     protected void saveArtifactNetwork(final ArtifactType fileType,
-                                           final Network network,
-                                           final MergingTask task,
-                                           final String format,
-                                           final Properties properties) {
-        try {
-            // write actual file
-            final String fileName = getFileName(fileType, task);
-            final Path filePath = Paths.get(configuration.getArtifactsDirectoryPath(task), fileName);
-            network.write(format, properties, filePath);
-            // put it in task data
-            final SavedFile artifactFile = new SavedFile(fileName, filePath.toString(), getArtifactLocation(fileType, task));
-            task.getArtifacts().putFile(fileType, artifactFile);
-            logSaved(fileName, task.getId());
-        } catch (final Exception e) {
-            handleSavingError(fileType, e);
-        }
-    }
+                                       final Network network,
+                                       final MergingTask task,
+                                       final String format,
+                                       final Properties properties) {
 
-    private void logSaved(final String fileName, final Long taskId) {
-        LOGGER.info("File '{}' is saved in task {} artifacts", fileName, taskId);
-    }
+        final SavedFile artifactFile = FileStorageUtils.save(
+            configuration.getArtifactsDirectoryPath(task),
+            getFileName(fileType, task),
+            getArtifactLocation(fileType, task),
+            path -> network.write(format, properties, path)
+        );
 
-    private void handleSavingError(final ArtifactType fileType, final Exception e) {
-        final String errorMessage = "error while saving %s artifact".formatted(fileType.name());
-        LOGGER.error(errorMessage);
-        throw new CeMergingException(errorMessage, e);
+        task.getArtifacts().putFile(fileType, artifactFile);
     }
 
     private String getFileName(final ArtifactType fileType, final MergingTask task) {
