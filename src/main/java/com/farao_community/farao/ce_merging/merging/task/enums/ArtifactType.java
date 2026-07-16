@@ -6,6 +6,15 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.enums;
 
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATETIME_FMT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NUMBER_FORMAT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.STRING_FORMAT;
+import static java.util.Locale.FRANCE;
+
 public enum ArtifactType {
     GERMAN_PRE_MERGED_IGM("%s_2D%d_DE0.uct", "german-pre-merge-result"),
     DK_CONVERTED_FILE("%s_2D%d_DK0.uct", "dk-igm-conversion-result"),
@@ -35,11 +44,20 @@ public enum ArtifactType {
         this.location = location;
     }
 
-    public String getLocation() {
-        return location;
+    public String getFileName(final OffsetDateTime targetDate) {
+        final ZonedDateTime targetZdtParis = targetDate.atZoneSameInstant(PARIS_ZONE_ID);
+        final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
+
+        if (fileName.contains(STRING_FORMAT) && fileName.contains(NUMBER_FORMAT)) {
+            return fileName.formatted(dateAndTime, targetZdtParis.getDayOfWeek().getValue());
+        } else if (fileName.contains(STRING_FORMAT)) {
+            return fileName.formatted(dateAndTime);
+        } else {
+            return fileName;
+        }
     }
 
-    public String getFileName() {
-        return fileName;
+    public String getLocation(final long taskId) {
+        return String.format("/tasks/%d/artifacts/%s", taskId, location);
     }
 }

@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.merging.process.naming_strategy;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.merging.process.ArtifactsUtil;
+import com.farao_community.farao.ce_merging.merging.process.FileStorageUtils;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.iidm.network.Network;
@@ -50,7 +50,7 @@ public class DKRenamingService {
             Network danishNetwork = Network.read(d1File.getOriginalName(), inputStream);
             Properties properties = buildExportProperties(dkHvdcXnodes);
             // danishNetwork.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes); : copied from core-merging todo check if this set is mondotary or network.write(UCTE_FORMAT, properties, filePath);
-            ArtifactsUtil.saveArtifactNetwork(
+            FileStorageUtils.saveArtifactNetwork(
                 DK_CONVERTED_FILE, danishNetwork, task, UCTE_FORMAT, properties, ceMergingConfiguration
             );
         } catch (Exception e) {

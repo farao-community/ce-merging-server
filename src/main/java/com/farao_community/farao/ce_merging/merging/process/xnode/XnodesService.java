@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_AND_DANISH_TSO;
-import static com.farao_community.farao.ce_merging.merging.process.ArtifactsUtil.saveArtifactFile;
+import static com.farao_community.farao.ce_merging.merging.process.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 
 @Service
