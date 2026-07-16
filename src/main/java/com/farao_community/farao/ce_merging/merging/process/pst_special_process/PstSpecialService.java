@@ -6,20 +6,34 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.pst_special_process;
 
+import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.process.pst_special_process.output.PstOutput;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.TwoWindingsTransformer;
+import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
+import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInOutage;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.getBoundaryP;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.getPstBranch;
@@ -37,6 +51,8 @@ import static com.farao_community.farao.ce_merging.merging.process.pst_special_p
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.forAllSpecialPst;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.toPstMap;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.PST_OUTPUT_FILE;
 import static com.powsybl.iidm.network.Country.AT;
 import static com.powsybl.iidm.network.Country.SI;
 import static com.powsybl.iidm.network.util.Networks.applySolvedTapPositionAndSolvedSectionCount;
@@ -44,8 +60,8 @@ import static com.powsybl.iidm.network.util.Networks.applySolvedTapPositionAndSo
 @Service
 public class PstSpecialService {
 
-    //private final CeMergingConfiguration configuration;
-    //private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
+    private final CeMergingConfiguration configuration;
+    private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
     private static final Logger LOGGER = LoggerFactory.getLogger(PstSpecialService.class);
 
     private static final String DIVACA_PADRICIANO_DANGLING_LINE = "LDIVAC2[0-9A-Z] XPA_DI21 1";
@@ -56,10 +72,11 @@ public class PstSpecialService {
     private static final int NEUTRAL_TAP = 0;
     private static final String PST_OUTPUT_FILENAME = "pstOutput.json";
 
-    /*public PstSpecialService(CeMergingConfiguration configuration, Supplier<LoadFlow.Runner> loadFlowRunnerSupplier) {
+    public PstSpecialService(final CeMergingConfiguration configuration,
+                             final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier) {
         this.configuration = configuration;
         this.loadFlowRunnerSupplier = loadFlowRunnerSupplier;
-    }*/
+    }
 
     public void fixPst(final MergingTask task) {
         try {
@@ -94,9 +111,9 @@ public class PstSpecialService {
                                 pstOutput,
                                 austria);
             fillPstOutputsFromCgm(cgm, pstIds, pstOutput, lfParameters);
-            //TODO
-            //savePstOutPutInArtifacts(pstOutput, taskEntity);
-            //saveCgmInArtifacts(networkCgm, taskEntity);
+
+            savePstOutPutInArtifacts(pstOutput, task);
+            saveCgmInArtifacts(cgm, task);
         } catch (final Exception e) {
             final String errorMessage = String.format("Error during fix PST special process for task '%d', cause : %s",
                                                       task.getId(), e.getMessage());
@@ -244,22 +261,19 @@ public class PstSpecialService {
         final Network slovenia = task.getIgm(SI);
         final Network austria = task.getIgm(AT);
 
-        // TODO
-        //LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection(slovenia, loadFlowRunnerSupplier, loadFlowParameters);
-        //LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection(austria, loadFlowRunnerSupplier, loadFlowParameters);
+        runLoadFlowWithBalanceTypeCorrection(slovenia, loadFlowRunnerSupplier, loadFlowParameters);
+        runLoadFlowWithBalanceTypeCorrection(austria, loadFlowRunnerSupplier, loadFlowParameters);
         applySolvedTapPositionAndSolvedSectionCount(slovenia);
         applySolvedTapPositionAndSolvedSectionCount(austria);
 
         pstOutput.getFlowDivacaPadriciano().setFlowIGM(getBoundaryP(DIVACA_PADRICIANO_DANGLING_LINE, slovenia));
         pstOutput.getFlowDivacaRedipuglia().setFlowIGM(getBoundaryP(DIVACA_REDIPULGIA_DANGLING_LINE, slovenia));
 
-        pstOutput.getFlowLipst().setFromIgmBranch(getPstBranch(LIENZ, austria));
-        pstOutput.getFlowNrpst21().setFromIgmBranch(getPstBranch(NRPST21, austria));
-        pstOutput.getFlowNrpst22().setFromIgmBranch(getPstBranch(NRPST22, austria));
+        pstOutput.getFlowLipst().setIgmFlowFrom(getPstBranch(LIENZ, austria));
+        pstOutput.getFlowNrpst21().setIgmFlowFrom(getPstBranch(NRPST21, austria));
+        pstOutput.getFlowNrpst22().setIgmFlowFrom(getPstBranch(NRPST22, austria));
 
-        forAllSpecialPst(pst -> pstOutput.getTap(pst).setIgm(
-            task.getIgm(pst.getCountry()).getTwoWindingsTransformer(pstIds.get(pst)))
-        );
+        forAllSpecialPst(pst -> pstOutput.setTapIgmFromId(pst, pstIds.get(pst), task.getIgm(pst.getCountry())));
 
     }
 
@@ -267,20 +281,41 @@ public class PstSpecialService {
                                        final Map<SpecialPst, String> pstIds,
                                        final PstOutput pstOutput,
                                        final LoadFlowParameters loadFlowParameters) {
-        //TODO
-        //LoadFlowUtils.runLoadFlow(network, loadFlowRunnerSupplier, loadFlowParameters);
+        runLoadFlow(cgm, loadFlowRunnerSupplier, loadFlowParameters);
         applySolvedTapPositionAndSolvedSectionCount(cgm);
 
-        pstOutput.getFlowDivacaPadriciano().setFromCgmBranch(getPstTieLine(DIVACA_PADRICIANO_LINE, cgm));
-        pstOutput.getFlowDivacaRedipuglia().setFromCgmBranch(getPstTieLine(DIVACA_REDIPULGIA_LINE, cgm));
+        pstOutput.getFlowDivacaPadriciano().setCgmFlowFrom(getPstTieLine(DIVACA_PADRICIANO_LINE, cgm));
+        pstOutput.getFlowDivacaRedipuglia().setCgmFlowFrom(getPstTieLine(DIVACA_REDIPULGIA_LINE, cgm));
 
-        pstOutput.getFlowLipst().setFromCgmBranch(getPstBranch(LIENZ, cgm));
-        pstOutput.getFlowNrpst21().setFromCgmBranch(getPstBranch(NRPST21, cgm));
-        pstOutput.getFlowNrpst22().setFromCgmBranch(getPstBranch(NRPST22, cgm));
+        pstOutput.getFlowLipst().setCgmFlowFrom(getPstBranch(LIENZ, cgm));
+        pstOutput.getFlowNrpst21().setCgmFlowFrom(getPstBranch(NRPST21, cgm));
+        pstOutput.getFlowNrpst22().setCgmFlowFrom(getPstBranch(NRPST22, cgm));
 
-        forAllSpecialPst(pst -> pstOutput.getTap(pst).setCgm(
-            cgm.getTwoWindingsTransformer(pstIds.get(pst)))
-        );
+        forAllSpecialPst(pst -> pstOutput.setTapCgmFromId(pst, pstIds.get(pst), cgm));
+    }
+
+    private void savePstOutPutInArtifacts(PstOutput pstOutput, MergingTask taskEntity) throws IOException {
+        Path filePath = Paths.get(configuration.getArtifactsDirectoryPath(taskEntity), PST_OUTPUT_FILENAME);
+        byte[] file = JsonUtils.writeToBytes(PstOutput.class, pstOutput);
+        Files.write(filePath, file);
+        SavedFile savedItFile = new SavedFile(PST_OUTPUT_FILENAME, filePath.toString(), String.format("/tasks/%d/artifacts/pst-result", taskEntity.getId()));
+        taskEntity.getArtifacts().putFile(PST_OUTPUT_FILE, savedItFile);
+    }
+
+    private void saveCgmInArtifacts(Network network, MergingTask taskEntity) {
+        String fileName = generateCgmFileName(taskEntity);
+        Path filePath = Paths.get(configuration.getArtifactsDirectoryPath(taskEntity), fileName);
+        network.write("UCTE", null, filePath);
+        SavedFile savedFile = new SavedFile(fileName, filePath.toString(), String.format("/tasks/%d/outputs/cgm", taskEntity.getId()));
+        taskEntity.getArtifacts().putFile(CGM_FILE_AFTER_PST, savedFile);
+    }
+
+    private String generateCgmFileName(MergingTask taskEntity) {
+        // UCTE filename convention <yyyymmdd>_<HHMM>_<TY><w>_<cc><v>.uct
+        ZonedDateTime targetDateInEuropeZone = taskEntity.getInputs().getTargetDate().atZoneSameInstant(ZoneId.of("Europe/Paris"));
+        String dateAndTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withLocale(Locale.FRANCE).format(targetDateInEuropeZone);
+        String dayOfWeek = DateTimeFormatter.ofPattern("e").withLocale(Locale.FRANCE).format(targetDateInEuropeZone);
+        return String.format("%s_2D%s_UX0_PST_APPLIED.uct", dateAndTime, dayOfWeek);
     }
 
 }

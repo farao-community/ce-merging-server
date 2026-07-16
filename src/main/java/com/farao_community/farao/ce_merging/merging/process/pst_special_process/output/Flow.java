@@ -29,12 +29,12 @@ public class Flow {
     }
 
     @JsonIgnore
-    public void setFromIgmBranch(final Branch<?> branch) {
+    public void setIgmFlowFrom(final Branch<?> branch) {
         this.flowIGM = getBranchFlow(branch);
     }
 
     @JsonIgnore
-    public void setFromCgmBranch(final Branch<?> branch) {
+    public void setCgmFlowFrom(final Branch<?> branch) {
         this.flowCGM = getBranchFlow(branch);
     }
 
@@ -42,7 +42,7 @@ public class Flow {
         final double p1 = Optional.ofNullable(branch).map(Branch::getTerminal1).map(Terminal::getP).orElse(NaN);
         final double p2 = Optional.ofNullable(branch).map(Branch::getTerminal2).map(Terminal::getP).orElse(NaN);
 
-        return isNaN(p1) || isNaN(p2) ? 0 : (p1 + p2) / 2;
+        return isNaN(p1) || isNaN(p2) ? 0 : (p1 - p2) / 2;
     }
 
     /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

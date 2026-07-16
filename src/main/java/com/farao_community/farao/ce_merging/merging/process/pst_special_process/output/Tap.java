@@ -28,12 +28,12 @@ public class Tap {
     }
 
     @JsonIgnore
-    public void setIgm(final TwoWindingsTransformer twt) {
+    public void setIgmTapFrom(final TwoWindingsTransformer twt) {
         this.tapIGM = getTapValue(twt);
     }
 
     @JsonIgnore
-    public void setCgm(final TwoWindingsTransformer twt) {
+    public void setCgmTapFrom(final TwoWindingsTransformer twt) {
         this.tapCGM = getTapValue(twt);
     }
 
@@ -47,9 +47,6 @@ public class Tap {
         }
     }
 
-    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-                    ACCESSORS
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
     public double getTapIGM() {
         return tapIGM;
     }

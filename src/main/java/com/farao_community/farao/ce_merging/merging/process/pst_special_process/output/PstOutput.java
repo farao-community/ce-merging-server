@@ -8,6 +8,7 @@ package com.farao_community.farao.ce_merging.merging.process.pst_special_process
 
 import com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.powsybl.iidm.network.Network;
 
 import java.io.Serializable;
 
@@ -91,6 +92,14 @@ public class PstOutput implements Serializable {
             case NRPST21 -> tapPstNr21;
             case NRPST22 -> tapPstNr22;
         };
+    }
+
+    public void setTapIgmFromId(final SpecialPst pst, final String tapId, final Network igm) {
+        getTap(pst).setIgmTapFrom(igm.getTwoWindingsTransformer(tapId));
+    }
+
+    public void setTapCgmFromId(final SpecialPst pst, final String tapId, final Network cgm) {
+         getTap(pst).setCgmTapFrom(cgm.getTwoWindingsTransformer(tapId));
     }
 
     public Flow getFlowDivacaPadriciano() {
