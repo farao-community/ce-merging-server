@@ -8,7 +8,6 @@ package com.farao_community.farao.ce_merging.merging.process.xnode;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
-import com.farao_community.farao.ce_merging.merging.process.AbstractMergingService;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
@@ -22,20 +21,24 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_AND_DANISH_TSO;
+import static com.farao_community.farao.ce_merging.merging.process.ArtifactsUtil.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 
 @Service
-public class XnodesService extends AbstractMergingService {
+public class XnodesService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XnodesService.class);
     private static final String FILE_IS_SAVED_IN_TASK_ARTIFACTS = "File '{}' is saved in task '{}' artifacts";
     private static final String FILE_NAME_INFORMATION = "xnodesInformation.json";
 
+    private final MergingTaskRepository tasksRepository;
+    private final CeMergingConfiguration configuration;
     private final InitialImportService initialImportService;
     private final XnodesCalculation xnodesCalculation;
 
     public XnodesService(MergingTaskRepository tasksRepository, CeMergingConfiguration configuration, InitialImportService initialImportService, XnodesCalculation xnodesCalculation) {
-        super(tasksRepository, configuration);
+        this.tasksRepository = tasksRepository;
+        this.configuration = configuration;
         this.initialImportService = initialImportService;
         this.xnodesCalculation = xnodesCalculation;
     }
@@ -49,7 +52,7 @@ public class XnodesService extends AbstractMergingService {
             xnodesCalculation.checkXnodesConfigConsistency(network, virtualHubList, xnodesConfigList);
             xnodesCalculation.fillXnodesInformation(network, tso, xnodeInformationMap, virtualHubList, xnodesConfigList, isGermanOrDanishTso(tso));
         });
-        saveArtifactFile(XNODES_INFORMATION_FILE, xnodeInformationMap, task);
+        saveArtifactFile(XNODES_INFORMATION_FILE, xnodeInformationMap, task, configuration);
         tasksRepository.save(task);
     }
 

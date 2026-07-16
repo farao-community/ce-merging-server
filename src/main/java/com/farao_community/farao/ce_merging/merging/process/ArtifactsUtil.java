@@ -8,13 +8,10 @@ package com.farao_community.farao.ce_merging.merging.process;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
-import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.powsybl.iidm.network.Network;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.util.Properties;
@@ -25,21 +22,16 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PAR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.STRING_FORMAT;
 import static java.util.Locale.FRANCE;
 
-public abstract class AbstractMergingService {
+public final class ArtifactsUtil {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractMergingService.class);
-    protected final MergingTaskRepository tasksRepository;
-    protected final CeMergingConfiguration configuration;
-
-    protected AbstractMergingService(final MergingTaskRepository tasksRepository,
-                                     final CeMergingConfiguration configuration) {
-        this.tasksRepository = tasksRepository;
-        this.configuration = configuration;
+    private ArtifactsUtil() {
+        // utility
     }
 
-    protected <T> void saveArtifactFile(final ArtifactType fileType,
-                                        final T businessObject,
-                                        final MergingTask task) {
+    public static <T> void saveArtifactFile(final ArtifactType fileType,
+                                            final T businessObject,
+                                            final MergingTask task,
+                                            final CeMergingConfiguration configuration) {
 
         final SavedFile artifactFile = FileStorageUtils.save(
             configuration.getArtifactsDirectoryPath(task),
@@ -52,11 +44,12 @@ public abstract class AbstractMergingService {
 
     }
 
-    protected void saveArtifactNetwork(final ArtifactType fileType,
-                                       final Network network,
-                                       final MergingTask task,
-                                       final String format,
-                                       final Properties properties) {
+    public static void saveArtifactNetwork(final ArtifactType fileType,
+                                           final Network network,
+                                           final MergingTask task,
+                                           final String format,
+                                           final Properties properties,
+                                           final CeMergingConfiguration configuration) {
 
         final SavedFile artifactFile = FileStorageUtils.save(
             configuration.getArtifactsDirectoryPath(task),
@@ -68,7 +61,7 @@ public abstract class AbstractMergingService {
         task.getArtifacts().putFile(fileType, artifactFile);
     }
 
-    private String getFileName(final ArtifactType fileType, final MergingTask task) {
+    private static String getFileName(final ArtifactType fileType, final MergingTask task) {
         final ZonedDateTime targetZdtParis = task.getInputs().getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
         final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
         final String fileName = fileType.getFileName();
@@ -82,7 +75,7 @@ public abstract class AbstractMergingService {
         }
     }
 
-    private String getArtifactLocation(final ArtifactType fileType, final MergingTask task) {
+    private static String getArtifactLocation(final ArtifactType fileType, final MergingTask task) {
         return String.format("/tasks/%d/artifacts/%s", task.getId(), fileType.getLocation());
     }
 

@@ -8,8 +8,7 @@ package com.farao_community.farao.ce_merging.merging.process.naming_strategy;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.merging.process.AbstractMergingService;
-import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
+import com.farao_community.farao.ce_merging.merging.process.ArtifactsUtil;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.iidm.network.Network;
@@ -31,13 +30,14 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCT
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
 
 @Service
-public class DKRenamingService extends AbstractMergingService {
+public class DKRenamingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DKRenamingService.class);
     private static final String UCTE_EXPORT_NAMING_STRATEGY_PROPERTY = "ucte.export.naming-strategy";
 
-    protected DKRenamingService(final MergingTaskRepository tasksRepository,
-                                final CeMergingConfiguration configuration) {
-        super(tasksRepository, configuration);
+    private final CeMergingConfiguration ceMergingConfiguration;
+
+    public DKRenamingService(CeMergingConfiguration ceMergingConfiguration) {
+        this.ceMergingConfiguration = ceMergingConfiguration;
     }
 
     public void renameDkCountry(MergingTask task) {
@@ -50,7 +50,9 @@ public class DKRenamingService extends AbstractMergingService {
             Network danishNetwork = Network.read(d1File.getOriginalName(), inputStream);
             Properties properties = buildExportProperties(dkHvdcXnodes);
             // danishNetwork.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes); : copied from core-merging todo check if this set is mondotary or network.write(UCTE_FORMAT, properties, filePath);
-            saveArtifactNetwork(DK_CONVERTED_FILE, danishNetwork, task, UCTE_FORMAT, properties);
+            ArtifactsUtil.saveArtifactNetwork(
+                DK_CONVERTED_FILE, danishNetwork, task, UCTE_FORMAT, properties, ceMergingConfiguration
+            );
         } catch (Exception e) {
             String errorMessage = String.format("Denmark Renaming strategy failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
             LOGGER.error(errorMessage);
