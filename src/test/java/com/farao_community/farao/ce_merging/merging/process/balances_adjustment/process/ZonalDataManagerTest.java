@@ -18,16 +18,16 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static test_utils.CeTestUtils.stringPathOf;
 
-class ZonalDataImporterTest {
+class ZonalDataManagerTest {
     private static final OffsetDateTime PROCESS_TARGET_DATE = OffsetDateTime.parse("2021-07-22T22:30Z");
 
     @Test
     void shouldImportGlsk() throws IOException {
         final File glskFile = new File(getClass().getResource("/balances/20210723-F226-v1.xml").getFile());
         final Network network = Network.read(stringPathOf("balances/20210723_0030_2D1_UC5_F100_CORESO.uct"));
-        final Map<String, Scalable> zonalData = ZonalDataImporter.getZonalDataFromGlsk(glskFile,
-                                                                                       network,
-                                                                                       PROCESS_TARGET_DATE);
+        final Map<String, Scalable> zonalData = ZonalDataManager.getZonalDataFromGlsk(glskFile,
+                                                                                      network,
+                                                                                      PROCESS_TARGET_DATE);
 
         assertThat(zonalData).isNotEmpty();
     }

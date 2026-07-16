@@ -12,20 +12,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.util.stream.Collectors.toMap;
 
 public final class TargetNetPositionsImporter {
 
-    private static final String NET_POSITION_LIST_FIELD = "netPositions";
-    private static final String NET_POSITION_FIELD = "netPosition";
-    private static final String AREA_FIELD = "area";
-
     private TargetNetPositionsImporter() {
-        throw new AssertionError("Utility class should not be instantiated");
+        /* This utility class should not be instantiated */
     }
 
     public static Map<String, Double> getTargetNetPositionsAreasFromFile(final File inputFile) throws IOException {
@@ -34,12 +29,17 @@ public final class TargetNetPositionsImporter {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public static Map<String, Double> getTargetNetPositionsAreasFromFile(final InputStream input) {
-        return ((ArrayList<HashMap<String, Object>>) JsonUtils.read(Map.class, input)
-            .get(NET_POSITION_LIST_FIELD))
+        return JsonUtils.read(NetPositionJson.class, input)
+            .netPositions()
             .stream()
-            .collect(toMap(o -> (String) o.get(AREA_FIELD),
-                           o -> (Double) o.get(NET_POSITION_FIELD)));
+            .collect(toMap(AreaNetPosition::area, AreaNetPosition::netPosition));
+    }
+
+
+    private record NetPositionJson(List<AreaNetPosition> netPositions) {
+    }
+
+    private record AreaNetPosition(String area, double netPosition) {
     }
 }

@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process;
+package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.powsybl.iidm.network.Network;
@@ -28,7 +28,7 @@ public final class LoadFlowUtils {
     private static final String DIVERGENCE_MESSAGE = "%s load flow diverged on network %s";
 
     private LoadFlowUtils() {
-        throw new AssertionError("Utility class should not be constructed");
+        /* This utility class should not be instantiated */
     }
 
     public static void runLoadflow(final Network network,

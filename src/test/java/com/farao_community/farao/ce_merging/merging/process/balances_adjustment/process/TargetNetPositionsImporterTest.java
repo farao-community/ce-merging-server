@@ -19,8 +19,8 @@ class TargetNetPositionsImporterTest {
 
     @Test
     void getReferenceNetPositionsAreasFromFileTest() throws IOException {
-        File netPositionsFile = new File(getClass().getResource("/balances/NetPositions.json").getFile());
-        Map<String, Double> netPositionNetworkAreas = TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile(netPositionsFile);
+        final File netPositionsFile = new File(getClass().getResource("/balances/NetPositions.json").getFile());
+        final Map<String, Double> netPositionNetworkAreas = TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile(netPositionsFile);
 
         assertFalse(netPositionNetworkAreas.isEmpty());
         assertEquals(12, netPositionNetworkAreas.size());

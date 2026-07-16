@@ -11,22 +11,27 @@ import com.powsybl.commons.report.TypedValue;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import java.util.List;
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_NODE_AREA_NAME_KEY;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_NODE_BALANCE_KEY;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_NODE_MISMATCH_KEY;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_NODE_TARGET_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_AREA_NAME_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_BALANCE_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_MISMATCH_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_TARGET_KEY;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ExtendWith(OutputCaptureExtension.class)
 class BalancesAdjustmentSummaryTest {
 
     @Test
-    void shouldPrintWithData() {
+    void shouldLogSummaryByCountryWithData(final CapturedOutput capturedOutput) {
         Network network = Network.create("test", "test");
 
         ReportNode rootNode = mock(ReportNode.class);
@@ -62,19 +67,10 @@ class BalancesAdjustmentSummaryTest {
 
         assertDoesNotThrow(() -> {
             BalancesAdjustmentSummary summary = new BalancesAdjustmentSummary(network, rootNode, 1);
-            summary.print();
+            summary.logSummaryByCountry();
         });
+
+        assertTrue(capturedOutput.getOut().contains("Incomplete shift for country FR : initial net position 0,000000, target net position 110,000000, net position in last iteration 100,000000, mismatch 10,000000"));
     }
 
-    @Test
-    void shouldPrintIfEmpty() {
-        Network network = mock(Network.class);
-        ReportNode rootNode = mock(ReportNode.class);
-        when(rootNode.getChildren()).thenReturn(List.of());
-
-        assertDoesNotThrow(() -> {
-            BalancesAdjustmentSummary summary = new BalancesAdjustmentSummary(network, rootNode, 1);
-            summary.print();
-        });
-    }
 }

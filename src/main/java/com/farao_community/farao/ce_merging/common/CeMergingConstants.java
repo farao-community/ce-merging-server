@@ -57,10 +57,7 @@ public final class CeMergingConstants {
     public static final String GERMAN_COUNTRY_CODE = "DE";
     public static final String DANISH_TSO = "D1";
     public static final String DENMARK_COUNTRY_CODE = "DK";
-    public static final String REPORT_NODE_AREA_NAME_KEY = "areaName";
-    public static final String REPORT_NODE_BALANCE_KEY = "balance";
-    public static final String REPORT_NODE_TARGET_KEY = "target";
-    public static final String REPORT_NODE_MISMATCH_KEY = "mismatch";
+
     public static final String DC = "DC";
     public static final String AC = "AC";
 

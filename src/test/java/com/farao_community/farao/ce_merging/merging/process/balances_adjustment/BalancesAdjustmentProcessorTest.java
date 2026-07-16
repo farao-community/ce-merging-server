@@ -18,8 +18,11 @@ import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.openloadflow.OpenLoadFlowProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,12 +35,14 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 import static java.lang.Double.isNaN;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static test_utils.CeTestUtils.stringPathOf;
 
 @SpringBootTest
+@ExtendWith(OutputCaptureExtension.class)
 class BalancesAdjustmentProcessorTest {
 
     private static final OffsetDateTime PROCESS_TARGET_DATE = OffsetDateTime.parse("2019-06-17T22:30Z");
@@ -101,7 +106,7 @@ class BalancesAdjustmentProcessorTest {
     }
 
     @Test
-    void shouldRunProcess() throws IOException {
+    void shouldRunProcess(final CapturedOutput capturedOutput) throws IOException {
         final BalancesAdjustmentProcessor processor = new BalancesAdjustmentProcessor(task, configuration, testLoadflowSupplier, testBalanceComputationParameters);
         assertDoesNotThrow(processor::run);
         final Network result = Network.read(stringPathOf("balances/20210723_0030_2D1_UC5_F100_CORESO.uct"));
@@ -110,10 +115,13 @@ class BalancesAdjustmentProcessorTest {
                 assertEquals(generator.getTargetP(), -generator.getTerminal().getP());
             }
         });
+
+        assertThat(capturedOutput)
+            .contains("Balance adjustment successful with AC loadflow after 2 iterations.");
     }
 
     @Test
-    void shouldFail() throws IOException {
+    void shouldNotBalance(final CapturedOutput capturedOutput) throws IOException {
         final File targetFile = new File(getClass().getResource("/balances/NetPositions_failed.json").getFile());
         task.getArtifacts().putFile(BALANCES_ADJUSTMENT_TARGET_FILE, new SavedFile("target",
                                                                                    targetFile.getPath(),
@@ -122,7 +130,9 @@ class BalancesAdjustmentProcessorTest {
         final BalancesAdjustmentProcessor processor = new BalancesAdjustmentProcessor(task, configuration, testLoadflowSupplier, testBalanceComputationParameters);
         assertDoesNotThrow(processor::run);
         final Network result = Network.read(stringPathOf("balances/20210723_0030_2D1_UC5_F100_CORESO.uct"));
-        assertTrue(result.getGeneratorStream().anyMatch(g -> g.getTargetP() + g.getTerminal().getP() != 0));
+        assertTrue(result.getGeneratorStream()
+                        .anyMatch(g -> g.getTargetP() + g.getTerminal().getP() != 0));
+        assertThat(capturedOutput).contains("Important mismatch between initial total net positions");
     }
 
 }

@@ -23,8 +23,8 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MAX
 import static com.powsybl.glsk.api.io.GlskDocumentImporters.importGlsk;
 import static com.powsybl.iidm.network.LoadType.FICTITIOUS;
 
-public final class ZonalDataImporter {
-    private ZonalDataImporter() {
+public final class ZonalDataManager {
+    private ZonalDataManager() {
         /* This utility class should not be instantiated */
     }
 
@@ -83,7 +83,7 @@ public final class ZonalDataImporter {
     }
 
     private static void createMissingLoad(final Network network, final VoltageLevel voltageLevel, final String busId) {
-        String loadId = busId + "_load";
+        final String loadId = busId + "_load";
         if (network.getLoad(loadId) == null) {
             voltageLevel.newLoad()
                 .setBus(busId)
