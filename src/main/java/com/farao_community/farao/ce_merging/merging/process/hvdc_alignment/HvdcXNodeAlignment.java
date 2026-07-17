@@ -24,6 +24,8 @@ final class HvdcXNodeAlignment {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HvdcXNodeAlignment.class);
     private static final List<UcteElementStatus> IN_OPERATION = Arrays.asList(UcteElementStatus.REAL_ELEMENT_IN_OPERATION, UcteElementStatus.EQUIVALENT_ELEMENT_IN_OPERATION, UcteElementStatus.BUSBAR_COUPLER_IN_OPERATION);
+    public static final String RECESSIVE_DANGLING_LINE = "recessive dangling line";
+    public static final String REFERENCE_DANGLING_LINE = "reference dangling line";
 
     private final Network referenceNetwork;
     private final Network recessiveNetwork;
@@ -68,7 +70,7 @@ final class HvdcXNodeAlignment {
             applyReferenceInOutageAlignment(recessiveDanglingLine);
         } else if (referenceInOperation && !recessiveInOperation) {
             applyRecessiveInOutageAlignment(referenceDanglingLine, recessiveDanglingLine);
-        } else if (referenceInOperation && recessiveInOperation) {
+        } else {
             applyAlignment(referenceDanglingLine, recessiveDanglingLine);
         }
     }
@@ -83,15 +85,15 @@ final class HvdcXNodeAlignment {
         invertDanglingLineStatus(recessiveDanglingLine);
         recessiveDanglingLine.setP0(0);
         recessiveDanglingLine.setQ0(0);
-        final DanglingLine.Generation generation = requireGeneration(recessiveDanglingLine, "recessive dangling line");
+        final DanglingLine.Generation generation = requireGeneration(recessiveDanglingLine, RECESSIVE_DANGLING_LINE);
         generation.setTargetP(0);
         generation.setTargetQ(0);
     }
 
     private void applyRecessiveInOutageAlignment(final DanglingLine referenceDanglingLine, final DanglingLine recessiveDanglingLine) {
         invertDanglingLineStatus(recessiveDanglingLine);
-        final DanglingLine.Generation referenceGeneration = requireGeneration(referenceDanglingLine, "reference dangling line");
-        final DanglingLine.Generation recessiveGeneration = requireGeneration(recessiveDanglingLine, "recessive dangling line");
+        final DanglingLine.Generation referenceGeneration = requireGeneration(referenceDanglingLine, REFERENCE_DANGLING_LINE);
+        final DanglingLine.Generation recessiveGeneration = requireGeneration(recessiveDanglingLine, RECESSIVE_DANGLING_LINE);
         final double referenceTargetP = referenceGeneration.getTargetP();
         final double referenceP0 = referenceDanglingLine.getP0();
         recessiveDanglingLine.setP0(-referenceP0);
@@ -100,8 +102,8 @@ final class HvdcXNodeAlignment {
 
     private void applyAlignment(final DanglingLine referenceDanglingLine, final DanglingLine recessiveDanglingLine) {
         recessiveDanglingLine.setP0(-referenceDanglingLine.getP0());
-        final DanglingLine.Generation referenceGeneration = requireGeneration(referenceDanglingLine, "reference dangling line");
-        final DanglingLine.Generation  recessiveGeneration = requireGeneration(recessiveDanglingLine, "recessive dangling line");
+        final DanglingLine.Generation referenceGeneration = requireGeneration(referenceDanglingLine, REFERENCE_DANGLING_LINE);
+        final DanglingLine.Generation  recessiveGeneration = requireGeneration(recessiveDanglingLine, RECESSIVE_DANGLING_LINE);
         recessiveGeneration.setTargetP(-referenceGeneration.getTargetP());
     }
 

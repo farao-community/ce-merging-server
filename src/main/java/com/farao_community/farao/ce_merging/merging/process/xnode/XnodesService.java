@@ -12,8 +12,6 @@ import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.iidm.network.Network;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,10 +24,6 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 
 @Service
 public class XnodesService {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(XnodesService.class);
-    private static final String FILE_IS_SAVED_IN_TASK_ARTIFACTS = "File '{}' is saved in task '{}' artifacts";
-    private static final String FILE_NAME_INFORMATION = "xnodesInformation.json";
 
     private final MergingTaskRepository tasksRepository;
     private final CeMergingConfiguration configuration;
