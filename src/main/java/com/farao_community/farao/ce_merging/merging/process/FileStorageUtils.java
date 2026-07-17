@@ -50,7 +50,7 @@ public final class FileStorageUtils {
                                             final MergingTask task,
                                             final CeMergingConfiguration configuration) {
 
-        final SavedFile artifactFile = FileStorageUtils.save(
+        final SavedFile artifactFile = save(
             configuration.getArtifactsDirectoryPath(task),
             fileType.getFileName(task.getInputs().getTargetDate()),
             fileType.getLocation(task.getId()),
@@ -68,7 +68,7 @@ public final class FileStorageUtils {
                                            final Properties properties,
                                            final CeMergingConfiguration configuration) {
 
-        final SavedFile artifactFile = FileStorageUtils.save(
+        final SavedFile artifactFile = save(
             configuration.getArtifactsDirectoryPath(task),
             fileType.getFileName(task.getInputs().getTargetDate()),
             fileType.getLocation(task.getId()),
