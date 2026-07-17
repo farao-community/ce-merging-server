@@ -11,6 +11,7 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.CountryCodeUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
+import com.farao_community.farao.ce_merging.merging.process.FileStorageUtils;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -22,12 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DENMARK_COUNTRY_CODE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_COUNTRY_CODE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 
 @Service
 public class HvdcXNodeAlignmentService {
@@ -146,10 +147,12 @@ public class HvdcXNodeAlignmentService {
                                         final Network network,
                                         final String country,
                                         final String location) {
-        final String networkFilename = network.getNameOrId() + ".uct";
-        final Path modifiedPath = Paths.get(configuration.getArtifactsDirectoryPath(task), networkFilename);
-        network.write(UCTE_FORMAT, null, modifiedPath);
-        final SavedFile savedFile = new SavedFile(networkFilename, modifiedPath.toString(), location);
+
+        final SavedFile savedFile = FileStorageUtils.save(
+            configuration.getArtifactsDirectoryPath(task), network.getNameOrId() + ".uct", location,
+            path -> network.write(UCTE_FORMAT, null, path)
+        );
+
         if (GERMAN_COUNTRY_CODE.equals(country)) {
             task.getArtifacts().putFile(ArtifactType.GERMAN_PRE_MERGED_IGM, savedFile);
         } else if (DENMARK_COUNTRY_CODE.equals(country)) {
