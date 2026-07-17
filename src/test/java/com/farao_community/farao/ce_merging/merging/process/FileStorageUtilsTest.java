@@ -34,7 +34,13 @@ class FileStorageUtilsTest {
             tempDir.toString(),
             fileName,
             location,
-            path -> Files.writeString(path, "content")
+            path -> {
+                try {
+                    Files.writeString(path, "content");
+                } catch (IOException e) {
+                    throw new CeMergingException("Cannot write test file", e);
+                }
+            }
         );
         final Path expectedPath = tempDir.resolve(fileName);
 

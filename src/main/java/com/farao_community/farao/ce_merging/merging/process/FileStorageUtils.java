@@ -16,6 +16,7 @@ import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
@@ -42,7 +43,7 @@ public final class FileStorageUtils {
 
     @FunctionalInterface
     public interface ThrowingConsumer<T> {
-        void accept(T t) throws Exception;
+        void accept(T t) throws CeMergingException;
     }
 
     public static <T> void saveArtifactFile(final ArtifactType fileType,
@@ -54,7 +55,13 @@ public final class FileStorageUtils {
             configuration.getArtifactsDirectoryPath(task),
             fileType.getFileName(task.getInputs().getTargetDate()),
             fileType.getLocation(task.getId()),
-            path -> JsonUtils.writeInPath((Class<T>) businessObject.getClass(), businessObject, path)
+                path -> {
+                    try {
+                        JsonUtils.writeInPath((Class<T>) businessObject.getClass(), businessObject, path);
+                    } catch (IOException e) {
+                        throw new CeMergingException("Cannot write artifact file", e);
+                    }
+                }
         );
 
         task.getArtifacts().putFile(fileType, artifactFile);
