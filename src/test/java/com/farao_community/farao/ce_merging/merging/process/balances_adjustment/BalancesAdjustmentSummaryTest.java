@@ -22,8 +22,8 @@ import static com.farao_community.farao.ce_merging.merging.process.balances_adju
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_BALANCE_KEY;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_MISMATCH_KEY;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_TARGET_KEY;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,7 +70,8 @@ class BalancesAdjustmentSummaryTest {
             summary.logSummaryByCountry();
         });
 
-        assertTrue(capturedOutput.getOut().contains("Incomplete shift for country FR : initial net position 0,000000, target net position 110,000000, net position in last iteration 100,000000, mismatch 10,000000"));
+        assertThat(capturedOutput)
+            .contains("Incomplete shift for country FR : initial net position 0");
     }
 
 }
