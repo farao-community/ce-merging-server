@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.CountryNetPositions;
@@ -81,7 +81,7 @@ public final class InitialNetPositionsImporter {
             return netPositions.countryNetPositionsMap();
         } catch (IOException e) {
             LOGGER.error("Error while reading initial net positions in BCI process", e);
-            throw new ServiceIOException("Error while reading initial net positions in BCI process", e);
+            throw new CeMergingException("Error while reading initial net positions in BCI process", e);
         }
     }
 

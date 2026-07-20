@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciProcessResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.commons.json.JsonUtil;
@@ -34,7 +34,7 @@ public final class BciResultUtil {
 
         } catch (final IOException e) {
             LOGGER.error("Error while writing result of '{}' region", result.regionName(), e);
-            throw new ServiceIOException(String.format("Error while writing result of '%s' region", result.regionName()), e);
+            throw new CeMergingException(String.format("Error while writing result of '%s' region", result.regionName()), e);
         }
     }
 
@@ -43,7 +43,7 @@ public final class BciResultUtil {
             return OBJECT_MAPPER.readValue(is, BciProcessResult.class);
         } catch (final IOException e) {
             LOGGER.error("Error while reading result", e);
-            throw new ServiceIOException("Error while reading result", e);
+            throw new CeMergingException("Error while reading result", e);
         }
     }
 

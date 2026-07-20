@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data;
 
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +64,7 @@ public class Interval {
         if (minValue > maxValue) {
             final String errorMessage = "Min value of feasibility range should be lower than max value";
             LOGGER.error(errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+            throw new CeMergingException(errorMessage);
         }
     }
 

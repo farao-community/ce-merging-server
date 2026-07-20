@@ -12,26 +12,22 @@ import com.farao_community.farao.ce_merging.common.util.FileUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroData;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroFlows;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAlegroData;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAlegroFlows;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciComputationResult;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciProcessResult;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.OutRegionResults;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.BciComputer;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.FeasibilityRangeCalculator;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
@@ -39,6 +35,7 @@ import java.util.TreeMap;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.readBytesFromPath;
+import static com.farao_community.farao.ce_merging.merging.process.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.ExternalConstraintsImporter.calculateConstraintsForAlegro;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.InitialNetPositionsImporter.getGlobalNetPosition;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
@@ -83,7 +80,7 @@ public class BciProcessor {
         try {
             importFiles();
             computeBci();
-            saveInArtifacts();
+            saveArtifactFile(BCI_OUTPUT_FILE, processResult, task, configuration);
         } catch (final Exception e) {
             final String errorMessage = "Error while running BCI";
             LOGGER.error(errorMessage);
@@ -132,8 +129,8 @@ public class BciProcessor {
 
     private void updateAlegroRegionNetPosition(final String countryCode,
                                                final AlegroFlows flows) {
-        final double alHubToCeFlow = getAlegroConstrainedTargetFlow(flows);
-        final double countryAlegroGap = alHubToCeFlow - flows.initialFlow();
+        final double alegroToCeFlow = getAlegroConstrainedTargetFlow(flows);
+        final double countryAlegroGap = alegroToCeFlow - flows.initialFlow();
         final String countryEic = regionConfiguration.getAreaInEic(countryCode);
 
         initialRegionNetPositions.shiftFlow(countryEic, countryAlegroGap);
@@ -226,23 +223,5 @@ public class BciProcessor {
 
     private Interval getGermanAlegroConstraint() {
         return alegroConstraints.get(ALEGRO_DE_NODE_NAME);
-    }
-
-    private void saveInArtifacts() {
-        final String fileName = "bciOutputs.json";
-        try {
-            final Path filePath = Paths.get(configuration.getArtifactsDirectoryPath(task), fileName);
-            Files.createFile(filePath);
-            JsonUtils.writeInPath(BciProcessResult.class, processResult, filePath);
-            final SavedFile savedFile = new SavedFile(fileName,
-                                                      filePath.toString(),
-                                                      String.format("/tasks/%d/artifacts/bci-output",
-                                                                    task.getId()));
-            task.getArtifacts().putFile(BCI_OUTPUT_FILE, savedFile);
-            LOGGER.info("file '{}' is saved in task '{}' artifacts", fileName, task.getId());
-        } catch (Exception e) {
-            LOGGER.error("Cannot write file '{}' in task '{}' artifacts", fileName, task.getId(), e);
-            throw new CeMergingException(String.format("Cannot write file '%s' in task '%d' artifacts", fileName, task.getId()), e);
-        }
     }
 }
