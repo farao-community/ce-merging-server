@@ -147,10 +147,12 @@ public class BciProcessor {
     private void computeBci() {
         final BciComputer computer = new BciComputer(regionConfiguration, referenceProgram, regionFeasibilityRanges);
 
-        final double alDeToCeFlow = shouldIgnoreAlegro() ? 0 : getAlegroConstrainedTargetFlow(alegroData.aldeFlows());
-        final double alBeToCeFlow = shouldIgnoreAlegro() ? 0 : getAlegroConstrainedTargetFlow(alegroData.albeFlows());
+        final double alegroGermanyToCeFlow = alegroOutOrNoData() ? 0 : getAlegroConstrainedTargetFlow(alegroData.aldeFlows());
+        final double alegroBelgiumToCeFlow = alegroOutOrNoData() ? 0 : getAlegroConstrainedTargetFlow(alegroData.albeFlows());
 
-        final BciComputationResult bciResults = computer.run(initialRegionNetPositions, alBeToCeFlow, alDeToCeFlow);
+        final BciComputationResult bciResults = computer.run(initialRegionNetPositions,
+                                                             alegroBelgiumToCeFlow,
+                                                             alegroGermanyToCeFlow);
 
         processResult = new BciProcessResult(regionConfiguration.getName(),
                                              task.getTargetDate(),
@@ -161,7 +163,7 @@ public class BciProcessor {
 
     private BciAlegroData getBciAlegroData() {
 
-        if (shouldIgnoreAlegro()) {
+        if (alegroOutOrNoData()) {
             return null;
         }
 
@@ -206,14 +208,14 @@ public class BciProcessor {
 
         final boolean flowsToGermany = alegroData.albeFlows().targetFlow() < 0;
 
-        final Interval atOrigin = flowsToGermany ? alBeConstraints : alDeConstraints;
-        final Interval atDestination = flowsToGermany ? alDeConstraints : alBeConstraints;
+        final Interval outAreaBoundaries = flowsToGermany ? alBeConstraints : alDeConstraints;
+        final Interval inAreaBoundaries = flowsToGermany ? alDeConstraints : alBeConstraints;
 
-        return min(abs(atOrigin.getMaxValue()),
-                   abs(atDestination.getMinValue()));
+        return min(abs(outAreaBoundaries.getMaxValue()),
+                   abs(inAreaBoundaries.getMinValue()));
     }
 
-    private boolean shouldIgnoreAlegro() {
+    private boolean alegroOutOrNoData() {
         return alegroData == null || alegroData.alegroInOutage();
     }
 
