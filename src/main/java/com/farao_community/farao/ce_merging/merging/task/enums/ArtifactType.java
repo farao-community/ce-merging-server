@@ -6,28 +6,58 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.enums;
 
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATETIME_FMT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NUMBER_FORMAT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.STRING_FORMAT;
+import static java.util.Locale.FRANCE;
+
 public enum ArtifactType {
-    GERMAN_PRE_MERGED_IGM,
-    DK_CONVERTED_FILE,
-    TOPOLOGICAL_MERGE_FILE,
-    BALANCED_CGM_FILE,
-    CGM_FILE_AFTER_PST,
-    GLSK_QUALITY_REPORT,
-    GLSK_QUALITY_CORRECTED_FILE,
-    IGMS_NET_POSITIONS_FILE,
-    GERMAN_IGMS_NET_POSITIONS_FILE,
-    BCI_OUTPUT_FILE,
-    BALANCES_ADJUSTMENT_TARGET_FILE,
-    CGM_NET_POSITIONS_FILE,
-    TGM_FILE_AFTER_RECESSIVITY,
-    TGM_NET_POSITIONS_FILE,
-    PST_OUTPUT_FILE,
-    MERGING_LOGS_EXPORTED_FILE,
-    MERGING_SUPERVISOR_EXECUTION_LOGS,
-    LOAD_FLOW_ON_FINAL_CGM_LOGS,
-    ALEGRO_NET_POSITIONS,
-    XNODES_INFORMATION_FILE,
-    XNODES_INCONSISTENCIES,
-    REFERENCE_PROGRAM_FORECAST_FILE,
-    PRE_TREATED_IGM_MAP
+    GERMAN_PRE_MERGED_IGM("%s_2D%d_DE0.uct", "german-pre-merge-result"),
+    DK_CONVERTED_FILE("%s_2D%d_DK0.uct", "dk-igm-conversion-result"),
+    TOPOLOGICAL_MERGE_FILE("%s_2D%d_UX0_TOPOLOGICAL_MERGED.uct", "topological-merge-result"),
+    BALANCED_CGM_FILE("%s_2D%d_UX0_BALANCED.uct", "cgm"),
+    CGM_FILE_AFTER_PST("%s_2D%d_UX0_PST_APPLIED.uct", "cgm"),
+    GLSK_QUALITY_REPORT("%s_GLSK_QUALITY_CHECK.xml", "glsk-quality-report"),
+    GLSK_QUALITY_CORRECTED_FILE("glsk_corrected_%s_2D%d_UX0.xml", "actual-glsk-report-correction"),
+    IGMS_NET_POSITIONS_FILE("igmsNetPositions.json", "igms-net-positions"),
+    GERMAN_IGMS_NET_POSITIONS_FILE("germanIgmsNetPositions.json", "german-igms-net-positions"),
+    BCI_OUTPUT_FILE("bciOutputs.json", "bci-output"),
+    BALANCES_ADJUSTMENT_TARGET_FILE("balancesAdjustmentTarget.json", "balances-adjustment-target"),
+    CGM_NET_POSITIONS_FILE("cgmNetPositions.json", "cgm-net-positions"),
+    TGM_FILE_AFTER_RECESSIVITY("%s_2D%d_UX0_RECESSIVITY_APPLIED.uct", "tgm-recessivity"),
+    PST_OUTPUT_FILE("pstOutput.json", "pst-result"),
+    LOAD_FLOW_ON_FINAL_CGM_LOGS("Loadflow_final_cgm_logs.xml", "open-loadflow-logs"),
+    ALEGRO_NET_POSITIONS("alegroNetPositions.json", "igms-net-positions"),
+    XNODES_INFORMATION_FILE("xnodesInformation.json", "xnodes-information"),
+    XNODES_INCONSISTENCIES("xnodesInconsistencies.json", "xnodes-inconsistencies"),
+    REFERENCE_PROGRAM_FORECAST_FILE("forecastReferenceProgram.json", "netPositionForecast");
+
+    private final String fileName;
+    private final String location;
+
+    ArtifactType(final String fileName, final String location) {
+        this.fileName = fileName;
+        this.location = location;
+    }
+
+    public String getFileName(final OffsetDateTime targetDate) {
+        final ZonedDateTime targetZdtParis = targetDate.atZoneSameInstant(PARIS_ZONE_ID);
+        final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
+
+        if (fileName.contains(STRING_FORMAT) && fileName.contains(NUMBER_FORMAT)) {
+            return fileName.formatted(dateAndTime, targetZdtParis.getDayOfWeek().getValue());
+        } else if (fileName.contains(STRING_FORMAT)) {
+            return fileName.formatted(dateAndTime);
+        } else {
+            return fileName;
+        }
+    }
+
+    public String getLocation(final long taskId) {
+        return String.format("/tasks/%d/artifacts/%s", taskId, location);
+    }
 }
