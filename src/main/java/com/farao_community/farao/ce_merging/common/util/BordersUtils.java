@@ -16,6 +16,7 @@ import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.TwoSides;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public final class BordersUtils {
 
@@ -30,11 +31,15 @@ public final class BordersUtils {
                 .anyMatch(nodeName::equals);
     }
 
+    public static Predicate<DanglingLine> isBorderOf(final Country country) {
+        return line -> getCountry(line) == country;
+    }
+
     public static double zeroIfNan(final double value) {
         return Double.isNaN(value) ? 0 : value;
     }
 
-    public static Country getCountrySide(final Branch branch, final TwoSides side) {
+    public static Country getCountrySide(final Branch<?> branch, final TwoSides side) {
         return branch.getTerminal(side).getVoltageLevel()
                 .getSubstation()
                 .orElseThrow(() -> new CeMergingException(

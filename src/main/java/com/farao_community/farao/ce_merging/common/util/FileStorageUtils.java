@@ -4,14 +4,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process;
+package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,5 +83,36 @@ public final class FileStorageUtils {
         );
 
         task.getArtifacts().putFile(fileType, artifactFile);
+    }
+
+    public static void savePreTreatedIgm(final String country,
+                                         final Network network,
+                                         final Properties properties,
+                                         final String format,
+                                         final String location,
+                                         final MergingTask task,
+                                         final CeMergingConfiguration configuration) {
+
+        final String fileLocation = String.format("/tasks/%d/artifacts/%s", task.getId(), location);
+
+        final SavedFile artifactFile = save(
+            configuration.getArtifactsDirectoryPath(task),
+            country + "_IGM.uct",
+            fileLocation,
+            path -> network.write(format, properties, path)
+        );
+
+        task.getArtifacts().getPreTreatedIgmMap().put(country, artifactFile);
+    }
+
+    public static void savePreTreatedIgm(final Country country,
+                                         final Network network,
+                                         final Properties properties,
+                                         final String format,
+                                         final String location,
+                                         final MergingTask task,
+                                         final CeMergingConfiguration configuration) {
+
+        savePreTreatedIgm(country.name(), network, properties, format, location, task, configuration);
     }
 }
