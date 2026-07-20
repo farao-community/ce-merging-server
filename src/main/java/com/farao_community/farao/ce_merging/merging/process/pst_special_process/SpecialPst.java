@@ -26,8 +26,8 @@ public enum SpecialPst {
     PADRICIANO("Padriciano", "IPDRV12[0-9A-Z] IPDRV12[0-9A-Z] 1", IT),
     DIVACA("Divača", "LDIVAC1[0-9A-Z] LDIVAC1[0-9A-Z] [1-2]", SI),
     LIENZ("Lienz", "OLIENN2[0-9A-Z] OLIENN2[0-9A-Z] [2]", AT),
-    NRPST21("Nauders 1", "ONAUDE2[0-9A-Z] ONAUDE2[0-9A-Z] 1", AT),
-    NRPST22("Nauders 2", "ONAUDE2[0-9A-Z] ONAUDE2[0-9A-Z] 2", AT);
+    NAUDERS1("Nauders 1", "ONAUDE2[0-9A-Z] ONAUDE2[0-9A-Z] 1", AT),
+    NAUDERS2("Nauders 2", "ONAUDE2[0-9A-Z] ONAUDE2[0-9A-Z] 2", AT);
 
     private final String fullName;
     private final String idRegex;
@@ -55,8 +55,8 @@ public enum SpecialPst {
         return Pattern.compile(idRegex).matcher(identifiable.getId()).matches();
     }
 
-    public static Stream<SpecialPst> stream() {
-        return Arrays.stream(SpecialPst.values());
+    public static Stream<SpecialPst> austrianSpecialPsts() {
+        return Stream.of(LIENZ, NAUDERS1, NAUDERS2);
     }
 
     public static <T> Map<SpecialPst, T> toPstMap(final Function<SpecialPst, T> valueMapper) {

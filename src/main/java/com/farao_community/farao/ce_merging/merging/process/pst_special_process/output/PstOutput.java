@@ -89,8 +89,17 @@ public class PstOutput implements Serializable {
             case LIENZ -> tapPstLienz;
             case DIVACA -> tapPstDivaca;
             case PADRICIANO -> tapPstPadriciano;
-            case NRPST21 -> tapPstNr21;
-            case NRPST22 -> tapPstNr22;
+            case NAUDERS1 -> tapPstNr21;
+            case NAUDERS2 -> tapPstNr22;
+        };
+    }
+
+    public Flow getFlow(final SpecialPst pst) {
+        return switch (pst) {
+            case LIENZ -> flowLipst;
+            case NAUDERS1 -> flowNrpst21;
+            case NAUDERS2 -> flowNrpst22;
+            default -> throw new IllegalArgumentException("Call to getFlow is ambiguous for Divača or Padriciano");
         };
     }
 

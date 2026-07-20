@@ -29,12 +29,12 @@ public class Flow {
     }
 
     @JsonIgnore
-    public void setIgmFlowFrom(final Branch<?> branch) {
+    public void setIgmFlowFromBranch(final Branch<?> branch) {
         this.flowIGM = getBranchFlow(branch);
     }
 
     @JsonIgnore
-    public void setCgmFlowFrom(final Branch<?> branch) {
+    public void setCgmFlowFromBranch(final Branch<?> branch) {
         this.flowCGM = getBranchFlow(branch);
     }
 
