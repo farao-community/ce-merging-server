@@ -48,11 +48,11 @@ class PstSpecialServiceTest {
     private final Path resourceDirectory = Paths.get("src", "test", "resources", "pst_special");
     private final String absolutePath = resourceDirectory.toFile().getAbsolutePath();
 
-    private final MergingTask entityForProcess1 = new MergingTask();
-    private final MergingTask entityForProcess1PadriocianoOutage = new MergingTask();
-    private final MergingTask entityForProcess1DivacaOutage = new MergingTask();
-    private final MergingTask entityForProcess3 = new MergingTask();
-    private final MergingTask entityError = new MergingTask();
+    private final MergingTask taskP1 = new MergingTask();
+    private final MergingTask taskP1PadricianoOut = new MergingTask();
+    private final MergingTask taskP1DivacaOut = new MergingTask();
+    private final MergingTask taskP3 = new MergingTask();
+    private final MergingTask taskFailed = new MergingTask();
     private IgmData igmSi;
     private IgmData igmIt;
     private IgmData igmAt;
@@ -65,30 +65,30 @@ class PstSpecialServiceTest {
         String loadflowParametersFile = "pst_special/ac-load-flow-parameters.json";
         Configurations configurations = new Configurations();
 
-        entityError.setConfigurations(configurations);
-        TaskTestUtils.setLoadflowParameters(entityError, loadflowParametersFile);
-        Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(entityError)));
-        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(entityError)));
+        taskFailed.setId(1L);
+        taskFailed.setConfigurations(configurations);
+        TaskTestUtils.setLoadflowParameters(taskFailed, loadflowParametersFile);
+        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(taskFailed)));
 
-        entityForProcess1.setConfigurations(configurations);
-        TaskTestUtils.setLoadflowParameters(entityForProcess1, loadflowParametersFile);
-        Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(entityForProcess1)));
-        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(entityForProcess1)));
+        taskP1.setId(2L);
+        taskP1.setConfigurations(configurations);
+        TaskTestUtils.setLoadflowParameters(taskP1, loadflowParametersFile);
+        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(taskP1)));
 
-        entityForProcess1PadriocianoOutage.setConfigurations(configurations);
-        TaskTestUtils.setLoadflowParameters(entityForProcess1PadriocianoOutage, loadflowParametersFile);
-        Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(entityForProcess1PadriocianoOutage)));
-        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(entityForProcess1PadriocianoOutage)));
+        taskP1PadricianoOut.setId(3L);
+        taskP1PadricianoOut.setConfigurations(configurations);
+        TaskTestUtils.setLoadflowParameters(taskP1PadricianoOut, loadflowParametersFile);
+        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(taskP1PadricianoOut)));
 
-        entityForProcess1DivacaOutage.setConfigurations(configurations);
-        TaskTestUtils.setLoadflowParameters(entityForProcess1DivacaOutage, loadflowParametersFile);
-        Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(entityForProcess1DivacaOutage)));
-        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(entityForProcess1DivacaOutage)));
+        taskP1DivacaOut.setId(4L);
+        taskP1DivacaOut.setConfigurations(configurations);
+        TaskTestUtils.setLoadflowParameters(taskP1DivacaOut, loadflowParametersFile);
+        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(taskP1DivacaOut)));
 
-        entityForProcess3.setConfigurations(configurations);
-        TaskTestUtils.setLoadflowParameters(entityForProcess3, loadflowParametersFile);
-        Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(entityForProcess3)));
-        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(entityForProcess3)));
+        taskP3.setId(5L);
+        taskP3.setConfigurations(configurations);
+        TaskTestUtils.setLoadflowParameters(taskP3, loadflowParametersFile);
+        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(taskP3)));
 
         inputs = new Inputs();
         artifacts = new Artifacts();
@@ -103,20 +103,20 @@ class PstSpecialServiceTest {
 
     @Test
     void testPstProcess1() throws FileNotFoundException {
-        igmIt.setIgmFilePath(absolutePath.concat("/process1/20200218_0030_FO2_IT0.uct"));
-        igmSi.setIgmFilePath(absolutePath.concat("/process1/20200219_0030_2D3_SI0.UCT"));
-        igmAt.setIgmFilePath(absolutePath.concat("/process1/20200219_0030_2D3_AT3.uct"));
+        igmIt.setIgmFilePath(absolutePath.concat("/process1/20260620_1130_FO2_IT0.uct"));
+        igmSi.setIgmFilePath(absolutePath.concat("/process1/20260620_1130_2D3_SI0.UCT"));
+        igmAt.setIgmFilePath(absolutePath.concat("/process1/20260620_1130_2D3_AT3.uct"));
         List<IgmData> igms = Arrays.asList(igmIt, igmSi, igmAt);
         inputs.setIgms(igms);
-        entityForProcess1.setInputs(inputs);
+        taskP1.setInputs(inputs);
 
-        shiftedCgm = new SavedFile("/20200219_0030_2D3_UX0.uct", absolutePath.concat("/process1/20200219_0030_2D3_UX0.uct"), "mock");
+        shiftedCgm = new SavedFile("/20260620_1130_2D3_UX0.uct", absolutePath.concat("/process1/20260620_1130_2D3_UX0.uct"), "mock");
         artifacts.putFile(BALANCED_CGM_FILE, shiftedCgm);
-        entityForProcess1.setArtifacts(artifacts);
+        taskP1.setArtifacts(artifacts);
 
-        pstSpecialService.fixPst(entityForProcess1);
+        pstSpecialService.fixPst(taskP1);
 
-        SavedFile pstOutputFile = entityForProcess1.getArtifacts().getFile(PST_OUTPUT_FILE);
+        SavedFile pstOutputFile = taskP1.getArtifacts().getFile(PST_OUTPUT_FILE);
         PstOutput result = JsonUtils.read(PstOutput.class, pstOutputFile.getPath());
         assertEquals(1, result.getProcessNumberDivaca());
         assertEquals(0., result.getTotalTargetFlowDivaca(), 0.0);
@@ -130,19 +130,19 @@ class PstSpecialServiceTest {
 
     @Test
     void testPstProcess1DivacaOutage() throws FileNotFoundException {
-        igmIt.setIgmFilePath(absolutePath.concat("/process1/divacaOutage/20200710_2130_FO5_IT0.uct"));
-        igmSi.setIgmFilePath(absolutePath.concat("/process1/divacaOutage/20200713_2130_2D1_SI0.UCT"));
-        igmAt.setIgmFilePath(absolutePath.concat("/process1/20200219_0030_2D3_AT3.uct"));
+        igmIt.setIgmFilePath(absolutePath.concat("/process1/divacaOutage/20260620_1130_FO5_IT0.uct"));
+        igmSi.setIgmFilePath(absolutePath.concat("/process1/divacaOutage/20260620_1130_2D1_SI0.UCT"));
+        igmAt.setIgmFilePath(absolutePath.concat("/process1/20260620_1130_2D3_AT3.uct"));
         List<IgmData> igms = Arrays.asList(igmIt, igmSi, igmAt);
         inputs.setIgms(igms);
-        entityForProcess1DivacaOutage.setInputs(inputs);
+        taskP1DivacaOut.setInputs(inputs);
 
-        shiftedCgm = new SavedFile("/20200713_2130_2D1_UX0.uct", absolutePath.concat("/process1/divacaOutage/20200713_2130_2D1_UX0.uct"), "mock");
+        shiftedCgm = new SavedFile("/20260620_1130_2D1_UX0.uct", absolutePath.concat("/process1/divacaOutage/20260620_1130_2D1_UX0.uct"), "mock");
         artifacts.putFile(BALANCED_CGM_FILE, shiftedCgm);
-        entityForProcess1DivacaOutage.setArtifacts(artifacts);
+        taskP1DivacaOut.setArtifacts(artifacts);
 
-        pstSpecialService.fixPst(entityForProcess1DivacaOutage);
-        SavedFile pstOutputFile = entityForProcess1DivacaOutage.getArtifacts().getFile(PST_OUTPUT_FILE);
+        pstSpecialService.fixPst(taskP1DivacaOut);
+        SavedFile pstOutputFile = taskP1DivacaOut.getArtifacts().getFile(PST_OUTPUT_FILE);
         PstOutput result = JsonUtils.read(PstOutput.class, pstOutputFile.getPath());
         assertEquals(1, result.getProcessNumberDivaca());
         assertEquals(0., result.getTotalTargetFlowDivaca(), 0.0);
@@ -156,19 +156,19 @@ class PstSpecialServiceTest {
 
     @Test
     void testPstProcess1PadricianoOutage() throws FileNotFoundException {
-        igmIt.setIgmFilePath(absolutePath.concat("/process1/padricianoOutage/20200710_2230_FO5_IT0.uct"));
-        igmSi.setIgmFilePath(absolutePath.concat("/process1/padricianoOutage/20200713_2230_2D1_SI0.UCT"));
-        igmAt.setIgmFilePath(absolutePath.concat("/process1/20200219_0030_2D3_AT3.uct"));
+        igmIt.setIgmFilePath(absolutePath.concat("/process1/padricianoOutage/20260620_1130_FO5_IT0.uct"));
+        igmSi.setIgmFilePath(absolutePath.concat("/process1/padricianoOutage/20260620_1130_2D1_SI0.UCT"));
+        igmAt.setIgmFilePath(absolutePath.concat("/process1/20260620_1130_2D3_AT3.uct"));
         List<IgmData> igms = Arrays.asList(igmIt, igmSi, igmAt);
         inputs.setIgms(igms);
-        entityForProcess1PadriocianoOutage.setInputs(inputs);
+        taskP1PadricianoOut.setInputs(inputs);
 
-        shiftedCgm = new SavedFile("/20200713_2230_2D1_UX0.uct", absolutePath.concat("/process1/padricianoOutage/20200713_2230_2D1_UX0.uct"), "mock");
+        shiftedCgm = new SavedFile("/20260620_1130__2230_2D1_UX0.uct", absolutePath.concat("/process1/padricianoOutage/20260620_1130_2D1_UX0.uct"), "mock");
         artifacts.putFile(BALANCED_CGM_FILE, shiftedCgm);
-        entityForProcess1PadriocianoOutage.setArtifacts(artifacts);
+        taskP1PadricianoOut.setArtifacts(artifacts);
 
-        pstSpecialService.fixPst(entityForProcess1PadriocianoOutage);
-        SavedFile pstOutputFile = entityForProcess1PadriocianoOutage.getArtifacts().getFile(PST_OUTPUT_FILE);
+        pstSpecialService.fixPst(taskP1PadricianoOut);
+        SavedFile pstOutputFile = taskP1PadricianoOut.getArtifacts().getFile(PST_OUTPUT_FILE);
         PstOutput result = JsonUtils.read(PstOutput.class, pstOutputFile.getPath());
         assertEquals(1, result.getProcessNumberDivaca());
         assertEquals(0., result.getTotalTargetFlowDivaca(), 0.0);
@@ -182,23 +182,23 @@ class PstSpecialServiceTest {
 
     @Test
     void testPstProcess3() throws FileNotFoundException {
-        igmIt.setIgmFilePath(absolutePath.concat("/process3/20200710_2330_FO5_IT0.uct"));
-        igmSi.setIgmFilePath(absolutePath.concat("/process3/20200713_2330_2D1_SI0.UCT"));
-        igmAt.setIgmFilePath(absolutePath.concat("/process1/20200219_0030_2D3_AT3.uct"));
+        igmIt.setIgmFilePath(absolutePath.concat("/process3/20260620_1130_FO5_IT0.uct"));
+        igmSi.setIgmFilePath(absolutePath.concat("/process3/20260620_1130_2D1_SI0.UCT"));
+        igmAt.setIgmFilePath(absolutePath.concat("/process1/20260620_1130_2D3_AT3.uct"));
         List<IgmData> igms = Arrays.asList(igmIt, igmSi, igmAt);
         Inputs inputs = new Inputs();
         inputs.setIgms(igms);
-        inputs.setTargetDate(OffsetDateTime.parse("2020-07-13T23:30Z"));
+        inputs.setTargetDate(OffsetDateTime.parse("2026-06-19T23:30Z"));
 
         Artifacts artifacts = new Artifacts();
-        shiftedCgm = new SavedFile("/20200713_2330_2D1_UX0.uct", absolutePath.concat("/process3/20200713_2330_2D1_UX0.uct"), "mock");
+        shiftedCgm = new SavedFile("/20260620_1130_2D1_UX0.uct", absolutePath.concat("/process3/20260620_1130_2D1_UX0.uct"), "mock");
         artifacts.putFile(BALANCED_CGM_FILE, shiftedCgm);
 
-        entityForProcess3.setInputs(inputs);
-        entityForProcess3.setArtifacts(artifacts);
+        taskP3.setInputs(inputs);
+        taskP3.setArtifacts(artifacts);
 
-        pstSpecialService.fixPst(entityForProcess3);
-        SavedFile pstOutputFile = entityForProcess3.getArtifacts().getFile(PST_OUTPUT_FILE);
+        pstSpecialService.fixPst(taskP3);
+        SavedFile pstOutputFile = taskP3.getArtifacts().getFile(PST_OUTPUT_FILE);
 
         PstOutput result = JsonUtils.read(PstOutput.class, pstOutputFile.getPath());
         assertEquals(3, result.getProcessNumberDivaca());
@@ -210,19 +210,19 @@ class PstSpecialServiceTest {
 
     @Test
     void testPstDivacaWithNoTargetFlow() throws FileNotFoundException {
-        igmIt.setIgmFilePath(absolutePath.concat("/error/20200218_0030_FO2_IT0.uct"));
-        igmSi.setIgmFilePath(absolutePath.concat("/error/20200219_0030_2D3_SI0.UCT"));
-        igmAt.setIgmFilePath(absolutePath.concat("/process1/20200219_0030_2D3_AT3.uct"));
+        igmIt.setIgmFilePath(absolutePath.concat("/error/20260620_1130_FO2_IT0.uct"));
+        igmSi.setIgmFilePath(absolutePath.concat("/error/20260620_1130_2D3_SI0.UCT"));
+        igmAt.setIgmFilePath(absolutePath.concat("/process1/20260620_1130_2D3_AT3.uct"));
         List<IgmData> igms = Arrays.asList(igmIt, igmSi, igmAt);
         inputs.setIgms(igms);
-        entityError.setInputs(inputs);
+        taskFailed.setInputs(inputs);
 
-        shiftedCgm = new SavedFile("/20200219_0030_2D3_UX0.uct", absolutePath.concat("/error/20200219_0030_2D3_UX0.uct"), "mock");
+        shiftedCgm = new SavedFile("/20260620_1130_2D3_UX0.uct", absolutePath.concat("/error/20260620_1130_2D3_UX0.uct"), "mock");
         artifacts.putFile(BALANCED_CGM_FILE, shiftedCgm);
-        entityError.setArtifacts(artifacts);
+        taskFailed.setArtifacts(artifacts);
 
-        pstSpecialService.fixPst(entityError);
-        SavedFile pstOutputFile = entityError.getArtifacts().getFile(PST_OUTPUT_FILE);
+        pstSpecialService.fixPst(taskFailed);
+        SavedFile pstOutputFile = taskFailed.getArtifacts().getFile(PST_OUTPUT_FILE);
         PstOutput result = JsonUtils.read(PstOutput.class, pstOutputFile.getPath());
         assertEquals(1, result.getProcessNumberDivaca());
         assertEquals(0., result.getTotalTargetFlowDivaca(), 0.0);

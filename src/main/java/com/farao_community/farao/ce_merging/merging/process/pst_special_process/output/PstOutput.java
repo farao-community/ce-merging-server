@@ -108,7 +108,7 @@ public class PstOutput implements Serializable {
     }
 
     public void setTapCgmFromId(final SpecialPst pst, final String tapId, final Network cgm) {
-         getTap(pst).setCgmTapFrom(cgm.getTwoWindingsTransformer(tapId));
+        getTap(pst).setCgmTapFrom(cgm.getTwoWindingsTransformer(tapId));
     }
 
     public Flow getFlowDivacaPadriciano() {
