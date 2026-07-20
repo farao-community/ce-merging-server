@@ -124,7 +124,7 @@ public class XnodesCalculation {
             branchOpt.ifPresent(branch -> addMergedInformation(branch, xnodeInformation));
         } else {
             // for german internal node that were renamed in germany premerge step: begin with "D" not "X"
-            final List<Branch> branches = network.getBranchStream().filter(branch -> branch.getId().contains(nodeId.substring(1, 8))).collect(Collectors.toList());
+            final List<Branch> branches = network.getBranchStream().filter(branch -> branch.getId().contains(nodeId.substring(1, 8))).toList();
             if (branches.size() == 1) {
                 addMergedInformation(branches.getFirst(), xnodeInformation);
             } else if (branches.size() == 2) {

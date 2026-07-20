@@ -8,6 +8,7 @@ package com.farao_community.farao.ce_merging.common;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 
 public final class CeMergingConstants {
@@ -32,8 +33,6 @@ public final class CeMergingConstants {
     public static final String OUTPUTS_DIR = "outputs";
     public static final String DAILY_OUTPUTS_DIR = "daily-outputs";
     public static final String DAILY_INPUTS_DIR = "daily-inputs";
-    public static final String BCI_OUTPUTS_DIR = "bci-outputs";
-    public static final String BCI_INPUTS_DIR = "bci-inputs";
     public static final String ARTIFACTS_DIR = "artifacts";
     public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";
@@ -61,6 +60,8 @@ public final class CeMergingConstants {
     public static final String DENMARK_COUNTRY_CODE = "DK";
     public static final String ALEGRO_BE_NODE_NAME = "BE_AL";
     public static final String ALEGRO_DE_NODE_NAME = "DE_AL";
+    public static final String STRING_FORMAT = "%s";
+    public static final String NUMBER_FORMAT = "%d";
 
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
@@ -69,4 +70,6 @@ public final class CeMergingConstants {
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
     public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
+    public static final DateTimeFormatter FILENAME_DATETIME_FMT = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+
 }
