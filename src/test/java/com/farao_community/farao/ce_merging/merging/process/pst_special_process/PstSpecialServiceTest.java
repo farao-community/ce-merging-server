@@ -97,7 +97,7 @@ class PstSpecialServiceTest {
         igmIt = new IgmData();
         igmIt.setCountry("IT");
         igmAt = new IgmData();
-        igmIt.setCountry("AT");
+        igmAt.setCountry("AT");
         inputs.setTargetDate(OffsetDateTime.parse("2020-02-19T00:30Z"));
     }
 
@@ -186,16 +186,16 @@ class PstSpecialServiceTest {
         igmSi.setIgmFilePath(absolutePath.concat("/process3/20260620_1130_2D1_SI0.UCT"));
         igmAt.setIgmFilePath(absolutePath.concat("/process1/20260620_1130_2D3_AT3.uct"));
         List<IgmData> igms = Arrays.asList(igmIt, igmSi, igmAt);
-        Inputs inputs = new Inputs();
-        inputs.setIgms(igms);
-        inputs.setTargetDate(OffsetDateTime.parse("2026-06-19T23:30Z"));
+        Inputs in = new Inputs();
+        in.setIgms(igms);
+        in.setTargetDate(OffsetDateTime.parse("2026-06-19T23:30Z"));
 
-        Artifacts artifacts = new Artifacts();
+        Artifacts af = new Artifacts();
         shiftedCgm = new SavedFile("/20260620_1130_2D1_UX0.uct", absolutePath.concat("/process3/20260620_1130_2D1_UX0.uct"), "mock");
-        artifacts.putFile(BALANCED_CGM_FILE, shiftedCgm);
+        af.putFile(BALANCED_CGM_FILE, shiftedCgm);
 
-        taskP3.setInputs(inputs);
-        taskP3.setArtifacts(artifacts);
+        taskP3.setInputs(in);
+        taskP3.setArtifacts(af);
 
         pstSpecialService.fixPst(taskP3);
         SavedFile pstOutputFile = taskP3.getArtifacts().getFile(PST_OUTPUT_FILE);

@@ -67,10 +67,12 @@ public final class LoadFlowUtils {
             LoadFlowResult result = runnerSupplier.get().run(network, parameters);
 
             if (hasDiverged(result)) {
-                LOGGER.warn(divergenceMessage(network, initialDcMode));
+                final String warningMessage = divergenceMessage(network, initialDcMode);
+                LOGGER.warn(warningMessage);
 
                 if (result.getLogs() != null) {
-                    LOGGER.error(new String(result.getLogs().getBytes(US_ASCII)));
+                    final String errorMessage = new String(result.getLogs().getBytes(US_ASCII));
+                    LOGGER.error(errorMessage);
                 }
 
                 if (!initialDcMode) {

@@ -11,12 +11,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Terminal;
 
+import java.io.Serializable;
 import java.util.Optional;
 
 import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
 
-public class Flow {
+public class Flow implements Serializable {
 
     @JsonProperty("flowIGM")
     private double flowIGM;

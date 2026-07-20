@@ -10,12 +10,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.powsybl.iidm.network.TwoWindingsTransformer;
 
+import java.io.Serializable;
+
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInOutage;
 import static java.lang.Double.NaN;
 
-public class Tap {
-
-    private static final int NEUTRAL_TAP = 0;
+public class Tap implements Serializable {
 
     @JsonProperty("tapIGM")
     private double tapIGM;
@@ -41,7 +41,7 @@ public class Tap {
         if (!isInOutage(twt) && twt.getPhaseTapChanger() != null) {
             return twt.getPhaseTapChanger().getTapPosition();
         } else if (twt != null && isInOutage(twt)) {
-            return NEUTRAL_TAP;
+            return 0;
         } else {
             return NaN;
         }

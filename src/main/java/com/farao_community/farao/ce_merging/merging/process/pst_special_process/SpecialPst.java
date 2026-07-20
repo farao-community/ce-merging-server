@@ -13,10 +13,10 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isIdentifiedBy;
 import static com.powsybl.iidm.network.Country.AT;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.SI;
@@ -52,7 +52,7 @@ public enum SpecialPst {
     }
 
     public boolean matches(final Identifiable<?> identifiable) {
-        return Pattern.compile(idRegex).matcher(identifiable.getId()).matches();
+        return isIdentifiedBy(idRegex).test(identifiable);
     }
 
     public static Stream<SpecialPst> austrianSpecialPsts() {

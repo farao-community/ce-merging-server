@@ -20,7 +20,8 @@ public final class NetworkUtil {
     }
 
     public static Predicate<Identifiable<?>> isIdentifiedBy(final String idRegex) {
-        return identifiable -> Pattern.compile(idRegex).matcher(identifiable.getId()).matches();
+        final Pattern idPattern = Pattern.compile(idRegex);
+        return identifiable -> idPattern.matcher(identifiable.getId()).matches();
     }
 
     public static boolean isInOutage(final Terminal terminal) {
