@@ -10,7 +10,6 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.AreasManager;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputation;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationArea;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationFactoryImpl;
@@ -33,7 +32,6 @@ import com.powsybl.loadflow.LoadFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -45,7 +43,9 @@ import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XIIDM_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadflow;
+import static com.farao_community.farao.ce_merging.merging.process.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.ZonalDataManager.getZonalDataFromGlsk;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
@@ -289,7 +289,7 @@ public class BalancesAdjustmentProcessor {
             .join();
 
         if (result.getStatus() == SUCCESS) {
-            exportOutputs(initGenerators, loadflowMode, result);
+            handleComputationSuccess(initGenerators, loadflowMode, result);
         } else { // DC Fallback
             final String detailMessage = getFailureMessage(loadflowMode, result);
             LOGGER.warn(detailMessage);
@@ -303,7 +303,7 @@ public class BalancesAdjustmentProcessor {
             result = balanceComputation.run(network, getVariantId(), balanceComputationParameters).join();
 
             if (result.getStatus() == SUCCESS) {
-                exportOutputs(initGenerators, DC, result);
+                handleComputationSuccess(initGenerators, DC, result);
             } else {
                 handleComputationFailure(result, rootReportNode);
             }
@@ -351,9 +351,9 @@ public class BalancesAdjustmentProcessor {
         }
     }
 
-    void exportOutputs(final Map<String, InitialBounds> initialBounds,
-                       final String loadflowMode,
-                       final BalanceComputationResult result) {
+    void handleComputationSuccess(final Map<String, InitialBounds> initialBounds,
+                                  final String loadflowMode,
+                                  final BalanceComputationResult result) {
 
         LOGGER.info("Balance adjustment successful with {} loadflow after {} iterations.",
                     loadflowMode, result.getIterationCount());
@@ -363,30 +363,10 @@ public class BalancesAdjustmentProcessor {
             task.getConfigurations().getLoadFlowParameters().setDc(true);
         }
 
-        final File cgmFileAdjusted = createAdjustedCgm(initialBounds,
-                                                       task.getArtifacts()
-                                                           .getFile(BALANCES_ADJUSTMENT_TARGET_FILE)
-                                                           .getOriginalName());
-
-        task.setArtifact(BALANCED_CGM_FILE, new SavedFile(cgmFileAdjusted.getName(),
-                                                          cgmFileAdjusted.getPath(),
-                                                          String.format("/tasks/%d/outputs/shifted-cgm",
-                                                                        task.getId())));
-
-    }
-
-    private File createAdjustedCgm(final Map<String, InitialBounds> initialBounds,
-                                   final String cgmFileName) {
-        final File cgmFileAdjusted = new File(configuration.getArtifactsDirectoryPath(task)
-                                              + File.separator
-                                              + cgmFileName
-                                              + "_adjusted.xiidm");
-
         restoreInitialGeneratorBounds(initialBounds);
-        network.write("XIIDM", null, Paths.get(cgmFileAdjusted.getPath()));
-        return cgmFileAdjusted;
-    }
+        saveArtifactNetwork(BALANCED_CGM_FILE, network, task, XIIDM_FORMAT, configuration);
 
+    }
 
     private record InitialBounds(double pMin, double pMax) {
     }
