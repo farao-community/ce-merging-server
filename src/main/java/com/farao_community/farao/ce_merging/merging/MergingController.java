@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging;
 
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskManagementService;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
@@ -264,8 +265,12 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "Valid virtual hubs configuration  returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "No valid virtual hubs configuration found for this instant.")
     })
-    public ResponseEntity<byte[]> getVirtualHubsConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws IOException {
-        return toAttachmentFileResponse(taskManager.getVirtualHubsConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "virtual-hubs-config.json");
+    public ResponseEntity<byte[]> getVirtualHubsConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
+        try {
+            return toAttachmentFileResponse(taskManager.getVirtualHubsConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "virtual-hubs-config.json");
+        } catch (IOException e) {
+            throw new CeMergingException("Cannot generate virtual hubs configuration file", e);
+        }
     }
 
     @PostMapping(value = "/global-configurations/xnodes-configuration/publish", produces = JSON_API_MIME_TYPE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -289,8 +294,12 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "XNodes configuration returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "No valid XNodes configuration found for this instant.")
     })
-    public ResponseEntity<byte[]> getXNodesConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime instant) throws IOException {
-        return toAttachmentFileResponse(taskManager.getXNodesConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "xnodes-config.json");
+    public ResponseEntity<byte[]> getXNodesConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime instant) throws CeMergingException {
+        try {
+            return toAttachmentFileResponse(taskManager.getXNodesConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "xnodes-config.json");
+        } catch (IOException e) {
+            throw new CeMergingException("Cannot generate XNodes configuration file", e);
+        }
     }
 
     @PostMapping(value = "/global-configurations/hvdc-xnode-alignment-configuration/publish", produces = JSON_API_MIME_TYPE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -314,8 +323,12 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "HVDC XNode alignment configuration returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "No valid HVDC XNode alignment configuration found for this instant.")
     })
-    public ResponseEntity<byte[]> getHvdcXnodeAlignementConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws IOException {
-        return toAttachmentFileResponse(taskManager.getHvdcXNodeAlignmentConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "hvdc-xnode-alignment-configuration.json");
+    public ResponseEntity<byte[]> getHvdcXnodeAlignementConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
+        try {
+            return toAttachmentFileResponse(taskManager.getHvdcXNodeAlignmentConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "hvdc-xnode-alignment-configuration.json");
+        } catch (IOException e) {
+            throw new CeMergingException("Cannot generate HVDC XNode alignment configuration file", e);
+        }
     }
 
     @PostMapping(value = "/global-configurations/bec-configuration/publish", produces = JSON_API_MIME_TYPE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -339,8 +352,12 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "BEC configuration  returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "No valid BEC configuration found for this instant.")
     })
-    public ResponseEntity<byte[]> getBecConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws Exception {
-        return toAttachmentFileResponse(taskManager.getBECKeyConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "sharingKeysBEC.json");
+    public ResponseEntity<byte[]> getBecConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) {
+        try {
+            return toAttachmentFileResponse(taskManager.getBECKeyConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "sharingKeysBEC.json");
+        } catch (IOException e) {
+            throw new CeMergingException("Cannot generate BEC configuration file", e);
+        }
     }
 
     @PostMapping(value = "/global-configurations/eic-configuration/publish", produces = JSON_API_MIME_TYPE, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -364,8 +381,12 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "EIC Code configuration returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "No valid EIC Code configuration found for this instant.")
     })
-    public ResponseEntity<byte[]> getEICConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws IOException {
-        return toAttachmentFileResponse(taskManager.getRegionConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "region_configuration.json");
+    public ResponseEntity<byte[]> getEICConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
+        try {
+            return toAttachmentFileResponse(taskManager.getRegionConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now())), "region_configuration.json");
+        } catch (IOException e) {
+            throw new CeMergingException("Cannot generate EIC Code configuration file", e);
+        }
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
