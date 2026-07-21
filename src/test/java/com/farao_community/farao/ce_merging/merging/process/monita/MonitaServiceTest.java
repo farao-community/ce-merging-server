@@ -6,11 +6,13 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.monita;
 
+import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.model.netpositions.GenerationAndLoadQuantity;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
 import com.farao_community.farao.ce_merging.common.util.BordersUtils;
+import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
@@ -18,20 +20,25 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.lang3.function.Predicates;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Stream;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isBorderOf;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.ME;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -41,16 +48,50 @@ class MonitaServiceTest {
     private static final String MONITA1_ME_NODE_NAME = "XKOTR120";
     private static final String MONITA2_ME_NODE_NAME = "XKOTR220";
 
-    @Test
-    void shouldMoveMonitaVirtualHubsFromItalyToMontenegro() {
-        final MergingTask task = new MergingTask();
+    private CeMergingConfiguration configuration;
+    private MonitaService service;
+    private MergingTask task;
+
+    @BeforeEach
+    void setup() {
         final Inputs inputs = new Inputs();
         final IgmData itIgm = new IgmData();
         itIgm.setIgmFilePath("20260720_1843_FO1_IT1.uct");
         inputs.setIgms(List.of(itIgm));
+        task = new MergingTask();
         task.setInputs(inputs);
-        final Artifacts artifacts = new Artifacts();
-        task.setArtifacts(artifacts);
+        task.setArtifacts(new Artifacts());
+        configuration = mock(CeMergingConfiguration.class);
+        service = new MonitaService(configuration);
+    }
+
+    @Test
+    void shouldSaveNetworkWithRenamedNode() {
+
+        try (MockedStatic<Network> networkStatic = mockStatic(Network.class);
+             MockedStatic<FileStorageUtils> fileStorageUtils = mockStatic(FileStorageUtils.class)) {
+            final Network network = mock(Network.class);
+            networkStatic.when(() -> Network.read(anyString())).thenReturn(network);
+
+            service.renameNode(task);
+
+            final ArgumentCaptor<Properties> propertiesCaptor = ArgumentCaptor.forClass(Properties.class);
+            fileStorageUtils.verify(() -> FileStorageUtils.savePreTreatedIgm(
+                eq(IT),
+                eq(network),
+                propertiesCaptor.capture(),
+                eq(UCTE_FORMAT),
+                eq("igms-after-monita-renaming"),
+                eq(task),
+                eq(configuration)
+            ));
+
+            assertEquals("MonitaNamingStrategy", propertiesCaptor.getValue().getProperty("ucte.export.naming-strategy"));
+        }
+    }
+
+    @Test
+    void shouldMoveMonitaVirtualHubsFromItalyToMontenegro() {
 
         Map<String, NetPositions> netPositionsMap = new HashMap<>();
 
@@ -102,8 +143,8 @@ class MonitaServiceTest {
             // then :
             assertEquals(0, itNp.getGlobalNetPosition().getWithVirtualHubs());
             assertEquals(0, itNp.getOutBciNetPosition());
-            assertFalse(itNp.getVirtualHubsExchanges().containsKey(MONITA1_ME_NODE_NAME));
-            assertFalse(itNp.getVirtualHubsExchanges().containsKey(MONITA2_ME_NODE_NAME));
+            assertThat(itNp.getVirtualHubsExchanges())
+                .doesNotContainKeys(MONITA1_ME_NODE_NAME, MONITA2_ME_NODE_NAME);
 
             assertEquals(800, meNp.getGlobalNetPosition().getWithVirtualHubs());
             assertEquals(800, meNp.getOutBciNetPosition());
