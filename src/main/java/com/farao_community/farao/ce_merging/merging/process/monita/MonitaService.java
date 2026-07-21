@@ -67,20 +67,21 @@ public class MonitaService {
             return;
         }
 
+        final Network italy = getItalianIgm(task);
+
         // Italy
-        removeFromItaly(MONITA1_ME_NODE_NAME, italyNetPosition);
-        removeFromItaly(MONITA2_ME_NODE_NAME, italyNetPosition);
+        removeFromItaly(MONITA1_ME_NODE_NAME, italyNetPosition, italy);
+        removeFromItaly(MONITA2_ME_NODE_NAME, italyNetPosition, italy);
 
         // Montenegro
-        addToMontenegroIfFound(MONITA1_ME_NODE_NAME, montenegroNetPosition, task);
-        addToMontenegroIfFound(MONITA2_ME_NODE_NAME, montenegroNetPosition, task);
+        addToMontenegroIfFound(MONITA1_ME_NODE_NAME, montenegroNetPosition, italy);
+        addToMontenegroIfFound(MONITA2_ME_NODE_NAME, montenegroNetPosition, italy);
     }
 
     private static void addToMontenegroIfFound(final String monitaNode,
                                                final NetPositions montenegroNp,
-                                               final MergingTask task) {
-        getItalianIgm(task)
-            .getDanglingLineStream()
+                                               final Network italy) {
+        italy.getDanglingLineStream()
             .filter(isBorderOf(IT))
             .filter(l -> l.getPairingKey().equals(monitaNode))
             .findFirst()
@@ -97,7 +98,7 @@ public class MonitaService {
             });
     }
 
-    private static void removeFromItaly(final String monitaNode, final NetPositions italianNetPositions) {
+    private static void removeFromItaly(final String monitaNode, final NetPositions italianNetPositions, final Network italy) {
         final double virtualHubFlow = italianNetPositions.getVirtualHubFlow(monitaNode);
 
         final double globalNetPosition = italianNetPositions.getGlobalNetPosition().getWithVirtualHubs();

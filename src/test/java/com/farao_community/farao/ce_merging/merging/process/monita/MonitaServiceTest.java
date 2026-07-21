@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.ce_merging.merging.process.monita;
 
 import com.farao_community.farao.ce_merging.common.model.netpositions.GenerationAndLoadQuantity;
@@ -47,29 +53,29 @@ class MonitaServiceTest {
         task.setArtifacts(artifacts);
 
         Map<String, NetPositions> netPositionsMap = new HashMap<>();
-        
+
         // Italy NetPositions
         Map<String, Double> itVirtualHubs = new HashMap<>();
         itVirtualHubs.put(MONITA1_ME_NODE_NAME, 100.0);
         itVirtualHubs.put(MONITA2_ME_NODE_NAME, 200.0);
         NetPositions itNp = new NetPositions(
-                new NetPositionsValues(300.0, 0.0),
-                new NetPositionsValues(0.0, 0.0),
-                300.0,
-                itVirtualHubs,
-                new HashMap<>(),
-                new GenerationAndLoadQuantity(0.0, 0.0)
+            new NetPositionsValues(300.0, 0.0),
+            new NetPositionsValues(0.0, 0.0),
+            300.0,
+            itVirtualHubs,
+            new HashMap<>(),
+            new GenerationAndLoadQuantity(0.0, 0.0)
         );
         netPositionsMap.put(IT.name(), itNp);
 
         // Montenegro NetPositions
         NetPositions meNp = new NetPositions(
-                new NetPositionsValues(500.0, 500.0),
-                new NetPositionsValues(500.0, 500.0),
-                500.0,
-                new HashMap<>(),
-                new HashMap<>(),
-                new GenerationAndLoadQuantity(0.0, 0.0)
+            new NetPositionsValues(500.0, 500.0),
+            new NetPositionsValues(500.0, 500.0),
+            500.0,
+            new HashMap<>(),
+            new HashMap<>(),
+            new GenerationAndLoadQuantity(0.0, 0.0)
         );
         netPositionsMap.put(ME.name(), meNp);
 

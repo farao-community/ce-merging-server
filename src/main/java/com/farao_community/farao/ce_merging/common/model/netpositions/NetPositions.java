@@ -9,7 +9,9 @@ package com.farao_community.farao.ce_merging.common.model.netpositions;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
@@ -32,8 +34,8 @@ public class NetPositions {
         this.globalNetPosition = globalNetPosition;
         this.inRegionNetPosition = inRegionNetPosition;
         this.outBciNetPosition = outBciNetPosition;
-        this.virtualHubsExchanges = virtualHubsExchanges;
-        this.globalDetailedExchanges = globalDetailedExchanges;
+        this.virtualHubsExchanges = Optional.ofNullable(virtualHubsExchanges).orElse(new HashMap<>());
+        this.globalDetailedExchanges = Optional.ofNullable(globalDetailedExchanges).orElse(new HashMap<>());
         this.generationAndLoadQuantity = generationAndLoadQuantity;
     }
 
