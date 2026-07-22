@@ -32,11 +32,14 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isBorderOf;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isInCountry;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWith;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.savePreTreatedIgm;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.ME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -76,41 +79,26 @@ class MonitaServiceTest {
             service.renameNode(task);
 
             final ArgumentCaptor<Properties> propertiesCaptor = ArgumentCaptor.forClass(Properties.class);
-            fileStorageUtils.verify(() -> FileStorageUtils.savePreTreatedIgm(
-                eq(IT),
-                eq(network),
-                propertiesCaptor.capture(),
-                eq(UCTE_FORMAT),
-                eq("igms-after-monita-renaming"),
-                eq(task),
-                eq(configuration)
+            fileStorageUtils.verify(() -> savePreTreatedIgm(eq(IT), eq(network), propertiesCaptor.capture(), eq(UCTE_FORMAT),
+                eq("igms-after-monita-renaming"), eq(task), eq(configuration)
             ));
 
-            assertEquals("MonitaNamingStrategy", propertiesCaptor.getValue().getProperty("ucte.export.naming-strategy"));
+            assertThat(propertiesCaptor.getValue()).containsEntry("ucte.export.naming-strategy", "MonitaNamingStrategy");
         }
     }
 
     @Test
     void shouldMoveMonitaVirtualHubsFromItalyToMontenegro() {
-
-        Map<String, NetPositions> netPositionsMap = new HashMap<>();
-
-        // Italy NetPositions
-        Map<String, Double> itVirtualHubs = new HashMap<>();
-        itVirtualHubs.put(MONITA1_ME_NODE_NAME, 100.0);
-        itVirtualHubs.put(MONITA2_ME_NODE_NAME, 200.0);
-        NetPositions itNp = new NetPositions(
+        final NetPositions italyNetPos = new NetPositions(
             new NetPositionsValues(300.0, 0.0),
             new NetPositionsValues(0.0, 0.0),
             300.0,
-            itVirtualHubs,
+            new HashMap<>(Map.of(MONITA1_ME_NODE_NAME, 100.0, MONITA2_ME_NODE_NAME, 200.0)),
             new HashMap<>(),
             new GenerationAndLoadQuantity(0.0, 0.0)
         );
-        netPositionsMap.put(IT.name(), itNp);
 
-        // Montenegro NetPositions
-        NetPositions meNp = new NetPositions(
+        final NetPositions montenegroNetPos = new NetPositions(
             new NetPositionsValues(500.0, 500.0),
             new NetPositionsValues(500.0, 500.0),
             500.0,
@@ -118,12 +106,12 @@ class MonitaServiceTest {
             new HashMap<>(),
             new GenerationAndLoadQuantity(0.0, 0.0)
         );
-        netPositionsMap.put(ME.name(), meNp);
 
-        NetPositionsResults results = new NetPositionsResults(netPositionsMap);
+        final NetPositionsResults results = new NetPositionsResults(new HashMap<>(Map.of(IT.name(), italyNetPos,
+                                                                                         ME.name(), montenegroNetPos)));
 
-        try (MockedStatic<Network> networkStatic = mockStatic(Network.class);
-             MockedStatic<BordersUtils> bordersUtils = mockStatic(BordersUtils.class)) {
+        try (final MockedStatic<Network> networkStatic = mockStatic(Network.class);
+             final MockedStatic<BordersUtils> bordersUtils = mockStatic(BordersUtils.class)) {
             // given :
             final Network network = mock(Network.class);
             final DanglingLine monita1 = mock(DanglingLine.class);
@@ -134,22 +122,23 @@ class MonitaServiceTest {
             when(monita1.getP0()).thenReturn(100.0);
             when(monita2.getPairingKey()).thenReturn(MONITA2_ME_NODE_NAME);
             when(monita2.getP0()).thenReturn(200.0);
-            bordersUtils.when(() -> isBorderOf(IT)).thenReturn(Predicates.truePredicate());
+            bordersUtils.when(() -> isInCountry(IT)).thenReturn(Predicates.truePredicate());
+            bordersUtils.when(() -> isPairedWith(any())).thenCallRealMethod();
             when(network.getDanglingLineStream()).thenAnswer(i -> Stream.of(monita1, monita2));
 
             // when :
             MonitaService.postTreatmentForMonita(task, results);
 
             // then :
-            assertEquals(0, itNp.getGlobalNetPosition().getWithVirtualHubs());
-            assertEquals(0, itNp.getOutBciNetPosition());
-            assertThat(itNp.getVirtualHubsExchanges())
+            assertEquals(0, italyNetPos.getGlobalNetPosition().getWithVirtualHubs());
+            assertEquals(0, italyNetPos.getOutBciNetPosition());
+            assertThat(italyNetPos.getVirtualHubsExchanges())
                 .doesNotContainKeys(MONITA1_ME_NODE_NAME, MONITA2_ME_NODE_NAME);
 
-            assertEquals(800, meNp.getGlobalNetPosition().getWithVirtualHubs());
-            assertEquals(800, meNp.getOutBciNetPosition());
-            assertEquals(100, meNp.getVirtualHubFlow(MONITA1_ME_NODE_NAME));
-            assertEquals(200, meNp.getVirtualHubFlow(MONITA2_ME_NODE_NAME));
+            assertEquals(800.0, montenegroNetPos.getGlobalNetPosition().getWithVirtualHubs());
+            assertEquals(800.0, montenegroNetPos.getOutBciNetPosition());
+            assertEquals(100.0, montenegroNetPos.getVirtualHubFlow(MONITA1_ME_NODE_NAME));
+            assertEquals(200.0, montenegroNetPos.getVirtualHubFlow(MONITA2_ME_NODE_NAME));
         }
     }
 }

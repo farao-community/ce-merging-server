@@ -19,7 +19,8 @@ import java.util.Optional;
 import java.util.Properties;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isBorderOf;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isInCountry;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWith;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.ME;
 
@@ -69,36 +70,36 @@ public class MonitaService {
 
         final Network italy = getItalianIgm(task);
 
-        // Italy
-        removeFromItaly(MONITA1_ME_NODE_NAME, italyNetPosition, italy);
-        removeFromItaly(MONITA2_ME_NODE_NAME, italyNetPosition, italy);
-
-        // Montenegro
+        removeFromItaly(MONITA1_ME_NODE_NAME, italyNetPosition);
+        removeFromItaly(MONITA2_ME_NODE_NAME, italyNetPosition);
         addToMontenegroIfFound(MONITA1_ME_NODE_NAME, montenegroNetPosition, italy);
         addToMontenegroIfFound(MONITA2_ME_NODE_NAME, montenegroNetPosition, italy);
     }
 
     private static void addToMontenegroIfFound(final String monitaNode,
-                                               final NetPositions montenegroNp,
+                                               final NetPositions montenegrinNetPositions,
                                                final Network italy) {
         italy.getDanglingLineStream()
-            .filter(isBorderOf(IT))
-            .filter(l -> l.getPairingKey().equals(monitaNode))
+            .filter(isPairedWith(monitaNode).and(isInCountry(IT)))
             .findFirst()
             .map(DanglingLine::getP0)
-            .ifPresent(monitaFlow -> {
-                final double initialGlobal = montenegroNp.getGlobalNetPosition().getWithVirtualHubs();
-                montenegroNp.getGlobalNetPosition().setWithVirtualHubs(initialGlobal + monitaFlow);
-
-                final double initialOutBci = montenegroNp.getOutBciNetPosition();
-                montenegroNp.setOutBciNetPosition(initialOutBci + monitaFlow);
-
-                final double flowUpdated = montenegroNp.getVirtualHubFlow(monitaNode) + monitaFlow;
-                montenegroNp.getVirtualHubsExchanges().put(monitaNode, flowUpdated);
-            });
+            .ifPresent(monitaFlow -> addToMontenegro(monitaNode, monitaFlow, montenegrinNetPositions));
     }
 
-    private static void removeFromItaly(final String monitaNode, final NetPositions italianNetPositions, final Network italy) {
+    private static void addToMontenegro(final String monitaNode,
+                                        final double monitaFlow,
+                                        final NetPositions montenegrinNetPositions) {
+        final double initialGlobal = montenegrinNetPositions.getGlobalNetPosition().getWithVirtualHubs();
+        montenegrinNetPositions.getGlobalNetPosition().setWithVirtualHubs(initialGlobal + monitaFlow);
+
+        final double initialOutBci = montenegrinNetPositions.getOutBciNetPosition();
+        montenegrinNetPositions.setOutBciNetPosition(initialOutBci + monitaFlow);
+
+        final double flowUpdated = montenegrinNetPositions.getVirtualHubFlow(monitaNode) + monitaFlow;
+        montenegrinNetPositions.getVirtualHubsExchanges().put(monitaNode, flowUpdated);
+    }
+
+    private static void removeFromItaly(final String monitaNode, final NetPositions italianNetPositions) {
         final double virtualHubFlow = italianNetPositions.getVirtualHubFlow(monitaNode);
 
         final double globalNetPosition = italianNetPositions.getGlobalNetPosition().getWithVirtualHubs();

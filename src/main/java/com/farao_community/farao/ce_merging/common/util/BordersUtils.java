@@ -31,8 +31,12 @@ public final class BordersUtils {
                 .anyMatch(nodeName::equals);
     }
 
-    public static Predicate<DanglingLine> isBorderOf(final Country country) {
+    public static Predicate<Injection<?>> isInCountry(final Country country) {
         return line -> getCountry(line) == country;
+    }
+
+    public static Predicate<DanglingLine> isPairedWith(final String nodeName) {
+        return l -> l.getPairingKey().equals(nodeName);
     }
 
     public static double zeroIfNan(final double value) {
