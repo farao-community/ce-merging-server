@@ -58,6 +58,8 @@ public final class CeMergingConstants {
     public static final String GERMAN_COUNTRY_CODE = "DE";
     public static final String DANISH_TSO = "D1";
     public static final String DENMARK_COUNTRY_CODE = "DK";
+    public static final String ALEGRO_BE_NODE_NAME = "BE_AL";
+    public static final String ALEGRO_DE_NODE_NAME = "DE_AL";
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
 

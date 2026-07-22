@@ -1,0 +1,264 @@
+{
+  "netPositionsByCountryMap" : {
+    "N24": {
+      "globalNetPosition": {
+        "withVirtualHubs": -194.00069904327393,
+        "withoutVirtualHubs": -194.00069904327393
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N11": {
+      "globalNetPosition": {
+        "withVirtualHubs": 1519.3981819152832,
+        "withoutVirtualHubs": 1519.3981819152832
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 719.6322059631348,
+        "withoutVirtualHubs": 719.6322059631348
+      }
+    },
+    "N27": {
+      "globalNetPosition": {
+        "withVirtualHubs": 408.5950845479965,
+        "withoutVirtualHubs": 408.5950845479965
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N12": {
+      "globalNetPosition": {
+        "withVirtualHubs": -347.01398849487305,
+        "withoutVirtualHubs": -347.01398849487305
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": -347.01398849487305,
+        "withoutVirtualHubs": -347.01398849487305
+      }
+    },
+    "N19": {
+      "globalNetPosition": {
+        "withVirtualHubs": 688.8999938964844,
+        "withoutVirtualHubs": 688.8999938964844
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N6": {
+      "globalNetPosition": {
+        "withVirtualHubs": 1068.4839918613434,
+        "withoutVirtualHubs": 1068.4839918613434
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N2": {
+      "globalNetPosition": {
+        "withVirtualHubs": 984.0770435333252,
+        "withoutVirtualHubs": 984.0770435333252
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 984.0770435333252,
+        "withoutVirtualHubs": 984.0770435333252
+      }
+    },
+    "N8": {
+      "globalNetPosition": {
+        "withVirtualHubs": -4043.5382623672485,
+        "withoutVirtualHubs": -3455.5982599258423
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": -2887.9612588882446,
+        "withoutVirtualHubs": -2887.9612588882446
+      }
+    },
+    "N21": {
+      "globalNetPosition": {
+        "withVirtualHubs": -1346.9254941940308,
+        "withoutVirtualHubs": -1346.9254941940308
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N9": {
+      "globalNetPosition": {
+        "withVirtualHubs": -1018.6000065803528,
+        "withoutVirtualHubs": -705.800018787384
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N1": {
+      "globalNetPosition": {
+        "withVirtualHubs": 13224.913007483468,
+        "withoutVirtualHubs": 10874.611005530343
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 5258.873452351079,
+        "withoutVirtualHubs": 5258.873452351079
+      }
+    },
+    "N22": {
+      "globalNetPosition": {
+        "withVirtualHubs": -1001.0,
+        "withoutVirtualHubs": -1001.0
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N10": {
+      "globalNetPosition": {
+        "withVirtualHubs": -738.5999946594238,
+        "withoutVirtualHubs": -738.5999946594238
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": -306.20000076293945,
+        "withoutVirtualHubs": -306.20000076293945
+      }
+    },
+    "N3": {
+      "globalNetPosition": {
+        "withVirtualHubs": -879.5999956130981,
+        "withoutVirtualHubs": -879.5999956130981
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": -163.9999876022339,
+        "withoutVirtualHubs": -163.9999876022339
+      }
+    },
+    "N16": {
+      "globalNetPosition": {
+        "withVirtualHubs": -5082.299957871437,
+        "withoutVirtualHubs": -5182.299957871437
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N14": {
+      "globalNetPosition": {
+        "withVirtualHubs": -187.00000095367432,
+        "withoutVirtualHubs": -187.00000095367432
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N15": {
+      "globalNetPosition": {
+        "withVirtualHubs": -36.99980020523071,
+        "withoutVirtualHubs": -36.99980020523071
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N25": {
+      "globalNetPosition": {
+        "withVirtualHubs": -2128.8139991760254,
+        "withoutVirtualHubs": -2560.8039894104004
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": -2560.8039894104004,
+        "withoutVirtualHubs": -2560.8039894104004
+      }
+    },
+    "N26": {
+      "globalNetPosition": {
+        "withVirtualHubs": -79.99003601074219,
+        "withoutVirtualHubs": -77.99003601074219
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 17.009963989257812,
+        "withoutVirtualHubs": 17.009963989257812
+      }
+    },
+    "N20": {
+      "globalNetPosition": {
+        "withVirtualHubs": -268.89999771118164,
+        "withoutVirtualHubs": -268.89999771118164
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N23": {
+      "globalNetPosition": {
+        "withVirtualHubs": 1040.1781005859375,
+        "withoutVirtualHubs": 1040.1781005859375
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 217.46210479736328,
+        "withoutVirtualHubs": 217.46210479736328
+      }
+    },
+    "N7": {
+      "globalNetPosition": {
+        "withVirtualHubs": 405.59495973587036,
+        "withoutVirtualHubs": 405.59495973587036
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N13": {
+      "globalNetPosition": {
+        "withVirtualHubs": 488.99998474121094,
+        "withoutVirtualHubs": 488.99998474121094
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 66.99996948242188,
+        "withoutVirtualHubs": 66.99996948242188
+      }
+    },
+    "N5": {
+      "globalNetPosition": {
+        "withVirtualHubs": 200.0,
+        "withoutVirtualHubs": 200.0
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": -215.0,
+        "withoutVirtualHubs": -215.0
+      }
+    },
+    "N18": {
+      "globalNetPosition": {
+        "withVirtualHubs": -34.39997863769531,
+        "withoutVirtualHubs": -34.39997863769531
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    },
+    "N4": {
+      "globalNetPosition": {
+        "withVirtualHubs": 305.00000953674316,
+        "withoutVirtualHubs": 305.00000953674316
+      },
+      "inRegionNetPosition": {
+        "withVirtualHubs": 0.0,
+        "withoutVirtualHubs": 0.0
+      }
+    }
+  }
+}
