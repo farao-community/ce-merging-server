@@ -8,6 +8,8 @@ import org.assertj.core.util.CanIgnoreReturnValue;
 
 import java.util.Objects;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 public class UcteNodeCodeAssert extends AbstractAssert<UcteNodeCodeAssert, UcteNodeCode> {
     protected UcteNodeCodeAssert(final UcteNodeCode ucteNodeCode) {
         super(ucteNodeCode, UcteNodeCodeAssert.class);
@@ -20,6 +22,7 @@ public class UcteNodeCodeAssert extends AbstractAssert<UcteNodeCodeAssert, UcteN
     @CanIgnoreReturnValue
     public UcteNodeCodeAssert isLocatedIn(final UcteCountryCode country,
                                           final String geographicalSpot) {
+        assertNotNull(actual);
         if (actual.getUcteCountryCode() != country) {
             failWithActualExpectedAndMessage(actual.getUcteCountryCode(), country, "Unexpected UCTE country code");
         }
@@ -32,6 +35,7 @@ public class UcteNodeCodeAssert extends AbstractAssert<UcteNodeCodeAssert, UcteN
     @CanIgnoreReturnValue
     public UcteNodeCodeAssert isBusBar(final UcteVoltageLevelCode voltageLevel,
                                        final char busbar) {
+        assertNotNull(actual);
         if (actual.getVoltageLevelCode() != voltageLevel) {
             failWithActualExpectedAndMessage(actual.getVoltageLevelCode(), voltageLevel, "Unexpected voltage level");
         }

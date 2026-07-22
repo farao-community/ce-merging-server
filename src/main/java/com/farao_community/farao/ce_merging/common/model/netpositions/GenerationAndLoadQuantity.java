@@ -9,6 +9,9 @@ package com.farao_community.farao.ce_merging.common.model.netpositions;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+/**
+ * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
+ */
 public record GenerationAndLoadQuantity(@JsonProperty("generation") double generation,
                                         @JsonProperty("load") double load) {
 
