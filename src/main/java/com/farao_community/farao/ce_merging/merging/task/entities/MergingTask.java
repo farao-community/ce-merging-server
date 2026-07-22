@@ -7,6 +7,8 @@
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Network;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -113,6 +115,14 @@ public class MergingTask implements Serializable {
 
     public void setOutputs(final Outputs outputs) {
         this.outputs = outputs;
+    }
+
+    public Network getIgm(final Country country) {
+        return Network.read(getIgmFile(country).getPath());
+    }
+
+    public SavedFile getIgmFile(final Country country) {
+        return  inputs.getIgm(country.toString()).getIgmFile();
     }
 
 }
