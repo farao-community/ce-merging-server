@@ -1,0 +1,144 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package com.farao_community.farao.ce_merging.merging.process.monita;
+
+import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.model.netpositions.GenerationAndLoadQuantity;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
+import com.farao_community.farao.ce_merging.common.util.BordersUtils;
+import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
+import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.Network;
+import org.apache.commons.lang3.function.Predicates;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.stream.Stream;
+
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isInCountry;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWith;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.savePreTreatedIgm;
+import static com.powsybl.iidm.network.Country.IT;
+import static com.powsybl.iidm.network.Country.ME;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
+
+class MonitaServiceTest {
+
+    private static final String MONITA1_ME_NODE_NAME = "XKOTR120";
+    private static final String MONITA2_ME_NODE_NAME = "XKOTR220";
+
+    private CeMergingConfiguration configuration;
+    private MonitaService service;
+    private MergingTask task;
+
+    @BeforeEach
+    void setup() {
+        final Inputs inputs = new Inputs();
+        final IgmData itIgm = new IgmData();
+        itIgm.setIgmFilePath("20260720_1843_FO1_IT1.uct");
+        inputs.setIgms(List.of(itIgm));
+        task = new MergingTask();
+        task.setInputs(inputs);
+        task.setArtifacts(new Artifacts());
+        configuration = mock(CeMergingConfiguration.class);
+        service = new MonitaService(configuration);
+    }
+
+    @Test
+    void shouldSaveNetworkWithRenamedNode() {
+
+        try (MockedStatic<Network> networkStatic = mockStatic(Network.class);
+             MockedStatic<FileStorageUtils> fileStorageUtils = mockStatic(FileStorageUtils.class)) {
+            final Network network = mock(Network.class);
+            networkStatic.when(() -> Network.read(anyString())).thenReturn(network);
+
+            service.renameNode(task);
+
+            final ArgumentCaptor<Properties> propertiesCaptor = ArgumentCaptor.forClass(Properties.class);
+            fileStorageUtils.verify(() -> savePreTreatedIgm(eq(IT), eq(network), propertiesCaptor.capture(), eq(UCTE_FORMAT),
+                eq("igms-after-monita-renaming"), eq(task), eq(configuration)
+            ));
+
+            assertThat(propertiesCaptor.getValue()).containsEntry("ucte.export.naming-strategy", "MonitaNamingStrategy");
+        }
+    }
+
+    @Test
+    void shouldMoveMonitaVirtualHubsFromItalyToMontenegro() {
+        final NetPositions italyNetPos = new NetPositions(
+            new NetPositionsValues(300.0, 0.0),
+            new NetPositionsValues(0.0, 0.0),
+            300.0,
+            new HashMap<>(Map.of(MONITA1_ME_NODE_NAME, 100.0, MONITA2_ME_NODE_NAME, 200.0)),
+            new HashMap<>(),
+            new GenerationAndLoadQuantity(0.0, 0.0)
+        );
+
+        final NetPositions montenegroNetPos = new NetPositions(
+            new NetPositionsValues(500.0, 500.0),
+            new NetPositionsValues(500.0, 500.0),
+            500.0,
+            new HashMap<>(),
+            new HashMap<>(),
+            new GenerationAndLoadQuantity(0.0, 0.0)
+        );
+
+        final NetPositionsResults results = new NetPositionsResults(new HashMap<>(Map.of(IT.name(), italyNetPos,
+                                                                                         ME.name(), montenegroNetPos)));
+
+        try (final MockedStatic<Network> networkStatic = mockStatic(Network.class);
+             final MockedStatic<BordersUtils> bordersUtils = mockStatic(BordersUtils.class)) {
+            // given :
+            final Network network = mock(Network.class);
+            final DanglingLine monita1 = mock(DanglingLine.class);
+            final DanglingLine monita2 = mock(DanglingLine.class);
+
+            networkStatic.when(() -> Network.read(anyString())).thenReturn(network);
+            when(monita1.getPairingKey()).thenReturn(MONITA1_ME_NODE_NAME);
+            when(monita1.getP0()).thenReturn(100.0);
+            when(monita2.getPairingKey()).thenReturn(MONITA2_ME_NODE_NAME);
+            when(monita2.getP0()).thenReturn(200.0);
+            bordersUtils.when(() -> isInCountry(IT)).thenReturn(Predicates.truePredicate());
+            bordersUtils.when(() -> isPairedWith(any())).thenCallRealMethod();
+            when(network.getDanglingLineStream()).thenAnswer(i -> Stream.of(monita1, monita2));
+
+            // when :
+            MonitaService.postTreatmentForMonita(task, results);
+
+            // then :
+            assertEquals(0, italyNetPos.getGlobalNetPosition().getWithVirtualHubs());
+            assertEquals(0, italyNetPos.getOutBciNetPosition());
+            assertThat(italyNetPos.getVirtualHubsExchanges())
+                .doesNotContainKeys(MONITA1_ME_NODE_NAME, MONITA2_ME_NODE_NAME);
+
+            assertEquals(800.0, montenegroNetPos.getGlobalNetPosition().getWithVirtualHubs());
+            assertEquals(800.0, montenegroNetPos.getOutBciNetPosition());
+            assertEquals(100.0, montenegroNetPos.getVirtualHubFlow(MONITA1_ME_NODE_NAME));
+            assertEquals(200.0, montenegroNetPos.getVirtualHubFlow(MONITA2_ME_NODE_NAME));
+        }
+    }
+}
