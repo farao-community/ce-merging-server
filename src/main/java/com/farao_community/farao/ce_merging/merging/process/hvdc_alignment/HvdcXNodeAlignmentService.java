@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.merging.process.hvdc_alignment;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.util.CountryCodeUtils;
+import com.farao_community.farao.ce_merging.common.util.CountryUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import com.farao_community.farao.ce_merging.merging.process.FileStorageUtils;
@@ -90,7 +90,7 @@ public class HvdcXNodeAlignmentService {
                     return new CeMergingException(errorMessage);
                 });
 
-        return CountryCodeUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
+        return CountryUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
     }
 
     private static Network getNetworkOrThrow(final MergingTask task, final String country, final String nodeName) {

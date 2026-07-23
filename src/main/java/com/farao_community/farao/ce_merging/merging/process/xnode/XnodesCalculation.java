@@ -141,7 +141,7 @@ public class XnodesCalculation {
         MergedXnodeInformation mergedXnodeInformation = new MergedXnodeInformation(status, 0, 0, 0, 0);
         if (isConnected) {
             final Country country1 = getCountry(xnodeInformation.getArea1Information());
-            final boolean country1IsSideOne = country1.equals(BordersUtils.getCountrySide(branch, TwoSides.ONE));
+            final boolean country1IsSideOne = country1.equals(BordersUtils.getCountryOfSide(branch, TwoSides.ONE));
             //We take the xnode flow in the direction country 1 to country 2
             final Terminal terminalFrom = country1IsSideOne ? branch.getTerminal1() : branch.getTerminal2();
             final Terminal terminalTo = country1IsSideOne ? branch.getTerminal2() : branch.getTerminal1();

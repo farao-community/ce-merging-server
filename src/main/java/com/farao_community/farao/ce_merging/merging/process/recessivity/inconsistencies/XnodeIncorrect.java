@@ -4,9 +4,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.recessivity.inconsistent_xnode;
+package com.farao_community.farao.ce_merging.merging.process.recessivity.inconsistencies;
 
+import com.farao_community.farao.ce_merging.merging.process.xnode.AreaInformation;
+import com.farao_community.farao.ce_merging.merging.process.xnode.XnodeInformation;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus;
+
+import java.util.List;
+
+import static com.farao_community.farao.ce_merging.merging.process.xnode.AreaInformation.empty;
+import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.CLOSE;
+import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
+import static java.util.Optional.ofNullable;
 
 public class XnodeIncorrect {
     private String name;
@@ -18,8 +27,6 @@ public class XnodeIncorrect {
     private boolean recessive2;
     private XnodeStatus finalStatus;
 
-    public XnodeIncorrect() {
-    }
 
     public XnodeIncorrect(final String name,
                           final String country1, final XnodeStatus status1, final boolean recessive1,
@@ -35,11 +42,25 @@ public class XnodeIncorrect {
         this.finalStatus = finalStatus;
     }
 
+    public static XnodeIncorrect buildFrom(final String name,
+                                           final XnodeInformation info,
+                                           final List<String> recessiveCountries) {
+        return new XnodeIncorrect(name,
+                                  ofNullable(info.getArea1Information()).orElse(empty()),
+                                  ofNullable(info.getArea2Information()).orElse(empty()),
+                                  recessiveCountries
+                                  );
+    }
+
     public XnodeIncorrect(final String name,
-                          final String country1, final XnodeStatus status1,
-                          final String country2, final XnodeStatus status2,
-                          final XnodeStatus finalStatus) {
-        this(name, country1, status1, false, country2, status2, false, finalStatus);
+                          final AreaInformation infos1,
+                          final AreaInformation infos2,
+                          final List<String> recessiveCountries) {
+        this(name,
+             infos1.getCountry(), infos1.getStatus(), recessiveCountries.contains(infos1.getCountry()),
+             infos2.getCountry(), infos2.getStatus(), recessiveCountries.contains(infos2.getCountry()),
+             OPEN.equals(infos1.getStatus()) || OPEN.equals(infos2.getStatus()) ? OPEN : CLOSE
+        );
     }
 
     public String getName() {

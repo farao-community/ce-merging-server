@@ -6,21 +6,28 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
+import com.farao_community.farao.ce_merging.merging.process.recessivity.RecessivityParameters;
 import com.powsybl.loadflow.LoadFlowParameters;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.merging.request_metadata.RequestMetadataManager.RECESSIVITY_DEFAULT_CONFIGURATION;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -30,6 +37,8 @@ import static jakarta.persistence.FetchType.LAZY;
  */
 @Embeddable
 public class Configurations implements Serializable {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Configurations.class);
 
     @ElementCollection(fetch = LAZY)
     private List<VirtualHubRecord> virtualHubList = new ArrayList<>();
@@ -62,6 +71,26 @@ public class Configurations implements Serializable {
 
     private transient LoadFlowParameters loadFlowParameters;
 
+    public List<String> getOrDefaultRecessiveCountries() {
+        try {
+            final RecessivityParameters params = JsonUtils.read(RecessivityParameters.class,
+                                                                recessivityParameters.getPath());
+            LOGGER.info("Recessive countries list is retrieved from {} file", recessivityParameters.getPath());
+            return params.getRecessiveCountries();
+        } catch (final Exception e) {
+            try {
+                LOGGER.warn("Recessive countries list is retrieved from default configuration file");
+                RecessivityParameters params = JsonUtils.read(RecessivityParameters.class,
+                                                              new ClassPathResource(RECESSIVITY_DEFAULT_CONFIGURATION)
+                                                                  .getInputStream());
+                return params.getRecessiveCountries();
+            } catch (final IOException ex) {
+                LOGGER.warn("Error while reading default recessivity configuration file, no country will be considered recessive");
+                return new ArrayList<>();
+            }
+        }
+    }
+
     // tagged falsely unused in IntelliJ - used for configuration deserialization
 
     public void setAcLoadFlowParametersFilePath(final String filePath) {
@@ -83,6 +112,8 @@ public class Configurations implements Serializable {
     public void setDcLoadFlowParametersFilePath(final String filePath) {
         dcLoadFlowParameters.feedPathAndName(filePath);
     }
+
+    // usual accessors
 
     public List<VirtualHubRecord> getVirtualHubList() {
         return virtualHubList;

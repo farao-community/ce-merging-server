@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
@@ -16,6 +17,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import org.apache.commons.io.FilenameUtils;
 
 import java.io.FileNotFoundException;
 import java.io.Serializable;
@@ -99,12 +101,15 @@ public class MergingTask implements Serializable {
         return artifacts;
     }
 
-    public <T> T getArtifact(final ArtifactType type, final Class<T> clazz) throws FileNotFoundException {
-        return JsonUtils.read(clazz, artifacts.getFile(type).getPath());
-    }
-
-    public Network getArtifact(final ArtifactType networkArtifact) {
-        return Network.read(artifacts.getFile(networkArtifact).getPath());
+    public <T> T getArtifact(final ArtifactType artifactType, final Class<T> clazz) throws FileNotFoundException {
+        final String format = FilenameUtils.getExtension(artifactType.getFileName()).toUpperCase();
+        final String path = artifacts.getFile(artifactType).getPath();
+        return switch (format){
+            case "JSON" -> JsonUtils.read(clazz, path);
+            case "XML" -> JaxbUtils.readFromPath(clazz, path);
+            case "UCT", "XIIDM" -> clazz == Network.class ? (T) Network.read(path) : null; // NOSONAR this is a Network
+            default -> null; // should never happen
+        };
     }
 
     public void setArtifacts(final Artifacts artifacts) {

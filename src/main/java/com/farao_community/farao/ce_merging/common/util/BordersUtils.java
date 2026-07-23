@@ -39,7 +39,7 @@ public final class BordersUtils {
         return branch -> branch.getId().contains(nodeId);
     }
 
-    public static Country getCountrySide(final Branch branch, final TwoSides side) {
+    public static Country getCountryOfSide(final Branch branch, final TwoSides side) {
         return branch.getTerminal(side).getVoltageLevel()
                 .getSubstation()
                 .orElseThrow(() -> new CeMergingException(

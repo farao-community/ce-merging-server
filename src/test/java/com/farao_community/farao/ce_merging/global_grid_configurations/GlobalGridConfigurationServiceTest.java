@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.KOSOVO_CODE;
-import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.KOSOVO_ISO_CODE;
+import static com.farao_community.farao.ce_merging.common.util.CountryUtils.KOSOVO_CODE;
+import static com.farao_community.farao.ce_merging.common.util.CountryUtils.KOSOVO_ISO_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;

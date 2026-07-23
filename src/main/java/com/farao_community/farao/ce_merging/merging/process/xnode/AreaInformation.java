@@ -27,6 +27,10 @@ public class AreaInformation {
         this.v = v;
     }
 
+    public static AreaInformation empty() {
+        return new AreaInformation("", null);
+    }
+
     public AreaInformation(String country, XnodeStatus status) {
         this(country, status, "", 0, 0, 0);
     }

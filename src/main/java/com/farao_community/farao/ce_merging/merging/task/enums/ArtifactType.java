@@ -44,6 +44,10 @@ public enum ArtifactType {
         this.location = location;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
     public String getFileName(final OffsetDateTime targetDate) {
         final ZonedDateTime targetZdtParis = targetDate.atZoneSameInstant(PARIS_ZONE_ID);
         final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
