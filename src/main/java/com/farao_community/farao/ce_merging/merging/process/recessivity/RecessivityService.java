@@ -228,8 +228,8 @@ public class RecessivityService {
     }
 
     private Predicate<Branch> linksGermanyRegionToNode(final String germanyRegionCode, final String node) {
-        return branch -> (getVoltageId1(branch).contains(node) && getVoltageId2(branch).startsWith(germanyRegionCode))
-                         || (getVoltageId2(branch).contains(node) && getVoltageId1(branch).startsWith(germanyRegionCode));
+        return branch -> getVoltageId1(branch).contains(node) && getVoltageId2(branch).startsWith(germanyRegionCode)
+                         || getVoltageId2(branch).contains(node) && getVoltageId1(branch).startsWith(germanyRegionCode);
     }
 
     private String getVoltageId1(final Branch<?> branch) {

@@ -104,7 +104,7 @@ public class MergingTask implements Serializable {
     public <T> T getArtifact(final ArtifactType artifactType, final Class<T> clazz) throws FileNotFoundException {
         final String format = FilenameUtils.getExtension(artifactType.getFileName()).toUpperCase();
         final String path = artifacts.getFile(artifactType).getPath();
-        return switch (format){
+        return switch (format) {
             case "JSON" -> JsonUtils.read(clazz, path);
             case "XML" -> JaxbUtils.readFromPath(clazz, path);
             case "UCT", "XIIDM" -> clazz == Network.class ? (T) Network.read(path) : null; // NOSONAR this is a Network

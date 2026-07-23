@@ -47,5 +47,4 @@ public class XnodesInconsistencies {
         this.xnodeIncompleteList = xnodeIncompleteList;
     }
 
-
 }
