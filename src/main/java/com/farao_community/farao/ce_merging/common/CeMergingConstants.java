@@ -39,6 +39,7 @@ public final class CeMergingConstants {
     public static final String MERGING_SUPERVISOR_TAG  = "Merging supervisor";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
     public static final String UCTE_FORMAT = "UCTE";
+    public static final String XIIDM_FORMAT = "XIIDM";
     public static final String DK_COUNTRY_CODE = "D1";
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
     public static final String DK_HVDC_XNODES_PROPERTY = "dk.hvdc.xnodes";
@@ -61,8 +62,13 @@ public final class CeMergingConstants {
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
 
+    public static final String DC = "DC";
+    public static final String AC = "AC";
+
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
+    public static final double MAX_FICTITIOUS_P = 9999.;
+    public static final double MAX_FICTITIOUS_Q = 99999.;
 
     // Date management
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");

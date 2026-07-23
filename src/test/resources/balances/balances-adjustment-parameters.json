@@ -1,0 +1,16 @@
+{
+  "load-flow-parameters": {
+    "version": "1.15",
+    "voltageInitMode": "DC_VALUES",
+    "transformerVoltageControlOn": false,
+    "phaseShifterRegulationOn": true,
+    "useReactiveLimits": false,
+    "twtSplitShuntAdmittance": false,
+    "balanceType": "PROPORTIONAL_TO_GENERATION_P",
+    "dcUseTransformerRatio": false,
+    "componentMode": "ALL_CONNECTED",
+    "countriesToBalance": ["DE", "RS", "BE", "PT", "BG", "DK", "HR", "FR", "UA", "HU", "SI", "SK", "ME", "MK", "CH", "IT", "AL", "GR", "ES", "AT", "CZ", "PL", "RO", "NL", "TR", "BA", "XK"]
+  },
+  "maxNumberIterations": 5,
+  "thresholdNetPosition": 1.0
+}
