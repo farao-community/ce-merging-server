@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ReportingInformation_MarketDocument xmlns="urn:iec62325.351:tc57wg16:451-n:reportinginformationdocument:2:1"
+                                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                                     xsi:schemaLocation="urn:iec62325.351:tc57wg16:451-n:reportinginformationdocument:2:1 iec62325-451-n-reportinginformation_v2_1.xsd">
+    <mRID>TEST</mRID>
+    <revisionNumber>1</revisionNumber>
+    <type>B19</type>
+    <process.processType>A01</process.processType>
+    <sender_MarketParticipant.mRID codingScheme="A01">XXXXXXXXXXXXXXXXXX</sender_MarketParticipant.mRID>
+    <sender_MarketParticipant.marketRole.type>A44</sender_MarketParticipant.marketRole.type>
+    <receiver_MarketParticipant.mRID codingScheme="A01">XXXXXXXXXXXXXXXXXXX</receiver_MarketParticipant.mRID>
+    <receiver_MarketParticipant.marketRole.type>A33</receiver_MarketParticipant.marketRole.type>
+    <createdDateTime>2020-01-10T09:51:00Z</createdDateTime>
+    <time_Period.timeInterval>
+        <start>2020-03-15T23:00Z</start>
+        <end>2020-03-16T23:00Z</end>
+    </time_Period.timeInterval>
+    <TimeSeries>
+        <mRID>XX-YY</mRID>
+        <businessType>B63</businessType>
+        <product>1111111111111</product>
+        <in_Domain.mRID codingScheme="A01">XXX</in_Domain.mRID>
+        <out_Domain.mRID codingScheme="A01">YYY</out_Domain.mRID>
+        <connectingLine_RegisteredResource.mRID codingScheme="A01">XX-YY</connectingLine_RegisteredResource.mRID>
+        <measurement_Unit.name>MAW</measurement_Unit.name>
+        <curveType>A03</curveType>
+        <Period>
+            <timeInterval>
+                <start>2020-03-15T23:00Z</start>
+                <end>2020-03-16T23:00Z</end>
+            </timeInterval>
+            <resolution>PT60M</resolution>
+            <Point>
+                <position>1</position>
+                <quantity>-38</quantity>
+            </Point>
+        </Period>
+    </TimeSeries>
+    <TimeSeries>
+        <mRID>AA-BB</mRID>
+        <businessType>B63</businessType>
+        <product>22222222222222</product>
+        <in_Domain.mRID codingScheme="A01">AAA</in_Domain.mRID>
+        <out_Domain.mRID codingScheme="A01">BBB</out_Domain.mRID>
+        <connectingLine_RegisteredResource.mRID codingScheme="A01">AA-BB</connectingLine_RegisteredResource.mRID>
+        <measurement_Unit.name>MAW</measurement_Unit.name>
+        <curveType>A03</curveType>
+        <Period>
+            <timeInterval>
+                <start>2020-03-15T23:00Z</start>
+                <end>2020-03-16T23:00Z</end>
+            </timeInterval>
+            <resolution>PT60M</resolution>
+            <Point>
+                <position>1</position>
+                <quantity>-295</quantity>
+            </Point>
+        </Period>
+    </TimeSeries>
+</ReportingInformation_MarketDocument>
