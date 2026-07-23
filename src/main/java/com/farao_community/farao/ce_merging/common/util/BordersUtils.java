@@ -16,6 +16,7 @@ import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.TwoSides;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public final class BordersUtils {
 
@@ -32,6 +33,10 @@ public final class BordersUtils {
 
     public static double zeroIfNan(final double value) {
         return Double.isNaN(value) ? 0 : value;
+    }
+
+    public static Predicate<Branch> isConnectedTo(final String nodeId) {
+        return branch -> branch.getId().contains(nodeId);
     }
 
     public static Country getCountrySide(final Branch branch, final TwoSides side) {

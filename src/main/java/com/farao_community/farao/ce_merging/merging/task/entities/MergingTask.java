@@ -6,7 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import com.powsybl.iidm.network.Network;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -14,6 +17,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import java.io.FileNotFoundException;
 import java.io.Serializable;
 
 import static jakarta.persistence.EnumType.STRING;
@@ -93,6 +97,14 @@ public class MergingTask implements Serializable {
 
     public Artifacts getArtifacts() {
         return artifacts;
+    }
+
+    public <T> T getArtifact(final ArtifactType type, final Class<T> clazz) throws FileNotFoundException {
+        return JsonUtils.read(clazz, artifacts.getFile(type).getPath());
+    }
+
+    public Network getArtifact(final ArtifactType networkArtifact) {
+        return Network.read(artifacts.getFile(networkArtifact).getPath());
     }
 
     public void setArtifacts(final Artifacts artifacts) {

@@ -39,7 +39,7 @@ public class RequestMetadataManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestMetadataManager.class);
     private static final String TASKS = "/tasks/";
-    private static final String RECESSIVITY_DEFAULT_CONFIGURATION = "gridDefaultConfigurations/default-recessivity-parameters.json";
+    public static final String RECESSIVITY_DEFAULT_CONFIGURATION = "gridDefaultConfigurations/default-recessivity-parameters.json";
     private static final String MISSING_FILES_ERROR = "Some input files are declared in request metadata but missing in provided archive: %s. Please ensure that files are present within archive and have the same name as request metadata.";
 
     private static final Map<String, Function<Inputs, SavedFile>> INPUT_GETTERS_BY_LOCATION = Map.of(
