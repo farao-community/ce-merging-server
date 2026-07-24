@@ -104,7 +104,7 @@ public final class LoadFlowUtils {
         );
     }
 
-    public static Predicate<Injection> isConnected(final LoadFlowParameters.ComponentMode componentMode){
+    public static Predicate<Injection> isConnected(final LoadFlowParameters.ComponentMode componentMode) {
         return injection -> isTerminalConnected(injection.getTerminal(), componentMode);
     }
 
@@ -131,10 +131,8 @@ public final class LoadFlowUtils {
         };
     }
 
-
     private static double getLeavingFlow(final DanglingLine danglingLine) {
         return danglingLine.getTerminal().isConnected() ? zeroIfNaN(-danglingLine.getBoundary().getP()) : 0;
     }
-
 
 }

@@ -155,7 +155,6 @@ class SlackCompensationServiceTest {
             .toList();
     }
 
-
     @Test
     void shouldNotAddSlackNodeIfNotExistingNode() {
         slackNodeFound = null;
@@ -167,8 +166,6 @@ class SlackCompensationServiceTest {
         assertTrue(getSlackTerminals(networkCgm).isEmpty());
     }
 
-
-
     private static Network createNetworkWithBus(String busId) {
         Network network = Network.create("network", "source");
         VoltageLevel vl = network.newVoltageLevel().setId("VL_" + busId).setNominalV(225).setTopologyKind(TopologyKind.BUS_BREAKER).add();
@@ -176,6 +173,5 @@ class SlackCompensationServiceTest {
         vl.newLoad().setId("L_" + busId).setBus(busId).setP0(0).setQ0(0).add();
         return network;
     }
-
 
 }
