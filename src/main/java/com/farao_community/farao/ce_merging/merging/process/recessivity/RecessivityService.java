@@ -154,7 +154,7 @@ public class RecessivityService {
         final List<XnodeIncorrect> incorrect = infosByName.entrySet()
             .stream()
             .filter(e -> e.getValue().isIncorrect())
-            .map(e -> getXnodeIncorrect(network, e.getKey(), e.getValue(), recessiveCountries))
+            .map(e -> fixAndGetIncorrect(network, e.getKey(), e.getValue(), recessiveCountries))
             .collect(toList()); // NOSONAR do not change with Java 16's toList(), we want a mutable list here
 
         checkAlegroXnodes(incorrect, infosByName, recessiveCountries);
@@ -162,22 +162,22 @@ public class RecessivityService {
         return incorrect;
     }
 
-    private XnodeIncorrect getXnodeIncorrect(final Network network,
-                                             final String name,
-                                             final XnodeInformation infos,
-                                             final List<String> recessiveCountries) {
+    private XnodeIncorrect fixAndGetIncorrect(final Network network,
+                                              final String name,
+                                              final XnodeInformation infos,
+                                              final List<String> recessiveCountries) {
 
         final XnodeIncorrect xNode = XnodeIncorrect.buildFrom(name, infos, recessiveCountries);
-
+        final boolean german = isGermanInternalNode(infos);
         // if there is a difference in recessivity, fix it
         if (xNode.isRecessive1() && !xNode.isRecessive2()) {
-            alignBranchStatusWithXnode(network, name,
-                                       xNode.getCountry1(), xNode.getStatus2(),
-                                       isGermanInternalNode(infos));
+            final String country1 = xNode.getCountry1();
+            getBranchToCorrect(network, name, country1, german)
+                .ifPresent(branch -> alignBranchStatusWithXnode(xNode.getStatus2(), getCountry(country1), branch));
         } else if (xNode.isRecessive2() && !xNode.isRecessive1()) {
-            alignBranchStatusWithXnode(network, name,
-                                       xNode.getCountry2(), xNode.getStatus1(),
-                                       isGermanInternalNode(infos));
+            final String country2 = xNode.getCountry2();
+            getBranchToCorrect(network, name, country2, german)
+                .ifPresent(branch -> alignBranchStatusWithXnode(xNode.getStatus1(), getCountry(country2), branch));
         }
 
         return xNode;
@@ -213,17 +213,15 @@ public class RecessivityService {
         return nodeName.equals(VIRTUAL_HUB_ALEGRO_BE_NODE_NAME) || nodeName.equals(VIRTUAL_HUB_ALEGRO_DE_NODE_NAME);
     }
 
-    private void alignBranchStatusWithXnode(final Network network,
-                                            final String nodeId,
-                                            final String countryName,
-                                            final XnodeStatus status,
-                                            final boolean isGermanInternalNode) {
+    private Optional<Branch> getBranchToCorrect(final Network network,
+                                                final String nodeId,
+                                                final String countryName,
+                                                final boolean isGermanInternalNode) {
 
-        final Optional<Branch> branchToCorrect = isGermanInternalNode ?
+        return isGermanInternalNode ?
             Optional.ofNullable(findCorrectGermanBranch(network, countryName, nodeId))
             : network.getBranchStream().filter(isConnectedTo(nodeId)).findFirst();
 
-        branchToCorrect.ifPresent(branch -> alignBranchStatusWithXnode(status, getCountry(countryName), branch));
     }
 
     private Branch<?> findCorrectGermanBranch(final Network network,

@@ -51,7 +51,17 @@ public class XnodeIncorrect {
         this.country2 = infos2.getCountry();
         this.status2 = infos2.getStatus();
         this.recessive2 = recessiveCountries.contains(infos2.getCountry());
-        this.finalStatus =  OPEN.equals(infos1.getStatus()) || OPEN.equals(infos2.getStatus()) ? OPEN : CLOSE;
+        this.finalStatus = computeFinalStatus();
+    }
+
+    private XnodeStatus computeFinalStatus() {
+        if (recessive1 == recessive2) {
+            return OPEN.equals(status1) || OPEN.equals(status2) ? OPEN : CLOSE;
+        } else if (!recessive1) {
+            return status1;
+        } else {
+            return status2;
+        }
     }
 
     public String getName() {
