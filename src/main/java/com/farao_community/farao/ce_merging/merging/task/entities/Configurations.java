@@ -22,12 +22,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.merging.request_metadata.RequestMetadataManager.RECESSIVITY_DEFAULT_CONFIGURATION;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 
@@ -37,6 +35,7 @@ import static jakarta.persistence.FetchType.LAZY;
  */
 @Embeddable
 public class Configurations implements Serializable {
+    public static final String RECESSIVITY_DEFAULT_CONFIGURATION = "gridDefaultConfigurations/default-recessivity-parameters.json";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Configurations.class);
 
@@ -84,7 +83,7 @@ public class Configurations implements Serializable {
                                                               new ClassPathResource(RECESSIVITY_DEFAULT_CONFIGURATION)
                                                                   .getInputStream());
                 return params.getRecessiveCountries();
-            } catch (final IOException ex) {
+            } catch (final Exception ex) {
                 LOGGER.warn("Error while reading default recessivity configuration file, no country will be considered recessive");
                 return new ArrayList<>();
             }

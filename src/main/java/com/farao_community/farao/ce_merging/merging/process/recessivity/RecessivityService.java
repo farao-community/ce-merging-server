@@ -51,6 +51,8 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static com.powsybl.iidm.network.Country.BE;
 import static com.powsybl.iidm.network.Country.DE;
+import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang3.ObjectUtils.allNotNull;
 import static org.apache.commons.lang3.ObjectUtils.anyNull;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -128,14 +130,20 @@ public class RecessivityService {
             return;
         }
 
-        final XnodeStatus alegroDeStatus = deAlInfo.getArea1Information().getStatus();
-        final XnodeStatus alegroBeStatus = beAlInfo.getArea1Information().getStatus();
+        final AreaInformation alDe1Info = deAlInfo.getArea1Information();
+        final AreaInformation alBe1Info = beAlInfo.getArea1Information();
 
-        if (alegroDeStatus != alegroBeStatus) {
-            final AreaInformation alegroDeInfo = new AreaInformation("D7", VIRTUAL_HUB_ALEGRO_DE_NODE_NAME, alegroDeStatus);
-            final AreaInformation alegroBeInfo = new AreaInformation(BE.name(), VIRTUAL_HUB_ALEGRO_BE_NODE_NAME, alegroBeStatus);
+        if (allNotNull(alDe1Info, alBe1Info)) {
+            final XnodeStatus alegroDeStatus = alDe1Info.getStatus();
+            final XnodeStatus alegroBeStatus = alBe1Info.getStatus();
 
-            xnodeIncorrects.add(new XnodeIncorrect(ALEGRO_NODE_PREFIX, alegroBeInfo, alegroDeInfo, recessiveCountries));
+            if (alegroDeStatus != alegroBeStatus) {
+                final AreaInformation alegroDeInfo = new AreaInformation("D7", VIRTUAL_HUB_ALEGRO_DE_NODE_NAME, alegroDeStatus);
+                final AreaInformation alegroBeInfo = new AreaInformation(BE.name(), VIRTUAL_HUB_ALEGRO_BE_NODE_NAME, alegroBeStatus);
+
+                xnodeIncorrects.add(new XnodeIncorrect(ALEGRO_NODE_PREFIX, alegroBeInfo, alegroDeInfo, recessiveCountries));
+            }
+
         }
 
     }
@@ -147,7 +155,7 @@ public class RecessivityService {
             .stream()
             .filter(e -> e.getValue().isIncorrect())
             .map(e -> getXnodeIncorrect(network, e.getKey(), e.getValue(), recessiveCountries))
-            .toList();
+            .collect(toList()); // NOSONAR do not change with Java 16's toList(), we want a mutable list here
 
         checkAlegroXnodes(incorrect, infosByName, recessiveCountries);
 
@@ -252,7 +260,7 @@ public class RecessivityService {
             .forEach(setToXnodeStatus);
     }
 
-    private boolean isGermanInternalNode(XnodeInformation xnodeInformation) {
+    private boolean isGermanInternalNode(final XnodeInformation xnodeInformation) {
         final AreaInformation info1 = xnodeInformation.getArea1Information();
         final AreaInformation info2 = xnodeInformation.getArea2Information();
         return info1 != null && getCountry(info1.getCountry()) == DE

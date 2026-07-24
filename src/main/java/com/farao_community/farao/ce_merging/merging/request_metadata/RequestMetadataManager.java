@@ -32,6 +32,7 @@ import java.util.function.Function;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.getPathInParent;
+import static com.farao_community.farao.ce_merging.merging.task.entities.Configurations.RECESSIVITY_DEFAULT_CONFIGURATION;
 
 public class RequestMetadataManager {
     private final String inputsPath;
@@ -39,7 +40,6 @@ public class RequestMetadataManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RequestMetadataManager.class);
     private static final String TASKS = "/tasks/";
-    public static final String RECESSIVITY_DEFAULT_CONFIGURATION = "gridDefaultConfigurations/default-recessivity-parameters.json";
     private static final String MISSING_FILES_ERROR = "Some input files are declared in request metadata but missing in provided archive: %s. Please ensure that files are present within archive and have the same name as request metadata.";
 
     private static final Map<String, Function<Inputs, SavedFile>> INPUT_GETTERS_BY_LOCATION = Map.of(

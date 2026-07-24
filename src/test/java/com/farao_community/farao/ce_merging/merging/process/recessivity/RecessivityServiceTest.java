@@ -126,7 +126,7 @@ class RecessivityServiceTest {
         when(terminalDe.getVoltageLevel()).thenReturn(vl2De);
         when(vl1De.getSubstation()).thenReturn(Optional.of(ss1De));
         when(vl2De.getSubstation()).thenReturn(Optional.of(ss2De));
-        when(ss1De.getCountry()).thenReturn(Optional.of(BE));
+        when(ss1De.getCountry()).thenReturn(Optional.of(DE));
         when(ss2De.getCountry()).thenReturn(Optional.of(DE));
         when(ss2De.getNullableCountry()).thenReturn(DE);
 

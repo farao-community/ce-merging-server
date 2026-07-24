@@ -16,8 +16,8 @@ import java.util.List;
  */
 public class RecessivityParameters {
     /**
-     * Contains the recessive IGMs country codes
-     * By default, recessive countries are configured under defaultConfigurations/default-recessivity-parameters.json
+     * Contains the recessive IGMs country codes.
+     * By default, recessive countries are configured under gridDefaultConfigurations/default-recessivity-parameters.json
      * recessive means that it will not impose the status of the X-Node in case of inconsistency
      */
     private List<String> recessiveCountries;
