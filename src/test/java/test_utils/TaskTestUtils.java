@@ -21,6 +21,8 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.xsd.Xnodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.loadflow.json.JsonLoadFlowParameters;
 import com.powsybl.openrao.virtualhubs.BorderDirection;
 import com.powsybl.openrao.virtualhubs.VirtualHub;
 import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
@@ -134,5 +136,10 @@ public final class TaskTestUtils {
             borderDirectionRecord.setBorderFrom(mapKsToXk(borderDirectionRecord.getBorderFrom()));
             borderDirectionRecord.setBorderTo(mapKsToXk(borderDirectionRecord.getBorderTo()));
         });
+    }
+
+    public static void setLoadflowParameters(MergingTask task, String loadflowParametersFile) throws IOException {
+        LoadFlowParameters loadFlowParameters = JsonLoadFlowParameters.read(new ClassPathResource(loadflowParametersFile).getInputStream());
+        task.getConfigurations().setLoadFlowParameters(loadFlowParameters);
     }
 }

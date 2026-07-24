@@ -41,6 +41,7 @@ import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.get
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isConnected;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadflow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
+import static com.farao_community.farao.ce_merging.merging.process.FileStorageUtils.save;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
 import static com.powsybl.ucte.network.UcteNodeTypeCode.UT;
 import static java.util.Locale.FRANCE;
@@ -65,8 +66,6 @@ public class SlackCompensationService {
     }
 
     public Network compensateNetwork(final MergingTask task) {
-        //This post-processing consists in saving the values calculated by the loadflow during the compensation in the cgm
-        //Warning: This is compatible with the current behavior of the loadflow which does not compensate on xnodes
         final SavedFile cgmFileToCompensate = task.getArtifacts().getFile(CGM_FILE_AFTER_PST);
         final Network cgm = Network.read(cgmFileToCompensate.getPath());
         final LoadFlowParameters loadFlowParameters = task.getConfigurations().getLoadFlowParameters();
@@ -108,7 +107,7 @@ public class SlackCompensationService {
              final InputStreamReader isr = new InputStreamReader(fis);
              final BufferedReader spanishIgm = new BufferedReader(isr)) {
             spain = new UcteReader().read(spanishIgm, new ReportNodeNoOp());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.warn("Error while reading slack node in ES IGM, default slack node '{}' will be added to the final CGM", defaultSlackNode);
         }
 
@@ -132,7 +131,7 @@ public class SlackCompensationService {
     private void updateSlackBus(final Network cgm, final String busId) {
         SlackTerminal.reset(cgm);
 
-        LOGGER.info("Adding slack node of ES IGM '{}' to the final CGM", busId);
+        LOGGER.info("Adding slack node of Spanish IGM '{}' to the final CGM", busId);
         final String notFoundWarning = "Cannot add slack node to the final CGM : node %s absent from CGM ".formatted(busId);
 
         Optional.ofNullable(cgm.getBusBreakerView().getBus(busId))
@@ -146,15 +145,13 @@ public class SlackCompensationService {
         final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
 
         /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            Never change this file name without CORESO's agreement because it's interfaced with CCCTool
+                Be careful when modifying this file name because it's interfaced with CCCTool
            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
         final String fileName = String.format("%s_2D%s_UX0.uct", dateAndTime, targetZdtParis.getDayOfWeek().getValue());
 
-        SavedFile savedFile = FileStorageUtils.save(configuration.getOutputsDirectoryPath(task),
-                                                    fileName,
-                                                    String.format("/tasks/%d/outputs/cgm", task.getId()),
-                                                    path -> network.write(UCTE_FORMAT, null, path));
-
-        task.getOutputs().setCgm(savedFile);
+        task.getOutputs().setCgm(save(configuration.getOutputsDirectoryPath(task),
+                                      fileName,
+                                      String.format("/tasks/%d/outputs/cgm", task.getId()),
+                                      path -> network.write(UCTE_FORMAT, null, path)));
     }
 }

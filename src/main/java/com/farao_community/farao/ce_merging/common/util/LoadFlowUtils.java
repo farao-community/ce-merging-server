@@ -8,6 +8,7 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.powsybl.iidm.network.Bus;
+import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.stream.Collectors.collectingAndThen;
@@ -117,4 +119,22 @@ public final class LoadFlowUtils {
             default -> throw new CeMergingException("Component number parameter should be 0 or 1");
         };
     }
+
+    public static double getBorderFlow(final DanglingLine danglingLine, final LoadFlowParameters.ComponentMode componentMode) {
+        return switch (componentMode) {
+            case MAIN_CONNECTED -> danglingLine.getTerminal()
+                .getBusBreakerView()
+                .getConnectableBus()
+                .isInMainConnectedComponent() ? getLeavingFlow(danglingLine) : 0.;
+            case ALL_CONNECTED -> getLeavingFlow(danglingLine);
+            default -> throw new CeMergingException("Component number parameter should be 0 or 1");
+        };
+    }
+
+
+    private static double getLeavingFlow(final DanglingLine danglingLine) {
+        return danglingLine.getTerminal().isConnected() ? zeroIfNaN(-danglingLine.getBoundary().getP()) : 0;
+    }
+
+
 }
