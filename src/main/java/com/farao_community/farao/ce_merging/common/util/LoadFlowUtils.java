@@ -7,7 +7,10 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.powsybl.iidm.network.Bus;
+import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.Terminal;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
@@ -15,7 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
@@ -88,5 +93,28 @@ public final class LoadFlowUtils {
         }
         return loadFlowResults.isEmpty()
                || loadFlowResults.getFirst().getStatus() != LoadFlowResult.ComponentResult.Status.CONVERGED;
+    }
+
+    public static LoadFlowParameters.ComponentMode getComponentModeLfParameter(LoadFlowParameters loadFlowParameters) {
+        return Objects.requireNonNullElse(
+            loadFlowParameters.getComponentMode(),
+            LoadFlowParameters.ComponentMode.MAIN_CONNECTED
+        );
+    }
+
+    public static Predicate<Injection> isConnected(final LoadFlowParameters.ComponentMode componentMode){
+        return injection -> isTerminalConnected(injection.getTerminal(), componentMode);
+    }
+
+    private static boolean isTerminalConnected(Terminal terminal, LoadFlowParameters.ComponentMode componentModeLfParameter) {
+        final Terminal.BusView busView = terminal != null ? terminal.getBusView() : null;
+        final Bus bus = busView != null ? busView.getBus() : null;
+        final boolean terminalConnectedToBus = terminal != null && terminal.isConnected() && bus != null;
+
+        return switch (componentModeLfParameter) {
+            case MAIN_CONNECTED -> terminalConnectedToBus && bus.isInMainSynchronousComponent();
+            case ALL_CONNECTED -> terminalConnectedToBus;
+            default -> throw new CeMergingException("Component number parameter should be 0 or 1");
+        };
     }
 }

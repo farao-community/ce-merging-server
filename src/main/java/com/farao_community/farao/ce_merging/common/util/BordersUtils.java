@@ -30,10 +30,6 @@ public final class BordersUtils {
                 .anyMatch(nodeName::equals);
     }
 
-    public static double zeroIfNan(final double value) {
-        return Double.isNaN(value) ? 0 : value;
-    }
-
     public static Country getCountrySide(final Branch branch, final TwoSides side) {
         return branch.getTerminal(side).getVoltageLevel()
                 .getSubstation()
