@@ -16,6 +16,9 @@ public class XnodeIncomplete {
     private String countryAbsent;
     private XnodeStatus status;
 
+    public XnodeIncomplete() {
+    }
+
     public XnodeIncomplete(final String name, final AreaInformation existingInfo, final String absent) {
         this.name = name;
         this.nodeName = existingInfo.getNode();

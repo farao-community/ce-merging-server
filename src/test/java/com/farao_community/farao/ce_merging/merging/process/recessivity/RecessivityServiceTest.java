@@ -49,23 +49,27 @@ import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.CLOSE;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INCONSISTENCIES;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static com.powsybl.iidm.network.Country.BE;
+import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.Country.FR;
 import static com.powsybl.iidm.network.TwoSides.ONE;
 import static com.powsybl.iidm.network.TwoSides.TWO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class RecessivityServiceTest {
+class RecessivityServiceTest {
 
     @Autowired
     private RecessivityService recessivityService;
@@ -75,6 +79,7 @@ public class RecessivityServiceTest {
 
     private MergingTask task;
     private MergingTask taskFr;
+    private MergingTask taskDe;
     private MergingTask taskWithAlegro;
 
     @Autowired
@@ -82,18 +87,26 @@ public class RecessivityServiceTest {
 
     private Network network;
     private Terminal terminal2;
+    private Terminal terminalDe;
 
     @BeforeEach
     void setUp() throws IOException {
         // grid
         network = mock(Network.class);
         Branch branch = mock(Branch.class);
+        Branch branchDe = mock(Branch.class);
         Terminal terminal1 = mock(Terminal.class);
         terminal2 = mock(Terminal.class);
+        Terminal terminal1De = mock(Terminal.class);
+        terminalDe = mock(Terminal.class);
         VoltageLevel vl1 = mock(VoltageLevel.class);
         VoltageLevel vl2 = mock(VoltageLevel.class);
+        VoltageLevel vl1De = mock(VoltageLevel.class);
+        VoltageLevel vl2De = mock(VoltageLevel.class);
         Substation ss1 = mock(Substation.class);
         Substation ss2 = mock(Substation.class);
+        Substation ss1De = mock(Substation.class);
+        Substation ss2De = mock(Substation.class);
 
         when(branch.getId()).thenReturn("XAC_LO11");
         when(branch.getTerminal(ONE)).thenReturn(terminal1);
@@ -106,7 +119,18 @@ public class RecessivityServiceTest {
         when(ss2.getCountry()).thenReturn(Optional.of(FR));
         when(ss2.getNullableCountry()).thenReturn(FR);
 
-        when(network.getBranchStream()).thenAnswer(invocation -> Stream.of(branch));
+        when(branchDe.getId()).thenReturn("XDE_LO11");
+        when(branchDe.getTerminal(ONE)).thenReturn(terminal1De);
+        when(branchDe.getTerminal(TWO)).thenReturn(terminalDe);
+        when(terminal1De.getVoltageLevel()).thenReturn(vl1De);
+        when(terminalDe.getVoltageLevel()).thenReturn(vl2De);
+        when(vl1De.getSubstation()).thenReturn(Optional.of(ss1De));
+        when(vl2De.getSubstation()).thenReturn(Optional.of(ss2De));
+        when(ss1De.getCountry()).thenReturn(Optional.of(BE));
+        when(ss2De.getCountry()).thenReturn(Optional.of(DE));
+        when(ss2De.getNullableCountry()).thenReturn(DE);
+
+        when(network.getBranchStream()).thenAnswer(invocation -> Stream.of(branch, branchDe));
 
         // task data
 
@@ -114,19 +138,18 @@ public class RecessivityServiceTest {
         igmFr.setCountry("FR");
         IgmData igmD6 = new IgmData();
         igmD6.setCountry("D6");
+        IgmData igmDe = new IgmData();
+        igmDe.setCountry("DE");
         IgmData igmBe = new IgmData();
         igmBe.setCountry("BE");
         IgmData igmNl = new IgmData();
         igmNl.setCountry("NL");
-        List<IgmData> igms = Arrays.asList(igmFr, igmBe, igmNl, igmD6);
+        List<IgmData> igms = Arrays.asList(igmFr, igmBe, igmNl, igmD6, igmDe);
 
         Map<String, XnodeInformation> xnodeInformationMap = new HashMap<>();
         xnodeInformationMap.put("XAC_LO11", new XnodeInformation(new AreaInformation("BE", CLOSE), new AreaInformation("FR", OPEN)));
-        // Add some more to match previous test expectations if needed, but the logic is what matters
-        for (int i = 0; i < 40; i++) {
-            xnodeInformationMap.put("XINCOMPLETE_" + i, new XnodeInformation(new AreaInformation("BE", OPEN), null));
-        }
-        // Specific ones from old test
+        xnodeInformationMap.put("XDE_LO11", new XnodeInformation(new AreaInformation("BE", CLOSE), new AreaInformation("DE", OPEN)));
+
         xnodeInformationMap.put("XBE_GB1B", new XnodeInformation(new AreaInformation("BE", OPEN), null));
         xnodeInformationMap.put("XBE_OX21", new XnodeInformation(new AreaInformation("BE", OPEN), null));
 
@@ -165,6 +188,17 @@ public class RecessivityServiceTest {
         when(taskFr.getArtifacts()).thenReturn(mockArtifacts);
         when(taskFr.getId()).thenReturn(2L);
 
+        taskDe = mock(MergingTask.class);
+        when(taskDe.getInputs()).thenReturn(inputs);
+        Configurations configurationsDe = mock(Configurations.class);
+        when(configurationsDe.getOrDefaultRecessiveCountries()).thenReturn(List.of("DE"));
+        when(taskDe.getConfigurations()).thenReturn(configurationsDe);
+        when(taskDe.getArtifact(XNODES_INFORMATION_FILE, XnodesCheck.class)).thenReturn(xnodesCheck);
+        when(taskDe.getArtifact(TOPOLOGICAL_MERGE_FILE, Network.class)).thenReturn(network);
+        when(taskDe.getArtifact(XNODES_INCONSISTENCIES, XnodesInconsistencies.class)).thenCallRealMethod();
+        when(taskDe.getArtifacts()).thenReturn(mockArtifacts);
+        when(taskDe.getId()).thenReturn(3L);
+
         when(taskWithAlegro.getConfigurations()).thenReturn(configurations);
         Map<String, XnodeInformation> xnodeInformationMapAlegro = new HashMap<>();
         xnodeInformationMapAlegro.put("XLI_OB1A", new XnodeInformation(new AreaInformation("D7", OPEN), null));
@@ -177,39 +211,48 @@ public class RecessivityServiceTest {
         Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(task)));
         Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(taskFr)));
         Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(taskFr)));
+        Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(taskDe)));
+        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(taskDe)));
     }
 
     @Test
-    public void getRecessiveCountriesFromConfiguration() {
+    void getRecessiveCountriesFromConfiguration() {
         List<String> recessivityCountries = task.getConfigurations().getOrDefaultRecessiveCountries();
         assertEquals(14, recessivityCountries.size());
     }
 
     @Test
-    public void applyRecessivity() {
+    void applyRecessivity() {
         try (MockedStatic<FileStorageUtils> fileStorage = mockStatic(FileStorageUtils.class)) {
             recessivityService.applyRecessivity(task);
 
-            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES),
-                                                                       argThat(o -> hasIncorrectXnode(o, "XAC_LO11")
-                                                                                    && hasNumberOfIncompleteXnodes(o, 42)),
-                                                                       eq(task),
-                                                                       eq(configuration)));
+            fileStorage.verify(() -> FileStorageUtils.saveArtifactNetwork(eq(TGM_FILE_AFTER_RECESSIVITY), any(), any(), anyString(), isNull(), any()));
+            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES), any(), any(), any()));
 
         }
     }
 
     @Test
-    public void applyRecessivityFR() {
+    void applyRecessivityFR() {
         try (MockedStatic<FileStorageUtils> fileStorage = mockStatic(FileStorageUtils.class)) {
             recessivityService.applyRecessivity(taskFr);
 
-            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES),
-                                                                       argThat(o -> hasIncorrectXnode(o, "XAC_LO11")),
-                                                                       eq(taskFr),
-                                                                       eq(configuration)));
+            fileStorage.verify(() -> FileStorageUtils.saveArtifactNetwork(eq(TGM_FILE_AFTER_RECESSIVITY), any(), any(), anyString(), isNull(), any()));
+            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES), any(), any(), any()));
 
             verify(terminal2).connect();
+        }
+    }
+
+    @Test
+    void applyRecessivityDE() {
+        try (MockedStatic<FileStorageUtils> fileStorage = mockStatic(FileStorageUtils.class)) {
+            recessivityService.applyRecessivity(taskDe);
+
+            fileStorage.verify(() -> FileStorageUtils.saveArtifactNetwork(eq(TGM_FILE_AFTER_RECESSIVITY), any(), any(), anyString(), isNull(), any()));
+            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES), any(), any(), any()));
+
+            verify(terminalDe).connect();
         }
     }
 
@@ -230,7 +273,7 @@ public class RecessivityServiceTest {
     }
 
     @Test
-    public void checkAlegroXnodesInconsistenciesTest() throws FileNotFoundException {
+    void checkAlegroXnodesInconsistenciesTest() throws FileNotFoundException {
         List<XnodeIncorrect> xnodeIncorrectsList = new ArrayList<>();
         List<String> recessivityCountries = taskWithAlegro.getConfigurations().getOrDefaultRecessiveCountries();
         XnodesCheck xnodesCheck = taskWithAlegro.getArtifact(XNODES_INFORMATION_FILE, XnodesCheck.class);

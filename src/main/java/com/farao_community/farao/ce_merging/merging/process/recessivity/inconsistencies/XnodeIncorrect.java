@@ -27,6 +27,9 @@ public class XnodeIncorrect {
     private boolean recessive2;
     private XnodeStatus finalStatus;
 
+    public XnodeIncorrect() {
+    }
+
     public XnodeIncorrect(final String name,
                           final String country1, final XnodeStatus status1, final boolean recessive1,
                           final String country2, final XnodeStatus status2, final boolean recessive2,
