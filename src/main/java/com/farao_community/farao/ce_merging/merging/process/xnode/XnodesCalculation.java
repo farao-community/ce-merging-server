@@ -35,7 +35,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DENMARK_COUNTRY_CODE;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.zeroIfNan;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 
 @Service
 public class XnodesCalculation {
@@ -222,11 +222,11 @@ public class XnodesCalculation {
     }
 
     private double getQ(final Terminal terminal) {
-        return zeroIfNan(terminal.getQ());
+        return zeroIfNaN(terminal.getQ());
     }
 
     private double getP(final Terminal terminal) {
-        return zeroIfNan(terminal.getP());
+        return zeroIfNaN(terminal.getP());
     }
 
     private Country getCountry(final AreaInformation xnodeAreaInformation) {
