@@ -31,8 +31,12 @@ public class AreaInformation {
         return new AreaInformation("", null);
     }
 
-    public AreaInformation(String country, XnodeStatus status) {
+    public AreaInformation(final String country, final XnodeStatus status) {
         this(country, status, "", 0, 0, 0);
+    }
+
+    public AreaInformation(final String country, final String node, final XnodeStatus status) {
+        this(country, status, node, 0, 0, 0);
     }
 
     public String getCountry() {

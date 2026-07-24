@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_NODE_PREFIX;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
@@ -117,77 +118,81 @@ public class RecessivityService {
     }
 
     void checkAlegroXnodes(final List<XnodeIncorrect> xnodeIncorrects,
-                           final Map<String, XnodeInformation> xnodeInfos,
+                           final Map<String, XnodeInformation> infosByName,
                            final List<String> recessiveCountries) {
 
-        final XnodeInformation deAlInfo = xnodeInfos.get(VIRTUAL_HUB_ALEGRO_DE_NODE_NAME);
-        final XnodeInformation beAlInfo = xnodeInfos.get(VIRTUAL_HUB_ALEGRO_BE_NODE_NAME);
+        final XnodeInformation deAlInfo = infosByName.get(VIRTUAL_HUB_ALEGRO_DE_NODE_NAME);
+        final XnodeInformation beAlInfo = infosByName.get(VIRTUAL_HUB_ALEGRO_BE_NODE_NAME);
 
         if (anyNull(deAlInfo, beAlInfo)) {
             return;
         }
 
-        final XnodeStatus germanAlegroStatus = deAlInfo.getArea1Information().getStatus();
-        final XnodeStatus belgianAlegroStatus = beAlInfo.getArea1Information().getStatus();
+        final XnodeStatus alegroDeStatus = deAlInfo.getArea1Information().getStatus();
+        final XnodeStatus alegroBeStatus = beAlInfo.getArea1Information().getStatus();
 
-        if (germanAlegroStatus != belgianAlegroStatus) {
-            boolean isBelgiumRecessive = recessiveCountries.contains(BE.name());
-            boolean isD7Recessive = recessiveCountries.contains("D7");
+        if (alegroDeStatus != alegroBeStatus) {
+            final AreaInformation alegroDeInfo = new AreaInformation("D7", VIRTUAL_HUB_ALEGRO_DE_NODE_NAME, alegroDeStatus);
+            final AreaInformation alegroBeInfo = new AreaInformation(BE.name(), VIRTUAL_HUB_ALEGRO_BE_NODE_NAME, alegroBeStatus);
 
-            xnodeIncorrects.add(new XnodeIncorrect("XLI_OB1", BE.name(), belgianAlegroStatus, isBelgiumRecessive,
-                                                   "D7", germanAlegroStatus, isD7Recessive, OPEN));
+            xnodeIncorrects.add(new XnodeIncorrect(ALEGRO_NODE_PREFIX, alegroBeInfo, alegroDeInfo, recessiveCountries));
         }
 
     }
 
     private List<XnodeIncorrect> getIncorrectXnodes(final Network network,
-                                                    final Map<String, XnodeInformation> xnodeInformationMap,
+                                                    final Map<String, XnodeInformation> infosByName,
                                                     final List<String> recessiveCountries) {
-        final List<XnodeIncorrect> incorrect = xnodeInformationMap.entrySet()
+        final List<XnodeIncorrect> incorrect = infosByName.entrySet()
             .stream()
-            .filter(entry -> entry.getValue().isIncorrect())
-            .map(entry -> getXnodeIncorrect(network, entry.getKey(), entry.getValue(), recessiveCountries))
+            .filter(e -> e.getValue().isIncorrect())
+            .map(e -> getXnodeIncorrect(network, e.getKey(), e.getValue(), recessiveCountries))
             .toList();
 
-        checkAlegroXnodes(incorrect, xnodeInformationMap, recessiveCountries);
+        checkAlegroXnodes(incorrect, infosByName, recessiveCountries);
 
         return incorrect;
     }
 
     private XnodeIncorrect getXnodeIncorrect(final Network network,
                                              final String name,
-                                             final XnodeInformation info,
+                                             final XnodeInformation infos,
                                              final List<String> recessiveCountries) {
 
-        final XnodeIncorrect xnodeIncorrect = XnodeIncorrect.buildFrom(name, info, recessiveCountries);
+        final XnodeIncorrect xNode = XnodeIncorrect.buildFrom(name, infos, recessiveCountries);
 
-        if (xnodeIncorrect.isRecessive1() && !xnodeIncorrect.isRecessive2()) {
-            correctBranchStatus(network, name, xnodeIncorrect.getCountry1(), xnodeIncorrect.getStatus2(), isGermanInternalNode(info));
-        } else if (xnodeIncorrect.isRecessive2() && !xnodeIncorrect.isRecessive1()) {
-            correctBranchStatus(network, name, xnodeIncorrect.getCountry2(), xnodeIncorrect.getStatus1(), isGermanInternalNode(info));
+        // if there is a difference in recessivity, fix it
+        if (xNode.isRecessive1() && !xNode.isRecessive2()) {
+            alignBranchStatusWithXnode(network, name,
+                                       xNode.getCountry1(), xNode.getStatus2(),
+                                       isGermanInternalNode(infos));
+        } else if (xNode.isRecessive2() && !xNode.isRecessive1()) {
+            alignBranchStatusWithXnode(network, name,
+                                       xNode.getCountry2(), xNode.getStatus1(),
+                                       isGermanInternalNode(infos));
         }
 
-        return xnodeIncorrect;
+        return xNode;
     }
 
-    private List<XnodeIncomplete> getIncompleteXnodes(final List<XnodeConfig> xnodesConfig,
-                                                      final Map<String, XnodeInformation> xnodeInformationMap) {
+    private List<XnodeIncomplete> getIncompleteXnodes(final List<XnodeConfig> xNodesConfig,
+                                                      final Map<String, XnodeInformation> infosByName) {
 
-        return xnodeInformationMap.entrySet()
+        return infosByName.entrySet()
             .stream()
-            .filter(entry -> entry.getValue().isIncomplete() && !isAlegroXnode(entry.getKey()))
-            .map(entry -> getIncompleteXnode(xnodesConfig, entry.getKey(), entry.getValue()))
+            .filter(e -> e.getValue().isIncomplete() && !isAlegroXnode(e.getKey()))
+            .map(e -> getIncompleteXnode(xNodesConfig, e.getKey(), e.getValue()))
             .toList();
     }
 
-    private XnodeIncomplete getIncompleteXnode(final List<XnodeConfig> xnodesConfig,
+    private XnodeIncomplete getIncompleteXnode(final List<XnodeConfig> xNodesConfig,
                                                final String xNodeName,
                                                final XnodeInformation info) {
         final boolean hasArea1Info = info.getArea1Information() != null;
         final AreaInformation existingInfo = hasArea1Info ? info.getArea1Information() : info.getArea2Information();
 
-        final String countryAbsent = xnodesConfig.stream()
-            .filter(xnode -> xnode.getName().equals(xNodeName))
+        final String countryAbsent = xNodesConfig.stream()
+            .filter(xNode -> xNode.getName().equals(xNodeName))
             .findFirst()
             .map(cfg -> hasArea1Info ? cfg.getArea2() : cfg.getArea1())
             .orElse("");
@@ -200,17 +205,17 @@ public class RecessivityService {
         return nodeName.equals(VIRTUAL_HUB_ALEGRO_BE_NODE_NAME) || nodeName.equals(VIRTUAL_HUB_ALEGRO_DE_NODE_NAME);
     }
 
-    private void correctBranchStatus(final Network network,
-                                     final String nodeId,
-                                     final String countryName,
-                                     final XnodeStatus status,
-                                     final boolean isGermanInternalNode) {
+    private void alignBranchStatusWithXnode(final Network network,
+                                            final String nodeId,
+                                            final String countryName,
+                                            final XnodeStatus status,
+                                            final boolean isGermanInternalNode) {
 
         final Optional<Branch> branchToCorrect = isGermanInternalNode ?
             Optional.ofNullable(findCorrectGermanBranch(network, countryName, nodeId))
             : network.getBranchStream().filter(isConnectedTo(nodeId)).findFirst();
 
-        branchToCorrect.ifPresent(branch -> correctBranchStatus(status, getCountry(countryName), branch));
+        branchToCorrect.ifPresent(branch -> alignBranchStatusWithXnode(status, getCountry(countryName), branch));
     }
 
     private Branch<?> findCorrectGermanBranch(final Network network,
@@ -228,27 +233,23 @@ public class RecessivityService {
     }
 
     private Predicate<Branch> linksGermanyRegionToNode(final String germanyRegionCode, final String node) {
-        return branch -> getVoltageId1(branch).contains(node) && getVoltageId2(branch).startsWith(germanyRegionCode)
-                         || getVoltageId2(branch).contains(node) && getVoltageId1(branch).startsWith(germanyRegionCode);
+        return branch ->
+            branch.getTerminal1().getVoltageLevel().getId().contains(node)
+            && branch.getTerminal2().getVoltageLevel().getId().startsWith(germanyRegionCode)
+            ||
+            branch.getTerminal2().getVoltageLevel().getId().contains(node)
+            && branch.getTerminal1().getVoltageLevel().getId().startsWith(germanyRegionCode);
     }
 
-    private String getVoltageId1(final Branch<?> branch) {
-        return branch.getTerminal1().getVoltageLevel().getId();
-    }
-
-    private String getVoltageId2(final Branch<?> branch) {
-        return branch.getTerminal2().getVoltageLevel().getId();
-    }
-
-    private void correctBranchStatus(final XnodeStatus xnodeStatus,
-                                     final Country country,
-                                     final Branch<?> branch) {
-        final Consumer<Terminal> alignStatusWithXnode = xnodeStatus == OPEN ? Terminal::disconnect : Terminal::connect;
+    private void alignBranchStatusWithXnode(final XnodeStatus xnodeStatus,
+                                            final Country country,
+                                            final Branch<?> branch) {
+        final Consumer<Terminal> setToXnodeStatus = xnodeStatus == OPEN ? Terminal::disconnect : Terminal::connect;
 
         Arrays.stream(TwoSides.values())
             .filter(side -> country.equals(getCountryOfSide(branch, side)))
             .map(branch::getTerminal)
-            .forEach(alignStatusWithXnode);
+            .forEach(setToXnodeStatus);
     }
 
     private boolean isGermanInternalNode(XnodeInformation xnodeInformation) {

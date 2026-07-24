@@ -30,7 +30,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import test_utils.TaskTestUtils;
 
 import java.io.FileNotFoundException;
@@ -61,6 +60,7 @@ import static com.powsybl.iidm.network.TwoSides.TWO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
@@ -74,7 +74,7 @@ class RecessivityServiceTest {
     @Autowired
     private RecessivityService recessivityService;
 
-    @MockBean
+    @Autowired
     private MergingTaskRepository tasksRepository;
 
     private MergingTask task;
@@ -227,7 +227,9 @@ class RecessivityServiceTest {
             recessivityService.applyRecessivity(task);
 
             fileStorage.verify(() -> FileStorageUtils.saveArtifactNetwork(eq(TGM_FILE_AFTER_RECESSIVITY), any(), any(), anyString(), isNull(), any()));
-            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES), any(), any(), any()));
+            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES),
+                                                                       argThat(o -> hasIncompleteXnode(o, "XBE_OX21")),
+                                                                       any(), any()));
 
         }
     }
@@ -238,7 +240,9 @@ class RecessivityServiceTest {
             recessivityService.applyRecessivity(taskFr);
 
             fileStorage.verify(() -> FileStorageUtils.saveArtifactNetwork(eq(TGM_FILE_AFTER_RECESSIVITY), any(), any(), anyString(), isNull(), any()));
-            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES), any(), any(), any()));
+            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES),
+                                                                       argThat(o -> hasIncorrectXnode(o, "XAC_LO11")),
+                                                                       any(), any()));
 
             verify(terminal2).connect();
         }
@@ -250,7 +254,9 @@ class RecessivityServiceTest {
             recessivityService.applyRecessivity(taskDe);
 
             fileStorage.verify(() -> FileStorageUtils.saveArtifactNetwork(eq(TGM_FILE_AFTER_RECESSIVITY), any(), any(), anyString(), isNull(), any()));
-            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES), any(), any(), any()));
+            fileStorage.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INCONSISTENCIES),
+                                                                       argThat(o -> hasIncorrectXnode(o, "XDE_LO11")),
+                                                                       any(), any()));
 
             verify(terminalDe).connect();
         }
@@ -258,16 +264,16 @@ class RecessivityServiceTest {
 
     private boolean hasIncorrectXnode(final Object artifact, final String nodeId) {
         if (artifact instanceof final XnodesInconsistencies inc) {
-            List<XnodeIncorrect> xnodesIncorrect = inc.getXnodeIncorrectList();
-            return xnodesIncorrect.size() == 1 && xnodesIncorrect.getFirst().getName().equals(nodeId);
+            final List<XnodeIncorrect> xnodesIncorrect = inc.getXnodeIncorrectList();
+            return xnodesIncorrect.stream().anyMatch(xn -> xn.getName().equals(nodeId));
         }
         return false;
     }
 
-    private boolean hasNumberOfIncompleteXnodes(final Object artifact, final int count) {
+    private boolean hasIncompleteXnode(final Object artifact, final String nodeId) {
         if (artifact instanceof final XnodesInconsistencies inc) {
-            List<XnodeIncomplete> xnodesIncorrect = inc.getXnodeIncompleteList();
-            return xnodesIncorrect.size() == count;
+            final List<XnodeIncomplete> xnodesIncomplete = inc.getXnodeIncompleteList();
+            return xnodesIncomplete.stream().anyMatch(xn -> xn.getName().equals(nodeId));
         }
         return false;
     }

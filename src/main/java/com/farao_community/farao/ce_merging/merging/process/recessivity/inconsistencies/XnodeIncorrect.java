@@ -30,20 +30,6 @@ public class XnodeIncorrect {
     public XnodeIncorrect() {
     }
 
-    public XnodeIncorrect(final String name,
-                          final String country1, final XnodeStatus status1, final boolean recessive1,
-                          final String country2, final XnodeStatus status2, final boolean recessive2,
-                          XnodeStatus finalStatus) {
-        this.name = name;
-        this.country1 = country1;
-        this.status1 = status1;
-        this.recessive1 = recessive1;
-        this.country2 = country2;
-        this.status2 = status2;
-        this.recessive2 = recessive2;
-        this.finalStatus = finalStatus;
-    }
-
     public static XnodeIncorrect buildFrom(final String name,
                                            final XnodeInformation info,
                                            final List<String> recessiveCountries) {
@@ -58,11 +44,14 @@ public class XnodeIncorrect {
                           final AreaInformation infos1,
                           final AreaInformation infos2,
                           final List<String> recessiveCountries) {
-        this(name,
-             infos1.getCountry(), infos1.getStatus(), recessiveCountries.contains(infos1.getCountry()),
-             infos2.getCountry(), infos2.getStatus(), recessiveCountries.contains(infos2.getCountry()),
-             OPEN.equals(infos1.getStatus()) || OPEN.equals(infos2.getStatus()) ? OPEN : CLOSE
-        );
+        this.name = name;
+        this.country1 = infos1.getCountry();
+        this.status1 = infos1.getStatus();
+        this.recessive1 = recessiveCountries.contains(infos1.getCountry());
+        this.country2 = infos2.getCountry();
+        this.status2 = infos2.getStatus();
+        this.recessive2 = recessiveCountries.contains(infos2.getCountry());
+        this.finalStatus =  OPEN.equals(infos1.getStatus()) || OPEN.equals(infos2.getStatus()) ? OPEN : CLOSE;
     }
 
     public String getName() {
