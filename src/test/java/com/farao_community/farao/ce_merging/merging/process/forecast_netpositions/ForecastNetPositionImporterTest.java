@@ -13,7 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ForecastNetPositionImporterTest {
+class ForecastNetPositionImporterTest {
 
     private static final String NET_POSITION_ALEGRO_FILE_PATH = "src/test/resources/forecastNetPosition/test_npf_file.xml";
     private static final OffsetDateTime TARGET_DATE = OffsetDateTime.parse("2020-03-15T23:00Z");
