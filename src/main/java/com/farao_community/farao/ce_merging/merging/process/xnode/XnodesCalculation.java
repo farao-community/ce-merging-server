@@ -11,8 +11,8 @@ import com.farao_community.farao.ce_merging.common.util.BordersUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Bus;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
@@ -22,20 +22,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 import java.util.Map;
 import java.util.Optional;
-
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_TSO;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_COUNTRY_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DENMARK_COUNTRY_CODE;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.zeroIfNan;
+import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
+import static com.powsybl.iidm.network.Country.DE;
 
 @Service
 public class XnodesCalculation {
@@ -44,14 +41,14 @@ public class XnodesCalculation {
 
     public void fillXnodesInformation(final Network network, final String tso, final Map<String, XnodeInformation> xnodeInformationMap, final List<VirtualHubRecord> virtualHubList, final List<XnodeConfig> xnodes, final boolean germanMode) {
         final Set<String> xnodesArea1 = xnodes.stream()
-                .filter(xnode -> matchesArea1(xnode, tso, germanMode))
-                .map(XnodeConfig::getName)
-                .collect(Collectors.toSet());
+            .filter(xnode -> matchesArea1(xnode, tso, germanMode))
+            .map(XnodeConfig::getName)
+            .collect(Collectors.toSet());
 
         final Set<String> xnodesArea2 = xnodes.stream()
-                .filter(xnode -> matchesArea2(xnode, tso, germanMode))
-                .map(XnodeConfig::getName)
-                .collect(Collectors.toSet());
+            .filter(xnode -> matchesArea2(xnode, tso, germanMode))
+            .map(XnodeConfig::getName)
+            .collect(Collectors.toSet());
 
         final String alegroVirtualHub = germanMode ? VIRTUAL_HUB_ALEGRO_DE_NODE_NAME : VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
         final Optional<String> tsoOpt = germanMode ? Optional.of(tso) : Optional.empty();
@@ -112,14 +109,14 @@ public class XnodesCalculation {
 
     public Map<String, XnodeInformation> completeXnodeMergedInformation(final Network network, final Map<String, XnodeInformation> xnodeInformationMap) {
         xnodeInformationMap.entrySet().stream().filter(e -> e.getValue().getArea1Information() != null && e.getValue().getArea2Information() != null)
-                .forEach(e -> processXnodeEntry(network, e));
+            .forEach(e -> processXnodeEntry(network, e));
         return xnodeInformationMap;
     }
 
     private void processXnodeEntry(Network network, Map.Entry<String, XnodeInformation> e) {
         final String nodeId = e.getKey();
         final XnodeInformation xnodeInformation = e.getValue();
-        if (!isGermanInternalNode(xnodeInformation)) {
+        if (!xnodeInformation.isInternalNodeOf(DE)) {
             final Optional<Branch> branchOpt = network.getBranchStream().filter(branch -> branch.getId().contains(nodeId.substring(0, 8))).findFirst();
             branchOpt.ifPresent(branch -> addMergedInformation(branch, xnodeInformation));
         } else {
@@ -140,8 +137,8 @@ public class XnodesCalculation {
         XnodeStatus status = isConnected ? XnodeStatus.CLOSE : XnodeStatus.OPEN;
         MergedXnodeInformation mergedXnodeInformation = new MergedXnodeInformation(status, 0, 0, 0, 0);
         if (isConnected) {
-            final Country country1 = getCountry(xnodeInformation.getArea1Information());
-            final boolean country1IsSideOne = country1.equals(BordersUtils.getCountrySide(branch, TwoSides.ONE));
+            final Country country1 = getCountry(xnodeInformation.getArea1Information().getCountry());
+            final boolean country1IsSideOne = country1.equals(BordersUtils.getCountryOfSide(branch, TwoSides.ONE));
             //We take the xnode flow in the direction country 1 to country 2
             final Terminal terminalFrom = country1IsSideOne ? branch.getTerminal1() : branch.getTerminal2();
             final Terminal terminalTo = country1IsSideOne ? branch.getTerminal2() : branch.getTerminal1();
@@ -222,48 +219,31 @@ public class XnodesCalculation {
     }
 
     private double getQ(final Terminal terminal) {
-        return zeroIfNaN(terminal.getQ());
+        return zeroIfNan(terminal.getQ());
     }
 
     private double getP(final Terminal terminal) {
-        return zeroIfNaN(terminal.getP());
+        return zeroIfNan(terminal.getP());
     }
 
-    private Country getCountry(final AreaInformation xnodeAreaInformation) {
-        if (GERMAN_TSO.contains(xnodeAreaInformation.getCountry())) {
-            return Country.valueOf(GERMAN_COUNTRY_CODE);
-        } else if (DANISH_TSO.equals(xnodeAreaInformation.getCountry())) {
-            return Country.valueOf(DENMARK_COUNTRY_CODE);
-        } else {
-            return Country.valueOf(xnodeAreaInformation.getCountry());
-        }
-    }
-
-    private boolean isGermanInternalNode(final XnodeInformation xnodeInformation) {
-        final AreaInformation area1Information = xnodeInformation.getArea1Information();
-        final AreaInformation area2Information = xnodeInformation.getArea2Information();
-        return area1Information != null && getCountry(area1Information).equals(Country.DE)
-                && area2Information != null && getCountry(area2Information).equals(Country.DE);
-    }
-
-    private boolean matchesArea1(XnodeConfig xnode, String tso, boolean germanMode) {
-        return germanMode
-                ? GERMAN_COUNTRY_CODE.equals(xnode.getArea1()) && tso.equals(xnode.getSubarea1())
-                : tso.equals(xnode.getArea1());
+    private boolean matchesArea1(XnodeConfig xnode, String tso, boolean germanNode) {
+        return germanNode
+            ? Country.valueOf(xnode.getArea1()) == DE && tso.equals(xnode.getSubarea1())
+            : tso.equals(xnode.getArea1());
     }
 
     private boolean matchesArea2(XnodeConfig xnode, String tso, boolean germanMode) {
         return germanMode
-                ? GERMAN_COUNTRY_CODE.equals(xnode.getArea2()) && tso.equals(xnode.getSubarea2())
-                : tso.equals(xnode.getArea2());
+            ? Country.valueOf(xnode.getArea2()) == DE && tso.equals(xnode.getSubarea2())
+            : tso.equals(xnode.getArea2());
     }
 
     private void processDanglingLines(final Network network, final Set<String> xnodes, final List<VirtualHubRecord> virtualHubList, final String virtualHubException, final Map<String, XnodeInformation> xnodeInformationMap, final int areaNumber, Optional<String> tsoOpt) {
         network.getDanglingLineStream()
-                .filter(dl -> xnodes.contains(dl.getPairingKey()))
-                .filter(dl -> !BordersUtils.isVirtualHubDanglingLine(dl, virtualHubList) ||
-                        dl.getPairingKey().equals(virtualHubException))
-                .forEach(dl -> addAreaInformation(xnodeInformationMap, dl, areaNumber, tsoOpt));
+            .filter(dl -> xnodes.contains(dl.getPairingKey()))
+            .filter(dl -> !BordersUtils.isVirtualHubDanglingLine(dl, virtualHubList) ||
+                          dl.getPairingKey().equals(virtualHubException))
+            .forEach(dl -> addAreaInformation(xnodeInformationMap, dl, areaNumber, tsoOpt));
     }
 
 }

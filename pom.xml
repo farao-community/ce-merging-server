@@ -42,15 +42,29 @@
                 <artifactId>jaxb2-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>xjc</id>
+                        <id>xnodes</id>
                         <goals>
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/main/resources/xsd</source>
+                                <source>src/main/resources/xsd/xnodes</source>
                             </sources>
-                            <packageName>com.farao_community.farao.ce_merging.xsd</packageName>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.xnodes</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb/xnodes</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>forecast_netpositions</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/xsd/forecast_netpositions</source>
+                            </sources>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.forecast_netpositions</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb/forecast_netpositions</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

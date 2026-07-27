@@ -6,9 +6,9 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.TsoInfos;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectionRecord;
@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.KOSOVO_CODE;
-import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.KOSOVO_ISO_CODE;
+import static com.powsybl.iidm.network.Country.XK;
+import static com.powsybl.ucte.network.UcteCountryCode.KS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -77,10 +77,10 @@ class GlobalGridConfigurationServiceTest {
         assertEquals("10Y1001C--00001J", dk1CobraVirtualHub.getEic());
         assertEquals("XED_EE1N", dk1CobraVirtualHub.getNodeName());
 
-        List<BorderDirectionRecord> borderDirectionRecordWithKs = getBorderDirectionRecordsByCountry(defaultBorderDirection, KOSOVO_CODE);
+        List<BorderDirectionRecord> borderDirectionRecordWithKs = getBorderDirectionRecordsByCountry(defaultBorderDirection, KS.name());
         assertEquals(0, borderDirectionRecordWithKs.size());
 
-        List<BorderDirectionRecord> borderDirectionRecordWithXK = getBorderDirectionRecordsByCountry(defaultBorderDirection, KOSOVO_ISO_CODE);
+        List<BorderDirectionRecord> borderDirectionRecordWithXK = getBorderDirectionRecordsByCountry(defaultBorderDirection, XK.name());
         assertEquals(4, borderDirectionRecordWithXK.size());
     }
 

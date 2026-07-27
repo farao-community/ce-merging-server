@@ -17,7 +17,8 @@ public final class CeMergingConstants {
         // constants class
     }
 
-    // Strings
+    // app configuration
+    public static final String TAG_VERSION = "1.0.0";
     public static final String CE_MERGING_URL = "/ce-merging/";
     public static final String API_VERSION = "v1";
     public static final String JSON_API_MIME_TYPE = "application/vnd.api+json";
@@ -36,32 +37,34 @@ public final class CeMergingConstants {
     public static final String ARTIFACTS_DIR = "artifacts";
     public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";
-    public static final String MERGING_SUPERVISOR_TAG  = "Merging supervisor";
+    public static final String MERGING_SUPERVISOR_TAG = "Merging supervisor";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
-    public static final String UCTE_FORMAT = "UCTE";
-    public static final String XIIDM_FORMAT = "XIIDM";
-    public static final String DK_COUNTRY_CODE = "D1";
-    public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
-    public static final String DK_HVDC_XNODES_PROPERTY = "dk.hvdc.xnodes";
-    public static final String DK_NAMING_STRATEGY = "DKNamingStrategy";
-    public static final String INPUTS_TAG = "Inputs";
     public static final String GLOBAL_CONFIGURATIONS_TAG = "Global Configurations";
     public static final String TASK_CONFIGURATIONS_TAG = "Task Configurations";
-    public static final String ID = "id";
-    public static final String NAME = "name";
-    public static final String CSV_SEPARATOR = ";";
-    public static final String ARROW = "->";
-    public static final String TAG_VERSION = "1.0.0";
-    public static final Set<String> GERMAN_AND_DANISH_TSO = Set.of("D1", "D2", "D4", "D6", "D7", "D8");
-    public static final Set<String> GERMAN_TSO = Set.of("D2", "D4", "D6", "D7", "D8");
+    public static final String INPUTS_TAG = "Inputs";
+    public static final String DK_HVDC_XNODES_PROPERTY = "dk.hvdc.xnodes";
+    public static final String DK_NAMING_STRATEGY = "DKNamingStrategy";
+    public static final String UCTE_EXPORT_NAMING_STRATEGY_PROPERTY = "ucte.export.naming-strategy";
+    public static final String MONITA_NAMING_STRATEGY = "MonitaNamingStrategy";
+    // nodes
+    public static final String ALEGRO_NODE_PREFIX = "XLI_OB1";
     public static final String VIRTUAL_HUB_ALEGRO_BE_NODE_NAME = "XLI_OB1B";
     public static final String VIRTUAL_HUB_ALEGRO_DE_NODE_NAME = "XLI_OB1A";
-    public static final String GERMAN_COUNTRY_CODE = "DE";
-    public static final String DANISH_TSO = "D1";
-    public static final String DENMARK_COUNTRY_CODE = "DK";
+    public static final String MONITA1_ME_NODE_NAME = "XKOTR120";
+    public static final String MONITA2_ME_NODE_NAME = "XKOTR220";
+    // formatting
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
+    public static final String CSV_SEPARATOR = ";";
+    public static final String ARROW = "->";
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
-
+    // other strings
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String DANISH_TSO = "D1";
+    public static final Set<String> GERMAN_AND_DANISH_TSO = Set.of("D1", "D2", "D4", "D6", "D7", "D8");
+    public static final String UCTE_FORMAT = "UCTE";
+    public static final String XIIDM_FORMAT = "XIIDM";
     public static final String DC = "DC";
     public static final String AC = "AC";
 
