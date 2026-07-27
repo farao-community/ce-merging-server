@@ -42,8 +42,8 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getCountryOfSide;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isConnectedTo;
 import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
-import static com.farao_community.farao.ce_merging.merging.process.FileStorageUtils.saveArtifactFile;
-import static com.farao_community.farao.ce_merging.merging.process.FileStorageUtils.saveArtifactNetwork;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
