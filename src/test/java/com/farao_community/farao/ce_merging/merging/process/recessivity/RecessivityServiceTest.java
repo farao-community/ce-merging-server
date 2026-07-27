@@ -8,9 +8,9 @@ package com.farao_community.farao.ce_merging.merging.process.recessivity;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.merging.process.FileStorageUtils;
-import com.farao_community.farao.ce_merging.merging.process.recessivity.inconsistencies.XnodeIncomplete;
-import com.farao_community.farao.ce_merging.merging.process.recessivity.inconsistencies.XnodeIncorrect;
-import com.farao_community.farao.ce_merging.merging.process.recessivity.inconsistencies.XnodesInconsistencies;
+import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodeIncomplete;
+import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodeIncorrect;
+import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodesInconsistencies;
 import com.farao_community.farao.ce_merging.merging.process.xnode.AreaInformation;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodeInformation;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodesCheck;

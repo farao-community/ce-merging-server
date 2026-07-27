@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.recessivity.inconsistencies;
+package com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -55,6 +55,14 @@ public class XnodesInconsistencies {
 
     public void setXnodeIncompleteList(final List<XnodeIncomplete> xnodeIncompleteList) {
         this.xnodeIncompleteList = xnodeIncompleteList;
+    }
+
+    public List<XnodeUndefined> getXnodeUndefinedList() {
+        return xnodeUndefinedList;
+    }
+
+    public void setXnodeUndefinedList(final List<XnodeUndefined> xnodeUndefinedList) {
+        this.xnodeUndefinedList = xnodeUndefinedList;
     }
 
 }
