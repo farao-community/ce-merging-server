@@ -124,7 +124,7 @@ class RecessivityServiceTest {
 
     @Test
     void applyRecessivity() {
-        try (MockedStatic<FileStorageUtils> fileStorage = mockStatic(FileStorageUtils.class)) {
+        try (final MockedStatic<FileStorageUtils> fileStorage = mockStatic(FileStorageUtils.class)) {
             recessivityService.applyRecessivity(task);
 
             fileStorage.verify(() -> FileStorageUtils.saveArtifactNetwork(eq(TGM_FILE_AFTER_RECESSIVITY), any(), any(), anyString(), isNull(), any()));
@@ -137,7 +137,7 @@ class RecessivityServiceTest {
 
     @Test
     void applyRecessivityOnFrance() {
-        try (MockedStatic<FileStorageUtils> fileStorage = mockStatic(FileStorageUtils.class)) {
+        try (final MockedStatic<FileStorageUtils> fileStorage = mockStatic(FileStorageUtils.class)) {
             recessivityService.applyRecessivity(taskFr);
 
             fileStorage.verify(() -> FileStorageUtils.saveArtifactNetwork(eq(TGM_FILE_AFTER_RECESSIVITY), any(), any(), anyString(), isNull(), any()));
@@ -154,7 +154,7 @@ class RecessivityServiceTest {
 
     @Test
     void applyRecessivityOnGermany() {
-        try (MockedStatic<FileStorageUtils> fileStorage = mockStatic(FileStorageUtils.class)) {
+        try (final MockedStatic<FileStorageUtils> fileStorage = mockStatic(FileStorageUtils.class)) {
             recessivityService.applyRecessivity(taskDe);
 
             fileStorage.verify(() -> FileStorageUtils.saveArtifactNetwork(eq(TGM_FILE_AFTER_RECESSIVITY), any(), any(), anyString(), isNull(), any()));
@@ -171,18 +171,20 @@ class RecessivityServiceTest {
 
     @Test
     void checkAlegroXnodesInconsistenciesTest() throws FileNotFoundException {
-        List<XnodeIncorrect> xnodeIncorrectsList = new ArrayList<>();
-        List<String> recessivityCountries = taskWithAlegro.getConfigurations().getOrDefaultRecessiveCountries();
-        XnodesCheck xnodesCheck = taskWithAlegro.getArtifact(XNODES_INFORMATION_FILE, XnodesCheck.class);
+        final List<XnodeIncorrect> xnodeIncorrectsList = new ArrayList<>();
+        final List<String> recessivityCountries = taskWithAlegro.getConfigurations().getOrDefaultRecessiveCountries();
+        final XnodesCheck xnodesCheck = taskWithAlegro.getArtifact(XNODES_INFORMATION_FILE, XnodesCheck.class);
         recessivityService.checkAlegroXnodes(xnodeIncorrectsList, xnodesCheck.getXnodeInformationMap(), recessivityCountries);
 
         assertEquals(1, xnodeIncorrectsList.size());
-        assertEquals(ALEGRO_NODE_PREFIX, xnodeIncorrectsList.getFirst().getName());
-        assertEquals(BE.name(), xnodeIncorrectsList.getFirst().getCountry1());
-        assertEquals(D7.name(), xnodeIncorrectsList.getFirst().getCountry2());
-        assertEquals(CLOSE, xnodeIncorrectsList.getFirst().getStatus1());
-        assertEquals(OPEN, xnodeIncorrectsList.getFirst().getStatus2());
-        assertEquals(OPEN, xnodeIncorrectsList.getFirst().getFinalStatus());
+        final XnodeIncorrect xnodeIncorrect = xnodeIncorrectsList.getFirst();
+
+        assertEquals(ALEGRO_NODE_PREFIX, xnodeIncorrect.getName());
+        assertEquals(BE.name(), xnodeIncorrect.getCountry1());
+        assertEquals(D7.name(), xnodeIncorrect.getCountry2());
+        assertEquals(CLOSE, xnodeIncorrect.getStatus1());
+        assertEquals(OPEN, xnodeIncorrect.getStatus2());
+        assertEquals(OPEN, xnodeIncorrect.getFinalStatus());
     }
 
     /*
@@ -201,14 +203,14 @@ class RecessivityServiceTest {
         final IgmData igmNl = new IgmData();
         igmNl.setCountry(NL.name());
 
-        Inputs inputs = new Inputs();
+        final Inputs inputs = new Inputs();
         inputs.setIgms(List.of(igmFr, igmBe, igmNl, igmD6, igmD7));
         inputs.setTargetDate(OffsetDateTime.now(PARIS_ZONE_ID));
 
         return inputs;
     }
 
-    void prepareMockNetwork() {
+    private void prepareMockNetwork() {
         network = mock(Network.class);
         final Branch<?> branch = mock(Branch.class);
         final Branch<?> branchDe = mock(Branch.class);
@@ -266,7 +268,7 @@ class RecessivityServiceTest {
             "XBE_OX21", new XnodeInformation(new AreaInformation(BE.name(), OPEN), null)
         ));
         final MergingTask mock = mock(MergingTask.class);
-        Configurations mockCfg = mock(Configurations.class);
+        final Configurations mockCfg = mock(Configurations.class);
         if (recessive == null) {
             when(mockCfg.getOrDefaultRecessiveCountries()).thenCallRealMethod();
         } else {

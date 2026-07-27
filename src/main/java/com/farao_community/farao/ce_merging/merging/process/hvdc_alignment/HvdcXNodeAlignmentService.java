@@ -104,13 +104,20 @@ public class HvdcXNodeAlignmentService {
 
     private static Optional<Network> getNetworkForCountry(final MergingTask task,
                                                           final String country) {
-        final SavedFile igm = switch (Country.valueOf(country)) {
-            case DE -> task.getArtifacts().getFile(GERMAN_PRE_MERGED_IGM);
-            case DK -> task.getArtifacts().getFile(DK_CONVERTED_FILE);
-            default -> Optional.ofNullable(task.getArtifacts().getPreTreatedIgmMap().get(country))
-                .orElseGet(() -> getInputIgm(task, country));
-        };
-        return igm != null ? Optional.of(Network.read(igm.getPath())) : Optional.empty();
+        try {
+            final SavedFile igm = switch (Country.valueOf(country)) {
+                case DE -> task.getArtifacts().getFile(GERMAN_PRE_MERGED_IGM);
+                case DK -> task.getArtifacts().getFile(DK_CONVERTED_FILE);
+                default -> Optional.ofNullable(task.getArtifacts().getPreTreatedIgmMap().get(country))
+                    .orElseGet(() -> getInputIgm(task, country));
+            };
+            return igm != null ? Optional.of(Network.read(igm.getPath())) : Optional.empty();
+        }
+        catch (final Exception e) {
+            LOGGER.warn("Country {} not found in Country enum values", country);
+            return Optional.empty();
+        }
+
     }
 
     private static SavedFile getInputIgm(final MergingTask task, final String country) {

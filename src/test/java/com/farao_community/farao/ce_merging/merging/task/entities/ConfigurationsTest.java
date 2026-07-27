@@ -29,25 +29,25 @@ class ConfigurationsTest {
 
     @Test
     void shouldReturnCustomListWhenPathIsValid() throws IOException {
-        Path customFile = tempDir.resolve("custom-recessivity.json");
-        List<String> customCountries = List.of("FR", "BE");
-        RecessivityParameters params = new RecessivityParameters(customCountries);
+        final Path customFile = tempDir.resolve("custom-recessivity.json");
+        final List<String> customCountries = List.of("FR", "BE");
+        final RecessivityParameters params = new RecessivityParameters(customCountries);
         JsonUtils.writeInPath(RecessivityParameters.class, params, customFile);
 
-        Configurations configurations = new Configurations();
+        final Configurations configurations = new Configurations();
         configurations.setRecessivityParametersFilePath(customFile.toString());
 
-        List<String> result = configurations.getOrDefaultRecessiveCountries();
+        final List<String> result = configurations.getOrDefaultRecessiveCountries();
 
         assertEquals(customCountries, result);
     }
 
     @Test
     void shouldReturnDefaultListWhenPathIsInvalid() {
-        Configurations configurations = new Configurations();
+        final Configurations configurations = new Configurations();
         configurations.setRecessivityParametersFilePath("non-existing-file.json");
 
-        List<String> result = configurations.getOrDefaultRecessiveCountries();
+        final List<String> result = configurations.getOrDefaultRecessiveCountries();
 
         assertEquals(14, result.size());
         assertTrue(result.contains("AL"));
@@ -56,13 +56,13 @@ class ConfigurationsTest {
 
     @Test
     void shouldReturnEmptyListWhenBothPathsFail() {
-        try (MockedConstruction<ClassPathResource> mockedClassPathResource = mockConstruction(ClassPathResource.class, (mock, context) -> {
+        try (final MockedConstruction<ClassPathResource> mockedClassPathResource = mockConstruction(ClassPathResource.class, (mock, context) -> {
             when(mock.getInputStream()).thenThrow(new IOException("Default file not found"));
         })) {
-            Configurations configurations = new Configurations();
+            final Configurations configurations = new Configurations();
             configurations.setRecessivityParametersFilePath("non-existing-file.json");
 
-            List<String> result = configurations.getOrDefaultRecessiveCountries();
+            final List<String> result = configurations.getOrDefaultRecessiveCountries();
 
             assertTrue(result.isEmpty());
         }

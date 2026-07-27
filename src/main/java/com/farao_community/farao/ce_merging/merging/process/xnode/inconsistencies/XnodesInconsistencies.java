@@ -39,6 +39,7 @@ public class XnodesInconsistencies {
     public XnodesInconsistencies(final List<XnodeIncorrect> xnodeIncoherentList, final List<XnodeIncomplete> xnodeIncompleteList) {
         this.xnodeIncorrectList = xnodeIncoherentList;
         this.xnodeIncompleteList = xnodeIncompleteList;
+        this.xnodeUndefinedList = new ArrayList<>();
     }
 
     public List<XnodeIncorrect> getXnodeIncorrectList() {
