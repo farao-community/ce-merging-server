@@ -36,7 +36,7 @@ public final class CeMergingConstants {
     public static final String ARTIFACTS_DIR = "artifacts";
     public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";
-    public static final String MERGING_SUPERVISOR_TAG  = "Merging supervisor";
+    public static final String MERGING_SUPERVISOR_TAG = "Merging supervisor";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
     public static final String UCTE_FORMAT = "UCTE";
     public static final String XIIDM_FORMAT = "XIIDM";
@@ -53,12 +53,10 @@ public final class CeMergingConstants {
     public static final String ARROW = "->";
     public static final String TAG_VERSION = "1.0.0";
     public static final Set<String> GERMAN_AND_DANISH_TSO = Set.of("D1", "D2", "D4", "D6", "D7", "D8");
-    public static final Set<String> GERMAN_TSO = Set.of("D2", "D4", "D6", "D7", "D8");
+    public static final String ALEGRO_NODE_PREFIX = "XLI_OB1";
     public static final String VIRTUAL_HUB_ALEGRO_BE_NODE_NAME = "XLI_OB1B";
     public static final String VIRTUAL_HUB_ALEGRO_DE_NODE_NAME = "XLI_OB1A";
-    public static final String GERMAN_COUNTRY_CODE = "DE";
     public static final String DANISH_TSO = "D1";
-    public static final String DENMARK_COUNTRY_CODE = "DK";
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
 
