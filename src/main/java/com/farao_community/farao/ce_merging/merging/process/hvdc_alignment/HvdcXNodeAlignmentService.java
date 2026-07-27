@@ -112,8 +112,7 @@ public class HvdcXNodeAlignmentService {
                     .orElseGet(() -> getInputIgm(task, country));
             };
             return igm != null ? Optional.of(Network.read(igm.getPath())) : Optional.empty();
-        }
-        catch (final Exception e) {
+        } catch (final Exception e) {
             LOGGER.warn("Country {} not found in Country enum values", country);
             return Optional.empty();
         }

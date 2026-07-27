@@ -6,9 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies;
 
-import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodeIncomplete;
-import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodeIncorrect;
-import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodesInconsistencies;
 import org.junit.jupiter.api.Test;
 import test_utils.GetterSetterVerifier;
 
