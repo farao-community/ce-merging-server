@@ -17,6 +17,9 @@ import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeSt
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
 import static java.util.Optional.ofNullable;
 
+/**
+ * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
+ */
 public class XnodeIncorrect {
     private String name;
     private String country1;

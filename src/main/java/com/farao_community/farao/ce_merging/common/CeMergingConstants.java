@@ -55,9 +55,7 @@ public final class CeMergingConstants {
     public static final String ALEGRO_NODE_PREFIX = "XLI_OB1";
     public static final String VIRTUAL_HUB_ALEGRO_BE_NODE_NAME = "XLI_OB1B";
     public static final String VIRTUAL_HUB_ALEGRO_DE_NODE_NAME = "XLI_OB1A";
-    public static final String GERMAN_COUNTRY_CODE = "DE";
     public static final String DANISH_TSO = "D1";
-    public static final String DENMARK_COUNTRY_CODE = "DK";
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
 

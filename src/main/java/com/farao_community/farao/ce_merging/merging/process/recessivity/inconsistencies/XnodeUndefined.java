@@ -6,35 +6,32 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.recessivity.inconsistencies;
 
-import com.farao_community.farao.ce_merging.merging.process.xnode.AreaInformation;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus;
 
 /**
  * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
  */
-public class XnodeIncomplete {
+public class XnodeUndefined {
     private String name;
     private String nodeName;
     private String countryPresent;
-    private String countryAbsent;
     private XnodeStatus status;
 
-    public XnodeIncomplete() {
+    public XnodeUndefined() {
     }
 
-    public XnodeIncomplete(final String name, final AreaInformation existingInfo, final String absent) {
+    public XnodeUndefined(String name, String nodeName, String countryPresent, XnodeStatus status) {
         this.name = name;
-        this.nodeName = existingInfo.getNode();
-        this.countryPresent = existingInfo.getCountry();
-        this.countryAbsent = absent;
-        this.status = existingInfo.getStatus();
+        this.nodeName = nodeName;
+        this.countryPresent = countryPresent;
+        this.status = status;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -42,7 +39,7 @@ public class XnodeIncomplete {
         return nodeName;
     }
 
-    public void setNodeName(final String nodeName) {
+    public void setNodeName(String nodeName) {
         this.nodeName = nodeName;
     }
 
@@ -50,23 +47,15 @@ public class XnodeIncomplete {
         return countryPresent;
     }
 
-    public void setCountryPresent(final String countryPresent) {
+    public void setCountryPresent(String countryPresent) {
         this.countryPresent = countryPresent;
-    }
-
-    public String getCountryAbsent() {
-        return countryAbsent;
-    }
-
-    public void setCountryAbsent(final String countryAbsent) {
-        this.countryAbsent = countryAbsent;
     }
 
     public XnodeStatus getStatus() {
         return status;
     }
 
-    public void setStatus(final XnodeStatus status) {
+    public void setStatus(XnodeStatus status) {
         this.status = status;
     }
 }

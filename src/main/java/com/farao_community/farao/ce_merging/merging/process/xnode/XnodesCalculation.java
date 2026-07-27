@@ -28,7 +28,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_COUNTRY_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.zeroIfNan;
@@ -227,15 +226,15 @@ public class XnodesCalculation {
         return zeroIfNan(terminal.getP());
     }
 
-    private boolean matchesArea1(XnodeConfig xnode, String tso, boolean germanMode) {
-        return germanMode
-            ? GERMAN_COUNTRY_CODE.equals(xnode.getArea1()) && tso.equals(xnode.getSubarea1())
+    private boolean matchesArea1(XnodeConfig xnode, String tso, boolean germanNode) {
+        return germanNode
+            ? Country.valueOf(xnode.getArea1()) == DE && tso.equals(xnode.getSubarea1())
             : tso.equals(xnode.getArea1());
     }
 
     private boolean matchesArea2(XnodeConfig xnode, String tso, boolean germanMode) {
         return germanMode
-            ? GERMAN_COUNTRY_CODE.equals(xnode.getArea2()) && tso.equals(xnode.getSubarea2())
+            ? Country.valueOf(xnode.getArea2()) == DE && tso.equals(xnode.getSubarea2())
             : tso.equals(xnode.getArea2());
     }
 

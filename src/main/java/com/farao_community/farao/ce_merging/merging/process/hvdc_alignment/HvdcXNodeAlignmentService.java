@@ -13,10 +13,11 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import com.farao_community.farao.ce_merging.merging.process.FileStorageUtils;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
@@ -26,9 +27,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DENMARK_COUNTRY_CODE;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_COUNTRY_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
 
 @Service
 public class HvdcXNodeAlignmentService {
@@ -50,8 +51,8 @@ public class HvdcXNodeAlignmentService {
             final String nodeName = zeroFlowNode.getXnode();
             final String country = zeroFlowNode.getCountryCode();
             getNetworkForCountry(task, country).ifPresentOrElse(
-                    network -> updateDanglingLineFlow(task, network, nodeName, country, location),
-                    () -> LOGGER.warn("Unable to find the IGM associated to the country {}, The xnode {} flow will not be set to 0", country, nodeName));
+                network -> updateDanglingLineFlow(task, network, nodeName, country, location),
+                () -> LOGGER.warn("Unable to find the IGM associated to the country {}, The xnode {} flow will not be set to 0", country, nodeName));
         });
         repository.save(task);
     }
@@ -82,13 +83,13 @@ public class HvdcXNodeAlignmentService {
     private static String getVirtualHubCountry(final List<VirtualHubRecord> virtualHubRecords,
                                                final String nodeName) {
         VirtualHubRecord virtualHubRecord = virtualHubRecords.stream()
-                .filter(vhRecord -> vhRecord.getNodeName().equals(nodeName))
-                .findFirst()
-                .orElseThrow(() -> {
-                    String errorMessage = "Could not find node " + nodeName + " in virtual hub config";
-                    LOGGER.error(errorMessage);
-                    return new CeMergingException(errorMessage);
-                });
+            .filter(vhRecord -> vhRecord.getNodeName().equals(nodeName))
+            .findFirst()
+            .orElseThrow(() -> {
+                String errorMessage = "Could not find node " + nodeName + " in virtual hub config";
+                LOGGER.error(errorMessage);
+                return new CeMergingException(errorMessage);
+            });
 
         return CountryUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
     }
@@ -103,39 +104,38 @@ public class HvdcXNodeAlignmentService {
 
     private static Optional<Network> getNetworkForCountry(final MergingTask task,
                                                           final String country) {
-        final String path = switch (country) {
-            case GERMAN_COUNTRY_CODE -> task.getArtifacts().getFile(ArtifactType.GERMAN_PRE_MERGED_IGM).getPath();
-            case DENMARK_COUNTRY_CODE -> task.getArtifacts().getFile(ArtifactType.DK_CONVERTED_FILE).getPath();
+        final SavedFile igm = switch (Country.valueOf(country)) {
+            case DE -> task.getArtifacts().getFile(GERMAN_PRE_MERGED_IGM);
+            case DK -> task.getArtifacts().getFile(DK_CONVERTED_FILE);
             default -> Optional.ofNullable(task.getArtifacts().getPreTreatedIgmMap().get(country))
-                    .orElseGet(() -> getInputIgmPath(task, country))
-                    .getPath();
+                .orElseGet(() -> getInputIgm(task, country));
         };
-        return path != null ? Optional.of(Network.read(path)) : Optional.empty();
+        return igm != null ? Optional.of(Network.read(igm.getPath())) : Optional.empty();
     }
 
-    private static SavedFile getInputIgmPath(final MergingTask task, final String country) {
+    private static SavedFile getInputIgm(final MergingTask task, final String country) {
         return task.getInputs().getIgms().stream()
-                .filter(igmData -> igmData.getCountry().equals(country))
-                .findFirst()
-                .map(igmData -> igmData.getIgmFile())
-                .orElse(null);
+            .filter(igmData -> igmData.getCountry().equals(country))
+            .findFirst()
+            .map(IgmData::getIgmFile)
+            .orElse(null);
     }
 
     private void updateDanglingLineFlow(final MergingTask task, final Network network, final String nodeName, final String country, final String location) {
         network.getDanglingLineStream()
-                .filter(danglingLine -> danglingLine.getPairingKey().equals(nodeName))
-                .findFirst()
-                .ifPresentOrElse(
-                        danglingLine -> {
-                            setDanglingLineToZeroFlow(danglingLine);
-                            LOGGER.info("Set {} flow to 0.0", nodeName);
-                            saveNetworkInArtifacts(task, network, country, location);
-                        },
-                        () -> LOGGER.warn(
-                                "Could not update XNode flows, dangling line {} not found in {} network",
-                                nodeName,
-                                network.getNameOrId()
-                        ));
+            .filter(danglingLine -> danglingLine.getPairingKey().equals(nodeName))
+            .findFirst()
+            .ifPresentOrElse(
+                danglingLine -> {
+                    setDanglingLineToZeroFlow(danglingLine);
+                    LOGGER.info("Set {} flow to 0.0", nodeName);
+                    saveNetworkInArtifacts(task, network, country, location);
+                },
+                () -> LOGGER.warn(
+                    "Could not update XNode flows, dangling line {} not found in {} network",
+                    nodeName,
+                    network.getNameOrId()
+                ));
     }
 
     private static void setDanglingLineToZeroFlow(final DanglingLine danglingLine) {
@@ -145,7 +145,7 @@ public class HvdcXNodeAlignmentService {
 
     private void saveNetworkInArtifacts(final MergingTask task,
                                         final Network network,
-                                        final String country,
+                                        final String countryCode,
                                         final String location) {
 
         final SavedFile savedFile = FileStorageUtils.save(
@@ -153,12 +153,12 @@ public class HvdcXNodeAlignmentService {
             path -> network.write(UCTE_FORMAT, null, path)
         );
 
-        if (GERMAN_COUNTRY_CODE.equals(country)) {
-            task.getArtifacts().putFile(ArtifactType.GERMAN_PRE_MERGED_IGM, savedFile);
-        } else if (DENMARK_COUNTRY_CODE.equals(country)) {
-            task.getArtifacts().putFile(ArtifactType.DK_CONVERTED_FILE, savedFile);
-        } else {
-            task.getArtifacts().getPreTreatedIgmMap().put(country, savedFile);
+        final Country country = Country.valueOf(countryCode);
+
+        switch (country) {
+            case DE -> task.getArtifacts().putFile(GERMAN_PRE_MERGED_IGM, savedFile);
+            case DK -> task.getArtifacts().putFile(DK_CONVERTED_FILE, savedFile);
+            default -> task.getArtifacts().getPreTreatedIgmMap().put(countryCode, savedFile);
         }
     }
 }

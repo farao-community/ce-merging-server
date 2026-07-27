@@ -18,15 +18,25 @@ import java.util.List;
 public class XnodesInconsistencies {
     private List<XnodeIncorrect> xnodeIncorrectList;
     private List<XnodeIncomplete> xnodeIncompleteList;
+    private List<XnodeUndefined> xnodeUndefinedList;
 
     public XnodesInconsistencies() {
         xnodeIncompleteList = new ArrayList<>();
         xnodeIncorrectList = new ArrayList<>();
+        xnodeUndefinedList = new ArrayList<>();
     }
 
     @JsonCreator
     public XnodesInconsistencies(@JsonProperty("xnodeIncorrectList") final List<XnodeIncorrect> xnodeIncoherentList,
-                                 @JsonProperty("xnodeIncompleteList") final List<XnodeIncomplete> xnodeIncompleteList) {
+                                 @JsonProperty("xnodeIncompleteList") final List<XnodeIncomplete> xnodeIncompleteList,
+                                 @JsonProperty("xnodeUndefinedList") final List<XnodeUndefined> xnodeUndefinedList) {
+        this.xnodeIncorrectList = xnodeIncoherentList;
+        this.xnodeIncompleteList = xnodeIncompleteList;
+        this.xnodeUndefinedList = xnodeUndefinedList;
+    }
+
+    @JsonCreator
+    public XnodesInconsistencies(final List<XnodeIncorrect> xnodeIncoherentList, final List<XnodeIncomplete> xnodeIncompleteList) {
         this.xnodeIncorrectList = xnodeIncoherentList;
         this.xnodeIncompleteList = xnodeIncompleteList;
     }
