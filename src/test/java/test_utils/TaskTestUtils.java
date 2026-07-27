@@ -19,7 +19,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectio
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.farao_community.farao.ce_merging.xsd.Xnodes;
+import com.farao_community.farao.ce_merging.xsd.xnodes.Xnodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.openrao.virtualhubs.BorderDirection;
 import com.powsybl.openrao.virtualhubs.VirtualHub;
