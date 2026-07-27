@@ -43,7 +43,11 @@ public final class BordersUtils {
         return Double.isNaN(value) ? 0 : value;
     }
 
-    public static Country getCountrySide(final Branch<?> branch, final TwoSides side) {
+    public static Predicate<Branch> isConnectedTo(final String nodeId) {
+        return branch -> branch.getId().contains(nodeId);
+    }
+
+    public static Country getCountryOfSide(final Branch<?> branch, final TwoSides side) {
         return branch.getTerminal(side).getVoltageLevel()
                 .getSubstation()
                 .orElseThrow(() -> new CeMergingException(

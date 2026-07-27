@@ -85,6 +85,14 @@ public final class FileStorageUtils {
         task.getArtifacts().putFile(fileType, artifactFile);
     }
 
+    public static void saveArtifactNetwork(final ArtifactType fileType,
+                                           final Network network,
+                                           final MergingTask task,
+                                           final String format,
+                                           final CeMergingConfiguration configuration) {
+        saveArtifactNetwork(fileType, network, task, format, null, configuration);
+    }
+
     public static void savePreTreatedIgm(final String country,
                                          final Network network,
                                          final Properties properties,

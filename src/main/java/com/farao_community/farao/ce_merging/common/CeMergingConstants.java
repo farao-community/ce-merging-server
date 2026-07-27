@@ -39,6 +39,7 @@ public final class CeMergingConstants {
     public static final String MERGING_SUPERVISOR_TAG = "Merging supervisor";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
     public static final String UCTE_FORMAT = "UCTE";
+    public static final String XIIDM_FORMAT = "XIIDM";
     public static final String DK_COUNTRY_CODE = "D1";
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
     public static final String DK_HVDC_XNODES_PROPERTY = "dk.hvdc.xnodes";
@@ -52,19 +53,22 @@ public final class CeMergingConstants {
     public static final String ARROW = "->";
     public static final String TAG_VERSION = "1.0.0";
     public static final Set<String> GERMAN_AND_DANISH_TSO = Set.of("D1", "D2", "D4", "D6", "D7", "D8");
-    public static final Set<String> GERMAN_TSO = Set.of("D2", "D4", "D6", "D7", "D8");
+    public static final String ALEGRO_NODE_PREFIX = "XLI_OB1";
     public static final String VIRTUAL_HUB_ALEGRO_BE_NODE_NAME = "XLI_OB1B";
     public static final String VIRTUAL_HUB_ALEGRO_DE_NODE_NAME = "XLI_OB1A";
-    public static final String GERMAN_COUNTRY_CODE = "DE";
     public static final String DANISH_TSO = "D1";
-    public static final String DENMARK_COUNTRY_CODE = "DK";
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
     public static final String UCTE_EXPORT_NAMING_STRATEGY_PROPERTY = "ucte.export.naming-strategy";
     public static final String MONITA_NAMING_STRATEGY = "MonitaNamingStrategy";
 
+    public static final String DC = "DC";
+    public static final String AC = "AC";
+
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
+    public static final double MAX_FICTITIOUS_P = 9999.;
+    public static final double MAX_FICTITIOUS_Q = 99999.;
 
     // Date management
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");

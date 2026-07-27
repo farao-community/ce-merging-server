@@ -19,7 +19,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectio
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.farao_community.farao.ce_merging.xsd.Xnodes;
+import com.farao_community.farao.ce_merging.xsd.xnodes.Xnodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.openrao.virtualhubs.BorderDirection;
 import com.powsybl.openrao.virtualhubs.VirtualHub;
@@ -31,7 +31,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapKsToXk;
+import static com.farao_community.farao.ce_merging.common.util.CountryUtils.mapKsToXk;
 import static com.powsybl.openrao.virtualhubs.xml.XmlVirtualHubsConfiguration.importConfiguration;
 
 public final class TaskTestUtils {
