@@ -31,6 +31,14 @@ public final class BordersUtils {
                 .anyMatch(nodeName::equals);
     }
 
+    public static Predicate<Injection<?>> isInCountry(final Country country) {
+        return line -> getCountry(line) == country;
+    }
+
+    public static Predicate<DanglingLine> isPairedWith(final String nodeName) {
+        return l -> l.getPairingKey().equals(nodeName);
+    }
+
     public static double zeroIfNan(final double value) {
         return Double.isNaN(value) ? 0 : value;
     }
@@ -39,7 +47,7 @@ public final class BordersUtils {
         return branch -> branch.getId().contains(nodeId);
     }
 
-    public static Country getCountryOfSide(final Branch branch, final TwoSides side) {
+    public static Country getCountryOfSide(final Branch<?> branch, final TwoSides side) {
         return branch.getTerminal(side).getVoltageLevel()
                 .getSubstation()
                 .orElseThrow(() -> new CeMergingException(

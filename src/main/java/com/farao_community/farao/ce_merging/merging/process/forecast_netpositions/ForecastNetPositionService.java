@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.merging.process.forecast_netpositio
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.merging.process.FileStorageUtils;
+import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
