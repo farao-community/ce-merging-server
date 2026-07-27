@@ -23,7 +23,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_COUNTRY_CODE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_HVDC_XNODES_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_NAMING_STRATEGY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_EXPORT_NAMING_STRATEGY_PROPERTY;
@@ -41,7 +41,7 @@ public class DKRenamingService {
     }
 
     public void renameDkCountry(MergingTask task) {
-        SavedFile d1File = task.getInputs().getIgm(DK_COUNTRY_CODE).getIgmFile();
+        SavedFile d1File = task.getInputs().getIgm(DANISH_TSO).getIgmFile();
         try (InputStream inputStream = new FileInputStream(d1File.getPath())) {
             String dkHvdcXnodes = Optional.ofNullable(task.getConfigurations().getDkHvdcXnodes())
                 .orElseGet(Collections::emptyList)
