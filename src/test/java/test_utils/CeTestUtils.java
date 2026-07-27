@@ -14,6 +14,8 @@ import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.powsybl.commons.report.ReportNode;
+import com.powsybl.commons.report.TypedValue;
 import org.assertj.core.api.ThrowableAssert;
 
 import java.io.File;
@@ -23,6 +25,9 @@ import java.io.OutputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -31,6 +36,8 @@ import static java.time.ZoneOffset.UTC;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public final class CeTestUtils {
 
@@ -108,6 +115,27 @@ public final class CeTestUtils {
         task.setStatus(status);
 
         return task;
+    }
+
+    public static TypedValue mockTypedValue(final String stringValue) {
+        final TypedValue mockValue = mock(TypedValue.class);
+        when(mockValue.toString()).thenReturn(stringValue);
+        return mockValue;
+    }
+
+    public static ReportNode mockReportNode(final List<ReportNode> children, final Map<String, TypedValue> properties) {
+        final ReportNode node = mock(ReportNode.class);
+        when(node.getChildren()).thenReturn(children);
+        properties.forEach((key, value) -> when(node.getValue(key)).thenReturn(Optional.of(value)));
+        return node;
+    }
+
+    public static ReportNode mockReportNode(final Map<String, TypedValue> properties) {
+        return mockReportNode(Collections.emptyList(), properties);
+    }
+
+    public static ReportNode mockReportNode(final List<ReportNode> children) {
+        return mockReportNode(children, Collections.emptyMap());
     }
 
     // If just using Stream.of, you'd have to specify the type
