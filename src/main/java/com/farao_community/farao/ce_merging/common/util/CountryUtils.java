@@ -6,10 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
+import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
 import com.powsybl.iidm.network.Country;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_TSO;
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.Country.DK;
 
@@ -31,7 +31,7 @@ public final class CountryUtils {
     }
 
     public static Country getCountry(final String countryName) {
-        if (GERMAN_TSO.contains(countryName)) {
+        if (GermanTso.includes(countryName)) {
             return DE;
         } else if (DANISH_TSO.equals(countryName)) {
             return DK;

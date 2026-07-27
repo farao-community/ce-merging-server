@@ -49,6 +49,7 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INCONSISTENCIES;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.GermanTso.D7;
 import static com.powsybl.iidm.network.Country.BE;
 import static com.powsybl.iidm.network.Country.DE;
 import static java.util.stream.Collectors.toList;
@@ -79,7 +80,7 @@ public class RecessivityService {
                 task, recessiveCountries, task.getArtifact(TOPOLOGICAL_MERGE_FILE, Network.class)
             );
         } catch (final Exception e) {
-            String errorMessage = String.format("Xnodes check failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
+            final String errorMessage = String.format("Xnodes check failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
             LOGGER.error(errorMessage);
             throw new CeMergingException(errorMessage, e);
         }
@@ -92,10 +93,10 @@ public class RecessivityService {
         final XnodesCheck xnodesCheck = task.getArtifact(XNODES_INFORMATION_FILE, XnodesCheck.class);
         final List<XnodeConfig> xnodesConfigs = task.getConfigurations().getXnodeList();
 
-        final XnodesInconsistencies xnodesInconsistencies = analyzeXnodes(network,
-                                                                          xnodesCheck,
-                                                                          xnodesConfigs,
-                                                                          recessiveCountries);
+        final XnodesInconsistencies xnodesInconsistencies = checkXnodesConsistency(network,
+                                                                                   xnodesCheck,
+                                                                                   xnodesConfigs,
+                                                                                   recessiveCountries);
 
         saveArtifactNetwork(TGM_FILE_AFTER_RECESSIVITY, network, task, UCTE_FORMAT, null, configuration);
         saveArtifactFile(XNODES_INCONSISTENCIES, xnodesInconsistencies, task, configuration);
@@ -103,10 +104,10 @@ public class RecessivityService {
 
     }
 
-    private XnodesInconsistencies analyzeXnodes(final Network network,
-                                                final XnodesCheck xnodesCheck,
-                                                final List<XnodeConfig> xnodeConfigs,
-                                                final List<String> recessiveCountries) {
+    private XnodesInconsistencies checkXnodesConsistency(final Network network,
+                                                         final XnodesCheck xnodesCheck,
+                                                         final List<XnodeConfig> xnodeConfigs,
+                                                         final List<String> recessiveCountries) {
 
         if (xnodesCheck == null || isEmpty(xnodesCheck.getXnodeInformationMap())) {
             return new XnodesInconsistencies();
@@ -138,8 +139,12 @@ public class RecessivityService {
             final XnodeStatus alegroBeStatus = alBe1Info.getStatus();
 
             if (alegroDeStatus != alegroBeStatus) {
-                final AreaInformation alegroDeInfo = new AreaInformation("D7", VIRTUAL_HUB_ALEGRO_DE_NODE_NAME, alegroDeStatus);
-                final AreaInformation alegroBeInfo = new AreaInformation(BE.name(), VIRTUAL_HUB_ALEGRO_BE_NODE_NAME, alegroBeStatus);
+                final AreaInformation alegroDeInfo = new AreaInformation(D7.name(),
+                                                                         VIRTUAL_HUB_ALEGRO_DE_NODE_NAME,
+                                                                         alegroDeStatus);
+                final AreaInformation alegroBeInfo = new AreaInformation(BE.name(),
+                                                                         VIRTUAL_HUB_ALEGRO_BE_NODE_NAME,
+                                                                         alegroBeStatus);
 
                 xnodeIncorrects.add(new XnodeIncorrect(ALEGRO_NODE_PREFIX, alegroBeInfo, alegroDeInfo, recessiveCountries));
             }
@@ -164,11 +169,11 @@ public class RecessivityService {
 
     private XnodeIncorrect fixAndGetIncorrect(final Network network,
                                               final String name,
-                                              final XnodeInformation infos,
+                                              final XnodeInformation xNodeInfo,
                                               final List<String> recessiveCountries) {
 
-        final XnodeIncorrect xNode = XnodeIncorrect.buildFrom(name, infos, recessiveCountries);
-        final boolean german = isGermanInternalNode(infos);
+        final XnodeIncorrect xNode = XnodeIncorrect.from(name, xNodeInfo, recessiveCountries);
+        final boolean german = xNodeInfo.isInternalNodeOf(DE);
         // if there is a difference in recessivity, fix it
         if (xNode.isRecessive1() && !xNode.isRecessive2()) {
             final String country1 = xNode.getCountry1();
@@ -195,9 +200,9 @@ public class RecessivityService {
 
     private XnodeIncomplete getIncompleteXnode(final List<XnodeConfig> xNodesConfig,
                                                final String xNodeName,
-                                               final XnodeInformation info) {
-        final boolean hasArea1Info = info.getArea1Information() != null;
-        final AreaInformation existingInfo = hasArea1Info ? info.getArea1Information() : info.getArea2Information();
+                                               final XnodeInformation xNodeInfo) {
+        final boolean hasArea1Info = xNodeInfo.getArea1Information() != null;
+        final AreaInformation existingInfo = hasArea1Info ? xNodeInfo.getArea1Information() : xNodeInfo.getArea2Information();
 
         final String countryAbsent = xNodesConfig.stream()
             .filter(xNode -> xNode.getName().equals(xNodeName))
@@ -239,12 +244,16 @@ public class RecessivityService {
     }
 
     private Predicate<Branch> linksGermanyRegionToNode(final String germanyRegionCode, final String node) {
-        return branch ->
-            branch.getTerminal1().getVoltageLevel().getId().contains(node)
-            && branch.getTerminal2().getVoltageLevel().getId().startsWith(germanyRegionCode)
-            ||
-            branch.getTerminal2().getVoltageLevel().getId().contains(node)
-            && branch.getTerminal1().getVoltageLevel().getId().startsWith(germanyRegionCode);
+        return branch -> sideOneId(branch).contains(node) && sideTwoId(branch).startsWith(germanyRegionCode)
+                         || sideTwoId(branch).contains(node) && sideOneId(branch).startsWith(germanyRegionCode);
+    }
+
+    final String sideOneId(final Branch branch) {
+        return branch.getTerminal1().getVoltageLevel().getId();
+    }
+
+    final String sideTwoId(final Branch branch) {
+        return branch.getTerminal2().getVoltageLevel().getId();
     }
 
     private void alignBranchStatusWithXnode(final XnodeStatus xnodeStatus,
@@ -258,10 +267,4 @@ public class RecessivityService {
             .forEach(setToXnodeStatus);
     }
 
-    private boolean isGermanInternalNode(final XnodeInformation xnodeInformation) {
-        final AreaInformation info1 = xnodeInformation.getArea1Information();
-        final AreaInformation info2 = xnodeInformation.getArea2Information();
-        return info1 != null && getCountry(info1.getCountry()) == DE
-               && info2 != null && getCountry(info2.getCountry()) == DE;
-    }
 }

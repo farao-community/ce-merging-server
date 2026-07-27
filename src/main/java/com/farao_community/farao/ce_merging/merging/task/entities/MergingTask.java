@@ -17,7 +17,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import org.apache.commons.io.FilenameUtils;
 
 import java.io.FileNotFoundException;
 import java.io.Serializable;
@@ -102,13 +101,11 @@ public class MergingTask implements Serializable {
     }
 
     public <T> T getArtifact(final ArtifactType artifactType, final Class<T> clazz) throws FileNotFoundException {
-        final String format = FilenameUtils.getExtension(artifactType.getFileName()).toUpperCase();
         final String path = artifacts.getFile(artifactType).getPath();
-        return switch (format) {
-            case "JSON" -> JsonUtils.read(clazz, path);
-            case "XML" -> JaxbUtils.readFromPath(clazz, path);
-            case "UCT", "XIIDM" -> clazz == Network.class ? (T) Network.read(path) : null; // NOSONAR this is a Network
-            default -> null; // should never happen
+        return switch (artifactType.getFormat()) {
+            case JSON -> JsonUtils.read(clazz, path);
+            case XML -> JaxbUtils.readFromPath(clazz, path);
+            case UCT, XIIDM -> clazz == Network.class ? (T) Network.read(path) : null; // NOSONAR this is a Network
         };
     }
 

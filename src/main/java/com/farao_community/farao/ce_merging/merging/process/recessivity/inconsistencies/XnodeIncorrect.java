@@ -30,14 +30,14 @@ public class XnodeIncorrect {
     public XnodeIncorrect() {
     }
 
-    public static XnodeIncorrect buildFrom(final String name,
-                                           final XnodeInformation info,
-                                           final List<String> recessiveCountries) {
+    public static XnodeIncorrect from(final String name,
+                                      final XnodeInformation info,
+                                      final List<String> recessiveCountries) {
         return new XnodeIncorrect(name,
                                   ofNullable(info.getArea1Information()).orElse(empty()),
                                   ofNullable(info.getArea2Information()).orElse(empty()),
                                   recessiveCountries
-                                  );
+        );
     }
 
     public XnodeIncorrect(final String name,
