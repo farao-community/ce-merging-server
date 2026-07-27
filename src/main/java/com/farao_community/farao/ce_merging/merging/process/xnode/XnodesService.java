@@ -9,9 +9,9 @@ package com.farao_community.farao.ce_merging.merging.process.xnode;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
+import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.powsybl.iidm.network.Network;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,11 +38,11 @@ public class XnodesService {
     }
 
     public void checkIgmsStatus(MergingTask task) {
-        Map<String, Network> networkByTsoMap = initialImportService.importInitialIgms(task);
-        Map<String, XnodeInformation> xnodeInformationMap = new TreeMap<>();
-        List<VirtualHubRecord> virtualHubList = task.getConfigurations().getVirtualHubList();
-        List<XnodeConfig> xnodesConfigList = task.getConfigurations().getXnodeList();
-        networkByTsoMap.forEach((tso, network) -> {
+        final Configurations configurations = task.getConfigurations();
+        final Map<String, XnodeInformation> xnodeInformationMap = new TreeMap<>();
+        final List<VirtualHubRecord> virtualHubList = configurations.getVirtualHubList();
+        final List<XnodeConfig> xnodesConfigList = configurations.getXnodeList();
+        initialImportService.importInitialIgms(task).forEach((tso, network) -> {
             xnodesCalculation.checkXnodesConfigConsistency(network, virtualHubList, xnodesConfigList);
             xnodesCalculation.fillXnodesInformation(network, tso, xnodeInformationMap, virtualHubList, xnodesConfigList, isGermanOrDanishTso(tso));
         });

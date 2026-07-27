@@ -39,19 +39,19 @@ public class XnodesCalculation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XnodesCalculation.class);
 
-    public void fillXnodesInformation(final Network network, final String tso, final Map<String, XnodeInformation> xnodeInformationMap, final List<VirtualHubRecord> virtualHubList, final List<XnodeConfig> xnodes, final boolean germanMode) {
+    public void fillXnodesInformation(final Network network, final String tso, final Map<String, XnodeInformation> xnodeInformationMap, final List<VirtualHubRecord> virtualHubList, final List<XnodeConfig> xnodes, final boolean germanNode) {
         final Set<String> xnodesArea1 = xnodes.stream()
-            .filter(xnode -> matchesArea1(xnode, tso, germanMode))
+            .filter(xnode -> matchesArea1(xnode, tso, germanNode))
             .map(XnodeConfig::getName)
             .collect(Collectors.toSet());
 
         final Set<String> xnodesArea2 = xnodes.stream()
-            .filter(xnode -> matchesArea2(xnode, tso, germanMode))
+            .filter(xnode -> matchesArea2(xnode, tso, germanNode))
             .map(XnodeConfig::getName)
             .collect(Collectors.toSet());
 
-        final String alegroVirtualHub = germanMode ? VIRTUAL_HUB_ALEGRO_DE_NODE_NAME : VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
-        final Optional<String> tsoOpt = germanMode ? Optional.of(tso) : Optional.empty();
+        final String alegroVirtualHub = germanNode ? VIRTUAL_HUB_ALEGRO_DE_NODE_NAME : VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
+        final Optional<String> tsoOpt = germanNode ? Optional.of(tso) : Optional.empty();
 
         processDanglingLines(network, xnodesArea1, virtualHubList, alegroVirtualHub, xnodeInformationMap, 1, tsoOpt);
 
