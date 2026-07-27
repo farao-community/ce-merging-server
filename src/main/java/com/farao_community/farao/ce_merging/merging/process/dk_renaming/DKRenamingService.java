@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_COUNTRY_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_HVDC_XNODES_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_NAMING_STRATEGY;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_EXPORT_NAMING_STRATEGY_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
 
 @Service
 public class DKRenamingService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DKRenamingService.class);
-    private static final String UCTE_EXPORT_NAMING_STRATEGY_PROPERTY = "ucte.export.naming-strategy";
 
     private final CeMergingConfiguration ceMergingConfiguration;
 
@@ -44,9 +44,9 @@ public class DKRenamingService {
         SavedFile d1File = task.getInputs().getIgm(DK_COUNTRY_CODE).getIgmFile();
         try (InputStream inputStream = new FileInputStream(d1File.getPath())) {
             String dkHvdcXnodes = Optional.ofNullable(task.getConfigurations().getDkHvdcXnodes())
-                    .orElseGet(Collections::emptyList)
-                    .stream()
-                    .collect(Collectors.joining(","));
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .collect(Collectors.joining(","));
             Network danishNetwork = Network.read(d1File.getOriginalName(), inputStream);
             Properties properties = buildExportProperties(dkHvdcXnodes);
             // danishNetwork.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes); : copied from core-merging todo check if this set is mondotary or network.write(UCTE_FORMAT, properties, filePath);

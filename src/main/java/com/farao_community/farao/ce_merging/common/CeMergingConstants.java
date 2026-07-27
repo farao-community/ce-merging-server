@@ -36,7 +36,7 @@ public final class CeMergingConstants {
     public static final String ARTIFACTS_DIR = "artifacts";
     public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";
-    public static final String MERGING_SUPERVISOR_TAG  = "Merging supervisor";
+    public static final String MERGING_SUPERVISOR_TAG = "Merging supervisor";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
     public static final String UCTE_FORMAT = "UCTE";
     public static final String DK_COUNTRY_CODE = "D1";
@@ -60,6 +60,8 @@ public final class CeMergingConstants {
     public static final String DENMARK_COUNTRY_CODE = "DK";
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
+    public static final String UCTE_EXPORT_NAMING_STRATEGY_PROPERTY = "ucte.export.naming-strategy";
+    public static final String MONITA_NAMING_STRATEGY = "MonitaNamingStrategy";
 
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;

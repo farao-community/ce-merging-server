@@ -23,7 +23,15 @@ import static org.mockito.Mockito.when;
 import static test_utils.assertions.UcteNodeCodeAssert.assertThat;
 
 class MonitaNamingStrategyTest {
-    private NamingStrategy strategy = new MonitaNamingStrategy();
+    private final NamingStrategy strategy = new MonitaNamingStrategy();
+    private static final String ITALY_MONITA_CODE = "IKOTR121";
+    private static final String ITALY_OTHER_CODE = "I190V121";
+
+    private static final String ITALY_MONITA_SPOT = "KOTR1";
+    private static final String ITALY_OTHER_SPOT = "190V1";
+
+    private static final String MONITA_BRANCH = "IKOTR121 IKOTR111 1";
+    private static final String ITALY_OTHER_BRANCH = "I190V121 ITVSV121 1";
 
     @Test
     void getName() {
@@ -32,41 +40,41 @@ class MonitaNamingStrategyTest {
 
     @Test
     void getUcteNodeCodeWithMonitaId() {
-        assertThat(strategy.getUcteNodeCode("IKOTR121"))
-            .isLocatedIn(XX, "KOTR1")
+        assertThat(strategy.getUcteNodeCode(ITALY_MONITA_CODE))
+            .isLocatedIn(XX, ITALY_MONITA_SPOT)
             .isBusBar(VL_220, '0');
     }
 
     @Test
     void getUcteNodeCodeWithAnotherId() {
-        assertThat(strategy.getUcteNodeCode("I190V121"))
-            .isLocatedIn(IT, "190V1")
+        assertThat(strategy.getUcteNodeCode(ITALY_OTHER_CODE))
+            .isLocatedIn(IT, ITALY_OTHER_SPOT)
             .isBusBar(VL_220, '1');
     }
 
     @Test
     void getUcteNodeCodeWithMonitaBus() {
         Bus bus = mock(Bus.class);
-        when(bus.getId()).thenReturn("IKOTR121");
+        when(bus.getId()).thenReturn(ITALY_MONITA_CODE);
 
         assertThat(strategy.getUcteNodeCode(bus))
-            .isLocatedIn(XX, "KOTR1")
+            .isLocatedIn(XX, ITALY_MONITA_SPOT)
             .isBusBar(VL_220, '0');
     }
 
     @Test
     void getUcteNodeCodeWithAnotherBus() {
-        Bus bus = mock(Bus.class);
-        when(bus.getId()).thenReturn("I190V121");
+        final Bus bus = mock(Bus.class);
+        when(bus.getId()).thenReturn(ITALY_OTHER_CODE);
 
         assertThat(strategy.getUcteNodeCode(bus))
-            .isLocatedIn(IT, "190V1")
+            .isLocatedIn(IT, ITALY_OTHER_SPOT)
             .isBusBar(VL_220, '1');
     }
 
     @Test
     void getUcteNodeWithMonitaDanglingLine() {
-        DanglingLine danglingLine = mock(DanglingLine.class);
+        final DanglingLine danglingLine = mock(DanglingLine.class);
         when(danglingLine.getPairingKey()).thenReturn("XKO_LA11");
 
         assertThat(strategy.getUcteNodeCode(danglingLine))
@@ -76,7 +84,7 @@ class MonitaNamingStrategyTest {
 
     @Test
     void getUcteNodeWithAnotherDanglingLine() {
-        DanglingLine danglingLine = mock(DanglingLine.class);
+        final DanglingLine danglingLine = mock(DanglingLine.class);
         when(danglingLine.getPairingKey()).thenReturn("XAL_PO21");
 
         assertThat(strategy.getUcteNodeCode(danglingLine))
@@ -86,23 +94,23 @@ class MonitaNamingStrategyTest {
 
     @Test
     void getUcteElementIdWithMonitaId() {
-        UcteElementId ucteElementId = strategy.getUcteElementId("IKOTR121 IKOTR111 1");
+        final UcteElementId ucteElementId = strategy.getUcteElementId(MONITA_BRANCH);
 
         assertThat(ucteElementId.getNodeCode1())
-            .isLocatedIn(XX, "KOTR1")
+            .isLocatedIn(XX, ITALY_MONITA_SPOT)
             .isBusBar(VL_220, '0');
 
         assertThat(ucteElementId.getNodeCode2())
-            .isLocatedIn(IT, "KOTR1")
+            .isLocatedIn(IT, ITALY_MONITA_SPOT)
             .isBusBar(VL_380, '1');
     }
 
     @Test
     void getUcteElementIdWithAnotherId() {
-        UcteElementId ucteElementId = strategy.getUcteElementId("I190V121 ITVSV121 1");
+        final UcteElementId ucteElementId = strategy.getUcteElementId(ITALY_OTHER_BRANCH);
 
         assertThat(ucteElementId.getNodeCode1())
-            .isLocatedIn(IT, "190V1")
+            .isLocatedIn(IT, ITALY_OTHER_SPOT)
             .isBusBar(VL_220, '1');
 
         assertThat(ucteElementId.getNodeCode2())
@@ -112,29 +120,29 @@ class MonitaNamingStrategyTest {
 
     @Test
     void getUcteElementIdWithMonitaBranch() {
-        Branch branch = mock(Branch.class);
-        when(branch.getId()).thenReturn("IKOTR121 IKOTR111 1");
+        final Branch<?> branch = mock(Branch.class);
+        when(branch.getId()).thenReturn(MONITA_BRANCH);
 
-        UcteElementId ucteElementId = strategy.getUcteElementId(branch);
+        final UcteElementId ucteElementId = strategy.getUcteElementId(branch);
 
         assertThat(ucteElementId.getNodeCode1())
-            .isLocatedIn(XX, "KOTR1")
+            .isLocatedIn(XX, ITALY_MONITA_SPOT)
             .isBusBar(VL_220, '0');
 
         assertThat(ucteElementId.getNodeCode2())
-            .isLocatedIn(IT, "KOTR1")
+            .isLocatedIn(IT, ITALY_MONITA_SPOT)
             .isBusBar(VL_380, '1');
     }
 
     @Test
     void getUcteElementIdWithAnotherBranch() {
-        Branch<?> branch = mock(Branch.class);
-        when(branch.getId()).thenReturn("I190V121 ITVSV121 1");
+        final Branch<?> branch = mock(Branch.class);
+        when(branch.getId()).thenReturn(ITALY_OTHER_BRANCH);
 
         UcteElementId ucteElementId = strategy.getUcteElementId(branch);
 
         assertThat(ucteElementId.getNodeCode1())
-            .isLocatedIn(IT, "190V1")
+            .isLocatedIn(IT, ITALY_OTHER_SPOT)
             .isBusBar(VL_220, '1');
 
         assertThat(ucteElementId.getNodeCode2())
@@ -144,26 +152,26 @@ class MonitaNamingStrategyTest {
 
     @Test
     void getUcteElementIdWithMonitaDanglingLine() {
-        DanglingLine danglingLine = mock(DanglingLine.class);
+        final DanglingLine danglingLine = mock(DanglingLine.class);
         when(danglingLine.getId()).thenReturn("XKO_LA11 IKOTR111 1");
 
-        UcteElementId ucteElementId = strategy.getUcteElementId(danglingLine);
+        final UcteElementId ucteElementId = strategy.getUcteElementId(danglingLine);
 
         assertThat(ucteElementId.getNodeCode1())
             .isLocatedIn(XX, "KO_LA")
             .isBusBar(VL_380, '1');
 
         assertThat(ucteElementId.getNodeCode2())
-            .isLocatedIn(IT, "KOTR1")
+            .isLocatedIn(IT, ITALY_MONITA_SPOT)
             .isBusBar(VL_380, '1');
     }
 
     @Test
     void getUcteElementIdWithAnotherDanglingLine() {
-        DanglingLine danglingLine = mock(DanglingLine.class);
+        final DanglingLine danglingLine = mock(DanglingLine.class);
         when(danglingLine.getId()).thenReturn("XAL_PO21 IPONTA21 1");
 
-        UcteElementId ucteElementId = strategy.getUcteElementId(danglingLine);
+        final UcteElementId ucteElementId = strategy.getUcteElementId(danglingLine);
 
         assertThat(ucteElementId.getNodeCode1())
             .isLocatedIn(XX, "AL_PO")
