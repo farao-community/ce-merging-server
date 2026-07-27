@@ -27,7 +27,7 @@ public final class ForecastNetPositionImporter {
 
     public static ReferenceProgram importFromFile(final String netPositionFilePath, final OffsetDateTime targetDateTime) {
         final ReportingInformationMarketDocument document = JaxbUtils.readFromPath(ReportingInformationMarketDocument.class, netPositionFilePath);
-        if (!isValidDocumentInterval(document, targetDateTime)) {
+        if (!isDateTimeInDocumentInterval(document, targetDateTime)) {
             LOGGER.error("Net position file is not valid for this date {}", targetDateTime);
             throw new CeMergingException("Net position file is not valid for this date " + targetDateTime);
         }
@@ -55,7 +55,7 @@ public final class ForecastNetPositionImporter {
 
     private static double getFlow(final OffsetDateTime dateTime, final TimeSeries timeSeries) {
         return timeSeries.getPeriod().stream()
-                .filter(period -> isValidPeriodInterval(period, dateTime))
+                .filter(period -> isDateTimeInPeriod(period, dateTime))
                 .findFirst()
                 .map(period -> getFlowFromPeriod(dateTime, period, timeSeries.getCurveType()))
                 .orElseGet(() -> {
@@ -65,13 +65,13 @@ public final class ForecastNetPositionImporter {
 
     }
 
-    private static boolean isValidPeriodInterval(SeriesPeriod seriesPeriod, OffsetDateTime dateTime) {
+    private static boolean isDateTimeInPeriod(SeriesPeriod seriesPeriod, OffsetDateTime dateTime) {
         OffsetDateTime startDateTime = parseDateTime(seriesPeriod.getTimeInterval().getStart());
         OffsetDateTime endDateTime = parseDateTime(seriesPeriod.getTimeInterval().getEnd());
         return !dateTime.isBefore(startDateTime) && dateTime.isBefore(endDateTime);
     }
 
-    private static boolean isValidDocumentInterval(final ReportingInformationMarketDocument document, final OffsetDateTime dateTime) {
+    private static boolean isDateTimeInDocumentInterval(final ReportingInformationMarketDocument document, final OffsetDateTime dateTime) {
         if (document.getTimePeriodTimeInterval() == null) {
             throw new CeMergingException("Cannot import net position forecast file: missing time interval");
         }
@@ -100,21 +100,14 @@ public final class ForecastNetPositionImporter {
         return resolution.getHours() * 3600 + resolution.getMinutes() * 60 + (long) resolution.getSeconds();
     }
 
-    private static double getFlowFromConstantResolutionCurve(final OffsetDateTime dateTime, OffsetDateTime startDateTime, final long resolutionInSeconds, final List<Point> points) {
+    private static double getFlowFromConstantResolutionCurve(final OffsetDateTime dateTime, final OffsetDateTime startDateTime, final long resolutionInSeconds, final List<Point> points) {
         //The curve is made of successive Intervals of time (Blocks) of constant duration (size),
         // where the size of the Blocks is equal to the Resolution of the Period
-        int increment = 0;
-        OffsetDateTime currentStartDateTime = startDateTime;
-        while (increment < points.size()) {
-            final Point actualPoint = points.get(increment);
-            final OffsetDateTime intervalEnd = currentStartDateTime.plus(resolutionInSeconds, ChronoUnit.SECONDS);
-            if (dateTime.isBefore(intervalEnd)) {
-                return actualPoint.getQuantity().doubleValue();
-            }
-            increment++;
-            currentStartDateTime = intervalEnd;
+        final long secondsSinceStart = ChronoUnit.SECONDS.between(startDateTime, dateTime);
+        final int index = (int) Math.floor((double) secondsSinceStart / resolutionInSeconds);
+        if (index >= 0 && index < points.size()) {
+            return points.get(index).getQuantity().doubleValue();
         }
-
         return 0.0;
     }
 
@@ -122,15 +115,15 @@ public final class ForecastNetPositionImporter {
         //The curve is made of successive Intervals of time (Blocks) of variable duration (size),
         //where the end date and end time of each Block are equal to the start date and start time of the next Interval.
         // For the last Block the end date and end time of the last Interval would be equal to EndDateTime of TimeInterval
-        int increment = 0;
-        while (increment < points.size() - 1) {
-            final Point actualPoint = points.get(increment);
-            final Point nextPoint = points.get(increment + 1);
+        int position = 0;
+        while (position < points.size() - 1) {
+            final Point actualPoint = points.get(position);
+            final Point nextPoint = points.get(position + 1);
             final OffsetDateTime intervalEnd = startDateTime.plus((nextPoint.getPosition() - 1) * resolutionInSeconds, ChronoUnit.SECONDS);
             if (dateTime.isBefore(intervalEnd)) {
                 return actualPoint.getQuantity().doubleValue();
             }
-            increment++;
+            position++;
         }
         if (dateTime.isBefore(endDateTime)) {
             return points.get(points.size() - 1).getQuantity().doubleValue();
