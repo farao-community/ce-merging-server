@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.xnode;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.util.BordersUtils;
+import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.iidm.network.Branch;
@@ -30,7 +30,7 @@ import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.zeroIfNan;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNan;
 import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
 import static com.powsybl.iidm.network.Country.DE;
 
@@ -92,7 +92,7 @@ public class XnodesCalculation {
 
     private AreaInformation fillAreaInformation(final DanglingLine danglingLine, final Optional<String> tsoOpt) {
         final XnodeStatus status = danglingLine.getTerminal().isConnected() ? XnodeStatus.CLOSE : XnodeStatus.OPEN;
-        final String country = tsoOpt.orElseGet(() -> BordersUtils.getCountry(danglingLine).toString());
+        final String country = tsoOpt.orElseGet(() -> NetworkUtil.getCountry(danglingLine).toString());
         double v = 0;
         final DanglingLine.Generation generation = danglingLine.getGeneration();
         final double p0 = danglingLine.getP0();
@@ -138,7 +138,7 @@ public class XnodesCalculation {
         MergedXnodeInformation mergedXnodeInformation = new MergedXnodeInformation(status, 0, 0, 0, 0);
         if (isConnected) {
             final Country country1 = getCountry(xnodeInformation.getArea1Information().getCountry());
-            final boolean country1IsSideOne = country1.equals(BordersUtils.getCountryOfSide(branch, TwoSides.ONE));
+            final boolean country1IsSideOne = country1.equals(NetworkUtil.getCountryOfSide(branch, TwoSides.ONE));
             //We take the xnode flow in the direction country 1 to country 2
             final Terminal terminalFrom = country1IsSideOne ? branch.getTerminal1() : branch.getTerminal2();
             final Terminal terminalTo = country1IsSideOne ? branch.getTerminal2() : branch.getTerminal1();
@@ -241,7 +241,7 @@ public class XnodesCalculation {
     private void processDanglingLines(final Network network, final Set<String> xnodes, final List<VirtualHubRecord> virtualHubList, final String virtualHubException, final Map<String, XnodeInformation> xnodeInformationMap, final int areaNumber, Optional<String> tsoOpt) {
         network.getDanglingLineStream()
             .filter(dl -> xnodes.contains(dl.getPairingKey()))
-            .filter(dl -> !BordersUtils.isVirtualHubDanglingLine(dl, virtualHubList) ||
+            .filter(dl -> !NetworkUtil.isVirtualHubDanglingLine(dl, virtualHubList) ||
                           dl.getPairingKey().equals(virtualHubException))
             .forEach(dl -> addAreaInformation(xnodeInformationMap, dl, areaNumber, tsoOpt));
     }

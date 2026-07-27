@@ -39,8 +39,8 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALE
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getCountryOfSide;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isConnectedTo;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isConnectedTo;
 import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;

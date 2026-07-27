@@ -24,6 +24,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -71,7 +73,7 @@ public final class LoadFlowUtils {
     }
 
     private static String getDivergenceMessage(final String networkId, final boolean isDc) {
-        final String loadflowMode = isDc ? "DC" : "AC";
+        final String loadflowMode = isDc ? DC : AC;
         return DIVERGENCE_MESSAGE.formatted(loadflowMode, networkId);
     }
 

@@ -11,8 +11,8 @@ import com.farao_community.farao.ce_merging.common.model.netpositions.Generation
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
-import com.farao_community.farao.ce_merging.common.util.BordersUtils;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
+import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
@@ -32,9 +32,9 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isInCountry;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWith;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.savePreTreatedIgm;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInCountry;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.ME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -80,7 +80,7 @@ class MonitaServiceTest {
 
             final ArgumentCaptor<Properties> propertiesCaptor = ArgumentCaptor.forClass(Properties.class);
             fileStorageUtils.verify(() -> savePreTreatedIgm(eq(IT), eq(network), propertiesCaptor.capture(), eq(UCTE_FORMAT),
-                eq("igms-after-monita-renaming"), eq(task), eq(configuration)
+                                                            eq("igms-after-monita-renaming"), eq(task), eq(configuration)
             ));
 
             assertThat(propertiesCaptor.getValue()).containsEntry("ucte.export.naming-strategy", "MonitaNamingStrategy");
@@ -111,7 +111,7 @@ class MonitaServiceTest {
                                                                                          ME.name(), montenegroNetPos)));
 
         try (final MockedStatic<Network> networkStatic = mockStatic(Network.class);
-             final MockedStatic<BordersUtils> bordersUtils = mockStatic(BordersUtils.class)) {
+             final MockedStatic<NetworkUtil> networkUtil = mockStatic(NetworkUtil.class)) {
             // given :
             final Network network = mock(Network.class);
             final DanglingLine monita1 = mock(DanglingLine.class);
@@ -122,8 +122,8 @@ class MonitaServiceTest {
             when(monita1.getP0()).thenReturn(100.0);
             when(monita2.getPairingKey()).thenReturn(MONITA2_ME_NODE_NAME);
             when(monita2.getP0()).thenReturn(200.0);
-            bordersUtils.when(() -> isInCountry(IT)).thenReturn(Predicates.truePredicate());
-            bordersUtils.when(() -> isPairedWith(any())).thenCallRealMethod();
+            networkUtil.when(() -> isInCountry(IT)).thenReturn(Predicates.truePredicate());
+            networkUtil.when(() -> isPairedWith(any())).thenCallRealMethod();
             when(network.getDanglingLineStream()).thenAnswer(i -> Stream.of(monita1, monita2));
 
             // when :
