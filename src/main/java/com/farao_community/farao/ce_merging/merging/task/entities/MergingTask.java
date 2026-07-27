@@ -6,7 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.powsybl.iidm.network.Network;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -14,7 +19,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.nio.file.Paths;
+import java.time.OffsetDateTime;
+import java.util.Optional;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.AUTO;
@@ -96,7 +106,7 @@ public class MergingTask implements Serializable {
     }
 
     public <T> T getArtifact(final ArtifactType artifactType, final Class<T> clazz) throws FileNotFoundException {
-        final String path = artifacts.getFile(artifactType).getPath();
+        final String path = getArtifactPath(artifactType);
         return switch (artifactType.getFormat()) {
             case JSON -> JsonUtils.read(clazz, path);
             case XML -> JaxbUtils.readFromPath(clazz, path);
