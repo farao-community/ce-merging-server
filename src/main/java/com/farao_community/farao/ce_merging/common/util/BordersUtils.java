@@ -12,9 +12,11 @@ import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.TwoSides;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 public final class BordersUtils {
 
@@ -29,11 +31,23 @@ public final class BordersUtils {
                 .anyMatch(nodeName::equals);
     }
 
+    public static Predicate<Injection<?>> isInCountry(final Country country) {
+        return line -> getCountry(line) == country;
+    }
+
+    public static Predicate<DanglingLine> isPairedWith(final String nodeName) {
+        return l -> l.getPairingKey().equals(nodeName);
+    }
+
     public static double zeroIfNan(final double value) {
         return Double.isNaN(value) ? 0 : value;
     }
 
-    public static Country getCountrySide(final Branch branch, final TwoSides side) {
+    public static Predicate<Branch> isConnectedTo(final String nodeId) {
+        return branch -> branch.getId().contains(nodeId);
+    }
+
+    public static Country getCountryOfSide(final Branch<?> branch, final TwoSides side) {
         return branch.getTerminal(side).getVoltageLevel()
                 .getSubstation()
                 .orElseThrow(() -> new CeMergingException(
@@ -44,7 +58,11 @@ public final class BordersUtils {
     }
 
     public static Country getCountry(final Injection<?> injection) {
-        return injection.getTerminal().getVoltageLevel().getSubstation().isPresent() ? injection.getTerminal().getVoltageLevel().getSubstation().get().getNullableCountry() : null;
+        return injection.getTerminal()
+                .getVoltageLevel()
+                .getSubstation()
+                .map(Substation::getNullableCountry)
+                .orElse(null);
     }
 
 }
