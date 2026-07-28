@@ -27,7 +27,7 @@ public final class GlskBlockRedispatcher {
     private GlskBlockRedispatcher() {
     }
 
-    static void storeValue(final Map<String, List<GlskRedispatchingEntity>> map, final String gskName, String nodeName, final double factor) {
+    static void storeValue(final Map<String, List<GlskRedispatchingEntity>> map, final String gskName, final String nodeName, final double factor) {
         map.computeIfAbsent(gskName, s -> new ArrayList<>()).add(new GlskRedispatchingEntity(nodeName, factor));
     }
 
@@ -94,11 +94,16 @@ public final class GlskBlockRedispatcher {
     private static void normalizeFactors(final double factorSum, final List<ManualNodesType> nodes) {
         final double difference = factorSum - EXPECTED_FACTOR_SUM;
         nodes.stream()
-                .max(Comparator.comparingDouble(node -> node.getFactor().getV().doubleValue()))
-                .filter(node -> node.getFactor().getV().doubleValue() > 0)
+                .max(Comparator.comparingDouble((ManualNodesType node) -> getFactorValue(node)))
+                .filter(node -> getFactorValue(node) > 0)
                 .ifPresent(maxNode -> {
-                    maxNode.getFactor().setV(BigDecimal.valueOf(maxNode.getFactor().getV().doubleValue() - difference));
+                    final double factorValue = getFactorValue(maxNode);
+                    maxNode.getFactor().setV(BigDecimal.valueOf(factorValue - difference));
                 });
+    }
+
+    private static double getFactorValue(final ManualNodesType node) {
+        return node.getFactor().getV().doubleValue();
     }
 
     private static double roundGlsk(double v) {

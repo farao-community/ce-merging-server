@@ -16,21 +16,21 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAT
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 
 public final class DateTimeUtils {
+    private static final DateTimeFormatter TARGET_DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withLocale(Locale.FRANCE);
+    private static final DateTimeFormatter DAY_OF_WEEK_FORMATTER = DateTimeFormatter.ofPattern("e").withLocale(Locale.FRANCE);
 
     private DateTimeUtils() {
     }
 
     public static String formatTargetDate(final MergingTask task) {
-        final ZonedDateTime targetDate = task.getInputs().getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
-        return DateTimeFormatter.ofPattern(DATE_TIME_FORMAT)
-                .withLocale(Locale.FRANCE)
-                .format(targetDate);
+        return TARGET_DATE_FORMATTER.format(getTargetDateAtParisZone(task));
     }
 
     public static String dayOfWeek(final MergingTask task) {
-        final ZonedDateTime targetDate = task.getInputs().getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
-        return DateTimeFormatter.ofPattern("e")
-                .withLocale(Locale.FRANCE)
-                .format(targetDate);
+        return DAY_OF_WEEK_FORMATTER.format(getTargetDateAtParisZone(task));
+    }
+
+    private static ZonedDateTime getTargetDateAtParisZone(final MergingTask task) {
+        return task.getInputs().getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
     }
 }

@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.GregorianCalendar;
+import java.util.function.Function;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
 
@@ -192,10 +193,17 @@ public class GlskQualityCheckService {
     }
 
     private boolean containsAlegro(final GSKSeriesType gskSeries, final Instant processTargetDate) {
-        return gskSeries.getAutoGSKBlock().stream()
-                .anyMatch(block -> isAlegroHubInInterval(block.getGSKName().getV(), block.getTimeInterval().getV(), processTargetDate))
-                || gskSeries.getManualGSKBlock().stream()
-                .anyMatch(block -> isAlegroHubInInterval(block.getGSKName().getV(), block.getTimeInterval().getV(), processTargetDate));
+        return containsAlegroBlock(gskSeries.getAutoGSKBlock(), AutoGSKBlockType::getGSKName, AutoGSKBlockType::getTimeInterval, processTargetDate)
+                || containsAlegroBlock(gskSeries.getManualGSKBlock(), ManualGSKBlockType::getGSKName, ManualGSKBlockType::getTimeInterval, processTargetDate);
+    }
+
+    private <T> boolean containsAlegroBlock(final List<T> blocks, final Function<T, IdentificationType> gskNameExtractor, final Function<T, TimeIntervalType> timeIntervalExtractor, final Instant processTargetDate) {
+        return blocks.stream()
+                .anyMatch(block -> isAlegroHubInInterval(
+                        gskNameExtractor.apply(block).getV(),
+                        timeIntervalExtractor.apply(block).getV(),
+                        processTargetDate
+                ));
     }
 
     private boolean isAlegroHubInInterval(final String gskName, final String timeInterval, final Instant processTargetDate) {

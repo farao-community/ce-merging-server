@@ -20,6 +20,7 @@ import com.powsybl.commons.report.ReportNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.threeten.extra.Interval;
 
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -76,10 +77,8 @@ public class GlskFixService {
             );
             if (isEmptyGlskSeries(glskSeries)) {
                 removeGskSeriesTypes.add(glskSeries);
-                // strore incorrect why ?
             } else {
                 storeSerieValue(context.getCorrectSerie(), glskSeries);
-                // strore incorrect why ?
             }
         });
 
@@ -101,7 +100,7 @@ public class GlskFixService {
     private static boolean isEmptyGlskSeries(GSKSeriesType glskSeries) {
         return glskSeries.getAutoGSKBlock().isEmpty() &&
                 glskSeries.getManualGSKBlock().isEmpty() &&
-                (glskSeries.getCountryGSKBlock() == null || glskSeries.getCountryGSKBlock().isEmpty());
+                CollectionUtils.isEmpty(glskSeries.getCountryGSKBlock());
     }
 
     private List<ReportNode> getQualityLogs(final ReportNode reportNode, final String tso) {
@@ -160,7 +159,6 @@ public class GlskFixService {
 
         private final Map<String, List<GlskRedispatchingEntity>> incorrectBlock = new HashMap<>();
         private final Map<String, List<GlskRedispatchingEntity>> correctBlock = new HashMap<>();
-        private final Map<String, List<GlskRedispatchingEntity>> incorrectSerie = new HashMap<>();
         private final Map<String, List<GlskRedispatchingEntity>> correctSerie = new HashMap<>();
 
         public Map<String, List<GlskRedispatchingEntity>> getIncorrectBlock() {
@@ -169,10 +167,6 @@ public class GlskFixService {
 
         public Map<String, List<GlskRedispatchingEntity>> getCorrectBlock() {
             return correctBlock;
-        }
-
-        public Map<String, List<GlskRedispatchingEntity>> getIncorrectSerie() {
-            return incorrectSerie;
         }
 
         public Map<String, List<GlskRedispatchingEntity>> getCorrectSerie() {
