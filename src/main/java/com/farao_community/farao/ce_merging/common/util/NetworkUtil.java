@@ -1,8 +1,5 @@
-/*
- * Copyright (c) 2026, RTE (http://www.rte-france.com)
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+/**
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)   This Source Code Form is subject to the terms of the Mozilla Public   License, v. 2.0. If a copy of the MPL was not distributed with this   file, You can obtain one at http://mozilla.org/MPL/2.0/.   SPDX-License-Identifier: MPL-2.0
  */
 package com.farao_community.farao.ce_merging.common.util;
 
@@ -34,6 +31,10 @@ public final class NetworkUtil {
         return isNaN(value) ? 0 : value;
     }
 
+    public static boolean isConnected(final Branch<?> branch) {
+        return branch.getTerminal1().isConnected() && branch.getTerminal2().isConnected();
+    }
+
     public static boolean isVirtualHubDanglingLine(final DanglingLine danglingLine, final List<VirtualHubRecord> virtualHubList) {
         final String nodeName = danglingLine.getPairingKey().substring(0, 8);
         return virtualHubList.stream()
@@ -47,10 +48,6 @@ public final class NetworkUtil {
 
     public static Predicate<DanglingLine> isPairedWith(final String nodeName) {
         return l -> l.getPairingKey().equals(nodeName);
-    }
-
-    public static double zeroIfNan(final double value) {
-        return isNaN(value) ? 0 : value;
     }
 
     public static Predicate<Branch> isConnectedTo(final String nodeId) {

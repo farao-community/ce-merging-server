@@ -59,13 +59,14 @@ public class SlackCompensationService {
         this.configuration = configuration;
     }
 
-    public void compensateFinalCgmSlackImbalance(final MergingTask task) {
+    public Network compensateFinalCgmSlackImbalance(final MergingTask task) {
         final Network compensatedNetwork = compensateNetwork(task);
         addSlackNode(compensatedNetwork, task);
         saveCgmInOutputs(compensatedNetwork, task);
+        return compensatedNetwork;
     }
 
-    public Network compensateNetwork(final MergingTask task) {
+    private Network compensateNetwork(final MergingTask task) {
         final SavedFile cgmFileToCompensate = task.getArtifacts().getFile(CGM_FILE_AFTER_PST);
         final Network cgm = Network.read(cgmFileToCompensate.getPath());
         final LoadFlowParameters loadFlowParameters = task.getConfigurations().getLoadFlowParameters();

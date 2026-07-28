@@ -184,7 +184,7 @@ class SlackCompensationServiceTest {
     }
 
     @Test
-    void shouldCompensateNetworkTest() {
+    void shouldCompensateNetwork() {
         final LoadFlow.Runner mockRunner = mock(LoadFlow.Runner.class);
         when(loadFlowRunnerSupplier.get()).thenReturn(mockRunner);
 
@@ -241,7 +241,7 @@ class SlackCompensationServiceTest {
                                                                        tempFile.toString(),
                                                                        "mock"));
 
-        final Network cgmAfterCompensation = slackCompensationService.compensateNetwork(task1);
+        final Network cgmAfterCompensation = slackCompensationService.compensateFinalCgmSlackImbalance(task1);
 
         final Load loadAfterCompensation = cgmAfterCompensation.getLoad(loadId);
         final Generator generatorAfterCompensation = cgmAfterCompensation.getGenerator(generatorId);

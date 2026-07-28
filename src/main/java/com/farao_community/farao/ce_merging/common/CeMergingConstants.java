@@ -1,15 +1,11 @@
-/*
- * Copyright (c) 2026, RTE (http://www.rte-france.com)
- * This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+/**
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)   This Source Code Form is subject to the terms of the Mozilla Public   License, v. 2.0. If a copy of the MPL was not distributed with this   file, You can obtain one at http://mozilla.org/MPL/2.0/.   SPDX-License-Identifier: MPL-2.0
  */
 package com.farao_community.farao.ce_merging.common;
 
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
 
 public final class CeMergingConstants {
 
@@ -62,7 +58,6 @@ public final class CeMergingConstants {
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String DANISH_TSO = "D1";
-    public static final Set<String> GERMAN_AND_DANISH_TSO = Set.of("D1", "D2", "D4", "D6", "D7", "D8");
     public static final String UCTE_FORMAT = "UCTE";
     public static final String XIIDM_FORMAT = "XIIDM";
     public static final String DC = "DC";
