@@ -15,7 +15,6 @@ import com.farao_community.farao.ce_merging.merging.process.forecast_netposition
 import com.farao_community.farao.ce_merging.merging.process.forecast_netpositions.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
@@ -27,35 +26,39 @@ import java.util.List;
 import java.util.Map;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 
 public class VirtualHubsShifting {
     private static final Logger LOGGER = LoggerFactory.getLogger(VirtualHubsShifting.class);
 
     public static Map<String, Double> applyVirtualHubFlows(final MergingTask task, final CeMergingConfiguration configuration) throws FileNotFoundException {
         Map<String, Double> virtualHubsGaps = new HashMap<>();
-        final ReferenceProgram referenceProgram = JsonUtils.read(ReferenceProgram.class, task.getArtifacts().getFile(ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE).getPath());
+        final ReferenceProgram referenceProgram = JsonUtils.read(ReferenceProgram.class, task.getArtifactPath(REFERENCE_PROGRAM_FORECAST_FILE));
         final List<VirtualHubRecord> virtualHubRecords = task.getConfigurations().getVirtualHubList();
-        final String tgmPath = task.getArtifacts().getFile(ArtifactType.TGM_FILE_AFTER_RECESSIVITY).getPath();
+        final String tgmPath = task.getArtifactPath(TGM_FILE_AFTER_RECESSIVITY);
         final Network network = Network.read(tgmPath);
         referenceProgram.getReferenceExchangeDataList()
-                .forEach(referenceExchangeData -> {
-                    final VirtualHubRecord virtualHubRecord = findVirtualHub(virtualHubRecords, referenceExchangeData.getAreaOutId(), referenceExchangeData.getAreaInId());
-                    final String nodeName = virtualHubRecord.getNodeName();
-                    final DanglingLine danglingLine = findDanglingLine(network, nodeName);
-                    if (danglingLine.getTerminal().isConnected()) {
-                        final double initialFlow = danglingLine.getP0();
-                        final double targetFlow = computeTargetFlow(virtualHubRecord, referenceExchangeData);
-                        final double virtualHubFlowGap = targetFlow - initialFlow;
-                        if (virtualHubFlowGap != 0.0) {
-                            final String country = CountryUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
-                            virtualHubsGaps.put(country, virtualHubFlowGap);
-                            setDanglingLineFlow(danglingLine, targetFlow);
-                            LOGGER.info("Shift virtual hub {}: {} -> {} (gap={})", nodeName, initialFlow, targetFlow, virtualHubFlowGap);
-                        }
-                    }
-                });
-        FileStorageUtils.saveArtifactNetwork(ArtifactType.TGM_FILE_AFTER_RECESSIVITY, network, task, UCTE_FORMAT, configuration);
+                .forEach(referenceExchangeData -> applyVirtualHubFlow(virtualHubsGaps, virtualHubRecords, network, referenceExchangeData));
+        FileStorageUtils.saveArtifactNetwork(TGM_FILE_AFTER_RECESSIVITY, network, task, UCTE_FORMAT, configuration);
         return virtualHubsGaps;
+    }
+
+    private static void applyVirtualHubFlow(final Map<String, Double> virtualHubsGaps, final List<VirtualHubRecord> virtualHubRecords, final Network network, final ReferenceExchangeData referenceExchangeData) {
+        final VirtualHubRecord virtualHubRecord = findVirtualHub(virtualHubRecords, referenceExchangeData.getAreaOutId(), referenceExchangeData.getAreaInId());
+        final String nodeName = virtualHubRecord.getNodeName();
+        final DanglingLine danglingLine = findDanglingLine(network, nodeName);
+        if (danglingLine.getTerminal().isConnected()) {
+            final double initialFlow = danglingLine.getP0();
+            final double targetFlow = computeTargetFlow(virtualHubRecord, referenceExchangeData);
+            final double virtualHubFlowGap = targetFlow - initialFlow;
+            if (virtualHubFlowGap != 0.0) {
+                final String country = CountryUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
+                virtualHubsGaps.put(country, virtualHubFlowGap);
+                setDanglingLineFlow(danglingLine, targetFlow);
+                LOGGER.info("Shift virtual hub {}: {} -> {} (gap={})", nodeName, initialFlow, targetFlow, virtualHubFlowGap);
+            }
+        }
     }
 
     private static double computeTargetFlow(final VirtualHubRecord virtualHub, final ReferenceExchangeData exchange) {
