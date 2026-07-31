@@ -67,6 +67,19 @@
                             <outputDirectory>${project.build.directory}/generated-sources/jaxb/forecast_netpositions</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>glsk_fix</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/xsd/glsk_fix</source>
+                            </sources>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.glsk_fix</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb/glsk_fix</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
