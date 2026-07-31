@@ -18,6 +18,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.Properties;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MONITA1_ME_NODE_NAME;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MONITA2_ME_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MONITA_NAMING_STRATEGY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_EXPORT_NAMING_STRATEGY_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
@@ -28,9 +30,6 @@ import static com.powsybl.iidm.network.Country.ME;
 
 @Service
 public class MonitaService {
-    private static final String MONITA1_ME_NODE_NAME = "XKOTR120";
-    private static final String MONITA2_ME_NODE_NAME = "XKOTR220";
-
     private final CeMergingConfiguration configuration;
 
     public MonitaService(final CeMergingConfiguration configuration) {
