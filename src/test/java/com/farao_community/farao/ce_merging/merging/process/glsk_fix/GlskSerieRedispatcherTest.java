@@ -24,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class GlskSerieRedispatcherTest {
 
-    public static final String AREA_1 = "AREA1";
-    public static final String TS_001 = "TS001";
-    public static final String TS_002 = "TS002";
+    private static final String AREA_1 = "AREA1";
+    private static final String TS_001 = "TS001";
+    private static final String TS_002 = "TS002";
 
     @Test
     void shouldStoreValueByArea() {
@@ -116,7 +116,7 @@ public class GlskSerieRedispatcherTest {
         );
     }
 
-    private GSKSeriesType createGskSeries(String id) {
+    private GSKSeriesType createGskSeries(final String id) {
         final GSKSeriesType series = new GSKSeriesType();
         final IdentificationType identification = new IdentificationType();
         identification.setV(id);

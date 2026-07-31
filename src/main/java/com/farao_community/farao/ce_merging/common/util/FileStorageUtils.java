@@ -50,11 +50,10 @@ public final class FileStorageUtils {
                                             final T businessObject,
                                             final MergingTask task,
                                             final CeMergingConfiguration configuration) {
-
-        final SavedFile artifactFile = save(
-            configuration.getArtifactsDirectoryPath(task),
-            fileType.getFileName(task.getInputs().getTargetDate()),
-            fileType.getLocation(task.getId()),
+        saveArtifactFileWithWriter(
+                fileType,
+                task,
+                configuration,
                 path -> {
                     try {
                         JsonUtils.writeInPath((Class<T>) businessObject.getClass(), businessObject, path);
@@ -63,9 +62,21 @@ public final class FileStorageUtils {
                     }
                 }
         );
+    }
+
+    public static void saveArtifactFileWithWriter(final ArtifactType fileType,
+                                                  final MergingTask task,
+                                                  final CeMergingConfiguration configuration,
+                                                  final ThrowingConsumer<Path> writer) {
+
+        final SavedFile artifactFile = save(
+                configuration.getArtifactsDirectoryPath(task),
+                fileType.getFileName(task.getInputs().getTargetDate()),
+                fileType.getLocation(task.getId()),
+                writer
+        );
 
         task.getArtifacts().putFile(fileType, artifactFile);
-
     }
 
     public static void saveArtifactNetwork(final ArtifactType fileType,

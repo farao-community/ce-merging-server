@@ -6,7 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.*;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKSeriesType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.AutoGSKBlockType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualGSKBlockType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualNodesType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.TimeIntervalType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.commons.report.TypedValue;
 import org.threeten.extra.Interval;
@@ -24,18 +29,18 @@ import static com.powsybl.glsk.commons.GlskReports.NODE_ID_KEY;
 
 public final class GlskBlockFix {
 
-    static void validateAndRemoveInvalidGskBlocks(final Map<String, List<GlskRedispatchingEntity>> incorrectGlskBlockValue,
-                                                  final Map<String, List<GlskRedispatchingEntity>> correctGlskBlockValue,
-                                                  final GSKSeriesType glsk,
-                                                  final Instant targetDate,
-                                                  final List<ReportNode> reportNodeList) {
+    static void removeInvalidGskBlocks(final Map<String, List<GlskRedispatchingEntity>> incorrectValuesByGskName,
+                                       final Map<String, List<GlskRedispatchingEntity>> correctValuesByGskName,
+                                       final GSKSeriesType glsk,
+                                       final Instant targetDate,
+                                       final List<ReportNode> reportNodeList) {
         filterAutoGskBlocks(glsk.getAutoGSKBlock(), targetDate, reportNodeList);
-        processManualBlocks(glsk.getManualGSKBlock(), incorrectGlskBlockValue, correctGlskBlockValue, targetDate, reportNodeList);
+        processManualBlocks(glsk.getManualGSKBlock(), incorrectValuesByGskName, correctValuesByGskName, targetDate, reportNodeList);
     }
 
     private static void filterAutoGskBlocks(final List<AutoGSKBlockType> blocks, final Instant targetDate, final List<ReportNode> reportNodeList) {
         blocks.removeIf(block -> {
-            if (isAlegroHub(block.getGSKName().getV()) || !getInterval(block.getTimeInterval()).contains(targetDate)) {
+            if (isAlegroHub(block.getGSKName()) || !isInTimeInterval(block.getTimeInterval(), targetDate)) {
                 return true;
             }
             removeInvalidAutoGskNodes(block, reportNodeList);
@@ -43,84 +48,83 @@ public final class GlskBlockFix {
         });
     }
 
-    private static void removeInvalidAutoGskNodes(final AutoGSKBlockType autoGSKBlockType, final List<ReportNode> reportNodeList) {
+    private static void removeInvalidAutoGskNodes(final AutoGSKBlockType autoGSKBlock, final List<ReportNode> reportNodeList) {
         final Set<String> reportNodeIds = reportNodeList.stream()
                 .map(reportNode -> extractValue(reportNode, NODE_ID_KEY))
                 .collect(Collectors.toSet());
 
-        autoGSKBlockType.getAutoNodes()
+        autoGSKBlock.getAutoNodes()
                 .removeIf(autoNode -> reportNodeIds.contains(autoNode.getNodeName().getV()));
     }
 
     private static void processManualBlocks(final List<ManualGSKBlockType> blocks,
-                                          final Map<String, List<GlskRedispatchingEntity>> incorrectGlskBlockValue,
-                                          final Map<String, List<GlskRedispatchingEntity>> correctGlskBlockValue,
-                                          final Instant targetDate,
-                                          final List<ReportNode> reportNodeList) {
+                                            final Map<String, List<GlskRedispatchingEntity>> incorrectValuesByGskName,
+                                            final Map<String, List<GlskRedispatchingEntity>> correctValuesByGskName,
+                                            final Instant targetDate,
+                                            final List<ReportNode> reportNodeList) {
         final List<ManualGSKBlockType> manualNodesBlocks = new ArrayList<>();
 
-        blocks.forEach(manualGSKBlockType -> {
-            if (isAlegroHub(manualGSKBlockType.getGSKName().getV())) {
-                manualNodesBlocks.add(manualGSKBlockType);
+        blocks.forEach(manualGskBlock -> {
+            if (isAlegroHub(manualGskBlock.getGSKName())) {
+                manualNodesBlocks.add(manualGskBlock);
             }
-            final Interval timeInterval = getInterval(manualGSKBlockType.getTimeInterval());
-            if (timeInterval.contains(targetDate)) {
-                removeInvalidManualNodesAndStoreFactors(incorrectGlskBlockValue, correctGlskBlockValue, manualGSKBlockType, reportNodeList);
+            if (isInTimeInterval(manualGskBlock.getTimeInterval(), targetDate)) {
+                removeInvalidManualNodesAndStoreFactors(incorrectValuesByGskName, correctValuesByGskName, manualGskBlock, reportNodeList);
             } else {
-                manualNodesBlocks.add(manualGSKBlockType);
+                manualNodesBlocks.add(manualGskBlock);
             }
-            if (manualGSKBlockType.getManualNodes().isEmpty()) {
-                storeFactorValueByNodes(incorrectGlskBlockValue, manualGSKBlockType.getGSKName().getV(), manualGSKBlockType.getManualNodes());
-                manualNodesBlocks.add(manualGSKBlockType);
+            if (manualGskBlock.getManualNodes().isEmpty()) {
+                storeFactorValueByNodes(incorrectValuesByGskName, manualGskBlock.getGSKName().getV(), manualGskBlock.getManualNodes());
+                manualNodesBlocks.add(manualGskBlock);
             }
 
-            GlskBlockRedispatcher.redispatchFactorValue(incorrectGlskBlockValue, correctGlskBlockValue, manualGSKBlockType);
+            GlskBlockRedispatcher.redispatchFactorValue(incorrectValuesByGskName, correctValuesByGskName, manualGskBlock);
 
         });
 
         blocks.removeAll(manualNodesBlocks);
     }
 
-    private static void removeInvalidManualNodesAndStoreFactors(final Map<String, List<GlskRedispatchingEntity>> incorrectGlskBlockValue,
-                                         final Map<String, List<GlskRedispatchingEntity>> correctGlskBlockValue,
-                                         final ManualGSKBlockType manualGSKBlockType,
-                                         final List<ReportNode> reportNodeList) {
+    private static void removeInvalidManualNodesAndStoreFactors(final Map<String, List<GlskRedispatchingEntity>> incorrectValuesByGskName,
+                                                                final Map<String, List<GlskRedispatchingEntity>> correctValuesByGskName,
+                                                                final ManualGSKBlockType manualGSKBlock,
+                                                                final List<ReportNode> reportNodeList) {
         final List<ManualNodesType> nodesToRemove = new ArrayList<>();
 
-        manualGSKBlockType.getManualNodes().forEach(manualNodesType -> {
+        manualGSKBlock.getManualNodes().forEach(manualNodes -> {
             reportNodeList.stream()
-                    .filter(reportNode -> extractValue(reportNode, NODE_ID_KEY).equals(manualNodesType.getNodeName().getV()))
-                    .map(reportNode -> manualNodesType)
+                    .filter(reportNode -> extractValue(reportNode, NODE_ID_KEY).equals(manualNodes.getNodeName().getV()))
+                    .map(reportNode -> manualNodes)
                     .forEach(nodesToRemove::add);
         });
 
-        manualGSKBlockType.getManualNodes().removeAll(nodesToRemove);
+        manualGSKBlock.getManualNodes().removeAll(nodesToRemove);
 
-        final String gskName = manualGSKBlockType.getGSKName().getV();
-        final List<ManualNodesType> manualNodesTypeList = manualGSKBlockType.getManualNodes();
+        final String gskName = manualGSKBlock.getGSKName().getV();
+        final List<ManualNodesType> manualNodesList = manualGSKBlock.getManualNodes();
 
-        storeFactorValueByNodes(incorrectGlskBlockValue, gskName, nodesToRemove);
-        storeFactorValueByNodes(correctGlskBlockValue, gskName, manualNodesTypeList);
+        storeFactorValueByNodes(incorrectValuesByGskName, gskName, nodesToRemove);
+        storeFactorValueByNodes(correctValuesByGskName, gskName, manualNodesList);
     }
 
-    private static void storeFactorValueByNodes(final Map<String, List<GlskRedispatchingEntity>> map, final String gskName, final List<ManualNodesType> manualNodesTypeList) {
-        manualNodesTypeList.forEach(manualNodesType -> {
-            final String nodeName = manualNodesType.getNodeName().getV();
-            final double factor = manualNodesType.getFactor().getV().doubleValue();
-            GlskBlockRedispatcher.storeValue(map, gskName, nodeName, factor);
+    private static void storeFactorValueByNodes(final Map<String, List<GlskRedispatchingEntity>> valuesByGskName, final String gskName, final List<ManualNodesType> manualNodesList) {
+        manualNodesList.forEach(manualNode -> {
+            final String nodeName = manualNode.getNodeName().getV();
+            final double factor = manualNode.getFactor().getV().doubleValue();
+            GlskBlockRedispatcher.storeValue(valuesByGskName, gskName, nodeName, factor);
         });
     }
 
-    private static boolean isAlegroHub(final String gskName) {
-        return VIRTUAL_HUB_ALEGRO_BE_CODE.equals(gskName) || VIRTUAL_HUB_ALEGRO_DE_CODE.equals(gskName);
+    private static boolean isAlegroHub(final IdentificationType gskName) {
+        return VIRTUAL_HUB_ALEGRO_BE_CODE.equals(gskName.getV()) || VIRTUAL_HUB_ALEGRO_DE_CODE.equals(gskName.getV());
     }
 
     private static String extractValue(final ReportNode reportNode, final String key) {
         return reportNode.getValue(key).map(TypedValue::toString).orElseThrow(() -> new IllegalArgumentException("Missing value for key: " + key));
     }
 
-    private static Interval getInterval(final TimeIntervalType timeInterval) {
-        return Interval.parse(timeInterval.getV());
+    private static boolean isInTimeInterval(final TimeIntervalType timeInterval, final Instant targetDate) {
+        return Interval.parse(timeInterval.getV()).contains(targetDate);
     }
 
 }

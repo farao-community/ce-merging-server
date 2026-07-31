@@ -42,7 +42,7 @@ class GlskBlockFixTest {
         final GSKSeriesType series = createSeries();
         series.getAutoGSKBlock().add(createAutoBlock(GSK_NAME, INVALID_INTERVAL));
 
-        GlskBlockFix.validateAndRemoveInvalidGskBlocks(
+        GlskBlockFix.removeInvalidGskBlocks(
                 new HashMap<>(),
                 new HashMap<>(),
                 series,
@@ -58,7 +58,7 @@ class GlskBlockFixTest {
         final GSKSeriesType series = createSeries();
         series.getManualGSKBlock().add(createManualBlock(GSK_NAME, INVALID_INTERVAL));
 
-        GlskBlockFix.validateAndRemoveInvalidGskBlocks(
+        GlskBlockFix.removeInvalidGskBlocks(
                 new HashMap<>(),
                 new HashMap<>(),
                 series,
@@ -78,7 +78,7 @@ class GlskBlockFixTest {
 
         series.getManualGSKBlock().add(block);
 
-        GlskBlockFix.validateAndRemoveInvalidGskBlocks(
+        GlskBlockFix.removeInvalidGskBlocks(
                 new HashMap<>(),
                 new HashMap<>(),
                 series,
@@ -98,7 +98,7 @@ class GlskBlockFixTest {
 
         series.getManualGSKBlock().add(block);
 
-        GlskBlockFix.validateAndRemoveInvalidGskBlocks(
+        GlskBlockFix.removeInvalidGskBlocks(
                 new HashMap<>(),
                 new HashMap<>(),
                 series,
@@ -117,7 +117,7 @@ class GlskBlockFixTest {
     private ManualGSKBlockType createManualBlock(final String gskName,
                                                  final String interval) {
         final ManualGSKBlockType block = new ManualGSKBlockType();
-        block.setGSKName(createStringValue(gskName));
+        block.setGSKName(createGskName(gskName));
         block.setTimeInterval(createTimeInterval(interval));
         return block;
     }
@@ -125,7 +125,7 @@ class GlskBlockFixTest {
     private AutoGSKBlockType createAutoBlock(final String gskName,
                                              final String interval) {
         final AutoGSKBlockType block = new AutoGSKBlockType();
-        block.setGSKName(createStringValue(gskName));
+        block.setGSKName(createGskName(gskName));
         block.setTimeInterval(createTimeInterval(interval));
         return block;
     }
@@ -133,8 +133,8 @@ class GlskBlockFixTest {
     private ManualNodesType createManualNode(final String nodeName,
                                              final int factor) {
         final ManualNodesType node = new ManualNodesType();
-        node.setNodeName(createStringValue(nodeName));
-        node.setFactor(createDecimalValue(factor));
+        node.setNodeName(createGskName(nodeName));
+        node.setFactor(createFactor(factor));
         return node;
     }
 
@@ -148,21 +148,21 @@ class GlskBlockFixTest {
         return reportNode;
     }
 
-    private IdentificationType createStringValue(final String value) {
-        final IdentificationType type = new IdentificationType();
-        type.setV(value);
-        return type;
+    private IdentificationType createGskName(final String gskNameValue) {
+        final IdentificationType gskName = new IdentificationType();
+        gskName.setV(gskNameValue);
+        return gskName;
     }
 
-    private TimeIntervalType createTimeInterval(final String value) {
-        final TimeIntervalType type = new TimeIntervalType();
-        type.setV(value);
-        return type;
+    private TimeIntervalType createTimeInterval(final String timeIntervalValue) {
+        final TimeIntervalType timeInterval = new TimeIntervalType();
+        timeInterval.setV(timeIntervalValue);
+        return timeInterval;
     }
 
-    private QuantityType createDecimalValue(final int value) {
-        final QuantityType type = new QuantityType();
-        type.setV(BigDecimal.valueOf(value));
-        return type;
+    private QuantityType createFactor(final int factorValue) {
+        final QuantityType factor = new QuantityType();
+        factor.setV(BigDecimal.valueOf(factorValue));
+        return factor;
     }
 }

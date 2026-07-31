@@ -6,14 +6,9 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
-import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
-import com.farao_community.farao.ce_merging.merging.process.FileStorageService;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKDocument;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKSeriesType;
 import com.powsybl.commons.report.ReportNode;
@@ -23,67 +18,51 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.threeten.extra.Interval;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.nio.file.Files;
 import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
+import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.TSO_KEY;
 
 @Service
 public class GlskFixService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GlskFixService.class);
-    public static final String ACTUAL_GLSK_REPORT_CORRECTION_URL = "/tasks/%d/artifacts/actual-glsk-report-correction";
-    public static final String GLSK_CORRECTED_NAME = "glsk_corrected_%s_2D%s_UX0.xml";
 
-    private final CeMergingConfiguration configuration;
-    private final FileStorageService storage;
-
-    public GlskFixService(CeMergingConfiguration configuration, FileStorageService service) {
-        this.configuration = configuration;
-        this.storage = service;
+    public byte[] fixGlsk(final byte[] glskBytes, final ReportNode reportNode, final Instant targetDate) {
+        return fixGlsk(glskBytes, reportNode, targetDate, DateTimeUtils.getNowDate());
     }
 
-    public byte[] fixGlsk(byte[] glskBytes, ReportNode reportNode, Instant targetDate) {
-        return fixGlsk(glskBytes, reportNode, targetDate, getNowDate());
-    }
-
-    public byte[] fixGlsk(byte[] glskBytes, final ReportNode reportNode, final Instant targetDate, final XMLGregorianCalendar fileCreationDate) {
+    public byte[] fixGlsk(final byte[] glskBytes, final ReportNode reportNode, final Instant targetDate, final XMLGregorianCalendar fileCreationDate) {
         final GSKDocument glskDocument = importGlskDocument(glskBytes);
         updateCreationDate(glskDocument, fileCreationDate);
-        fixSeries(reportNode, targetDate, glskDocument);
+        fixGlskSeries(reportNode, targetDate, glskDocument);
         return exportGLsk(glskDocument);
     }
 
-    private void fixSeries(final ReportNode reportNode, final Instant targetDate, final GSKDocument glskDocument) {
-        final List<GSKSeriesType> removeGskSeriesTypes = new ArrayList<>();
+    private void fixGlskSeries(final ReportNode reportNode, final Instant targetDate, final GSKDocument glskDocument) {
+        final List<GSKSeriesType> invalidGskSeries = new ArrayList<>();
         final GlskFixContext context = new GlskFixContext();
         glskDocument.getGSKSeries().forEach(glskSeries -> {
-            GlskBlockFix.validateAndRemoveInvalidGskBlocks(
-                    context.getIncorrectBlock(),
-                    context.getCorrectBlock(),
+            GlskBlockFix.removeInvalidGskBlocks(
+                    context.getIncorrectBlockByGskName(),
+                    context.getCorrectBlockByGskName(),
                     glskSeries,
                     targetDate,
                     getQualityLogs(reportNode, glskSeries.getArea().getV())
             );
-            if (isEmptyGlskSeries(glskSeries)) {
-                removeGskSeriesTypes.add(glskSeries);
+            if (isEmpty(glskSeries)) {
+                invalidGskSeries.add(glskSeries);
             } else {
-                storeSerieValue(context.getCorrectSerie(), glskSeries);
+                storeSerieValue(context.getCorrectSeriesByArea(), glskSeries);
             }
         });
 
-        glskDocument.getGSKSeries().removeAll(removeGskSeriesTypes);
-        GlskSerieRedispatcher.redispatchShareValue(context.getCorrectSerie(), glskDocument);
+        glskDocument.getGSKSeries().removeAll(invalidGskSeries);
+        GlskSerieRedispatcher.redispatchShareValue(context.getCorrectSeriesByArea(), glskDocument);
     }
 
     private void storeSerieValue(final Map<String, List<GlskRedispatchingEntity>> correctSeries, final GSKSeriesType glskSeries) {
@@ -97,7 +76,7 @@ public class GlskFixService {
         glskDocument.getCreationDateTime().setV(fileCreationDate);
     }
 
-    private static boolean isEmptyGlskSeries(GSKSeriesType glskSeries) {
+    private static boolean isEmpty(final GSKSeriesType glskSeries) {
         return glskSeries.getAutoGSKBlock().isEmpty() &&
                 glskSeries.getManualGSKBlock().isEmpty() &&
                 CollectionUtils.isEmpty(glskSeries.getCountryGSKBlock());
@@ -105,48 +84,22 @@ public class GlskFixService {
 
     private List<ReportNode> getQualityLogs(final ReportNode reportNode, final String tso) {
         return reportNode.getChildren().stream()
-                .filter(report -> report.getValue("TSO")
+                .filter(report -> report.getValue(TSO_KEY)
                         .map(Object::toString)
                         .filter(tso::equals)
                         .isPresent())
                 .toList();
     }
 
-    private GSKDocument importGlskDocument(byte[] glskBytes) {
+    private GSKDocument importGlskDocument(final byte[] glskBytes) {
         return JaxbUtils.readFromBytes(GSKDocument.class, glskBytes);
     }
 
-    private byte[] exportGLsk(GSKDocument glskDocument) {
+    private byte[] exportGLsk(final GSKDocument glskDocument) {
         return JaxbUtils.writeToBytes(GSKDocument.class, glskDocument);
     }
 
-    private XMLGregorianCalendar getNowDate() {
-        try {
-            final GregorianCalendar calendar = GregorianCalendar.from(ZonedDateTime.now(PARIS_ZONE_ID));
-            final XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
-            xmlGregorianCalendar.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
-            xmlGregorianCalendar.setTimezone(0);
-            return xmlGregorianCalendar;
-        } catch (DatatypeConfigurationException e) {
-            throw new CeMergingException("Cannot create XMLGregorianCalendar date for fixed glsk document, " + e.getMessage());
-        }
-    }
-
-    protected void saveInArtifacts(byte[] file, MergingTask task) {
-        final String fileName = generateGlskFileName(task);
-        final SavedFile savedFile = storage.save(configuration.getArtifactsDirectoryPath(task),
-                fileName,
-                String.format(ACTUAL_GLSK_REPORT_CORRECTION_URL, task.getId()),
-                path -> Files.write(path, file));
-        task.getArtifacts().putFile(ArtifactType.GLSK_QUALITY_CORRECTED_FILE, savedFile);
-
-    }
-
-    private String generateGlskFileName(MergingTask task) {
-        return String.format(GLSK_CORRECTED_NAME, DateTimeUtils.formatTargetDate(task), DateTimeUtils.dayOfWeek(task));
-    }
-
-    void checkTimeInterval(byte[] glskBytes, OffsetDateTime targetDate) {
+    void checkTimeInterval(final byte[] glskBytes, final OffsetDateTime targetDate) {
         final GSKDocument glskDocument = importGlskDocument(glskBytes);
         final Interval timeInterval = Interval.parse(glskDocument.getGSKTimeInterval().getV());
         if (!timeInterval.contains(targetDate.toInstant())) {
@@ -157,20 +110,20 @@ public class GlskFixService {
 
     private static class GlskFixContext {
 
-        private final Map<String, List<GlskRedispatchingEntity>> incorrectBlock = new HashMap<>();
-        private final Map<String, List<GlskRedispatchingEntity>> correctBlock = new HashMap<>();
-        private final Map<String, List<GlskRedispatchingEntity>> correctSerie = new HashMap<>();
+        private final Map<String, List<GlskRedispatchingEntity>> incorrectBlockByGskName = new HashMap<>();
+        private final Map<String, List<GlskRedispatchingEntity>> correctBlockByGskName = new HashMap<>();
+        private final Map<String, List<GlskRedispatchingEntity>> correctSeriesByArea = new HashMap<>();
 
-        public Map<String, List<GlskRedispatchingEntity>> getIncorrectBlock() {
-            return incorrectBlock;
+        public Map<String, List<GlskRedispatchingEntity>> getIncorrectBlockByGskName() {
+            return incorrectBlockByGskName;
         }
 
-        public Map<String, List<GlskRedispatchingEntity>> getCorrectBlock() {
-            return correctBlock;
+        public Map<String, List<GlskRedispatchingEntity>> getCorrectBlockByGskName() {
+            return correctBlockByGskName;
         }
 
-        public Map<String, List<GlskRedispatchingEntity>> getCorrectSerie() {
-            return correctSerie;
+        public Map<String, List<GlskRedispatchingEntity>> getCorrectSeriesByArea() {
+            return correctSeriesByArea;
         }
     }
 }

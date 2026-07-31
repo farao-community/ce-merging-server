@@ -26,9 +26,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
-import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_BASE_NAME;
+import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.NODE_ID_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.TYPE_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.TSO_KEY;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,7 +51,7 @@ public class GlskQualityCheckServiceTest {
     public void shouldReturnAlegroSeries() throws IOException, URISyntaxException {
         final List<GSKSeriesType> alegroGskSeries = glskQualityCheckService.getAlegroGskSeries(
                 loadGlsk(ALEGRO_FILE),
-                instant(VALID_DATE)
+                toInstant(VALID_DATE)
         );
         assertEquals(2, alegroGskSeries.size());
     }
@@ -56,7 +60,7 @@ public class GlskQualityCheckServiceTest {
     public void shouldReturnEmptyListWhenTargetDateDoesNotMatch() throws IOException, URISyntaxException {
         final List<GSKSeriesType> alegroGskSeries = glskQualityCheckService.getAlegroGskSeries(
                 loadGlsk(ALEGRO_FILE),
-                instant("2019-08-29T23:30:00Z")
+                toInstant("2019-08-29T23:30:00Z")
         );
         assertTrue(alegroGskSeries.isEmpty());
     }
@@ -65,7 +69,7 @@ public class GlskQualityCheckServiceTest {
     public void shouldReturnEmptyListWhenFileContainsNoAlegroSeries() throws IOException, URISyntaxException {
         final List<GSKSeriesType> alegroGskSeries = glskQualityCheckService.getAlegroGskSeries(
                 loadGlsk("20160728_GLSK.xml"),
-                instant(VALID_DATE));
+                toInstant(VALID_DATE));
         assertTrue(alegroGskSeries.isEmpty());
     }
 
@@ -75,7 +79,7 @@ public class GlskQualityCheckServiceTest {
         addReport(rootReportNode, "glsk.node.not.found", "XLI_OB1A", "Load", "22Y201903145---4");
         addReport(rootReportNode, "glsk.node.connected", "XLI_OB1B", "Generator", "22Y201903144---9");
         addReport(rootReportNode, "glsk.node.not.found", "XNODE", "Load", "NL");
-        final ReportNode newReporter = glskQualityCheckService.removeInitialAlegroReports(rootReportNode);
+        final ReportNode newReporter = glskQualityCheckService.createReportWithoutAlegroReports(rootReportNode);
         assertEquals(1, newReporter.getChildren().size());
     }
 
@@ -190,12 +194,12 @@ public class GlskQualityCheckServiceTest {
                 .build();
     }
 
-    private byte[] loadGlsk(String fileName) throws IOException, URISyntaxException {
+    private byte[] loadGlsk(final String fileName) throws IOException, URISyntaxException {
         return Files.readAllBytes(
                 Paths.get(getClass().getResource("/glskFix/" + fileName).toURI()));
     }
 
-    private Instant instant(String isoDate) {
+    private Instant toInstant(final String isoDate) {
         return OffsetDateTime.parse(isoDate).toInstant();
     }
 }

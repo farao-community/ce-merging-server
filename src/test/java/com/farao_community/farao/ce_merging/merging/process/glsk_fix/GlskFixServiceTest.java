@@ -6,18 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
-import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
-import com.farao_community.farao.ce_merging.merging.process.FileStorageService;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.*;
 
 import com.powsybl.commons.report.ReportNode;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -36,26 +30,15 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class GlskFixServiceTest {
 
     public static final String INVALID_TARGET_DATE = "2016-07-30T10:00:00Z";
-    @Mock
-    private CeMergingConfiguration configuration;
-
-    @Mock
-    private FileStorageService storage;
-
-    private GlskFixService glskFixService;
 
     private static final String TARGET_DATE = "2016-07-29T00:00:00Z";
     private static final String CREATION_DATE = "2026-01-01T00:00:00Z";
     private static final String GLSK_FIX_RESOURCE_PATH = "glskFix";
 
-    @BeforeEach
-    void setUp() {
-        glskFixService = new GlskFixService(configuration, storage);
-    }
+    private GlskFixService glskFixService = new GlskFixService();
 
     @Test
     void shouldUpdateCreationDateWhenProcessingGlskFile() throws Exception {

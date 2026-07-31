@@ -20,8 +20,8 @@ public final class GlskSerieRedispatcher {
         // Utility class
     }
 
-    static void storeValue(final Map<String, List<GlskRedispatchingEntity>> map, final String area, final String timeSeriesIdentification, final double shareValue) {
-        map.computeIfAbsent(area, s -> new ArrayList<>()).add(new GlskRedispatchingEntity(timeSeriesIdentification, shareValue));
+    static void storeValue(final Map<String, List<GlskRedispatchingEntity>> valuesByArea, final String area, final String timeSeriesIdentification, final double shareValue) {
+        valuesByArea.computeIfAbsent(area, s -> new ArrayList<>()).add(new GlskRedispatchingEntity(timeSeriesIdentification, shareValue));
     }
 
     static void redispatchShareValue(final Map<String, List<GlskRedispatchingEntity>> valuesByArea, final GSKDocument gskDocument) {
@@ -31,14 +31,14 @@ public final class GlskSerieRedispatcher {
                 LOGGER.info("The sum of shares for area {} is {}, a share adjustment will be made.", area, shareSum);
                 final double shareAdjustment = TARGET_SHARE_VALUE - shareSum;
                 entities.forEach(entity ->
-                    updateGskShare(entity, shareAdjustment, shareSum, gskDocument)
+                        updateGskShare(entity, shareAdjustment, shareSum, gskDocument)
                 );
             }
         });
     }
 
     private static void updateGskShare(final GlskRedispatchingEntity entity, final double adjustment, final double shareSum, final GSKDocument gskDocument) {
-        if (Double.compare(shareSum, 0.0) == 0) {
+        if (shareSum == 0.0) {
             throw new CeMergingException("Division by zero: share sum cannot be zero");
         }
         final double initialShare = entity.getShare();

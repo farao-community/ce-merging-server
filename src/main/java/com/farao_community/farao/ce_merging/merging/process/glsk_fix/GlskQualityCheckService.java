@@ -8,9 +8,9 @@ package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
-import com.farao_community.farao.ce_merging.merging.process.FileStorageService;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -35,15 +35,26 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.time.*;
+import java.nio.file.Files;
+import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.GregorianCalendar;
 import java.util.function.Function;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_CODE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_CODE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SENDER_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RECEIVER_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_BASE_NAME;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CORE_REGION_ID;
 
 @Service
 public class GlskQualityCheckService {
@@ -54,17 +65,13 @@ public class GlskQualityCheckService {
     static final String TYPE_KEY = "Type";
     static final String TSO_KEY = "TSO";
     private static final Logger LOGGER = LoggerFactory.getLogger(GlskQualityCheckService.class);
-    private static final String GLSK_QUALITY_REPORT_URL = "/tasks/%d/artifacts/glsk-quality-report";
-    private static final String GLSK_QUALITY_REPORT_FILENAME = "%s_GLSK_QUALITY_CHECK.xml";
 
     private final CeMergingConfiguration configuration;
     private final GlskFixService glskFixService;
-    private final FileStorageService storageService;
 
-    public GlskQualityCheckService(CeMergingConfiguration configuration, GlskFixService glskFixService, FileStorageService storageService) {
+    public GlskQualityCheckService(CeMergingConfiguration configuration, GlskFixService glskFixService) {
         this.configuration = configuration;
         this.glskFixService = glskFixService;
-        this.storageService = storageService;
     }
 
     public void runQualityCheck(final MergingTask task) {
@@ -79,15 +86,32 @@ public class GlskQualityCheckService {
             ReportNode rootReportNode = createRootReportNode();
             GlskQualityProcessor.process(mergedFile.getOriginalName(), mergedFileIs, new ByteArrayInputStream(glskBytes), processTargetDate.toInstant(), rootReportNode);
             final byte[] correctedGlsk = glskFixService.fixGlsk(glskBytes, rootReportNode, processTargetDate.toInstant());
+            FileStorageUtils.saveArtifactFileWithWriter(
+                    ArtifactType.GLSK_QUALITY_CORRECTED_FILE,
+                    task,
+                    configuration,
+                    path -> {
+                        try {
+                            Files.write(path, correctedGlsk);
+                        } catch (IOException e) {
+                            throw new CeMergingException("Cannot write corrected GLSK artifact file", e);
+                        }
+                    }
+            );
             if (Boolean.TRUE.equals(inputs.getMergingWithInternalHvdc())) {
                 Network network = Network.read(mergedFile.getPath());
                 rootReportNode = checkAlegroGlskSeries(network, glskBytes, processTargetDate, rootReportNode);
             }
             QualityCheckReport xmlReport = exportQualityReport(rootReportNode, processTargetDate);
-            saveInArtifacts(xmlReport, task);
-            glskFixService.saveInArtifacts(correctedGlsk, task);
-        } catch (Exception e) {
-            String errorMessage = String.format("GLSK quality check failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
+            FileStorageUtils.saveArtifactFileWithWriter(
+                    ArtifactType.GLSK_QUALITY_REPORT,
+                    task,
+                    configuration,
+                    path -> JaxbUtils.writeToPath(QualityCheckReport.class, xmlReport, path)
+            );
+
+        } catch (final Exception e) {
+            final String errorMessage = String.format("GLSK quality check failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
             LOGGER.error(errorMessage, e);
             throw new CeMergingException(errorMessage, e);
         }
@@ -100,37 +124,36 @@ public class GlskQualityCheckService {
                 .build();
     }
 
-    ReportNode removeInitialAlegroReports(ReportNode initialReporter) {
+    ReportNode createReportWithoutAlegroReports(final ReportNode initialReporter) {
         //delete the log initially generated
-        ReportNode rootReportNode = ReportNode.newRootReportNode()
+        final ReportNode rootReportNode = ReportNode.newRootReportNode()
                 .withResourceBundles(REPORT_BASE_NAME, PowsyblEntsoeReportResourceBundle.BASE_NAME)
                 .withMessageTemplate(initialReporter.getMessageKey())
                 .build();
-        List<ReportNode> reportsWithoutAlegro = initialReporter.getChildren().stream()
+        initialReporter.getChildren().stream()
                 .filter(report -> !isAlegroReport(report))
-                .toList();
-        reportsWithoutAlegro.forEach(reportNode -> {
-            ReportNodeAdder reportNodeAdder = rootReportNode.newReportNode()
-                    .withMessageTemplate(reportNode.getMessageKey());
+                .forEach(reportNode -> {
+                    ReportNodeAdder reportNodeAdder = rootReportNode.newReportNode()
+                            .withMessageTemplate(reportNode.getMessageKey());
 
-            reportNode.getValues().forEach((key, value) -> reportNodeAdder.withTypedValue(key, value.toString(), ""));
+                    reportNode.getValues().forEach((key, value) -> reportNodeAdder.withTypedValue(key, value.toString(), ""));
 
-            reportNodeAdder.add();
-        });
+                    reportNodeAdder.add();
+                });
         return rootReportNode;
     }
 
-    private boolean isAlegroReport(ReportNode reportNode) {
-        Optional<TypedValue> typedValue = reportNode.getValue(TSO_KEY);
-        if (typedValue.isEmpty()) {
+    private boolean isAlegroReport(final ReportNode reportNode) {
+        final Optional<TypedValue> reportNodeValue = reportNode.getValue(TSO_KEY);
+        if (reportNodeValue.isEmpty()) {
             return false;
         }
-        String tsoEic = typedValue.get().toString();
+        final String tsoEic = reportNodeValue.get().toString();
         return VIRTUAL_HUB_ALEGRO_BE_EIC.equals(tsoEic) || VIRTUAL_HUB_ALEGRO_DE_EIC.equals(tsoEic);
     }
 
-    private ReportNode checkAlegroGlskSeries(Network network, byte[] glskBa, OffsetDateTime processTargetDate, ReportNode initialReport) {
-        ReportNode reporterWithAlegro = removeInitialAlegroReports(initialReport);
+    private ReportNode checkAlegroGlskSeries(final Network network, final byte[] glskBa, final OffsetDateTime processTargetDate, final ReportNode initialReport) {
+        final ReportNode reporterWithAlegro = createReportWithoutAlegroReports(initialReport);
         getAlegroGskSeries(glskBa, processTargetDate.toInstant())
                 .forEach(gskSeries -> checkAlegroGSKSeries(
                         gskSeries,
@@ -140,11 +163,11 @@ public class GlskQualityCheckService {
         return reporterWithAlegro;
     }
 
-    void checkAlegroGSKSeries(GSKSeriesType gskSeries, Network network, ReportNode reportNode) {
+    void checkAlegroGSKSeries(final GSKSeriesType gskSeries, final Network network, final ReportNode reportNode) {
 
-        List<AutoNodesType> autoNodes = new ArrayList<>();
-        List<ManualNodesType> manualNodes = new ArrayList<>();
-        List<String> nodeNames = new ArrayList<>();
+        final List<AutoNodesType> autoNodes = new ArrayList<>();
+        final List<ManualNodesType> manualNodes = new ArrayList<>();
+        final List<String> nodeNames = new ArrayList<>();
 
         gskSeries.getAutoGSKBlock().forEach(autoblock -> autoNodes.addAll(autoblock.getAutoNodes()));
         autoNodes.forEach(autonode -> nodeNames.add(autonode.getNodeName().getV()));
@@ -177,7 +200,7 @@ public class GlskQualityCheckService {
         }
     }
 
-    private String getType(GSKSeriesType gskSeries) {
+    private String getType(final GSKSeriesType gskSeries) {
         if (gskSeries.getBusinessType().getV().value().equals("Z02")) {
             return GENERATOR;
         } else if (gskSeries.getBusinessType().getV().value().equals("Z05")) {
@@ -215,29 +238,15 @@ public class GlskQualityCheckService {
         return interval.contains(processTargetDate);
     }
 
-    private void saveInArtifacts(final QualityCheckReport report, final MergingTask task) {
-        final String fileName = generateGlskQualityCheckFileName(task);
-        final SavedFile savedFile = storageService.save(
-                configuration.getArtifactsDirectoryPath(task),
-                fileName,
-                String.format(GLSK_QUALITY_REPORT_URL, task.getId()),
-                path -> JaxbUtils.writeToPath(
-                        QualityCheckReport.class,
-                        report,
-                        path)
-        );
-        task.getArtifacts().putFile(ArtifactType.GLSK_QUALITY_REPORT, savedFile);
-    }
-
-    QualityCheckReport exportQualityReport(ReportNode reporter, OffsetDateTime targetDateTime) throws DatatypeConfigurationException {
-        QualityCheckReport qualityCheckReport = new QualityCheckReport();
+    QualityCheckReport exportQualityReport(final ReportNode reporter, final OffsetDateTime targetDateTime) throws DatatypeConfigurationException {
+        final QualityCheckReport qualityCheckReport = new QualityCheckReport();
         fillHeader(qualityCheckReport, targetDateTime);
         fillQualityChecks(reporter, qualityCheckReport, targetDateTime);
 
         return qualityCheckReport;
     }
 
-    private void fillQualityChecks(ReportNode reportNode, QualityCheckReport qualityCheckReport, OffsetDateTime targetDateTime) {
+    private void fillQualityChecks(final ReportNode reportNode, final QualityCheckReport qualityCheckReport, final OffsetDateTime targetDateTime) {
         final List<QualityCheckType> convertedLogs = reportNode.getChildren().stream()
                 .map(report -> toQualityCheckType(report, targetDateTime))
                 .toList();
@@ -247,14 +256,14 @@ public class GlskQualityCheckService {
         qualityCheckReport.getQualityChecks().add(wrapper);
     }
 
-    private QualityCheckType toQualityCheckType(ReportNode reportNode, OffsetDateTime targetDateTime) {
+    private QualityCheckType toQualityCheckType(final ReportNode reportNode, final OffsetDateTime targetDateTime) {
         final QualityCheckType qualityCheckType = new QualityCheckType();
         qualityCheckType.setAssetId(getReportValue(reportNode, NODE_ID_KEY));
         qualityCheckType.setCheckId(reportNode.getMessageKey());
         qualityCheckType.setCheckType(GLSK);
         qualityCheckType.setInfo(getReportValue(reportNode, TYPE_KEY) + " - " + reportNode.getMessage());
         qualityCheckType.setSeverity("WARNING");
-        qualityCheckType.setTimeInterval(localDateToInterval(targetDateTime));
+        qualityCheckType.setTimeInterval(DateTimeUtils.toHourlyInterval(targetDateTime));
         final AreaType area = new AreaType();
         area.setCodingScheme(CodingSchemeType.A_01);
         area.setV(getReportValue(reportNode, TSO_KEY));
@@ -305,7 +314,7 @@ public class GlskQualityCheckService {
         qualityCheckReport.setMessageDateTime(messageDateTimeType);
 
         TimeIntervalType timeIntervalType = new TimeIntervalType();
-        timeIntervalType.setV(localDateToInterval(targetDateTime));
+        timeIntervalType.setV(DateTimeUtils.toHourlyInterval(targetDateTime));
         qualityCheckReport.setQualityCheckTimeInterval(timeIntervalType);
 
         MessageType messageType = new MessageType();
@@ -323,15 +332,5 @@ public class GlskQualityCheckService {
                 .orElseThrow(() -> new IllegalArgumentException("Missing report value: " + key))
                 .getValue()
                 .toString();
-    }
-
-    private String localDateToInterval(final OffsetDateTime targetDateTime) {
-        final Instant startInstant = targetDateTime.withMinute(0).toInstant();
-        final Instant endInstant = startInstant.plus(Duration.ofHours(1));
-        return String.format("%s/%s", OffsetDateTime.parse(startInstant.toString()), OffsetDateTime.parse(endInstant.toString()));
-    }
-
-    private String generateGlskQualityCheckFileName(final MergingTask task) {
-        return String.format(GLSK_QUALITY_REPORT_FILENAME, DateTimeUtils.formatTargetDate(task));
     }
 }
