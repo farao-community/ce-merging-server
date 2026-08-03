@@ -21,6 +21,8 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.xsd.xnodes.Xnodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.loadflow.json.JsonLoadFlowParameters;
 import com.powsybl.openrao.virtualhubs.BorderDirection;
 import com.powsybl.openrao.virtualhubs.VirtualHub;
 import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
@@ -45,6 +47,11 @@ public final class TaskTestUtils {
         } catch (Exception e) {
             // Should not happen
         }
+    }
+
+    public static void setLoadflowParameters(final MergingTask task, final String loadflowParametersFile) throws IOException {
+        final LoadFlowParameters loadFlowParameters = JsonLoadFlowParameters.read(new ClassPathResource(loadflowParametersFile).getInputStream());
+        task.getConfigurations().setLoadFlowParameters(loadFlowParameters);
     }
 
     private static InputStream getGridConfigStream(final String fileName) throws IOException {

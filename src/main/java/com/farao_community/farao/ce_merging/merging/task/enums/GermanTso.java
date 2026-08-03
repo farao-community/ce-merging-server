@@ -16,6 +16,6 @@ public enum GermanTso {
     D8;
 
     public static boolean includes(final String tsoCode) {
-        return Arrays.stream(values()).map(GermanTso::name).anyMatch(tsoCode::equals);
+        return tsoCode != null && Arrays.stream(values()).map(GermanTso::name).anyMatch(tsoCode::equals);
     }
 }

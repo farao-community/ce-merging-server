@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.powsybl.iidm.network.Country;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -21,11 +22,31 @@ public record NetPositionsResults(Map<String, NetPositions> netPositionsByCountr
         this.netPositionsByCountryMap = netPositionsByCountryMap;
     }
 
+    public NetPositionsResults() {
+        this(new HashMap<>());
+    }
+
     public NetPositions get(final Country country) {
         if (netPositionsByCountryMap == null || country == null) {
             return null;
         }
 
         return netPositionsByCountryMap.get(country.name());
+    }
+
+    public void put(final Country country, final NetPositions netPositions) {
+        netPositionsByCountryMap.put(country.name(), netPositions);
+    }
+
+    public void putIfAbsent(final Country country, final NetPositions netPositions) {
+        netPositionsByCountryMap.putIfAbsent(country.name(), netPositions);
+    }
+
+    public void put(final String region, final NetPositions netPositions) {
+        netPositionsByCountryMap.put(region, netPositions);
+    }
+
+    public void putIfAbsent(final String region, final NetPositions netPositions) {
+        netPositionsByCountryMap.putIfAbsent(region, netPositions);
     }
 }
