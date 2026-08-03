@@ -7,7 +7,8 @@
 package test_utils;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.exception.CeMergingException;import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -124,11 +125,14 @@ public final class CeTestUtils {
         return artifacts;
     }
 
-    public static Inputs singletonIgmInputs(final Country country, final String igmPath) {
+    public static Inputs singletonIgmInputs(final Country country,
+                                            final String igmPath) {
         return singletonIgmInputs(country.name(), igmPath);
     }
 
-    public static void createTempFolders(final MergingTask task, final Path tempDir, final CeMergingConfiguration configuration) {
+    public static void createTempFolders(final MergingTask task,
+                                         final Path tempDir,
+                                         final CeMergingConfiguration configuration) {
         try {
             Files.createDirectories(tempDir.resolve(Paths.get(configuration.getInputsDirectoryPath(task))));
             Files.createDirectories(tempDir.resolve(Paths.get(configuration.getArtifactsDirectoryPath(task))));
@@ -139,7 +143,8 @@ public final class CeTestUtils {
 
     }
 
-    public static Inputs singletonIgmInputs(final String country, final String igmPath) {
+    public static Inputs singletonIgmInputs(final String country,
+                                            final String igmPath) {
         final Inputs inputs = new Inputs();
         final IgmData igmEs = new IgmData();
         igmEs.setCountry(country);

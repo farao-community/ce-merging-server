@@ -33,7 +33,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -53,7 +52,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.createMockTask;
-import static test_utils.CeTestUtils.createTempFolders;import static test_utils.CeTestUtils.singletonArtifact;
+import static test_utils.CeTestUtils.createTempFolders;
+import static test_utils.CeTestUtils.singletonArtifact;
 import static test_utils.CeTestUtils.singletonIgmInputs;
 
 @SpringBootTest
