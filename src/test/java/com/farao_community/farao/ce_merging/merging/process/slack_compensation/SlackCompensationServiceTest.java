@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.slack_compensation;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -22,6 +22,7 @@ import com.powsybl.loadflow.LoadFlowResult;
 import com.powsybl.openloadflow.OpenLoadFlowProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -32,9 +33,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -42,6 +43,7 @@ import java.util.function.Supplier;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XIIDM_FORMAT;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
+import static com.powsybl.iidm.network.Country.ES;
 import static com.powsybl.iidm.network.TopologyKind.BUS_BREAKER;
 import static com.powsybl.loadflow.LoadFlowResult.ComponentResult.Status.CONVERGED;
 import static java.util.Collections.singletonList;
@@ -51,7 +53,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.createMockTask;
-import static test_utils.CeTestUtils.singletonArtifact;
+import static test_utils.CeTestUtils.createTempFolders;import static test_utils.CeTestUtils.singletonArtifact;
+import static test_utils.CeTestUtils.singletonIgmInputs;
 
 @SpringBootTest
 @ActiveProfiles("OpenLoadFlow")
@@ -66,13 +69,16 @@ class SlackCompensationServiceTest {
     @Autowired
     private CeMergingConfiguration configuration;
 
+    @TempDir
+    Path tempDir;
+
     private MergingTask task1;
     private MergingTask task2;
     private MergingTask task3;
 
     @TestConfiguration
     @Profile("OpenLoadFlow")
-    static class PlatformConfigTestContextConfig {
+    static class PlatformTestConfig {
 
         @Bean
         @Primary
@@ -88,28 +94,17 @@ class SlackCompensationServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        final Inputs inputs = new Inputs();
-        inputs.setTargetDate(OffsetDateTime.parse("2019-06-17T22:30Z"));
-        final IgmData igmEs = new IgmData();
-        igmEs.setCountry("ES");
-        igmEs.setIgmFilePath("20190617_0030_FO1_ES0.UCT");
-        inputs.setIgms(singletonList(igmEs));
+        final Inputs inputsWoSlackNode = singletonIgmInputs(ES, "20190617_0030_FO1_ES1.UCT");
+        final Artifacts artifactsWoSlackNode = singletonArtifact(CGM_FILE_AFTER_PST, "20190618_0030_2D2_UC0_withoutSlackNode.uct");
 
-        final IgmData igmEsWithoutSlackNode = new IgmData();
-        igmEsWithoutSlackNode.setCountry("ES");
-        igmEsWithoutSlackNode.setIgmFilePath("20190617_0030_FO1_ES1.UCT");
-        final Inputs inputs2 = new Inputs();
-        inputs2.setIgms(singletonList(igmEsWithoutSlackNode));
-
-        task1 = createMockTask(1L, inputs,
-                               singletonArtifact(CGM_FILE_AFTER_PST, "20190618_0030_2D2_UC0_withoutSlackNode.uct"),
-                               configuration);
-        task2 = createMockTask(2L, inputs2,
-                               singletonArtifact(CGM_FILE_AFTER_PST, "20190618_0030_2D2_UC0_withoutSlackNode.uct"),
-                               configuration);
-        task3 = createMockTask(3L, inputs2,
+        task1 = createMockTask(1L, singletonIgmInputs(ES, "20190617_0030_FO1_ES0.UCT"),
+                               artifactsWoSlackNode, configuration);
+        task2 = createMockTask(2L, inputsWoSlackNode, artifactsWoSlackNode, configuration);
+        task3 = createMockTask(3L, inputsWoSlackNode,
                                singletonArtifact(CGM_FILE_AFTER_PST, "20190618_0030_2D2_UC0_withoutNode.uct"),
                                configuration);
+
+        List.of(task1, task2, task3).forEach(task -> createTempFolders(task, tempDir, configuration));
 
     }
 
@@ -217,7 +212,7 @@ class SlackCompensationServiceTest {
                 .setVoltageRegulatorOn(false)
                 .add();
 
-        final Path tempFile = Paths.get(configuration.getArtifactsDirectoryPath(task1), "test_compensate.xiidm");
+        final Path tempFile = tempDir.resolve(Paths.get(configuration.getArtifactsDirectoryPath(task1), "test_compensate.xiidm"));
         cgmBeforeCompensation.write(XIIDM_FORMAT, null, tempFile);
 
         task1.getArtifacts().putFile(CGM_FILE_AFTER_PST, new SavedFile("test_compensate.xiidm",
@@ -229,10 +224,10 @@ class SlackCompensationServiceTest {
         final Load loadAfterCompensation = cgmAfterCompensation.getLoad(loadId);
         final Generator generatorAfterCompensation = cgmAfterCompensation.getGenerator(generatorId);
 
-        assertEquals(110.0, loadAfterCompensation.getP0(), 0.1);
-        assertEquals(60.0, loadAfterCompensation.getQ0(), 0.1);
-        assertEquals(110.0, generatorAfterCompensation.getTargetP(), 0.1);
-        assertEquals(60.0, generatorAfterCompensation.getTargetQ(), 0.1);
+        assertEquals(110.0, loadAfterCompensation.getP0());
+        assertEquals(60.0, loadAfterCompensation.getQ0());
+        assertEquals(110.0, generatorAfterCompensation.getTargetP());
+        assertEquals(60.0, generatorAfterCompensation.getTargetQ());
     }
 
 }

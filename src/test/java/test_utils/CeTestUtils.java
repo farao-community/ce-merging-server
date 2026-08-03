@@ -7,9 +7,10 @@
 package test_utils;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
@@ -20,6 +21,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.commons.report.TypedValue;
+import com.powsybl.iidm.network.Country;
 import org.assertj.core.api.ThrowableAssert;
 
 import java.io.File;
@@ -38,6 +40,7 @@ import java.util.stream.Stream;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.ZoneOffset.UTC;
+import static java.util.Collections.singletonList;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.apache.commons.io.FileUtils.readFileToString;
 import static org.mockito.ArgumentMatchers.any;
@@ -111,10 +114,6 @@ public final class CeTestUtils {
         task.setInputs(inputs);
         task.setArtifacts(artifacts);
 
-        Files.createDirectories(Paths.get(configuration.getInputsDirectoryPath(task)));
-        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(task)));
-        Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(task)));
-
         return task;
     }
 
@@ -123,6 +122,30 @@ public final class CeTestUtils {
         final Artifacts artifacts = new Artifacts();
         artifacts.putFile(type, new SavedFile(name, name, "mock"));
         return artifacts;
+    }
+
+    public static Inputs singletonIgmInputs(final Country country, final String igmPath) {
+        return singletonIgmInputs(country.name(), igmPath);
+    }
+
+    public static void createTempFolders(final MergingTask task, final Path tempDir, final CeMergingConfiguration configuration) {
+        try {
+            Files.createDirectories(tempDir.resolve(Paths.get(configuration.getInputsDirectoryPath(task))));
+            Files.createDirectories(tempDir.resolve(Paths.get(configuration.getArtifactsDirectoryPath(task))));
+            Files.createDirectories(tempDir.resolve(Paths.get(configuration.getOutputsDirectoryPath(task))));
+        } catch (IOException e) {
+            throw new CeMergingException(e.getMessage());
+        }
+
+    }
+
+    public static Inputs singletonIgmInputs(final String country, final String igmPath) {
+        final Inputs inputs = new Inputs();
+        final IgmData igmEs = new IgmData();
+        igmEs.setCountry(country);
+        igmEs.setIgmFilePath(igmPath);
+        inputs.setIgms(singletonList(igmEs));
+        return inputs;
     }
 
     public static MergingTask taskWithIdAndStatus(final long id,
