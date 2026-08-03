@@ -32,7 +32,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -93,16 +92,13 @@ class SlackCompensationServiceTest {
     }
 
     @BeforeEach
-    void setUp() throws IOException {
+    void setUp() {
         final Inputs inputsWoSlackNode = singletonIgmInputs(ES, "20190617_0030_FO1_ES1.UCT");
         final Artifacts artifactsWoSlackNode = singletonArtifact(CGM_FILE_AFTER_PST, "20190618_0030_2D2_UC0_withoutSlackNode.uct");
 
-        task1 = createMockTask(1L, singletonIgmInputs(ES, "20190617_0030_FO1_ES0.UCT"),
-                               artifactsWoSlackNode, configuration);
-        task2 = createMockTask(2L, inputsWoSlackNode, artifactsWoSlackNode, configuration);
-        task3 = createMockTask(3L, inputsWoSlackNode,
-                               singletonArtifact(CGM_FILE_AFTER_PST, "20190618_0030_2D2_UC0_withoutNode.uct"),
-                               configuration);
+        task1 = createMockTask(1L, singletonIgmInputs(ES, "20190617_0030_FO1_ES0.UCT"), artifactsWoSlackNode);
+        task2 = createMockTask(2L, inputsWoSlackNode, artifactsWoSlackNode);
+        task3 = createMockTask(3L, inputsWoSlackNode, singletonArtifact(CGM_FILE_AFTER_PST, "20190618_0030_2D2_UC0_withoutNode.uct"));
 
         List.of(task1, task2, task3).forEach(task -> createTempFolders(task, tempDir, configuration));
 

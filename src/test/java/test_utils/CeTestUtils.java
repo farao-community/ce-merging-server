@@ -108,8 +108,7 @@ public final class CeTestUtils {
 
     public static MergingTask createMockTask(final long id,
                                              final Inputs inputs,
-                                             final Artifacts artifacts,
-                                             final CeMergingConfiguration configuration) throws IOException {
+                                             final Artifacts artifacts) {
         final MergingTask task = taskWithIdAndStatus(id, TaskStatus.CREATED);
         inputs.setTargetDate(BEGINNING_OF_2000);
         task.setInputs(inputs);
