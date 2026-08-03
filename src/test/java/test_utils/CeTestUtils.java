@@ -6,11 +6,15 @@
  */
 package test_utils;
 
+import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
@@ -61,8 +66,8 @@ public final class CeTestUtils {
 
     public static Path pathOf(final String fileName) {
         return Paths.get(Optional.ofNullable(THIS.getResource("/" + fileName))
-                             .orElse(THIS.getResource("/" + DEFAULT_FILE))
-                             .getPath());
+                                 .orElse(THIS.getResource("/" + DEFAULT_FILE))
+                                 .getPath());
     }
 
     public static String stringPathOf(final String fileName) {
@@ -97,7 +102,31 @@ public final class CeTestUtils {
         return any(SavedFile.class);
     }
 
-    public static MergingTask taskWithIdAndStatus(final long id, final TaskStatus status) {
+    public static MergingTask createMockTask(final long id,
+                                             final Inputs inputs,
+                                             final Artifacts artifacts,
+                                             final CeMergingConfiguration configuration) throws IOException {
+        final MergingTask task = taskWithIdAndStatus(id, TaskStatus.CREATED);
+        inputs.setTargetDate(BEGINNING_OF_2000);
+        task.setInputs(inputs);
+        task.setArtifacts(artifacts);
+
+        Files.createDirectories(Paths.get(configuration.getInputsDirectoryPath(task)));
+        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(task)));
+        Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(task)));
+
+        return task;
+    }
+
+    public static Artifacts singletonArtifact(final ArtifactType type,
+                                              final String name) {
+        final Artifacts artifacts = new Artifacts();
+        artifacts.putFile(type, new SavedFile(name, name, "mock"));
+        return artifacts;
+    }
+
+    public static MergingTask taskWithIdAndStatus(final long id,
+                                                  final TaskStatus status) {
         final MergingTask task = new MergingTask();
         task.setId(id);
         task.setArchiveFileOriginalName(INPUTS_ZIP_NAME);
@@ -105,11 +134,15 @@ public final class CeTestUtils {
         final Inputs inputs = new Inputs();
         inputs.setTargetDate(BEGINNING_OF_2000);
         task.setInputs(inputs);
+        task.setArtifacts(new Artifacts());
+        task.setOutputs(new Outputs());
+        TaskTestUtils.setTaskDefaultConfigurations(task);
 
         return task;
     }
 
-    public static MergingTaskDto taskDtoWithIdAndStatus(final long id, final TaskStatus status) {
+    public static MergingTaskDto taskDtoWithIdAndStatus(final long id,
+                                                        final TaskStatus status) {
         final MergingTaskDto task = new MergingTaskDto();
         task.setId(id);
         task.setStatus(status);
@@ -123,7 +156,8 @@ public final class CeTestUtils {
         return mockValue;
     }
 
-    public static ReportNode mockReportNode(final List<ReportNode> children, final Map<String, TypedValue> properties) {
+    public static ReportNode mockReportNode(final List<ReportNode> children,
+                                            final Map<String, TypedValue> properties) {
         final ReportNode node = mock(ReportNode.class);
         when(node.getChildren()).thenReturn(children);
         properties.forEach((key, value) -> when(node.getValue(key)).thenReturn(Optional.of(value)));

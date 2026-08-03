@@ -7,7 +7,6 @@
 package com.farao_community.farao.ce_merging.merging.process.slack_compensation;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
@@ -31,10 +30,8 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import test_utils.TaskTestUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
@@ -53,6 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static test_utils.CeTestUtils.createMockTask;
+import static test_utils.CeTestUtils.singletonArtifact;
 
 @SpringBootTest
 @ActiveProfiles("OpenLoadFlow")
@@ -67,9 +66,9 @@ class SlackCompensationServiceTest {
     @Autowired
     private CeMergingConfiguration configuration;
 
-    private final MergingTask task1 = new MergingTask();
-    private final MergingTask task2 = new MergingTask();
-    private final MergingTask task3 = new MergingTask();
+    private MergingTask task1;
+    private MergingTask task2;
+    private MergingTask task3;
 
     @TestConfiguration
     @Profile("OpenLoadFlow")
@@ -96,38 +95,22 @@ class SlackCompensationServiceTest {
         igmEs.setIgmFilePath("20190617_0030_FO1_ES0.UCT");
         inputs.setIgms(singletonList(igmEs));
 
-        final SavedFile cgmFileWithoutSlackNode = new SavedFile("20190618_0030_2D2_UC0_withoutSlackNode.uct", "20190618_0030_2D2_UC0_withoutSlackNode.uct", "mock");
-        final Artifacts artifacts = new Artifacts();
-        artifacts.putFile(CGM_FILE_AFTER_PST, cgmFileWithoutSlackNode);
-
-        task1.setId(1L);
-        task1.setInputs(inputs);
-        task1.setArtifacts(artifacts);
-
         final IgmData igmEsWithoutSlackNode = new IgmData();
         igmEsWithoutSlackNode.setCountry("ES");
         igmEsWithoutSlackNode.setIgmFilePath("20190617_0030_FO1_ES1.UCT");
         final Inputs inputs2 = new Inputs();
-        inputs2.setTargetDate(OffsetDateTime.parse("2019-11-17T08:30Z"));
         inputs2.setIgms(singletonList(igmEsWithoutSlackNode));
-        task2.setId(2L);
-        task2.setInputs(inputs2);
-        task2.setArtifacts(artifacts);
 
-        TaskTestUtils.setTaskDefaultConfigurations(task2);
+        task1 = createMockTask(1L, inputs,
+                               singletonArtifact(CGM_FILE_AFTER_PST, "20190618_0030_2D2_UC0_withoutSlackNode.uct"),
+                               configuration);
+        task2 = createMockTask(2L, inputs2,
+                               singletonArtifact(CGM_FILE_AFTER_PST, "20190618_0030_2D2_UC0_withoutSlackNode.uct"),
+                               configuration);
+        task3 = createMockTask(3L, inputs2,
+                               singletonArtifact(CGM_FILE_AFTER_PST, "20190618_0030_2D2_UC0_withoutNode.uct"),
+                               configuration);
 
-        task3.setId(3L);
-        task3.setInputs(inputs2);
-        final Artifacts artifacts3 = new Artifacts();
-        final SavedFile cgmFileWithoutNode = new SavedFile("20190618_0030_2D2_UC0_withoutNode.uct", "20190618_0030_2D2_UC0_withoutNode.uct", "mock");
-        artifacts3.putFile(CGM_FILE_AFTER_PST, cgmFileWithoutNode);
-        task3.setArtifacts(artifacts3);
-
-        for (final MergingTask task : List.of(task1, task2, task3)) {
-            TaskTestUtils.setTaskDefaultConfigurations(task);
-            Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(task)));
-            Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(task)));
-        }
     }
 
     @Test
@@ -153,10 +136,10 @@ class SlackCompensationServiceTest {
 
     private List<SlackTerminal> getSlackTerminals(Network network) {
         return network.getVoltageLevelStream()
-            .map(vl -> vl.getExtension(SlackTerminal.class))
-            .filter(Objects::nonNull)
-            .map(SlackTerminal.class::cast)
-            .toList();
+                .map(vl -> vl.getExtension(SlackTerminal.class))
+                .filter(Objects::nonNull)
+                .map(SlackTerminal.class::cast)
+                .toList();
     }
 
     @Test
@@ -173,10 +156,10 @@ class SlackCompensationServiceTest {
         final Network network = Network.create("network", "source");
 
         final VoltageLevel vl = network.newVoltageLevel()
-            .setId("VL_" + busId)
-            .setNominalV(225)
-            .setTopologyKind(BUS_BREAKER)
-            .add();
+                .setId("VL_" + busId)
+                .setNominalV(225)
+                .setTopologyKind(BUS_BREAKER)
+                .add();
         vl.getBusBreakerView().newBus().setId(busId).add();
         vl.newLoad().setId("L_" + busId).setBus(busId).setP0(0).setQ0(0).add();
 
@@ -211,28 +194,28 @@ class SlackCompensationServiceTest {
         final String busId = "BUS1";
         final Network cgmBeforeCompensation = Network.create("cgmBeforeCompensation", "source");
         final VoltageLevel vl = cgmBeforeCompensation.newVoltageLevel()
-            .setId("VL1")
-            .setNominalV(225)
-            .setTopologyKind(BUS_BREAKER)
-            .add();
+                .setId("VL1")
+                .setNominalV(225)
+                .setTopologyKind(BUS_BREAKER)
+                .add();
 
         vl.getBusBreakerView().newBus().setId(busId).add();
         vl.newLoad()
-            .setId(loadId)
-            .setBus(busId)
-            .setP0(100)
-            .setQ0(50)
-            .add();
+                .setId(loadId)
+                .setBus(busId)
+                .setP0(100)
+                .setQ0(50)
+                .add();
 
         vl.newGenerator()
-            .setId(generatorId)
-            .setBus(busId)
-            .setTargetP(100)
-            .setTargetQ(50)
-            .setMinP(-9999)
-            .setMaxP(9999)
-            .setVoltageRegulatorOn(false)
-            .add();
+                .setId(generatorId)
+                .setBus(busId)
+                .setTargetP(100)
+                .setTargetQ(50)
+                .setMinP(-9999)
+                .setMaxP(9999)
+                .setVoltageRegulatorOn(false)
+                .add();
 
         final Path tempFile = Paths.get(configuration.getArtifactsDirectoryPath(task1), "test_compensate.xiidm");
         cgmBeforeCompensation.write(XIIDM_FORMAT, null, tempFile);

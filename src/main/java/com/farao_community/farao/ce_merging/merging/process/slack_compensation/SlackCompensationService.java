@@ -43,6 +43,7 @@ import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isC
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadflow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
+import static com.powsybl.iidm.network.Country.ES;
 import static com.powsybl.ucte.network.UcteNodeTypeCode.UT;
 import static java.util.Locale.FRANCE;
 
@@ -76,12 +77,12 @@ public class SlackCompensationService {
         final LoadFlowParameters.ComponentMode componentMode = getComponentModeLfParameter(loadFlowParameters);
 
         cgm.getLoadStream()
-            .filter(isConnected(componentMode).and(NetworkUtil::hasActivePower))
-            .forEach(SlackCompensationService::compensateLoad);
+                .filter(isConnected(componentMode).and(NetworkUtil::hasActivePower))
+                .forEach(SlackCompensationService::compensateLoad);
 
         cgm.getGeneratorStream()
-            .filter(isConnected(componentMode).and(NetworkUtil::hasActivePower))
-            .forEach(SlackCompensationService::compensateGenerator);
+                .filter(isConnected(componentMode).and(NetworkUtil::hasActivePower))
+                .forEach(SlackCompensationService::compensateGenerator);
 
         return cgm;
     }
@@ -96,51 +97,59 @@ public class SlackCompensationService {
         generator.setTargetQ(-zeroIfNaN(generator.getTerminal().getQ()));
     }
 
-    void addSlackNode(final Network cgm, final MergingTask task) {
+    void addSlackNode(final Network cgm,
+                      final MergingTask task) {
         /*
-            setWriteSlackBus van't be used before correction of bilanPV=false on PowSyBl (ADNHelper class)
+            setWriteSlackBus can't be used before correction of bilanPV=false on PowSyBl (ADNHelper class)
             Otherwise the slack node of the loadflow "TKEBAN1" is not of type UT (3)
         */
 
         final String defaultSlackNode = task.getConfigurations().getDefaultSlackNode();
-        UcteNetwork spain = null;
-        try (final FileInputStream fis = new FileInputStream(task.getInputs().getIgm("ES").getIgmFile().getPath());
-             final InputStreamReader isr = new InputStreamReader(fis);
-             final BufferedReader spanishIgm = new BufferedReader(isr)) {
-            spain = new UcteReader().read(spanishIgm, new ReportNodeNoOp());
-        } catch (final IOException e) {
-            LOGGER.warn("Error while reading slack node in ES IGM, default slack node '{}' will be added to the final CGM", defaultSlackNode);
+
+        final Optional<String> slackNode = Optional.ofNullable(getSpanishNetwork(task))
+                .map(UcteNetwork::getNodes)
+                .stream()
+                .flatMap(Collection::stream)
+                .filter(ucteNode -> ucteNode.getTypeCode() == UT)
+                .findFirst()
+                .map(UcteNode::getCode)
+                .map(UcteNodeCode::toString);
+
+        if (slackNode.isPresent()) {
+            updateSlackBus(cgm, slackNode.get());
+        } else {
+            updateSlackBus(cgm, defaultSlackNode);
+            LOGGER.warn("No slack node defined in ES IGM, default slack node %s will be added to the final CGM".formatted(defaultSlackNode));
         }
 
-        final String slackNode = Optional.ofNullable(spain)
-            .map(UcteNetwork::getNodes)
-            .stream().flatMap(Collection::stream)
-            .filter(ucteNode -> ucteNode.getTypeCode() == UT)
-            .findFirst()
-            .map(UcteNode::getCode).map(UcteNodeCode::toString)
-            .orElse(getWithWarning(defaultSlackNode, "No slack node defined in ES IGM, default slack node %s will be added to the final CGM".formatted(defaultSlackNode)));
-
-        updateSlackBus(cgm, slackNode);
-
     }
 
-    final String getWithWarning(final String toGet, final String warning) {
-        LOGGER.warn(warning);
-        return toGet;
+    private UcteNetwork getSpanishNetwork(final MergingTask task) {
+        final String defaultSlackNode = task.getConfigurations().getDefaultSlackNode();
+        try (final FileInputStream fis = new FileInputStream(task.getInputs().getIgm(ES).getIgmFile().getPath());
+             final InputStreamReader isr = new InputStreamReader(fis);
+             final BufferedReader spanishIgm = new BufferedReader(isr)) {
+            return new UcteReader().read(spanishIgm, new ReportNodeNoOp());
+        } catch (final IOException e) {
+            LOGGER.warn("Error while reading slack node in ES IGM, default slack node '{}' will be added to the final CGM", defaultSlackNode);
+            return null;
+        }
     }
 
-    private void updateSlackBus(final Network cgm, final String busId) {
+    private void updateSlackBus(final Network cgm,
+                                final String busId) {
         SlackTerminal.reset(cgm);
 
         LOGGER.info("Adding slack node of Spanish IGM '{}' to the final CGM", busId);
         final String notFoundWarning = "Cannot add slack node to the final CGM : node %s absent from CGM ".formatted(busId);
 
         Optional.ofNullable(cgm.getBusBreakerView().getBus(busId))
-            .ifPresentOrElse(SlackTerminal::attach,
-                             () -> LOGGER.warn(notFoundWarning));
+                .ifPresentOrElse(SlackTerminal::attach,
+                                 () -> LOGGER.warn(notFoundWarning));
     }
 
-    private void saveCgmInOutputs(final Network network, MergingTask task) {
+    private void saveCgmInOutputs(final Network network,
+                                  MergingTask task) {
 
         final ZonedDateTime targetZdtParis = task.getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
         final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
