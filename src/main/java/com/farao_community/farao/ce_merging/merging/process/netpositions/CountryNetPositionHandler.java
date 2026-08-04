@@ -73,7 +73,7 @@ public class CountryNetPositionHandler {
     private final LoadFlowParameters.ComponentMode componentMode;
     private final List<Country> bciCountries;
 
-    public static CountryNetPositionHandler buildFrom(final Country country,
+    public static CountryNetPositionHandler initHandler(final Country country,
                                                       final Network network,
                                                       final Configurations configurations) {
         return new CountryNetPositionHandler(configurations.getRegionConfiguration(),

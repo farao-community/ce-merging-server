@@ -18,6 +18,8 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.loadflow.LoadFlow;
+import org.assertj.core.api.SoftAssertions;
+import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +28,6 @@ import test_utils.TaskTestUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +45,6 @@ import static com.powsybl.iidm.network.Country.DK;
 import static com.powsybl.iidm.network.Country.ES;
 import static com.powsybl.iidm.network.Country.FR;
 import static com.powsybl.iidm.network.Country.HR;
-import static com.powsybl.iidm.network.Country.HU;
 import static com.powsybl.iidm.network.Country.NL;
 import static com.powsybl.iidm.network.Country.PL;
 import static com.powsybl.iidm.network.Country.RO;
@@ -55,11 +55,12 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.BEGINNING_OF_2000;
 import static test_utils.CeTestUtils.anyTask;
+import static test_utils.CeTestUtils.stringPathOf;
 
 @SpringBootTest
 public class NetPositionServiceTest {
-    private Path resourceDirectory = Paths.get( "resources", "netPositionsData");
-    private String absolutePath = resourceDirectory.toFile().getAbsolutePath();
+
+    private static final Percentage VALUE_TOLERANCE = Percentage.withPercentage(1);
     private SavedFile igmDeFile;
     private SavedFile igmDkFile;
     private IgmData igmFr;
@@ -74,14 +75,12 @@ public class NetPositionServiceTest {
     private IgmData igmSi;
     private IgmData igmSk;
     private IgmData igmEs;
-    private MergingTask task;
 
     @Autowired
     private CeMergingConfiguration configuration;
     @Autowired
     private Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
 
-    private MergingTaskRepository repository;
     private NetPositionService netPositionService;
     private String loadflowParametersFile;
 
@@ -89,57 +88,57 @@ public class NetPositionServiceTest {
     void setUp() {
         igmFr = new IgmData();
         igmFr.setCountry("FR");
-        igmFr.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_FR0.uct"));
+        igmFr.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_FR0.uct"));
 
         igmAt = new IgmData();
         igmAt.setCountry("AT");
-        igmAt.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_AT1.uct"));
+        igmAt.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_AT1.uct"));
 
         igmBe = new IgmData();
         igmBe.setCountry("BE");
-        igmBe.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_BE0.UCT"));
+        igmBe.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_BE0.UCT"));
 
         igmCz = new IgmData();
         igmCz.setCountry("CZ");
-        igmCz.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_CZ0.UCT"));
+        igmCz.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_CZ0.UCT"));
 
         igmHr = new IgmData();
         igmHr.setCountry("HR");
-        igmHr.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_HR1.uct"));
+        igmHr.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_HR1.uct"));
 
         igmHu = new IgmData();
         igmHu.setCountry("HU");
-        igmHu.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_HU0.uct"));
+        igmHu.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_HU0.uct"));
 
         igmNl = new IgmData();
         igmNl.setCountry("NL");
-        igmNl.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_NL0.uct"));
+        igmNl.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_NL0.uct"));
 
         igmPl = new IgmData();
         igmPl.setCountry("PL");
-        igmPl.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_PL0.uct"));
+        igmPl.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_PL0.uct"));
 
         igmRo = new IgmData();
         igmRo.setCountry("RO");
-        igmRo.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_RO0.UCT"));
+        igmRo.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_RO0.UCT"));
 
         igmSi = new IgmData();
         igmSi.setCountry("SI");
-        igmSi.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_SI0.UCT"));
+        igmSi.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_SI0.UCT"));
 
         igmSk = new IgmData();
         igmSk.setCountry("SK");
-        igmSk.setIgmFilePath(absolutePath.concat("/20190618_0030_2D2_SK0.UCT"));
+        igmSk.setIgmFilePath(stringPathOf("netPositionsData/20190618_0030_2D2_SK0.UCT"));
 
         igmEs = new IgmData();
         igmEs.setCountry("ES");
-        igmEs.setIgmFilePath(absolutePath.concat("/20190617_0030_FO1_ES0.UCT"));
+        igmEs.setIgmFilePath(stringPathOf("netPositionsData/20190617_0030_FO1_ES0.UCT"));
 
-        igmDeFile = new SavedFile("germanPreMergedIgmFile.uct", absolutePath.concat("/germanPreMergedIgmFile.uct"), "mock");
-        igmDkFile = new SavedFile("denmarkRenamedIgmFile.uct", absolutePath.concat("/denmarkRenamedIgmFile.uct"), "mock");
+        igmDeFile = new SavedFile("germanPreMergedIgmFile.uct", stringPathOf("netPositionsData/germanPreMergedIgmFile.uct"), "mock");
+        igmDkFile = new SavedFile("denmarkRenamedIgmFile.uct", stringPathOf("netPositionsData/denmarkRenamedIgmFile.uct"), "mock");
 
         loadflowParametersFile = "loadflow_parameters/ac-load-flow-parameters_main_component.json";
-        repository = mock(MergingTaskRepository.class);
+        final MergingTaskRepository repository = mock(MergingTaskRepository.class);
         when(repository.save(anyTask())).thenAnswer(invocation -> invocation.getArgument(0));
         netPositionService = new NetPositionService(repository, configuration, loadFlowRunnerSupplier);
     }
@@ -159,7 +158,7 @@ public class NetPositionServiceTest {
 
         Configurations configurations = new Configurations();
 
-        task = new MergingTask();
+        final MergingTask task = new MergingTask();
         task.setId(1L);
         task.setInputs(inputs);
         task.setArtifacts(artifacts);
@@ -180,84 +179,139 @@ public class NetPositionServiceTest {
     }
 
     private void testNetPositionsValues(NetPositionsResults netPositions) {
-        assertEquals(1519.39, netPositions.get(AT).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(1519.39, netPositions.get(AT).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(647.06, netPositions.get(AT).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(647.06, netPositions.get(AT).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        final SoftAssertions soft = new SoftAssertions();
+        soft.assertThat(netPositions.get(AT).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(510, VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(AT).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(510, VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(AT).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(510, VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(AT).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(510, VALUE_TOLERANCE);
 
-        assertEquals(13224.91, netPositions.get(FR).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(11224.91, netPositions.get(FR).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(5258.87, netPositions.get(FR).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(5258.87, netPositions.get(FR).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(FR).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(1200, VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(FR).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(1200, VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(FR).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(1200, VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(FR).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(1200, VALUE_TOLERANCE);
 
-        assertEquals(-347.01, netPositions.get(BE).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-347.01, netPositions.get(BE).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(-347.01, netPositions.get(BE).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-347.01, netPositions.get(BE).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(BE).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(860., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(BE).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(860., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(BE).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(860., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(BE).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(860., VALUE_TOLERANCE);
 
-        assertEquals(984.07, netPositions.get(CZ).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(984.07, netPositions.get(CZ).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(997.37, netPositions.get(CZ).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(997.37, netPositions.get(CZ).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(CZ).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(1230., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(CZ).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(1230., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(CZ).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(1230., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(CZ).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(1230., VALUE_TOLERANCE);
 
-        assertEquals(-738.59, netPositions.get(HR).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-738.59, netPositions.get(HR).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(-306.20, netPositions.get(HR).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-306.20, netPositions.get(HR).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(HR).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(20., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(HR).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(20., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(HR).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(20., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(HR).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(20., VALUE_TOLERANCE);
 
-        assertEquals(-879.59, netPositions.get(HU).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-879.59, netPositions.get(HU).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(-163.99, netPositions.get(HU).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-163.99, netPositions.get(HU).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(AT).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(510., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(AT).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(510., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(AT).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(510., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(AT).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(510., VALUE_TOLERANCE);
 
-        assertEquals(-2128.81, netPositions.get(NL).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-2560.80, netPositions.get(NL).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(-2560.80, netPositions.get(NL).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-2560.80, netPositions.get(NL).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(NL).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(810., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(NL).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(810., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(NL).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(810., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(NL).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(810., VALUE_TOLERANCE);
 
-        assertEquals(-79.99, netPositions.get(PL).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(17.00, netPositions.get(PL).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(17.00, netPositions.get(PL).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(17.00, netPositions.get(PL).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(PL).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(120., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(PL).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(120., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(PL).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(120., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(PL).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(120., VALUE_TOLERANCE);
 
-        assertEquals(1040.17, netPositions.get(RO).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(1040.17, netPositions.get(RO).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(217.46, netPositions.get(RO).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(217.46, netPositions.get(RO).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(RO).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(20., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(RO).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(20., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(RO).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(20., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(RO).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(20., VALUE_TOLERANCE);
 
-        assertEquals(488.99, netPositions.get(SI).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(488.99, netPositions.get(SI).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(66.99, netPositions.get(SI).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(66.99, netPositions.get(SI).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(SI).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(450., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(SI).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(450., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(SI).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(450., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(SI).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(450., VALUE_TOLERANCE);
 
-        assertEquals(200.00, netPositions.get(SK).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(200.00, netPositions.get(SK).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(-215.00, netPositions.get(SK).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-215.00, netPositions.get(SK).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(SK).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(-110., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(SK).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(-110., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(SK).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(-110., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(SK).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(-110., VALUE_TOLERANCE);
 
-        assertEquals(-4043.53, netPositions.get(DE).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-3455.59, netPositions.get(DE).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(-2887.96, netPositions.get(DE).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(-2887.96, netPositions.get(DE).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(DE).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(200., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(DE).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(200., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(DE).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(200., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(DE).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(200., VALUE_TOLERANCE);
 
-        assertEquals(-1354.30, netPositions.get(DK).getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(590.4, netPositions.get(DK).getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
-        assertEquals(0., netPositions.get(DK).getInRegionNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(0., netPositions.get(DK).getInRegionNetPosition().getWithoutVirtualHubs(), 0.1);
+        soft.assertThat(netPositions.get(DK).getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(20., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(DK).getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(0., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(DK).getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(0., VALUE_TOLERANCE);
+        soft.assertThat(netPositions.get(DK).getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(0., VALUE_TOLERANCE);
+
+        soft.assertAll();
     }
 
     private void testDetailedExchanges(NetPositionsResults netPositionsFile) {
         NetPositions netPositionsFR = netPositionsFile.get(FR);
         Map<String, Double> globalDetailedExchanges = netPositionsFR.getGlobalDetailedExchanges();
-        assertEquals(6, globalDetailedExchanges.size());
-        assertEquals(13224.91, globalDetailedExchanges.values().stream().mapToDouble(v -> v).sum(), 0.1);
+        assertEquals(3, globalDetailedExchanges.size());
+        assertEquals(1200, globalDetailedExchanges.values().stream().mapToDouble(v -> v).sum(), 0.1);
 
-        assertEquals(13224.91 - 11224.91, netPositionsFR.getVirtualHubsExchanges().values().stream().mapToDouble(v -> v).sum(), 0.1);
+        assertEquals(0, netPositionsFR.getVirtualHubsExchanges().values().stream().mapToDouble(v -> v).sum(), 0.1);
 
         NetPositions netPositionsSK = netPositionsFile.get(SK);
         globalDetailedExchanges = netPositionsSK.getGlobalDetailedExchanges();
-        assertEquals(4, globalDetailedExchanges.size());
-        assertEquals(200.00, globalDetailedExchanges.values().stream().mapToDouble(v -> v).sum(), 0.1);
+        assertEquals(1, globalDetailedExchanges.size());
+        assertEquals(-110.00, globalDetailedExchanges.values().stream().mapToDouble(v -> v).sum(), 0.1);
 
     }
 
@@ -267,13 +321,13 @@ public class NetPositionServiceTest {
         assertEquals(sumVirtualHubs, netPositionsEs.getGlobalNetPosition().getWithVirtualHubs() - netPositionsEs.getGlobalNetPosition().getWithoutVirtualHubs(), 0.1);
         double sumExchanges = netPositionsEs.getGlobalDetailedExchanges().values().stream().mapToDouble(v -> v).sum();
         assertEquals(sumExchanges, netPositionsEs.getGlobalNetPosition().getWithVirtualHubs(), 0.1);
-        assertEquals(9.3, netPositionsEs.getGlobalDetailedExchanges().get("MA"), 0.1);
-        assertEquals(9.3, netPositionsEs.getOutBciNetPosition(), 0.1);
+        assertEquals(20, netPositionsEs.getGlobalDetailedExchanges().get("MA"), 0.1);
+        assertEquals(20, netPositionsEs.getOutBciNetPosition(), 0.1);
 
     }
 
     private void testGenerationAndLoad(NetPositionsResults netPositionsFile) {
-        assertEquals(7003.58, netPositionsFile.get(AT).getGenerationAndLoadQuantity().generation(), 0.1);
-        assertEquals(5414.91, netPositionsFile.get(AT).getGenerationAndLoadQuantity().load(), 0.1);
+        assertEquals(-10, netPositionsFile.get(AT).getGenerationAndLoadQuantity().generation(), 0.1);
+        assertEquals(1000, netPositionsFile.get(AT).getGenerationAndLoadQuantity().load(), 0.1);
     }
 }

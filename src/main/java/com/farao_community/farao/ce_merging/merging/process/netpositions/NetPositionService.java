@@ -8,11 +8,13 @@ package com.farao_community.farao.ce_merging.merging.process.netpositions;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
-import com.farao_community.farao.ce_merging.common.util.LoadFlowUtils;
 import com.farao_community.farao.ce_merging.merging.process.monita.MonitaService;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
+import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
@@ -25,16 +27,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
-import static com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler.buildFrom;
+import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection;
+import static com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler.initHandler;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.IGMS_NET_POSITIONS_FILE;
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.Country.DK;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class NetPositionService {
@@ -44,31 +49,35 @@ public class NetPositionService {
     private final CeMergingConfiguration configuration;
     private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
 
-    public NetPositionService(MergingTaskRepository tasksRepository,
-                              CeMergingConfiguration configuration,
-                              Supplier<LoadFlow.Runner> loadFlowRunnerSupplier) {
+    public NetPositionService(final MergingTaskRepository tasksRepository,
+                              final CeMergingConfiguration configuration,
+                              final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier) {
         this.tasksRepository = tasksRepository;
         this.configuration = configuration;
         this.loadFlowRunnerSupplier = loadFlowRunnerSupplier;
     }
 
-    public void computeInitialNetPositions(MergingTask task) {
+    public void computeInitialNetPositions(final MergingTask task) {
         try {
-            final NetPositionsResults netPositionsFile = new NetPositionsResults();
-
-            task.getInputs()
+            final Artifacts artifacts = task.getArtifacts();
+            final Map<String, NetPositions> fromPreTreatedInputs = task.getInputs()
                     .getIgms()
                     .stream()
                     .filter(igmData -> isNotPreTreated(task, igmData.getCountry()))
-                    .forEach(igmData -> computeNetPositions(task, igmData.getIgmFile(), igmData.getCountry(), netPositionsFile));
+                    .collect(toMap(IgmData::getCountry,
+                                   igmData -> computeNetPositions(task, igmData.getIgmFile(), igmData.getCountry())));
 
-            computeNetPositions(task, task.getArtifacts().getFile(GERMAN_PRE_MERGED_IGM), DE.name(), netPositionsFile);
-            computeNetPositions(task, task.getArtifacts().getFile(DK_CONVERTED_FILE), DK.name(), netPositionsFile);
+            final NetPositionsResults netPositionsFile = new NetPositionsResults(fromPreTreatedInputs);
 
-            task.getArtifacts()
-                    .getPreTreatedIgmMap()
-                    .forEach((country, savedFile) ->
-                                     computeNetPositions(task, savedFile, country, netPositionsFile));
+            netPositionsFile.put(DE, computeNetPositions(task, artifacts.getFile(GERMAN_PRE_MERGED_IGM), DE.name()));
+            netPositionsFile.put(DK, computeNetPositions(task, artifacts.getFile(DK_CONVERTED_FILE), DK.name()));
+
+            netPositionsFile.netPositionsByCountryMap()
+                    .putAll(artifacts.getPreTreatedIgmMap()
+                                    .entrySet()
+                                    .stream()
+                                    .collect(toMap(Map.Entry::getKey,
+                                                   e -> computeNetPositions(task, e.getValue(), e.getKey()))));
 
             MonitaService.postTreatmentForMonita(task, netPositionsFile);
 
@@ -81,22 +90,21 @@ public class NetPositionService {
         }
     }
 
-    private void computeNetPositions(MergingTask task,
-                                     SavedFile savedNetwork,
-                                     String countryCode,
-                                     NetPositionsResults netPositionsFile) {
+    private NetPositions computeNetPositions(final MergingTask task,
+                                             final SavedFile savedNetwork,
+                                             final String countryCode) {
         final Network network = prepareNetwork(task, savedNetwork);
         final Country country = EntsoeGeographicalCode.valueOf(countryCode).getCountry();
 
-        final CountryNetPositionHandler countryNetPositionHandler = buildFrom(country, network, task.getConfigurations());
-        netPositionsFile.put(country, countryNetPositionHandler.computeNetPositions());
+        final CountryNetPositionHandler handler = initHandler(country, network, task.getConfigurations());
+        return handler.computeNetPositions();
     }
 
     private Network prepareNetwork(final MergingTask task,
                                    final SavedFile savedNetwork) {
         final LoadFlowParameters loadFlowParameters = task.getConfigurations().getLoadFlowParameters();
         final Network network = Network.read(savedNetwork.getPath());
-        LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection(network, loadFlowRunnerSupplier, loadFlowParameters);
+        runLoadFlowWithBalanceTypeCorrection(network, loadFlowRunnerSupplier, loadFlowParameters);
         return network;
     }
 
@@ -106,31 +114,26 @@ public class NetPositionService {
         return !DANISH_TSO.equals(areaCode) && !GermanTso.includes(areaCode) && !preTreated.contains(areaCode);
     }
 
-    public NetPositionsResults computeGermanNetPositions(MergingTask task) {
-        LoadFlowParameters loadFlowParameters = task.getConfigurations().getLoadFlowParameters();
-        NetPositionsResults germanNetPositionsFile = new NetPositionsResults();
-        task.getInputs().getIgms().stream()
+    public NetPositionsResults computeGermanNetPositions(final MergingTask task) {
+        final LoadFlowParameters lfParams = task.getConfigurations().getLoadFlowParameters();
+        final Map<String, NetPositions> result = task.getInputs()
+                .getIgms()
+                .stream()
                 .filter(igmData -> GermanTso.includes(igmData.getCountry()))
-                .forEach(igmData -> computeGermanTsoNetPositions(task, igmData.getIgmFile(), igmData.getCountry(), germanNetPositionsFile, loadFlowParameters));
-        return germanNetPositionsFile;
+                .collect(toMap(IgmData::getCountry,
+                               igmData -> computeGermanTsoNetPositions(task, igmData.getIgmFile(), lfParams)));
+        return new NetPositionsResults(result);
     }
 
-    private void computeGermanTsoNetPositions(MergingTask task,
-                                              SavedFile igmFile,
-                                              String tso,
-                                              NetPositionsResults germanNetPositionsFile,
-                                              LoadFlowParameters loadFlowParameters) {
-        try {
-            Network network = Network.read(igmFile.getPath());
-            LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection(network, loadFlowRunnerSupplier, loadFlowParameters);
-            NetPositionsResults netPositionsFile = new NetPositionsResults();
-            netPositionsFile.put(DE, buildFrom(DE, network, task.getConfigurations()).computeNetPositions());
-            germanNetPositionsFile.putIfAbsent(tso, netPositionsFile.netPositionsByCountryMap().getOrDefault("DE", null));
-        } catch (Exception e) {
-            String errorMessage = "Error occurred while computing net position for tso: " + tso + ", cause: " + e.getMessage();
-            LOGGER.error(errorMessage);
-            throw new CeMergingException(errorMessage, e);
-        }
+    private NetPositions computeGermanTsoNetPositions(final MergingTask task,
+                                                      final SavedFile igmFile,
+                                                      final LoadFlowParameters loadFlowParameters) {
+        final Network network = Network.read(igmFile.getPath());
+        runLoadFlowWithBalanceTypeCorrection(network, loadFlowRunnerSupplier, loadFlowParameters);
+        final NetPositionsResults netPositionsFile = new NetPositionsResults(
+                Map.of(DE.name(), initHandler(DE, network, task.getConfigurations()).computeNetPositions())
+        );
+        return netPositionsFile.netPositionsByCountryMap().getOrDefault("DE", null);
     }
 
 }
