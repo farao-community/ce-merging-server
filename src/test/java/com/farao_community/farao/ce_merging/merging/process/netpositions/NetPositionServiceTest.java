@@ -58,7 +58,7 @@ import static test_utils.CeTestUtils.anyTask;
 import static test_utils.CeTestUtils.stringPathOf;
 
 @SpringBootTest
-public class NetPositionServiceTest {
+class NetPositionServiceTest {
 
     private static final Percentage VALUE_TOLERANCE = Percentage.withPercentage(1);
     private SavedFile igmDeFile;
@@ -144,7 +144,7 @@ public class NetPositionServiceTest {
     }
 
     @Test
-    public void computeInitialNetPositionsTest() throws IOException {
+    void computeInitialNetPositionsTest() throws IOException {
 
         List<IgmData> igms = Arrays.asList(igmFr, igmBe, igmAt, igmCz, igmHr, igmHu, igmNl, igmPl, igmRo, igmSi, igmSk, igmEs);
 

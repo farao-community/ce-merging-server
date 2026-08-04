@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getBorderFlow;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getCountryOnBorder;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getCountryOnOtherSide;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isBranchBorderOf;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isDanglingLineBorderOf;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isHvdcLineBorderOf;
@@ -74,8 +74,8 @@ public class CountryNetPositionHandler {
     private final List<Country> bciCountries;
 
     public static CountryNetPositionHandler initHandler(final Country country,
-                                                      final Network network,
-                                                      final Configurations configurations) {
+                                                        final Network network,
+                                                        final Configurations configurations) {
         return new CountryNetPositionHandler(configurations.getRegionConfiguration(),
                                              network,
                                              country,
@@ -141,7 +141,7 @@ public class CountryNetPositionHandler {
      */
     private void fillNetPositionsFromVirtualHubNodes() {
         network.getSubstationStream()
-                .map(this::getVirtualHubBus)
+                .map(this::getVirtualHubBuses)
                 .filter(Objects::nonNull)
                 .forEach(this::handleVirtualHubBus);
     }
@@ -178,12 +178,12 @@ public class CountryNetPositionHandler {
 
     private void handleHvdcLine(final HvdcLine hvdcLine) {
         double borderFlow = getBorderFlow(hvdcLine, country);
-        updatePositions(borderFlow, getCountryOnBorder(hvdcLine, country), false);
+        updatePositions(borderFlow, BordersUtils.getCountryOnOtherSide(hvdcLine, country), false);
         outBciNetPosition += borderFlow;
     }
 
     private void handleLine(final Line line) {
-        updatePositions(getBorderFlow(line, country), getCountryOnBorder(line, country), true);
+        updatePositions(getBorderFlow(line, country), getCountryOnOtherSide(line, country), true);
     }
 
     private void handleDanglingLine(final DanglingLine danglingLine) {
@@ -223,7 +223,7 @@ public class CountryNetPositionHandler {
         virtualHubsExchanges.putIfAbsent(hubName, flow);
     }
 
-    private Bus getVirtualHubBus(final Substation substation) {
+    private Bus getVirtualHubBuses(final Substation substation) {
         if (country == substation.getNullableCountry()) {
             final List<String> virtualHubsNodeNames = virtualHubList.stream().map(VirtualHubRecord::getNodeName).toList();
             for (final String virtualHubName : virtualHubsNodeNames) {
@@ -253,28 +253,31 @@ public class CountryNetPositionHandler {
 
         if (optionalXnode.isEmpty()) {
             LOGGER.warn("Could not find dangling line UCTE code: '{}' in xnodes config file. Considering it in outbci net position", danglingLine.getPairingKey());
-        } else {
-            final XnodeConfig xnode = optionalXnode.get();
-            if (isInvalidDeXnode(xnode)) {
-                LOGGER.warn("In the X-node configuration, {} is affected to area DE without valid subarea", xnode.getName());
-            } else {
-                final Country area1 = Country.valueOf(xnode.getArea1());
-                final String subArea1 = xnode.getSubarea1();
-                final Country area2 = Country.valueOf(xnode.getArea2());
-                final String subArea2 = xnode.getSubarea2();
-
-                updateIfKosovoXnode(xnode);
-
-                if (areSameArea(danglingLineCountry, area1, subArea1)) {
-                    return getCountry(subArea2 != null ? subArea2 : xnode.getArea2());
-                } else if (areSameArea(danglingLineCountry, area2, subArea2)) {
-                    return getCountry(subArea1 != null ? subArea1 : xnode.getArea1());
-                } else {
-                    LOGGER.warn("Error in xnodes configuration file : the node {} is not associated to country {}", xnode.getName(), danglingLineCountry);
-                }
-            }
+            return null;
         }
-        return null;
+
+        final XnodeConfig xnode = optionalXnode.get();
+
+        if (isInvalidDeXnode(xnode)) {
+            LOGGER.warn("In the X-node configuration, {} is affected to area DE without valid subarea", xnode.getName());
+            return null;
+        }
+
+        final Country area1 = Country.valueOf(xnode.getArea1());
+        final String subArea1 = xnode.getSubarea1();
+        final Country area2 = Country.valueOf(xnode.getArea2());
+        final String subArea2 = xnode.getSubarea2();
+
+        updateIfKosovoXnode(xnode);
+
+        if (areSameArea(danglingLineCountry, area1, subArea1)) {
+            return getCountry(subArea2 != null ? subArea2 : xnode.getArea2());
+        } else if (areSameArea(danglingLineCountry, area2, subArea2)) {
+            return getCountry(subArea1 != null ? subArea1 : xnode.getArea1());
+        } else {
+            LOGGER.warn("Error in xnodes configuration file : the node {} is not associated to country {}", xnode.getName(), danglingLineCountry);
+            return null;
+        }
     }
 
     private Optional<XnodeConfig> getDanglingLineXnode(final DanglingLine danglingLine) {

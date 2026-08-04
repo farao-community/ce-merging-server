@@ -19,7 +19,9 @@ import java.util.Map;
 public record NetPositionsResults(Map<String, NetPositions> netPositionsByCountryMap) {
     @JsonCreator
     public NetPositionsResults(@JsonProperty("netPositionsByCountryMap") final Map<String, NetPositions> netPositionsByCountryMap) {
-        this.netPositionsByCountryMap = netPositionsByCountryMap;
+        this.netPositionsByCountryMap = netPositionsByCountryMap == null ?
+                new HashMap<>()
+                : new HashMap<>(netPositionsByCountryMap);
     }
 
     public NetPositionsResults() {

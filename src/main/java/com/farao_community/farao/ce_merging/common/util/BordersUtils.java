@@ -56,7 +56,8 @@ public final class BordersUtils {
 
     public static Country getCountryOfSide(final Branch<?> branch,
                                            final TwoSides side) {
-        return branch.getTerminal(side).getVoltageLevel()
+        return branch.getTerminal(side)
+                .getVoltageLevel()
                 .getSubstation()
                 .orElseThrow(() -> new CeMergingException(
                         "Could not find substation of branch '" + branch.getId() + "'."))
@@ -69,13 +70,11 @@ public final class BordersUtils {
         return getCountry(injection.getTerminal());
     }
 
-    public static Country getCountry(final Branch<?> branch,
-                                     final TwoSides side) {
+    public static Country getCountry(final Branch<?> branch, final TwoSides side) {
         return getCountry(branch.getTerminal(side));
     }
 
-    public static Country getCountry(final HvdcLine hvdcLine,
-                                     final TwoSides side) {
+    public static Country getCountry(final HvdcLine hvdcLine, final TwoSides side) {
         return getCountry(hvdcLine.getConverterStation(side).getTerminal());
     }
 
@@ -102,35 +101,31 @@ public final class BordersUtils {
         return danglingLine -> getCountry(danglingLine) == country;
     }
 
-    public static double getBorderFlow(Line line,
-                                       Country country) {
-        double flowSide1 = line.getTerminal1().isConnected() ? zeroIfNan(line.getTerminal1().getP()) : 0;
-        double flowSide2 = line.getTerminal2().isConnected() ? zeroIfNan(line.getTerminal2().getP()) : 0;
-        double directFlow = (flowSide1 - flowSide2) / 2;
+    public static double getBorderFlow(final Line line, final Country country) {
+        final double directFlow = (getTerminalFlow(line.getTerminal1()) - getTerminalFlow(line.getTerminal2())) / 2;
         return country.equals(getCountry(line, ONE)) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(HvdcLine hvdcLine,
-                                       Country country) {
-        double flowSide1 = hvdcLine.getConverterStation1().getTerminal().isConnected() ?
-                zeroIfNan(hvdcLine.getConverterStation1().getTerminal().getP()) : 0;
-        double flowSide2 = hvdcLine.getConverterStation2().getTerminal().isConnected() ?
-                zeroIfNan(hvdcLine.getConverterStation2().getTerminal().getP()) : 0;
-        double directFlow = (flowSide1 - flowSide2) / 2;
-        return country.equals(hvdcLine.getConverterStation1().getTerminal().getVoltageLevel().getSubstation().map(Substation::getNullableCountry).orElse(null)) ? directFlow : -directFlow;
+    public static double getBorderFlow(final HvdcLine hvdcLine, final Country country) {
+        final double side1Flow = getTerminalFlow(hvdcLine.getConverterStation1().getTerminal());
+        final double side2Flow = getTerminalFlow(hvdcLine.getConverterStation1().getTerminal());
+        final double directFlow = (side1Flow - side2Flow) / 2;
+        return country.equals(getCountry(hvdcLine.getConverterStation1().getTerminal())) ? directFlow : -directFlow;
     }
 
-    public static Country getCountryOnBorder(Line line,
-                                             Country country) {
-        Country side1Country = getCountry(line, ONE);
-        Country side2Country = getCountry(line, TWO);
+    public static Double getTerminalFlow(final Terminal terminal) {
+        return terminal.isConnected() ? zeroIfNan(terminal.getP()) : 0;
+    }
+
+    public static Country getCountryOnOtherSide(final Line line, final Country country) {
+        final Country side1Country = getCountry(line, ONE);
+        final Country side2Country = getCountry(line, TWO);
         return country == side1Country ? side2Country : side1Country;
     }
 
-    public static Country getCountryOnBorder(HvdcLine hvdcLine,
-                                             Country country) {
-        Country side1Country = getCountry(hvdcLine, ONE);
-        Country side2Country = getCountry(hvdcLine, TWO);
+    public static Country getCountryOnOtherSide(final HvdcLine hvdcLine, final Country country) {
+        final Country side1Country = getCountry(hvdcLine, ONE);
+        final Country side2Country = getCountry(hvdcLine, TWO);
         return country == side1Country ? side2Country : side1Country;
     }
 
