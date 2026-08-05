@@ -28,4 +28,12 @@ public record NetPositionsResults(Map<String, NetPositions> netPositionsByCountr
 
         return netPositionsByCountryMap.get(country.name());
     }
+
+    public NetPositions get(final String tso) {
+        if (netPositionsByCountryMap == null || tso == null) {
+            return null;
+        }
+
+        return netPositionsByCountryMap.get(tso);
+    }
 }
