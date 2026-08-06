@@ -50,7 +50,7 @@ public class GermanPreMergeService {
 
     public void preMergeGermanCountries(final MergingTask task) {
         try {
-            Network mergedNetwork = mergeGermanRegions(task);
+            final Network mergedNetwork = mergeGermanRegions(task);
             LOGGER.info("German network files merged with success");
             // Save the german merged network file for investigation in case of exception in mismatch step
             saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, mergedNetwork, task, UCTE_FORMAT, configuration);
@@ -68,14 +68,11 @@ public class GermanPreMergeService {
     }
 
     public Network mergeGermanRegions(final MergingTask task) {
-        final String networkName = GERMAN_PRE_MERGED_IGM.getFileName(task.getTargetDate());
-        String mergedCaseName = (networkName == null || networkName.isEmpty()) ? "merged_case" : networkName;
-
         final Network[] networksToMerge = Arrays.stream(GermanTso.values())
                 .map(tso -> readGermanNetwork(tso, task))
                 .toArray(Network[]::new);
 
-        return Network.merge(mergedCaseName, networksToMerge);
+        return Network.merge(GERMAN_PRE_MERGED_IGM.getFileName(task.getTargetDate()), networksToMerge);
     }
 
     private Network readGermanNetwork(final GermanTso tso,

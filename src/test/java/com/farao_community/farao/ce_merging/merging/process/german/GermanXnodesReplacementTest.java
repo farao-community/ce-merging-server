@@ -9,24 +9,24 @@ package com.farao_community.farao.ce_merging.merging.process.german;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import java.util.Map;
+
+import static test_utils.assertions.NetworkAssert.assertThat;
 
 public class GermanXnodesReplacementTest {
 
     @Test
     public void shouldModifyPreMergedGermanIgm() {
-        Network deIgm = Network.read(getClass().getResource("/german/mergeFakeFile.uct").getPath());
-        GermanXnodesReplacer.replaceWithLines(deIgm);
+        final Network mergedGermanNetwork = Network.read(getClass().getResource("/german/mergeFakeFile.uct").getPath());
+        GermanXnodesReplacer.replaceWithLines(mergedGermanNetwork);
 
-        assertNull(deIgm.getBusBreakerView().getBus("XXXXXX11"));
-        assertNotNull(deIgm.getBusBreakerView().getBus("DXXXXX11"));
-        assertNull(deIgm.getLine("D2XXXX11 XXXXXX11 1"));
-        assertNotNull(deIgm.getLine("D2XXXX11 DXXXXX11 1"));
-        assertNotNull(deIgm.getLine("D4XXXX11 DXXXXX11 1"));
-        assertEquals("ELEMENT1", deIgm.getLine("D2XXXX11 DXXXXX11 1").getProperty("elementName"));
-        assertEquals("ELEMENT2", deIgm.getLine("D4XXXX11 DXXXXX11 1").getProperty("elementName"));
+        assertThat(mergedGermanNetwork)
+                .hasBus("DXXXXX11")
+                .doesNotHaveBus("XXXXXX11")
+                .doesNotHaveLine("D2XXXX11 XXXXXX11 1")
+                .hasLineWithProperties("D2XXXX11 DXXXXX11 1", Map.of("elementName", "ELEMENT1"))
+                .hasLineWithProperties("D4XXXX11 DXXXXX11 1", Map.of("elementName", "ELEMENT2"));
+
     }
 
 }
