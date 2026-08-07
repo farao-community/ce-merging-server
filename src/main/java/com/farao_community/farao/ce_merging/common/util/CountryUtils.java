@@ -24,10 +24,6 @@ public final class CountryUtils {
         return UcteCountryCode.KS.name().equals(country) ? Country.XK.name() : country;
     }
 
-    public static String mapXkToKs(final String country) {
-        return Country.XK.name().equals(country) ? UcteCountryCode.KS.name() : country;
-    }
-
     public static Country getCountry(final String countryName) {
         if (GermanTso.includes(countryName)) {
             return DE;

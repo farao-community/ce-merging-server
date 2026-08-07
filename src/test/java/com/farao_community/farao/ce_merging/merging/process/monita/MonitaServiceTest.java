@@ -34,12 +34,10 @@ import java.util.stream.Stream;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.savePreTreatedIgm;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInCountry;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.ME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -123,7 +121,6 @@ class MonitaServiceTest {
             when(monita2.getPairingKey()).thenReturn(MONITA2_ME_NODE_NAME);
             when(monita2.getP0()).thenReturn(200.0);
             networkUtil.when(() -> isInCountry(IT)).thenReturn(Predicates.truePredicate());
-            networkUtil.when(() -> isPairedWith(any())).thenCallRealMethod();
             when(network.getDanglingLineStream()).thenAnswer(i -> Stream.of(monita1, monita2));
 
             // when :

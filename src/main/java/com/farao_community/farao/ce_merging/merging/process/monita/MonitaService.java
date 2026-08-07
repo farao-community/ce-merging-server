@@ -21,8 +21,8 @@ import java.util.Properties;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MONITA_NAMING_STRATEGY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_EXPORT_NAMING_STRATEGY_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWith;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInCountry;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.ME;
 
@@ -55,9 +55,8 @@ public class MonitaService {
     }
 
     /*
-        MONITA nodes are in the IT igm ; we move them to ME in order to correct
-        the outBciNetPosition value of ME in the igmsNetPositions.json file.
-        This will allow us to correct the target value for ME in the balancesAdjustmentTarget.json file.
+        MONITA nodes are in the italian IGM; we move them to ME to correct the outBciNetPosition value of ME
+        in the igmsNetPositions.json file, to correct the target value for ME before balances adjustment.
      */
     public static void postTreatmentForMonita(final MergingTask task, final NetPositionsResults netPositionsFile) {
         final NetPositions italyNetPosition = netPositionsFile.get(IT);

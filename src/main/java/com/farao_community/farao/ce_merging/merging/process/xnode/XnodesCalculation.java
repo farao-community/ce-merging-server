@@ -1,5 +1,8 @@
-/**
- * Copyright (c) 2026, RTE (http://www.rte-france.com)   This Source Code Form is subject to the terms of the Mozilla Public   License, v. 2.0. If a copy of the MPL was not distributed with this   file, You can obtain one at http://mozilla.org/MPL/2.0/.   SPDX-License-Identifier: MPL-2.0
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package com.farao_community.farao.ce_merging.merging.process.xnode;
 
@@ -28,12 +31,16 @@ import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getCountryOfSide;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWith;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWithVirtualHub;
 import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isConnected;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.CLOSE;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
 import static com.powsybl.iidm.network.Country.DE;
+import static java.util.function.Predicate.not;
 
 @Service
 public class XnodesCalculation {
@@ -154,7 +161,7 @@ public class XnodesCalculation {
         final MergedXnodeInformation mergedXnodeInformation = new MergedXnodeInformation(isConnected ? CLOSE : OPEN, 0, 0, 0, 0);
         if (isConnected) {
             final Country country1 = getCountry(xnodeInformation.getArea1Information().getCountry());
-            final boolean country1IsSideOne = country1.equals(NetworkUtil.getCountryOfSide(branch, TwoSides.ONE));
+            final boolean country1IsSideOne = country1.equals(getCountryOfSide(branch, TwoSides.ONE));
             //We take the xnode flow in the direction country 1 to country 2
             final Terminal terminalFrom = country1IsSideOne ? branch.getTerminal1() : branch.getTerminal2();
             final Terminal terminalTo = country1IsSideOne ? branch.getTerminal2() : branch.getTerminal1();
@@ -254,8 +261,7 @@ public class XnodesCalculation {
                                       final Optional<String> tsoOpt) {
         network.getDanglingLineStream()
                 .filter(dl -> xNodes.contains(dl.getPairingKey()))
-                .filter(dl -> !NetworkUtil.isVirtualHubDanglingLine(dl, virtualHubList) ||
-                              dl.getPairingKey().equals(virtualHubException))
+                .filter(isPairedWith(virtualHubException).or(not(isPairedWithVirtualHub(virtualHubList))))
                 .forEach(dl -> addAreaInformation(xNodeInformationMap, dl, areaNumber, tsoOpt));
     }
 
