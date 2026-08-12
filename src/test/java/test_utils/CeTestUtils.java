@@ -8,6 +8,7 @@ package test_utils;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -35,18 +36,13 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.ZoneOffset.UTC;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public final class CeTestUtils {
 
-    private CeTestUtils() {
-        // utility class
-    }
-
-    private static final Class<CeTestUtils> THIS = CeTestUtils.class;
-    private static final String DEFAULT_FILE = "blank.file";
     public static final String INPUTS_ZIP_NAME = "inputs.zip";
     public static final String INPUTS = "request-metadata/inputs.zip";
     public static final String METADATA = "request-metadata/metadata.json";
@@ -56,13 +52,38 @@ public final class CeTestUtils {
     public static final OffsetDateTime BEGINNING_OF_2000 = OffsetDateTime.of(2000, 1, 1,
                                                                              12, 0, 0, 0,
                                                                              UTC);
-
     public static final ServiceIOException S_IO_EXCEPTION = new ServiceIOException("Test");
+    private static final Class<CeTestUtils> THIS = CeTestUtils.class;
+    private static final String DEFAULT_FILE = "blank.file";
+
+    private CeTestUtils() {
+        // utility class
+    }
 
     public static Path pathOf(final String fileName) {
         return Paths.get(Optional.ofNullable(THIS.getResource("/" + fileName))
-                             .orElse(THIS.getResource("/" + DEFAULT_FILE))
-                             .getPath());
+                                 .orElse(THIS.getResource("/" + DEFAULT_FILE))
+                                 .getPath());
+    }
+
+    public static IgmData getIgm(final String path) {
+        final String countryCode = path.substring(path.length() - 7, path.length() - 5);
+        final IgmData igm = new IgmData();
+        igm.setCountry(countryCode);
+        igm.setIgmFilePath(stringPathOf(path));
+        final SavedFile file = new SavedFile();
+        file.setPath(stringPathOf(path));
+        final boolean hasFolder = path.lastIndexOf("/") > 0;
+        file.setOriginalName(hasFolder ? path.split("/")[1] : path.replace("/", ""));
+        file.setLocation(hasFolder ? path.split("/")[0] : ".");
+        igm.setIgmFile(file);
+
+        return igm;
+    }
+
+    public static void assertSumEquals(final double expectedSum,
+                                       final Map<String, Double> toSum) {
+        assertEquals(toSum.values().stream().mapToDouble(v -> v).sum(), expectedSum, 0.1);
     }
 
     public static String stringPathOf(final String fileName) {
@@ -97,7 +118,8 @@ public final class CeTestUtils {
         return any(SavedFile.class);
     }
 
-    public static MergingTask taskWithIdAndStatus(final long id, final TaskStatus status) {
+    public static MergingTask taskWithIdAndStatus(final long id,
+                                                  final TaskStatus status) {
         final MergingTask task = new MergingTask();
         task.setId(id);
         task.setArchiveFileOriginalName(INPUTS_ZIP_NAME);
@@ -109,7 +131,8 @@ public final class CeTestUtils {
         return task;
     }
 
-    public static MergingTaskDto taskDtoWithIdAndStatus(final long id, final TaskStatus status) {
+    public static MergingTaskDto taskDtoWithIdAndStatus(final long id,
+                                                        final TaskStatus status) {
         final MergingTaskDto task = new MergingTaskDto();
         task.setId(id);
         task.setStatus(status);
@@ -123,7 +146,8 @@ public final class CeTestUtils {
         return mockValue;
     }
 
-    public static ReportNode mockReportNode(final List<ReportNode> children, final Map<String, TypedValue> properties) {
+    public static ReportNode mockReportNode(final List<ReportNode> children,
+                                            final Map<String, TypedValue> properties) {
         final ReportNode node = mock(ReportNode.class);
         when(node.getChildren()).thenReturn(children);
         properties.forEach((key, value) -> when(node.getValue(key)).thenReturn(Optional.of(value)));

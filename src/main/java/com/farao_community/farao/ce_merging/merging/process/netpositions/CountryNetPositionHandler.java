@@ -26,7 +26,6 @@ import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
-import com.powsybl.iidm.network.VoltageLevel;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
@@ -50,21 +50,15 @@ import static com.farao_community.farao.ce_merging.common.util.BordersUtils.zero
 import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isConnected;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.streamIterable;
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.Country.DK;
 import static java.util.stream.Collectors.toSet;
 
 public class CountryNetPositionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CountryNetPositionHandler.class);
-
-    private double globalPosition;
-    private double globalPositionNoVh;
-    private double regionPosition;
-    private double regionPositionNoVh;
-    private double outBciNetPosition;
     private final Map<String, Double> globalDetailedExchanges;
     private final Map<String, Double> virtualHubsExchanges;
-
     private final RegionConfiguration regionConfiguration;
     private final Network network;
     private final Country country;
@@ -72,17 +66,12 @@ public class CountryNetPositionHandler {
     private final List<XnodeConfig> xnodeList;
     private final LoadFlowParameters.ComponentMode componentMode;
     private final List<Country> bciCountries;
-
-    public static CountryNetPositionHandler initHandler(final Country country,
-                                                        final Network network,
-                                                        final Configurations configurations) {
-        return new CountryNetPositionHandler(configurations.getRegionConfiguration(),
-                                             network,
-                                             country,
-                                             configurations.getVirtualHubList(),
-                                             configurations.getXnodeList(),
-                                             getComponentMode(configurations.getLoadFlowParameters()));
-    }
+    private final Set<Country> inCountries;
+    private double globalPosition;
+    private double globalPositionNoVh;
+    private double regionPosition;
+    private double regionPositionNoVh;
+    private double outBciNetPosition;
 
     public CountryNetPositionHandler(final RegionConfiguration regionConfiguration,
                                      final Network network,
@@ -103,11 +92,58 @@ public class CountryNetPositionHandler {
         this.virtualHubList = virtualHubList;
         this.xnodeList = xnodeList;
         this.componentMode = componentMode;
+
         this.bciCountries = regionConfiguration.getAreasAll()
                 .keySet()
                 .stream()
                 .map(Country::valueOf)
                 .toList();
+
+        this.inCountries = regionConfiguration.getAreasIn()
+                .keySet()
+                .stream()
+                .map(Country::valueOf)
+                .collect(toSet());
+    }
+
+    public static CountryNetPositionHandler initHandler(final Country country,
+                                                        final Network network,
+                                                        final Configurations configurations) {
+        return new CountryNetPositionHandler(configurations.getRegionConfiguration(),
+                                             network,
+                                             country,
+                                             configurations.getVirtualHubList(),
+                                             configurations.getXnodeList(),
+                                             getComponentMode(configurations.getLoadFlowParameters()));
+    }
+
+    //In the xnode config, the xnodes with area DE should have a subarea to differentiate DE and DK
+    private static boolean isInvalidDeXnode(final XnodeConfig xnode) {
+        return DE.name().equals(xnode.getArea1()) && !GermanTso.includes(xnode.getSubarea1()) && !DANISH_TSO.equals(xnode.getSubarea1()) ||
+               DE.name().equals(xnode.getArea2()) && !GermanTso.includes(xnode.getSubarea2()) && !DANISH_TSO.equals(xnode.getSubarea2());
+    }
+
+    private static boolean areSameArea(final Country country,
+                                       final Country area,
+                                       final String subArea) {
+        return country == DE && isGermanArea(area, subArea)
+               || country == DK && isDanishArea(area, subArea)
+               || country != DE && country != DK && country == area;
+    }
+
+    private static boolean isGermanArea(final Country area,
+                                        final String subArea) {
+        return area == DE && GermanTso.includes(subArea);
+    }
+
+    private static boolean isDanishArea(final Country area,
+                                        final String subArea) {
+        return area == DE && DANISH_TSO.equals(subArea);
+    }
+
+    private static void updateIfKosovoXnode(final XnodeConfig xnode) {
+        xnode.setArea1(CountryUtils.mapKsToXk(xnode.getArea1()));
+        xnode.setArea2(CountryUtils.mapKsToXk(xnode.getArea2()));
     }
 
     public NetPositions computeNetPositions() {
@@ -141,7 +177,7 @@ public class CountryNetPositionHandler {
      */
     private void fillNetPositionsFromVirtualHubNodes() {
         network.getSubstationStream()
-                .map(this::getVirtualHubBuses)
+                .map(this::getVirtualHubBus)
                 .filter(Objects::nonNull)
                 .forEach(this::handleVirtualHubBus);
     }
@@ -223,20 +259,22 @@ public class CountryNetPositionHandler {
         virtualHubsExchanges.putIfAbsent(hubName, flow);
     }
 
-    private Bus getVirtualHubBuses(final Substation substation) {
-        if (country == substation.getNullableCountry()) {
-            final List<String> virtualHubsNodeNames = virtualHubList.stream().map(VirtualHubRecord::getNodeName).toList();
-            for (final String virtualHubName : virtualHubsNodeNames) {
-                for (final VoltageLevel voltageLevel : substation.getVoltageLevels()) {
-                    for (final Bus bus : voltageLevel.getBusBreakerView().getBuses()) {
-                        if (virtualHubName.equals(bus.getId())) {
-                            return bus;
-                        }
-                    }
-                }
-            }
+    private Bus getVirtualHubBus(final Substation substation) {
+        if (country != substation.getNullableCountry()) {
+            return null;
+        } else {
+            return virtualHubList.stream()
+                    .map(VirtualHubRecord::getNodeName)
+                    .flatMap(name -> getSubstationBuses(substation).filter(bus -> bus.getId().equals(name)))
+                    .findFirst()
+                    .orElse(null);
         }
-        return null;
+
+    }
+
+    private Stream<Bus> getSubstationBuses(final Substation substation) {
+        return streamIterable(substation.getVoltageLevels())
+                .flatMap(vl -> streamIterable(vl.getBusBreakerView().getBuses()));
     }
 
     private void addToBorderExchange(final double flow,
@@ -286,35 +324,6 @@ public class CountryNetPositionHandler {
                 .findFirst();
     }
 
-    //In the xnode config, the xnodes with area DE should have a subarea to differentiate DE and DK
-    private static boolean isInvalidDeXnode(final XnodeConfig xnode) {
-        return DE.name().equals(xnode.getArea1()) && !GermanTso.includes(xnode.getSubarea1()) && !DANISH_TSO.equals(xnode.getSubarea1()) ||
-               DE.name().equals(xnode.getArea2()) && !GermanTso.includes(xnode.getSubarea2()) && !DANISH_TSO.equals(xnode.getSubarea2());
-    }
-
-    private static boolean areSameArea(final Country country,
-                                       final Country area,
-                                       final String subArea) {
-        return country == DE && isGermanArea(area, subArea)
-               || country == DK && isDanishArea(area, subArea)
-               || country != DE && country != DK && country == area;
-    }
-
-    private static boolean isGermanArea(final Country area,
-                                        final String subArea) {
-        return area == DE && GermanTso.includes(subArea);
-    }
-
-    private static boolean isDanishArea(final Country area,
-                                        final String subArea) {
-        return area == DE && DANISH_TSO.equals(subArea);
-    }
-
-    private static void updateIfKosovoXnode(final XnodeConfig xnode) {
-        xnode.setArea1(CountryUtils.mapKsToXk(xnode.getArea1()));
-        xnode.setArea2(CountryUtils.mapKsToXk(xnode.getArea2()));
-    }
-
     private boolean isCountryInRegionConfig() {
         return regionConfiguration.getAreasIn().containsKey(country.toString());
     }
@@ -324,10 +333,6 @@ public class CountryNetPositionHandler {
         if (countryFrom == null || countryTo == null) {
             return false;
         }
-        return regionConfiguration.getAreasIn().keySet()
-                .stream()
-                .map(Country::valueOf)
-                .collect(toSet())
-                .containsAll(List.of(countryFrom, countryTo));
+        return inCountries.containsAll(List.of(countryFrom, countryTo));
     }
 }
