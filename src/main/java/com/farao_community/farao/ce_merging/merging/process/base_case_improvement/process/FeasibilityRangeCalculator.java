@@ -11,8 +11,8 @@ import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
-import com.farao_community.farao.ce_merging.xsd.FeasibilityRangeConstraint;
-import com.farao_community.farao.ce_merging.xsd.FeasibilityRangeDocument;
+import com.farao_community.farao.ce_merging.xsd.bci.FeasibilityRangeConstraint;
+import com.farao_community.farao.ce_merging.xsd.bci.FeasibilityRangeDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,23 +36,6 @@ public class FeasibilityRangeCalculator {
         this.regionConfiguration = regionConfiguration;
     }
 
-    public Map<String, Interval> getRegionFeasibilityRanges(final byte[] externalConstraints,
-                                                            final OffsetDateTime targetDate,
-                                                            final FlowByAreaMap netPositions,
-                                                            final byte[] feasibilityRange) {
-
-        final Map<String, Interval> extConstraintsMap = calculateConstraints(externalConstraints,
-                                                                             regionConfiguration,
-                                                                             targetDate);
-        if (isEmpty(feasibilityRange)) {
-            return extConstraintsMap;
-        } else {
-            final Map<String, Interval> feasibilityRangeMap = importFeasibilityRangesFile(feasibilityRange,
-                                                                                          netPositions);
-            return computeFinalConstraints(extConstraintsMap, feasibilityRangeMap);
-        }
-    }
-
     private static Map<String, Interval> computeFinalConstraints(final Map<String, Interval> extConstraints,
                                                                  final Map<String, Interval> feasibilityRanges) {
         return extConstraints
@@ -63,28 +46,6 @@ public class FeasibilityRangeCalculator {
 
     private static Function<Map.Entry<String, Interval>, Interval> joinedWithFeasibilityRange(final Map<String, Interval> ranges) {
         return extCt -> extCt.getValue().join(ranges.getOrDefault(extCt.getKey(), infinity()));
-    }
-
-    public Map<String, Interval> importFeasibilityRangesFile(byte[] feasibilityRange,
-                                                             Map<String, Double> netPositionMap) {
-
-        final Map<String, Interval> feasibilityRangesMap = regionConfiguration
-            .getAreasIn()
-            .values()
-            .stream()
-            .collect(toMap(identity(), v -> infinity()));
-
-        final Map<String, Interval> fromDocument = JaxbUtils
-            .readFromBytes(FeasibilityRangeDocument.class, feasibilityRange)
-            .getConstraints()
-            .getFeasibilityRangeConstraint()
-            .stream()
-            .filter(distinctByProperty(getRangeArea()))
-            .collect(toMap(getRangeArea(), frc -> computeIntervalWithNetPositions(frc, netPositionMap)));
-
-        feasibilityRangesMap.putAll(fromDocument);
-
-        return feasibilityRangesMap;
     }
 
     private static Function<FeasibilityRangeConstraint, String> getRangeArea() {
@@ -112,5 +73,44 @@ public class FeasibilityRangeCalculator {
                 LOGGER.error("Feasibility range constraints type {} is not acceptable", type);
                 throw new CeMergingException("Feasibility range constraints type " + type + " is not acceptable");
         }
+    }
+
+    public Map<String, Interval> getRegionFeasibilityRanges(final byte[] externalConstraints,
+                                                            final OffsetDateTime targetDate,
+                                                            final FlowByAreaMap netPositions,
+                                                            final byte[] feasibilityRange) {
+
+        final Map<String, Interval> extConstraintsMap = calculateConstraints(externalConstraints,
+                                                                             regionConfiguration,
+                                                                             targetDate);
+        if (isEmpty(feasibilityRange)) {
+            return extConstraintsMap;
+        } else {
+            final Map<String, Interval> feasibilityRangeMap = importFeasibilityRangesFile(feasibilityRange,
+                                                                                          netPositions);
+            return computeFinalConstraints(extConstraintsMap, feasibilityRangeMap);
+        }
+    }
+
+    public Map<String, Interval> importFeasibilityRangesFile(byte[] feasibilityRange,
+                                                             Map<String, Double> netPositionMap) {
+
+        final Map<String, Interval> feasibilityRangesMap = regionConfiguration
+            .getAreasIn()
+            .values()
+            .stream()
+            .collect(toMap(identity(), v -> infinity()));
+
+        final Map<String, Interval> fromDocument = JaxbUtils
+            .readFromBytes(FeasibilityRangeDocument.class, feasibilityRange)
+            .getConstraints()
+            .getFeasibilityRangeConstraint()
+            .stream()
+            .filter(distinctByProperty(getRangeArea()))
+            .collect(toMap(getRangeArea(), frc -> computeIntervalWithNetPositions(frc, netPositionMap)));
+
+        feasibilityRangesMap.putAll(fromDocument);
+
+        return feasibilityRangesMap;
     }
 }

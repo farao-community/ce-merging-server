@@ -24,6 +24,7 @@ import com.farao_community.farao.ce_merging.merging.process.base_case_improvemen
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.BciComputer;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.FeasibilityRangeCalculator;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.powsybl.iidm.network.Country;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,14 +35,16 @@ import java.util.TreeMap;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.readBytesFromPath;
-import static com.farao_community.farao.ce_merging.merging.process.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.ExternalConstraintsImporter.calculateConstraintsForAlegro;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.InitialNetPositionsImporter.getGlobalNetPosition;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BCI_OUTPUT_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.IGMS_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
+import static com.powsybl.iidm.network.Country.BE;
+import static com.powsybl.iidm.network.Country.DE;
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
 import static java.util.stream.Collectors.toMap;
@@ -54,25 +57,25 @@ public class BciProcessor {
     private final FlowByAreaMap initialRegionNetPositions = new FlowByAreaMap();
     private final byte[] feasibilityRangesBytes;
     private final Map<String, Interval> alegroConstraints;
+    private final AlegroData alegroData;
     private BciProcessResult processResult;
     private FlowByAreaMap initialGlobalNetPositions;
     private Map<String, Interval> regionFeasibilityRanges;
     private ReferenceProgram referenceProgram;
-    private final AlegroData alegroData;
 
     public BciProcessor(final MergingTask task,
                         final CeMergingConfiguration configuration) {
         this.task = task;
         this.regionConfiguration = task.getConfigurations().getRegionConfiguration();
         this.alegroData = Optional.ofNullable(task.getArtifactPath(ALEGRO_NET_POSITIONS))
-            .map(path -> JsonUtils.read(AlegroData.class, path))
-            .orElse(null);
+                .map(path -> JsonUtils.read(AlegroData.class, path))
+                .orElse(null);
         this.configuration = configuration;
         this.alegroConstraints = calculateConstraintsForAlegro(readBytesFromPath(getExternalConstraintsPath()),
                                                                task.getTargetDate());
-        this.feasibilityRangesBytes =  Optional.ofNullable(getFeasibilityRangePath())
-            .map(FileUtils::readBytesFromPath)
-            .orElse(new byte[0]);
+        this.feasibilityRangesBytes = Optional.ofNullable(getFeasibilityRangePath())
+                .map(FileUtils::readBytesFromPath)
+                .orElse(new byte[0]);
 
     }
 
@@ -115,7 +118,7 @@ public class BciProcessor {
     private void computeInRegionNetPositions() {
         final FlowByAreaMap outRegionNetPositions = referenceProgram.getAllNetPositionsOutRegion(regionConfiguration);
         initialRegionNetPositions.putAll(
-            initialGlobalNetPositions.withValuesShiftedBy(region -> -outRegionNetPositions.getOrZero(region))
+                initialGlobalNetPositions.withValuesShiftedBy(region -> -outRegionNetPositions.getOrZero(region))
         );
     }
 
@@ -123,15 +126,15 @@ public class BciProcessor {
         if (alegroData == null) {
             return;
         }
-        updateAlegroRegionNetPosition("BE", alegroData.albeFlows());
-        updateAlegroRegionNetPosition("DE", alegroData.aldeFlows());
+        updateAlegroRegionNetPosition(BE, alegroData.albeFlows());
+        updateAlegroRegionNetPosition(DE, alegroData.aldeFlows());
     }
 
-    private void updateAlegroRegionNetPosition(final String countryCode,
+    private void updateAlegroRegionNetPosition(final Country country,
                                                final AlegroFlows flows) {
         final double alegroToCeFlow = getAlegroConstrainedTargetFlow(flows);
         final double countryAlegroGap = alegroToCeFlow - flows.initialFlow();
-        final String countryEic = regionConfiguration.getAreaInEic(countryCode);
+        final String countryEic = regionConfiguration.getAreaInEic(country.name());
 
         initialRegionNetPositions.shiftFlow(countryEic, countryAlegroGap);
     }
@@ -178,26 +181,26 @@ public class BciProcessor {
 
     private OutRegionResults getOutRegionResults() {
         final FlowByAreaMap globalNetPositionsByAreaId = referenceProgram
-            .computeGlobalNetPositionsForOutAreas(regionConfiguration);
+                .computeGlobalNetPositionsForOutAreas(regionConfiguration);
 
         final Map<String, Double> globalNpByCountry = regionConfiguration
-            .getAreasOut()
-            .entrySet()
-            .stream()
-            .collect(toMap(Map.Entry::getKey,
-                           e -> globalNetPositionsByAreaId.getOrZero(e.getValue()),
-                           (o1, o2) -> o1,
-                           TreeMap::new));
+                .getAreasOut()
+                .entrySet()
+                .stream()
+                .collect(toMap(Map.Entry::getKey,
+                               e -> globalNetPositionsByAreaId.getOrZero(e.getValue()),
+                               (o1, o2) -> o1,
+                               TreeMap::new));
 
         return new OutRegionResults(globalNpByCountry);
     }
 
     private Map<String, Interval> calculateRegionFeasibilityRanges() {
         return new FeasibilityRangeCalculator(regionConfiguration)
-            .getRegionFeasibilityRanges(readBytesFromPath(getExternalConstraintsPath()),
-                                        task.getTargetDate(),
-                                        initialRegionNetPositions,
-                                        feasibilityRangesBytes);
+                .getRegionFeasibilityRanges(readBytesFromPath(getExternalConstraintsPath()),
+                                            task.getTargetDate(),
+                                            initialRegionNetPositions,
+                                            feasibilityRangesBytes);
 
     }
 

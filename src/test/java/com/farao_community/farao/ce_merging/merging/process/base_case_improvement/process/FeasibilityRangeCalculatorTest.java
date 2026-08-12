@@ -26,11 +26,11 @@ import static test_utils.assertions.IntervalAssert.assertThat;
 
 class FeasibilityRangeCalculatorTest {
     private static final OffsetDateTime TARGET_DATE = OffsetDateTime.parse("2019-03-01T23:00Z");
+    private static final byte[] EMPTY_FEASIBILITY_RANGE = new byte[0];
+    private static final FlowByAreaMap EMPTY_NETPOSITIONS_MAP = new FlowByAreaMap();
     private final FlowByAreaMap netPositionsMap = new FlowByAreaMap();
     private byte[] externalConstraints;
     private byte[] bciFeasibilityRange;
-    private static final byte[] EMPTY_FEASIBILITY_RANGE = new byte[0];
-    private static final FlowByAreaMap EMPTY_NETPOSITIONS_MAP = new FlowByAreaMap();
     private RegionConfiguration regionConfiguration;
     private FeasibilityRangeCalculator feasibilityRangeCalculator;
 
@@ -48,8 +48,8 @@ class FeasibilityRangeCalculatorTest {
         netPositionsMap.put("AREA_NUMBER23_EIC", 500.0);
         netPositionsMap.put("AREA_NUMBER25_EIC", 600.0);
 
-        final String jsonConfig = new String(getBciTestFile("region_configuration.json"));
-        regionConfiguration = new ObjectMapper().readValue(jsonConfig, RegionConfiguration.class);
+        regionConfiguration = new ObjectMapper().readValue(getBciTestFile("region_configuration.json"),
+                                                           RegionConfiguration.class);
         feasibilityRangeCalculator = new FeasibilityRangeCalculator(regionConfiguration);
     }
 
@@ -65,8 +65,11 @@ class FeasibilityRangeCalculatorTest {
         assertThat(ecs.get("AREA_NUMBER25_EIC")).rangeIs(0, 11285);
         assertThat(ecs.get("AREA_NUMBER26_EIC")).rangeIs(0, 11285);
         assertThat(ecs.get("AREA_NUMBER2_EIC")).rangeIs(-MAX_VALUE, MAX_VALUE);
+    }
 
-        Map<String, Interval> frs = feasibilityRangeCalculator.getRegionFeasibilityRanges(externalConstraints,
+    @Test
+    void shouldCalculateFeasibilityRangesWithoutNetPosition() throws IOException {
+        Map<String, Interval> frs = feasibilityRangeCalculator.getRegionFeasibilityRanges(getBciTestFile("externalConstraints.xml"),
                                                                                           TARGET_DATE,
                                                                                           EMPTY_NETPOSITIONS_MAP,
                                                                                           EMPTY_FEASIBILITY_RANGE);

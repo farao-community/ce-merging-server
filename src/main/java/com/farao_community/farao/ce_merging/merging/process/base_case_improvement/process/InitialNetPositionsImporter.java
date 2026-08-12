@@ -40,32 +40,33 @@ public final class InitialNetPositionsImporter {
     }
 
     public static FlowByAreaMap getGlobalNetPosition(final String netPosFilePath,
-                                                     final RegionConfiguration region) throws IOException {
+                                                     final RegionConfiguration region) {
 
         if (isBlank(netPosFilePath)) {
             return new FlowByAreaMap();
         }
-        final FileInputStream netPosFis = new FileInputStream(netPosFilePath);
-        final FlowByAreaMap globalNp = getNetPositionsWithoutVirtualHubs(netPosFis,
-                                                                         region,
-                                                                         CountryNetPositions::globalNetPosition);
+        try (final FileInputStream netPositionsFile = new FileInputStream(netPosFilePath)) {
+            return getNetPositionsWithoutVirtualHubs(netPositionsFile,
+                                                     region,
+                                                     CountryNetPositions::globalNetPosition);
 
-        netPosFis.close();
+        } catch (final Exception e) {
+            throw new CeMergingException("could not get file %s".formatted(netPosFilePath));
+        }
 
-        return globalNp;
     }
 
     private static FlowByAreaMap getNetPositionsWithoutVirtualHubs(final InputStream initialNpFile,
                                                                    final RegionConfiguration region,
-                                                                   final Function<CountryNetPositions, NetPosition> npGetter) {
+                                                                   final Function<CountryNetPositions, NetPosition> getNetPositions) {
         final Map<String, String> areasIdByCountry = getAreasIdByCountry(region);
 
         return netPositionsMapFromContent(initialNpFile)
-            .entrySet()
-            .stream()
-            .filter(entry -> areasIdByCountry.containsKey(entry.getKey()))
-            .collect(toFlowByAreaMap(entry -> areasIdByCountry.get(entry.getKey()),
-                                       entry -> npGetter.apply(entry.getValue()).withoutVirtualHubs()));
+                .entrySet()
+                .stream()
+                .filter(entry -> areasIdByCountry.containsKey(entry.getKey()))
+                .collect(toFlowByAreaMap(entry -> areasIdByCountry.get(entry.getKey()),
+                                         entry -> getNetPositions.apply(entry.getValue()).withoutVirtualHubs()));
     }
 
     private static Map<String, String> getAreasIdByCountry(final RegionConfiguration region) {

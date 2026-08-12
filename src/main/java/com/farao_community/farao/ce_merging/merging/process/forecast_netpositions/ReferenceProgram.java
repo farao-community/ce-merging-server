@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.forecast_netpositions;
 
-import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeDeserializer;
-import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeSerializer;
+import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeDeserializer;
+import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeSerializer;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -37,6 +37,10 @@ public class ReferenceProgram implements Serializable {
         this.referenceExchangeDataList = Objects.requireNonNull(referenceExchangeDataList);
     }
 
+    public ReferenceProgram(List<ReferenceExchangeData> referenceExchangeDataList) {
+        this(null, null, referenceExchangeDataList);
+    }
+
     public String getDailyTimeInterval() {
         return dailyTimeInterval;
     }
@@ -51,10 +55,6 @@ public class ReferenceProgram implements Serializable {
 
     public void setTargetDateTime(OffsetDateTime targetDateTime) {
         this.targetDateTime = targetDateTime;
-    }
-
-    public ReferenceProgram(List<ReferenceExchangeData> referenceExchangeDataList) {
-        this(null, null, referenceExchangeDataList);
     }
 
     public List<ReferenceExchangeData> getReferenceExchangeDataList() {

@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs;
 
-import com.farao_community.farao.ce_merging.xsd.NetPositionConstraint;
+import com.farao_community.farao.ce_merging.xsd.bci.NetPositionConstraint;
 
 public class ExternalConstraintsInputs {
 
@@ -20,10 +20,10 @@ public class ExternalConstraintsInputs {
         this.value = value;
     }
 
-    public static ExternalConstraintsInputs fromNetPositionConstraint(final NetPositionConstraint npc) {
-        return new ExternalConstraintsInputs(npc.getHub().toUpperCase(),
-                                             npc.getDirection(),
-                                             npc.getValue().doubleValue());
+    public static ExternalConstraintsInputs fromNetPositionConstraint(final NetPositionConstraint constraint) {
+        return new ExternalConstraintsInputs(constraint.getHub().toUpperCase(),
+                                             constraint.getDirection(),
+                                             constraint.getValue().doubleValue());
     }
 
     public String getAreaId() {

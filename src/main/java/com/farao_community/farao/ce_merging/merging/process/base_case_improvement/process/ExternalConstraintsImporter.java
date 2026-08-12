@@ -9,10 +9,11 @@ package com.farao_community.farao.ce_merging.merging.process.base_case_improveme
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.ExternalConstraintDirection;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ExternalConstraintsInputs;
-import com.farao_community.farao.ce_merging.xsd.FlowBasedExternalConstraintDocument;
-import com.farao_community.farao.ce_merging.xsd.NetPositionConstraint;
+import com.farao_community.farao.ce_merging.xsd.bci.FlowBasedExternalConstraintDocument;
+import com.farao_community.farao.ce_merging.xsd.bci.NetPositionConstraint;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,11 +60,13 @@ public final class ExternalConstraintsImporter {
         return externalConstraintsMap;
     }
 
-    private static ExternalConstraintsInputs fromNetPositionConstraintWithRegion(final NetPositionConstraint npc,
+    private static ExternalConstraintsInputs fromNetPositionConstraintWithRegion(final NetPositionConstraint netPositionConstraint,
                                                                                  final RegionConfiguration regionConfiguration) {
-        final ExternalConstraintsInputs eci = fromNetPositionConstraint(npc);
-        final String originEic = regionConfiguration.getAreaInEic(npc.getTsoOrigin());
-        eci.setAreaId(Optional.ofNullable(originEic).orElseThrow());
+        final ExternalConstraintsInputs eci = fromNetPositionConstraint(netPositionConstraint);
+        final String originEic = regionConfiguration.getAreaInEic(netPositionConstraint.getTsoOrigin());
+        eci.setAreaId(Optional.ofNullable(originEic)
+                              .orElseThrow(() -> new CeMergingException(
+                                      "TSO %s not found in region configuration".formatted(netPositionConstraint.getTsoOrigin()))));
         return eci;
     }
 
@@ -118,18 +121,13 @@ public final class ExternalConstraintsImporter {
                                                            final Map<String, Interval> externalConstraintsMap) {
         externalConstraintsTmp.forEach(ec -> {
             final Interval interval = externalConstraintsMap.get(ec.getAreaId());
-            switch (ec.getDirection()) {
-                case "EXPORT":
+            switch (ExternalConstraintDirection.valueOf(ec.getDirection())) {
+                case EXPORT:
                     interval.setMaxValue(ec.getValue());
                     break;
-                case "IMPORT":
+                case IMPORT:
                     interval.setMinValue(-ec.getValue());
                     break;
-                default:
-                    final String errorMessage = "External constraints direction %s is not acceptable"
-                        .formatted(ec.getDirection());
-                    LOGGER.error(errorMessage);
-                    throw new CeMergingException(errorMessage);
             }
         });
     }
