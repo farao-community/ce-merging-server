@@ -6,9 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.powsybl.iidm.network.Network;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -16,7 +19,10 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
@@ -99,6 +105,15 @@ public class MergingTask implements Serializable {
         return artifacts;
     }
 
+    public <T> T getArtifact(final ArtifactType artifactType, final Class<T> clazz) throws FileNotFoundException {
+        final String path = getArtifactPath(artifactType);
+        return switch (artifactType.getFormat()) {
+            case JSON -> JsonUtils.read(clazz, path);
+            case XML -> JaxbUtils.readFromPath(clazz, path);
+            case UCT, XIIDM -> clazz == Network.class ? (T) Network.read(path) : null; // NOSONAR this is a Network
+        };
+    }
+
     public void setArtifacts(final Artifacts artifacts) {
         this.artifacts = artifacts;
     }
@@ -125,6 +140,10 @@ public class MergingTask implements Serializable {
             .orElse(null);
     }
 
+    public File getArtifactFile(final ArtifactType artifactType) {
+        return Paths.get(getArtifactPath(artifactType)).toFile();
+    }
+
     public void setArtifact(final ArtifactType artifactType, final SavedFile artifact) {
         artifacts.putFile(artifactType, artifact);
     }
@@ -133,5 +152,4 @@ public class MergingTask implements Serializable {
     public OffsetDateTime getTargetDate() {
         return inputs.getTargetDate();
     }
-
 }

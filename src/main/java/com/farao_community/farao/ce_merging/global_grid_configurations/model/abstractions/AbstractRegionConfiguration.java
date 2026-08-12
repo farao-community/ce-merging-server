@@ -7,6 +7,8 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.MappedSuperclass;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -27,7 +29,7 @@ public abstract class AbstractRegionConfiguration<T extends AbstractTsoInfos> {
     protected Map<String, String> areasIn;
     @ElementCollection(fetch = LAZY)
     protected Map<String, String> areasOut;
-    @ElementCollection(fetch = LAZY)
+    @OneToMany
     protected Map<String, T> germanyZone;
 
     @JsonIgnore
@@ -91,6 +93,12 @@ public abstract class AbstractRegionConfiguration<T extends AbstractTsoInfos> {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this);
+    }
+
+    @JsonIgnore
+    public Map<String, String> getCountriesByEicCode() {
+        BiMap<String, String> biMapAreas = HashBiMap.create(getAreasAll());
+        return biMapAreas.inverse();
     }
 
     @JsonIgnore

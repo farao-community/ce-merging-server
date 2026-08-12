@@ -1,0 +1,52 @@
+{
+  "netPositions": [
+    {
+      "area": "BE",
+      "netPosition": -1142.8
+    },
+    {
+      "area": "SK",
+      "netPosition": 193.5
+    },
+    {
+      "area": "DE",
+      "netPosition": -5269.7
+    },
+    {
+      "area": "HU",
+      "netPosition": -912.2
+    },
+    {
+      "area": "NL",
+      "netPosition": -2572.4
+    },
+    {
+      "area": "AT",
+      "netPosition": 2234.1
+    },
+    {
+      "area": "CZ",
+      "netPosition": 996.5
+    },
+    {
+      "area": "HR",
+      "netPosition": -839.1
+    },
+    {
+      "area": "PL",
+      "netPosition": -64.9
+    },
+    {
+      "area": "RO",
+      "netPosition": 1201.3
+    },
+    {
+      "area": "SI",
+      "netPosition": 478.8
+    },
+    {
+      "area": "FR",
+      "netPosition": 10929.7
+    }
+  ]
+}
