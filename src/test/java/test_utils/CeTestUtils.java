@@ -23,6 +23,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.commons.report.TypedValue;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Network;
+import com.powsybl.loadflow.LoadFlow;
+import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.loadflow.LoadFlowResult;
 import org.assertj.core.api.ThrowableAssert;
 
 import java.io.File;
@@ -39,6 +43,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
+import static com.powsybl.loadflow.LoadFlowResult.ComponentResult.Status.CONVERGED;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.time.ZoneOffset.UTC;
 import static java.util.Collections.singletonList;
@@ -50,12 +56,6 @@ import static org.mockito.Mockito.when;
 
 public final class CeTestUtils {
 
-    private CeTestUtils() {
-        // utility class
-    }
-
-    private static final Class<CeTestUtils> THIS = CeTestUtils.class;
-    private static final String DEFAULT_FILE = "blank.file";
     public static final String INPUTS_ZIP_NAME = "inputs.zip";
     public static final String INPUTS = "request-metadata/inputs.zip";
     public static final String METADATA = "request-metadata/metadata.json";
@@ -65,8 +65,13 @@ public final class CeTestUtils {
     public static final OffsetDateTime BEGINNING_OF_2000 = OffsetDateTime.of(2000, 1, 1,
                                                                              12, 0, 0, 0,
                                                                              UTC);
-
     public static final ServiceIOException S_IO_EXCEPTION = new ServiceIOException("Test");
+    private static final Class<CeTestUtils> THIS = CeTestUtils.class;
+    private static final String DEFAULT_FILE = "blank.file";
+
+    private CeTestUtils() {
+        // utility class
+    }
 
     public static Path pathOf(final String fileName) {
         return Paths.get(Optional.ofNullable(THIS.getResource("/" + fileName))
@@ -113,6 +118,7 @@ public final class CeTestUtils {
         inputs.setTargetDate(BEGINNING_OF_2000);
         task.setInputs(inputs);
         task.setArtifacts(artifacts);
+        task.setOutputs(new Outputs());
 
         return task;
     }
@@ -232,5 +238,18 @@ public final class CeTestUtils {
                 throw new IOException();
             }
         };
+    }
+
+    public static LoadFlow.Runner mockLoadFlowRunner() {
+        final LoadFlow.Runner mockRunner = mock(LoadFlow.Runner.class);
+        final LoadFlowResult.ComponentResult componentResult = mock(LoadFlowResult.ComponentResult.class);
+        when(componentResult.getStatus()).thenReturn(CONVERGED);
+        when(componentResult.getSynchronousComponentNum()).thenReturn(MAIN_NUM);
+        final LoadFlowResult result = mock(LoadFlowResult.class);
+        when(result.getComponentResults()).thenReturn(singletonList(componentResult));
+
+        when(mockRunner.run(any(Network.class), any(LoadFlowParameters.class))).thenReturn(result);
+
+        return mockRunner;
     }
 }

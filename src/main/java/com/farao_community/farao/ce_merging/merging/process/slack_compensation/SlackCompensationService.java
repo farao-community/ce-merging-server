@@ -29,13 +29,9 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.time.ZonedDateTime;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATETIME_FMT;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.save;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentModeLfParameter;
@@ -45,14 +41,13 @@ import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroI
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
 import static com.powsybl.iidm.network.Country.ES;
 import static com.powsybl.ucte.network.UcteNodeTypeCode.UT;
-import static java.util.Locale.FRANCE;
 
 @Service
 public class SlackCompensationService {
 
-    private CeMergingConfiguration configuration;
-    private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
     private static final Logger LOGGER = LoggerFactory.getLogger(SlackCompensationService.class);
+    private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
+    private final CeMergingConfiguration configuration;
 
     public SlackCompensationService(final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
                                     final CeMergingConfiguration configuration) {
@@ -60,11 +55,26 @@ public class SlackCompensationService {
         this.configuration = configuration;
     }
 
-    public Network compensateFinalCgmSlackImbalance(final MergingTask task) {
+    private static void compensateLoad(final Load load) {
+        load.setP0(load.getTerminal().getP());
+        load.setQ0(zeroIfNaN(load.getTerminal().getQ()));
+    }
+
+    private static void compensateGenerator(final Generator generator) {
+        generator.setTargetP(-generator.getTerminal().getP());
+        generator.setTargetQ(-zeroIfNaN(generator.getTerminal().getQ()));
+    }
+
+    public void compensateFinalCgmSlackImbalance(final MergingTask task) {
         final Network compensatedNetwork = compensateNetwork(task);
         addSlackNode(compensatedNetwork, task);
-        saveCgmInOutputs(compensatedNetwork, task);
-        return compensatedNetwork;
+
+        final SavedFile cgmFile = save(configuration.getOutputsDirectoryPath(task),
+                                        task.getOutputCgmFileName(),
+                                        String.format("/tasks/%d/outputs/cgm", task.getId()),
+                                        path -> compensatedNetwork.write(UCTE_FORMAT, null, path));
+
+        task.getOutputs().setCgm(cgmFile);
     }
 
     private Network compensateNetwork(final MergingTask task) {
@@ -87,16 +97,6 @@ public class SlackCompensationService {
         return cgm;
     }
 
-    private static void compensateLoad(final Load load) {
-        load.setP0(load.getTerminal().getP());
-        load.setQ0(zeroIfNaN(load.getTerminal().getQ()));
-    }
-
-    private static void compensateGenerator(final Generator generator) {
-        generator.setTargetP(-generator.getTerminal().getP());
-        generator.setTargetQ(-zeroIfNaN(generator.getTerminal().getQ()));
-    }
-
     void addSlackNode(final Network cgm,
                       final MergingTask task) {
         /*
@@ -106,20 +106,22 @@ public class SlackCompensationService {
 
         final String defaultSlackNode = task.getConfigurations().getDefaultSlackNode();
 
-        final Optional<String> slackNode = Optional.ofNullable(getSpanishNetwork(task))
-                .map(UcteNetwork::getNodes)
-                .stream()
-                .flatMap(Collection::stream)
-                .filter(ucteNode -> ucteNode.getTypeCode() == UT)
-                .findFirst()
-                .map(UcteNode::getCode)
-                .map(UcteNodeCode::toString);
+        final UcteNetwork spanishNetwork = getSpanishNetwork(task);
+
+        final Optional<String> slackNode = spanishNetwork == null ? Optional.empty() :
+                spanishNetwork.getNodes()
+                        .stream()
+                        .filter(ucteNode -> ucteNode.getTypeCode() == UT)
+                        .map(UcteNode::getCode)
+                        .map(UcteNodeCode::toString)
+                        .findFirst();
 
         if (slackNode.isPresent()) {
             updateSlackBus(cgm, slackNode.get());
         } else {
             updateSlackBus(cgm, defaultSlackNode);
-            LOGGER.warn("No slack node defined in ES IGM, default slack node %s will be added to the final CGM".formatted(defaultSlackNode));
+            LOGGER.warn("No slack node defined in ES IGM, default slack node %s will be added to the final CGM"
+                                .formatted(defaultSlackNode));
         }
 
     }
@@ -148,20 +150,4 @@ public class SlackCompensationService {
                                  () -> LOGGER.warn(notFoundWarning));
     }
 
-    private void saveCgmInOutputs(final Network network,
-                                  MergingTask task) {
-
-        final ZonedDateTime targetZdtParis = task.getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
-        final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
-
-        /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                Be careful when modifying this file name because it's interfaced with CCCTool
-           !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
-        final String fileName = String.format("%s_2D%s_UX0.uct", dateAndTime, targetZdtParis.getDayOfWeek().getValue());
-
-        task.getOutputs().setCgm(save(configuration.getOutputsDirectoryPath(task),
-                                      fileName,
-                                      String.format("/tasks/%d/outputs/cgm", task.getId()),
-                                      path -> network.write(UCTE_FORMAT, null, path)));
-    }
 }
