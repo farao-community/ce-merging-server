@@ -23,6 +23,7 @@ import java.util.Properties;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
+import static com.farao_community.farao.ce_merging.merging.process.german.GermanXnodesReplacer.replaceXnodesWithLines;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
 import static com.powsybl.computation.local.LocalComputationManager.getDefault;
 import static com.powsybl.iidm.network.ImportConfig.CACHE;
@@ -56,7 +57,7 @@ public class GermanPreMergeService {
             saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, mergedNetwork, task, UCTE_FORMAT, configuration);
             germanMismatchCompensation.apply(task, mergedNetwork);
             LOGGER.info("Replacement of German TSO's network element names by common German identifiers for network: {}", mergedNetwork);
-            GermanXnodesReplacer.replaceWithLines(mergedNetwork);
+            replaceXnodesWithLines(mergedNetwork);
             saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, mergedNetwork, task, UCTE_FORMAT, configuration);
             tasksRepository.save(task);
         } catch (Exception e) {

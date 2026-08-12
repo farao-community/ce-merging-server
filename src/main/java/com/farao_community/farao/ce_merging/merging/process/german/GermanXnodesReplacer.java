@@ -42,7 +42,7 @@ public final class GermanXnodesReplacer {
         this.network = network;
     }
 
-    public static void replaceWithLines(final Network network) {
+    public static void replaceXnodesWithLines(final Network network) {
         new GermanXnodesReplacer(network).replace();
     }
 

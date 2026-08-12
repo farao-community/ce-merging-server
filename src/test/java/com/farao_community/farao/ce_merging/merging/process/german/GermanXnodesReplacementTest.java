@@ -18,7 +18,7 @@ public class GermanXnodesReplacementTest {
     @Test
     public void shouldModifyPreMergedGermanIgm() {
         final Network mergedGermanNetwork = Network.read(getClass().getResource("/german/mergeFakeFile.uct").getPath());
-        GermanXnodesReplacer.replaceWithLines(mergedGermanNetwork);
+        GermanXnodesReplacer.replaceXnodesWithLines(mergedGermanNetwork);
 
         assertThat(mergedGermanNetwork)
                 .hasBus("DXXXXX11")

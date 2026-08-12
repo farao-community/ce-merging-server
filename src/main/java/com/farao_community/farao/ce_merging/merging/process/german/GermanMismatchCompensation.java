@@ -25,12 +25,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isVirtualHubDanglingLine;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.hasActivePower;
 import static com.powsybl.iidm.network.Country.DE;
 import static java.lang.Math.abs;
 
@@ -50,6 +52,7 @@ public class GermanMismatchCompensation {
 
     private static Predicate<DanglingLine> isExternalConnectedDanglingLine(final List<VirtualHubRecord> virtualHubs,
                                                                            final List<XnodeConfig> xnodes) {
+        //TODO simplify after merge of slack compensation
         return danglingLine -> !isVirtualHubDanglingLine(danglingLine, virtualHubs)
                                && isGermanExternalNode(danglingLine.getPairingKey(), xnodes)
                                && hasActivePower(danglingLine);
@@ -100,6 +103,7 @@ public class GermanMismatchCompensation {
         return Stream.of(GermanTso.values())
                 .map(GermanTso::name)
                 .map(germanNetPositions::get)
+                .filter(Objects::nonNull)
                 .map(NetPositions::getGlobalDetailedExchanges)
                 .mapToDouble(ex -> ex.getOrDefault(DE.name(), 0.))
                 .sum();
