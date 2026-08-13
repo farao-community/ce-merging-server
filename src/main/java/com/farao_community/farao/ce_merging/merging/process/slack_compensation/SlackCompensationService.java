@@ -70,9 +70,9 @@ public class SlackCompensationService {
         addSlackNode(compensatedNetwork, task);
 
         final SavedFile cgmFile = save(configuration.getOutputsDirectoryPath(task),
-                                        task.getOutputCgmFileName(),
-                                        String.format("/tasks/%d/outputs/cgm", task.getId()),
-                                        path -> compensatedNetwork.write(UCTE_FORMAT, null, path));
+                                       task.getOutputCgmFileName(),
+                                       String.format("/tasks/%d/outputs/cgm", task.getId()),
+                                       path -> compensatedNetwork.write(UCTE_FORMAT, null, path));
 
         task.getOutputs().setCgm(cgmFile);
     }
