@@ -10,6 +10,7 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
@@ -50,6 +51,7 @@ import static java.time.ZoneOffset.UTC;
 import static java.util.Collections.singletonList;
 import static org.apache.commons.io.FileUtils.readFileToByteArray;
 import static org.apache.commons.io.FileUtils.readFileToString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -77,6 +79,26 @@ public final class CeTestUtils {
         return Paths.get(Optional.ofNullable(THIS.getResource("/" + fileName))
                                  .orElse(THIS.getResource("/" + DEFAULT_FILE))
                                  .getPath());
+    }
+
+    public static IgmData getIgm(final String path) {
+        final String countryCode = path.substring(path.length() - 7, path.length() - 5);
+        final IgmData igm = new IgmData();
+        igm.setCountry(countryCode);
+        igm.setIgmFilePath(stringPathOf(path));
+        final SavedFile file = new SavedFile();
+        file.setPath(stringPathOf(path));
+        final boolean hasFolder = path.lastIndexOf("/") > 0;
+        file.setOriginalName(hasFolder ? path.split("/")[1] : path.replace("/", ""));
+        file.setLocation(hasFolder ? path.split("/")[0] : ".");
+        igm.setIgmFile(file);
+
+        return igm;
+    }
+
+    public static void assertSumEquals(final double expectedSum,
+                                       final Map<String, Double> toSum) {
+        assertEquals(toSum.values().stream().mapToDouble(v -> v).sum(), expectedSum, 0.1);
     }
 
     public static String stringPathOf(final String fileName) {

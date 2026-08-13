@@ -157,6 +157,10 @@ public class MergingTask implements Serializable {
         return inputs.getTargetDate();
     }
 
+    public boolean hasPreTreatedIgm(final String country) {
+        return artifacts.getPreTreatedIgmMap().containsKey(country);
+    }
+
     public String getOutputCgmFileName() {
         final ZonedDateTime targetZdtParis = getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
         final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);

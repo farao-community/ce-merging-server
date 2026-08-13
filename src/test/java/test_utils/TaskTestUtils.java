@@ -49,6 +49,11 @@ public final class TaskTestUtils {
         }
     }
 
+    public static void setLoadflowParameters(final MergingTask task, final String loadflowParametersFile) throws IOException {
+        final LoadFlowParameters loadFlowParameters = JsonLoadFlowParameters.read(new ClassPathResource(loadflowParametersFile).getInputStream());
+        task.getConfigurations().setLoadFlowParameters(loadFlowParameters);
+    }
+
     private static InputStream getGridConfigStream(final String fileName) throws IOException {
         return new ClassPathResource("gridDefaultConfigurations/%s".formatted(fileName)).getInputStream();
     }
