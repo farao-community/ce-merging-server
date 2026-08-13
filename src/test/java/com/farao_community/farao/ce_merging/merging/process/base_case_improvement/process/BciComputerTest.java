@@ -43,7 +43,7 @@ import static test_utils.mockdata.ReferenceProgramTestData.mockRefProg6;
 import static test_utils.mockdata.ReferenceProgramTestData.mockRefProg7;
 
 @SpringBootTest
-@ActiveProfiles({"BciComputationTest"})
+@ActiveProfiles("BciComputationTest")
 class BciComputerTest {
     private static final double EPSILON = 0.01;
     private static final List<BciTestCase> TEST_CASES = List.of(
@@ -105,7 +105,7 @@ class BciComputerTest {
 
     }
 
-    void assertApplyBci(final ReferenceProgram referenceProgram,
+    private void assertApplyBci(final ReferenceProgram referenceProgram,
                         final Map<String, Interval> feasibilityRange,
                         final boolean bciActive,
                         final boolean extendedRanges,
@@ -131,16 +131,6 @@ class BciComputerTest {
         assertRegionIsBalanced(results);
     }
 
-    private void assertRegionIsBalanced(final Map<String, BciAreaResults> results) {
-        double totalInRegionNetPosition = results
-                .values()
-                .stream()
-                .map(BciAreaResults::getInRegionNetPositions)
-                .mapToDouble(InRegionNetPositions::target)
-                .sum();
-        assertEquals(0, totalInRegionNetPosition, EPSILON);
-    }
-
     @Configuration
     @Profile("BciComputationTest")
     static class ContextConfiguration {
@@ -158,6 +148,16 @@ class BciComputerTest {
             regionConfiguration.setAreasIn(areasId);
             return regionConfiguration;
         }
+    }
+
+    private void assertRegionIsBalanced(final Map<String, BciAreaResults> results) {
+        final double totalInRegionNetPosition = results
+                .values()
+                .stream()
+                .map(BciAreaResults::getInRegionNetPositions)
+                .mapToDouble(InRegionNetPositions::target)
+                .sum();
+        assertEquals(0, totalInRegionNetPosition, EPSILON);
     }
 
     private record BciTestCase(ReferenceProgram referenceProgram,

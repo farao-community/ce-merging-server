@@ -69,7 +69,7 @@ class FeasibilityRangeCalculatorTest {
 
     @Test
     void shouldCalculateFeasibilityRangesWithoutNetPosition() throws IOException {
-        Map<String, Interval> frs = feasibilityRangeCalculator.getRegionFeasibilityRanges(getBciTestFile("externalConstraints.xml"),
+        final Map<String, Interval> frs = feasibilityRangeCalculator.getRegionFeasibilityRanges(getBciTestFile("externalConstraints.xml"),
                                                                                           TARGET_DATE,
                                                                                           EMPTY_NETPOSITIONS_MAP,
                                                                                           EMPTY_FEASIBILITY_RANGE);

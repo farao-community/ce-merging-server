@@ -9,7 +9,6 @@ package com.farao_community.farao.ce_merging.merging.process.base_case_improveme
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.ExternalConstraintDirection;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ExternalConstraintsInputs;
 import com.farao_community.farao.ce_merging.xsd.bci.FlowBasedExternalConstraintDocument;
@@ -138,5 +137,10 @@ public final class ExternalConstraintsImporter {
         final OffsetDateTime start = OffsetDateTime.parse(externalConstraintsDates.get(0), ISO_DATE_TIME);
         final OffsetDateTime end = OffsetDateTime.parse(externalConstraintsDates.get(1), ISO_DATE_TIME);
         return !targetDate.isBefore(start) && !targetDate.isAfter(end);
+    }
+
+    public enum ExternalConstraintDirection {
+        EXPORT,
+        IMPORT;
     }
 }

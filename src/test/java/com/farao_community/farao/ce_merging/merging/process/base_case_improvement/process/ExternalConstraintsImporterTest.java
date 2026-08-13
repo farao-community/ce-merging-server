@@ -41,9 +41,8 @@ class ExternalConstraintsImporterTest {
         externalConstraints = getBciTestFile("20190618_MergedEC.xml");
         correctAlegroFilePath = CeTestUtils.stringPathOf("bci/F229-MergedECs_v01_Alegro.xml");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonConfig = new String(readAllBytes(pathOf("bci/region_configuration.json")));
-        regionConfiguration = objectMapper.readValue(jsonConfig, RegionConfiguration.class);
+        final String jsonConfig = new String(readAllBytes(pathOf("bci/region_configuration.json")));
+        regionConfiguration = new ObjectMapper().readValue(jsonConfig, RegionConfiguration.class);
     }
 
     @Test
@@ -61,7 +60,7 @@ class ExternalConstraintsImporterTest {
     void checkAlegroExternalConstraintValues() {
         final FlowBasedExternalConstraintDocument ecFile = JaxbUtils.readFromPath(FlowBasedExternalConstraintDocument.class,
                                                                                   correctAlegroFilePath);
-        List<NetPositionConstraint> cts = ecFile.getConstraints().getNetPositionConstraint();
+        final List<NetPositionConstraint> cts = ecFile.getConstraints().getNetPositionConstraint();
         assertEquals(10, cts.size());
 
         assertEquals("BE_AL", cts.get(6).getHub());
