@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -51,5 +53,9 @@ public final class StreamsUtils {
             .filter(filter)
             .mapToDouble(getter)
             .sum();
+    }
+
+    public static <T> Stream<T> streamIterable(final Iterable<T> iterable) {
+        return StreamSupport.stream(iterable.spliterator(), false);
     }
 }

@@ -9,7 +9,6 @@ package com.farao_community.farao.ce_merging.common;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
 
 public final class CeMergingConstants {
 
@@ -64,7 +63,6 @@ public final class CeMergingConstants {
     public static final String ALEGRO_BE_NODE_NAME = "BE_AL";
     public static final String ALEGRO_DE_NODE_NAME = "DE_AL";
     public static final String DANISH_TSO = "D1";
-    public static final Set<String> GERMAN_AND_DANISH_TSO = Set.of("D1", "D2", "D4", "D6", "D7", "D8");
     public static final String UCTE_FORMAT = "UCTE";
     public static final String XIIDM_FORMAT = "XIIDM";
     public static final String DC = "DC";

@@ -45,7 +45,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XIIDM_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
-import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadflow;
+import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.ZonalDataManager.getZonalDataFromGlsk;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
@@ -163,7 +163,7 @@ public class BalancesAdjustmentProcessor {
     }
 
     private List<BalanceComputationArea> generateAreas() {
-        runLoadflow(network, loadFlowRunnerSupplier, balanceComputationParameters.getLoadFlowParameters());
+        runLoadFlow(network, loadFlowRunnerSupplier, balanceComputationParameters.getLoadFlowParameters());
 
         this.networkAreas = network.getCountries().stream().collect(toMap(Country::toString, CountryAreaFactory::new));
 

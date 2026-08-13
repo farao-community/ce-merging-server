@@ -5,10 +5,17 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
+
+import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
+import com.powsybl.iidm.network.Country;
 import jakarta.persistence.MappedSuperclass;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
+import static com.powsybl.iidm.network.Country.DE;
+import static com.powsybl.iidm.network.Country.DK;
 
 @MappedSuperclass
 public abstract class AbstractXNodeConfig {
@@ -17,6 +24,26 @@ public abstract class AbstractXNodeConfig {
     protected String area2;
     protected String subarea1;
     protected String subarea2;
+
+    public boolean isArea1Tso(final String tso) {
+        return isAreaOfTso(area1, subarea1, tso);
+    }
+
+    public boolean isArea2Tso(final String tso) {
+        return isAreaOfTso(area2, subarea2, tso);
+    }
+
+    private boolean isAreaOfTso(final String area,
+                                final String subarea,
+                                final String tso) {
+        if (GermanTso.includes(tso)) {
+            return tso.equals(subarea) && Country.valueOf(area) == DE;
+        } else if (DANISH_TSO.equals(tso)) {
+            return tso.equals(subarea) && Country.valueOf(area) == DK;
+        } else {
+            return tso.equals(area);
+        }
+    }
 
     public String getName() {
         return name;
