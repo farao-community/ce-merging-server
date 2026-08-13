@@ -76,21 +76,6 @@ class NetPositionServiceTest {
     private NetPositionService netPositionService;
     private String loadflowParametersFile;
 
-    private static void assertAllPositionsEqual(final NetPositions netPositions,
-                                                final double expected) {
-        assertNotNull(netPositions);
-        final SoftAssertions soft = new SoftAssertions();
-        soft.assertThat(netPositions.getGlobalNetPosition().getWithVirtualHubs())
-                .isCloseTo(expected, PERCENT_TOLERANCE);
-        soft.assertThat(netPositions.getGlobalNetPosition().getWithoutVirtualHubs())
-                .isCloseTo(expected, PERCENT_TOLERANCE);
-        soft.assertThat(netPositions.getInRegionNetPosition().getWithVirtualHubs())
-                .isCloseTo(expected, PERCENT_TOLERANCE);
-        soft.assertThat(netPositions.getInRegionNetPosition().getWithoutVirtualHubs())
-                .isCloseTo(expected, PERCENT_TOLERANCE);
-        soft.assertAll();
-    }
-
     @BeforeEach
     void setUp() {
         loadflowParametersFile = "loadflow_parameters/ac-load-flow-parameters_main_component.json";
@@ -216,5 +201,20 @@ class NetPositionServiceTest {
     private void testGenerationAndLoad(NetPositionsResults netPositionsFile) {
         assertEquals(-10, Objects.requireNonNull(netPositionsFile.get(AT)).getGenerationAndLoadQuantity().generation(), VALUE_TOLERANCE);
         assertEquals(1000, Objects.requireNonNull(netPositionsFile.get(AT)).getGenerationAndLoadQuantity().load(), VALUE_TOLERANCE);
+    }
+
+    private void assertAllPositionsEqual(final NetPositions netPositions,
+                                         final double expected) {
+        assertNotNull(netPositions);
+        final SoftAssertions soft = new SoftAssertions();
+        soft.assertThat(netPositions.getGlobalNetPosition().getWithVirtualHubs())
+                .isCloseTo(expected, PERCENT_TOLERANCE);
+        soft.assertThat(netPositions.getGlobalNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(expected, PERCENT_TOLERANCE);
+        soft.assertThat(netPositions.getInRegionNetPosition().getWithVirtualHubs())
+                .isCloseTo(expected, PERCENT_TOLERANCE);
+        soft.assertThat(netPositions.getInRegionNetPosition().getWithoutVirtualHubs())
+                .isCloseTo(expected, PERCENT_TOLERANCE);
+        soft.assertAll();
     }
 }
