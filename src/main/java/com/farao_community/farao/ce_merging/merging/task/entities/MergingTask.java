@@ -152,4 +152,8 @@ public class MergingTask implements Serializable {
     public OffsetDateTime getTargetDate() {
         return inputs.getTargetDate();
     }
+
+    public boolean hasPreTreatedIgm(final String country) {
+        return artifacts.getPreTreatedIgmMap().containsKey(country);
+    }
 }

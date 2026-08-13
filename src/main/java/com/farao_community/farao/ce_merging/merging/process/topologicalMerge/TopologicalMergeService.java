@@ -37,7 +37,7 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 public class TopologicalMergeService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TopologicalMergeService.class);
-    private static final String UCTE_IMPORT_CREATE_AREAS = "ucte.import.create-areas";
+    private static final String UCTE_IMPORT_CREATE_AREAS_KEY = "ucte.import.create-areas";
     private final CeMergingConfiguration configuration;
 
     public TopologicalMergeService(CeMergingConfiguration configuration) {
@@ -55,7 +55,7 @@ public class TopologicalMergeService {
                     configuration
             );
         } catch (final Exception e) {
-            final String errorMessage = String.format("Topological merge failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
+            final String errorMessage = String.format("Topological merge failed for task %d with target date %s, cause: %s", task.getId(), task.getTargetDate(), e.getMessage());
             LOGGER.error(errorMessage, e);
             throw new CeMergingException(errorMessage, e);
         }
@@ -63,19 +63,19 @@ public class TopologicalMergeService {
 
     private Network getTopologicalMergeNetwork(final MergingTask task) {
         final Properties properties = new Properties();
-        properties.setProperty(UCTE_IMPORT_CREATE_AREAS, "false");
+        properties.setProperty(UCTE_IMPORT_CREATE_AREAS_KEY, "false");
         final List<Network> networks = getTopologicalMergeFiles(task).stream()
                 .map(path -> readNetwork(path, properties))
                 .toList();
-        final String mergedNetworkName = ArtifactType.TOPOLOGICAL_MERGE_FILE.getFileName(task.getInputs().getTargetDate());
+        final String mergedNetworkName = ArtifactType.TOPOLOGICAL_MERGE_FILE.getFileName(task.getTargetDate());
         LOGGER.info("Merging {} networks into '{}'", networks.size(), mergedNetworkName);
         return Network.merge(mergedNetworkName, networks.toArray(Network[]::new));
     }
 
-    private static Network readNetwork(final Path path, final Properties parameters) {
+    private static Network readNetwork(final Path path, final Properties properties) {
         try (InputStream inputStream = Files.newInputStream(path)) {
             LOGGER.info("IIDM import of network: {}", path.getFileName());
-            return Network.read(path.getFileName().toString(), inputStream, LocalComputationManager.getDefault(), ImportConfig.CACHE.get(), parameters);
+            return Network.read(path.getFileName().toString(), inputStream, LocalComputationManager.getDefault(), ImportConfig.CACHE.get(), properties);
         } catch (final Exception e) {
             throw new CeMergingException(String.format("Cannot read network '%s'", path), e);
         }
@@ -91,10 +91,10 @@ public class TopologicalMergeService {
                 .forEach(networkFiles::add);
 
         // German pre-merged IGM
-        networkFiles.add(Paths.get(task.getArtifacts().getFile(GERMAN_PRE_MERGED_IGM).getPath()));
+        networkFiles.add(Paths.get(task.getArtifactPath(GERMAN_PRE_MERGED_IGM)));
 
         // Dk converted IGM
-        networkFiles.add(Paths.get(task.getArtifacts().getFile(DK_CONVERTED_FILE).getPath()));
+        networkFiles.add(Paths.get(task.getArtifactPath(DK_CONVERTED_FILE)));
 
         // Pre-treated IGMs
         task.getArtifacts()
@@ -108,8 +108,8 @@ public class TopologicalMergeService {
         return networkFiles;
     }
 
-    private static boolean isNotPreTreated(final MergingTask taskEntity, final IgmData igmData) {
+    private static boolean isNotPreTreated(final MergingTask task, final IgmData igmData) {
         return !GERMAN_AND_DANISH_TSO.contains(igmData.getCountry())
-                && !taskEntity.getArtifacts().getPreTreatedIgmMap().containsKey(igmData.getCountry());
+                && !task.hasPreTreatedIgm(igmData.getCountry());
     }
 }

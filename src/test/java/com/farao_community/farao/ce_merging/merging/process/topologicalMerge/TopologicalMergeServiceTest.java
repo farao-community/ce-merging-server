@@ -198,15 +198,12 @@ class TopologicalMergeServiceTest {
     private void createTask(final List<IgmData> igms, final Map<String, SavedFile> preTreatedIgms, final Path germanPath, final Path danishPath) {
         when(task.getInputs()).thenReturn(inputs);
         when(task.getArtifacts()).thenReturn(artifacts);
-
-        when(inputs.getTargetDate()).thenReturn(BEGINNING_OF_2000);
+        when(task.getTargetDate()).thenReturn(BEGINNING_OF_2000);
         when(inputs.getIgms()).thenReturn(igms);
-
+        when(task.getArtifactPath(ArtifactType.GERMAN_PRE_MERGED_IGM)).thenReturn(germanPath.toString());
+        when(task.getArtifactPath(ArtifactType.DK_CONVERTED_FILE)).thenReturn(danishPath.toString());
+        when(task.hasPreTreatedIgm(anyString())).thenAnswer(invocation -> preTreatedIgms.containsKey(invocation.getArgument(0)));
         when(artifacts.getPreTreatedIgmMap()).thenReturn(preTreatedIgms);
-        when(artifacts.getFile(ArtifactType.GERMAN_PRE_MERGED_IGM))
-                .thenReturn(savedFile(germanPath));
-        when(artifacts.getFile(ArtifactType.DK_CONVERTED_FILE))
-                .thenReturn(savedFile(danishPath));
     }
 
     private Path createFile(final String fileName) throws Exception {
