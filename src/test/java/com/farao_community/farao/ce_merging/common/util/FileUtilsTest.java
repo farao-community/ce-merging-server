@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
 

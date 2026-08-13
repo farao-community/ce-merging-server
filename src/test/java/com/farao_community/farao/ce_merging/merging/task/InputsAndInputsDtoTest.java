@@ -6,9 +6,9 @@
  */
 package com.farao_community.farao.ce_merging.merging.task;
 
-import com.farao_community.farao.ce_merging.merging.task.dto.InputsDto;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
-import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.InputsDto;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Inputs;
 import org.junit.jupiter.api.Test;
 import test_utils.GetterSetterVerifier;
 
@@ -16,7 +16,7 @@ import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DEFAULT_ALEGRO_THRESHOLD;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_WINTER_OFFSET;
-import static com.farao_community.farao.ce_merging.merging.task.enums.IgmType.SNAPSHOT;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.IgmType.SNAPSHOT;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;

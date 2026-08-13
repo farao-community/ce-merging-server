@@ -8,9 +8,13 @@ package com.farao_community.farao.ce_merging.merging.process.hvdc_alignment;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
-import com.farao_community.farao.ce_merging.merging.task.entities.*;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeEach;

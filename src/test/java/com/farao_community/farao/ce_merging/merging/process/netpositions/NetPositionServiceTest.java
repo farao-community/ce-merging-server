@@ -8,16 +8,16 @@
 package com.farao_community.farao.ce_merging.merging.process.netpositions;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
-import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
-import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.loadflow.LoadFlow;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.data.Percentage;
@@ -37,9 +37,9 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.IGMS_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.DK_CONVERTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.IGMS_NET_POSITIONS_FILE;
 import static com.powsybl.iidm.network.Country.AT;
 import static com.powsybl.iidm.network.Country.BE;
 import static com.powsybl.iidm.network.Country.CZ;

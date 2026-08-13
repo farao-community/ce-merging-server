@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.common.config;
 
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import com.farao_community.farao.ce_merging.common.model.TaskStatus;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

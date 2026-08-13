@@ -8,8 +8,8 @@ package com.farao_community.farao.ce_merging.merging.process.balances_adjustment
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.AreasManager;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputation;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationArea;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationFactoryImpl;
@@ -46,12 +46,12 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XIIDM_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.BALANCED_CGM_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.ZonalDataManager.getZonalDataFromGlsk;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 import static com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult.Status.SUCCESS;
 import static com.powsybl.iidm.modification.scalable.ScalingParameters.Priority.RESPECT_OF_VOLUME_ASKED;
 import static java.lang.Double.MAX_VALUE;

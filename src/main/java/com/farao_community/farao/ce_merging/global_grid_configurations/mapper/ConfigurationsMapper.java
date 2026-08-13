@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.mapper;
 
-import com.farao_community.farao.ce_merging.merging.task.dto.ConfigurationsDto;
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.ConfigurationsDto;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Configurations;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

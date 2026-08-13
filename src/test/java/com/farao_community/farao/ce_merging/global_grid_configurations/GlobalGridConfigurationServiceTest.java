@@ -11,11 +11,11 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
-import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectionRecord;
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
-import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.BorderDirectionRecord;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.VirtualHubRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

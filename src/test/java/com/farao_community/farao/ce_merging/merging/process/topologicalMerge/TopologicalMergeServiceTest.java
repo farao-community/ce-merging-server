@@ -8,13 +8,13 @@ package com.farao_community.farao.ce_merging.merging.process.topologicalMerge;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
-import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,15 +32,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
-
+import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.BEGINNING_OF_2000;
 import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 

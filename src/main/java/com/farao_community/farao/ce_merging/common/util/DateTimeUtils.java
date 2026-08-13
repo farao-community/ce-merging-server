@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
@@ -64,5 +64,10 @@ public final class DateTimeUtils {
         } catch (DatatypeConfigurationException e) {
             throw new CeMergingException("Cannot create XMLGregorianCalendar date for fixed glsk document, " + e.getMessage());
         }
+    }
+
+    public static OffsetDateTime convertToZFormat(OffsetDateTime targetDate) {
+        Instant date = Instant.from(targetDate);
+        return OffsetDateTime.parse(date.toString(), DateTimeFormatter.ISO_DATE_TIME);
     }
 }

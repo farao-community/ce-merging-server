@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.task;
 
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

@@ -6,9 +6,11 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Artifacts;
 import org.junit.jupiter.api.Test;
 
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ArtifactsTest {

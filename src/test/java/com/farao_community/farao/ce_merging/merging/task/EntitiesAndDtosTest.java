@@ -6,19 +6,19 @@
  */
 package com.farao_community.farao.ce_merging.merging.task;
 
-import com.farao_community.farao.ce_merging.merging.task.dto.ArtifactsDto;
-import com.farao_community.farao.ce_merging.merging.task.dto.ConfigurationsDto;
-import com.farao_community.farao.ce_merging.merging.task.dto.IgmDto;
-import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
-import com.farao_community.farao.ce_merging.merging.task.dto.OutputsDto;
-import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
-import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectionRecord;
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.ArtifactsDto;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.ConfigurationsDto;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.IgmDto;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.OutputsDto;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.BorderDirectionRecord;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Outputs;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.VirtualHubRecord;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 import test_utils.GetterSetterVerifier;

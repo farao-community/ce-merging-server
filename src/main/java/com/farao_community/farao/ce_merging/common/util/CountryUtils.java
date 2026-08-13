@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
+import com.farao_community.farao.ce_merging.merging.model.hourly.enums.GermanTso;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.ucte.network.UcteCountryCode;
 

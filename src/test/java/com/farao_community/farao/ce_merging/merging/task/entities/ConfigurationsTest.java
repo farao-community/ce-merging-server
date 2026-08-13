@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.process.recessivity.RecessivityParameters;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;

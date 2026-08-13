@@ -11,10 +11,10 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.CountryUtils;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.process.forecast_netpositions.ReferenceExchangeData;
 import com.farao_community.farao.ce_merging.merging.process.forecast_netpositions.ReferenceProgram;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 
 public class VirtualHubsShifting {
     private static final Logger LOGGER = LoggerFactory.getLogger(VirtualHubsShifting.class);

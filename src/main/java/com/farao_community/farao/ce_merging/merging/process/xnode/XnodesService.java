@@ -1,14 +1,17 @@
-/**
- * Copyright (c) 2026, RTE (http://www.rte-france.com)   This Source Code Form is subject to the terms of the Mozilla Public   License, v. 2.0. If a copy of the MPL was not distributed with this   file, You can obtain one at http://mozilla.org/MPL/2.0/.   SPDX-License-Identifier: MPL-2.0
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package com.farao_community.farao.ce_merging.merging.process.xnode;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,7 +19,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.XNODES_INFORMATION_FILE;
 
 @Service
 public class XnodesService {

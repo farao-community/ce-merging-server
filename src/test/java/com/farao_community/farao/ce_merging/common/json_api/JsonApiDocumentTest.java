@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.json_api;
 
-import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.MergingTaskDto;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

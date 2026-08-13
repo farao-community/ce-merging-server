@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
-import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.xsd.xnodes.Xnode;
 import com.farao_community.farao.ce_merging.xsd.xnodes.Xnodes;
 import org.assertj.core.api.ThrowableAssert;
