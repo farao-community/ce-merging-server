@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.powsybl.iidm.network.Country;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -18,7 +19,13 @@ import java.util.Map;
 public record NetPositionsResults(Map<String, NetPositions> netPositionsByCountryMap) {
     @JsonCreator
     public NetPositionsResults(@JsonProperty("netPositionsByCountryMap") final Map<String, NetPositions> netPositionsByCountryMap) {
-        this.netPositionsByCountryMap = netPositionsByCountryMap;
+        this.netPositionsByCountryMap = netPositionsByCountryMap == null ?
+                new HashMap<>()
+                : new HashMap<>(netPositionsByCountryMap);
+    }
+
+    public NetPositionsResults() {
+        this(new HashMap<>());
     }
 
     public NetPositions get(final Country country) {
@@ -29,11 +36,19 @@ public record NetPositionsResults(Map<String, NetPositions> netPositionsByCountr
         return netPositionsByCountryMap.get(country.name());
     }
 
-    public NetPositions get(final String tso) {
-        if (netPositionsByCountryMap == null || tso == null) {
-            return null;
-        }
+    public void put(final Country country, final NetPositions netPositions) {
+        netPositionsByCountryMap.put(country.name(), netPositions);
+    }
 
-        return netPositionsByCountryMap.get(tso);
+    public void putIfAbsent(final Country country, final NetPositions netPositions) {
+        netPositionsByCountryMap.putIfAbsent(country.name(), netPositions);
+    }
+
+    public void put(final String region, final NetPositions netPositions) {
+        netPositionsByCountryMap.put(region, netPositions);
+    }
+
+    public void putIfAbsent(final String region, final NetPositions netPositions) {
+        netPositionsByCountryMap.putIfAbsent(region, netPositions);
     }
 }

@@ -7,7 +7,12 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.powsybl.iidm.network.Bus;
+import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.Generator;
+import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.Terminal;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
@@ -16,9 +21,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isInMainConnectedComponent;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
+import static com.powsybl.loadflow.LoadFlowParameters.BalanceType.PROPORTIONAL_TO_GENERATION_P;
+import static com.powsybl.loadflow.LoadFlowParameters.BalanceType.PROPORTIONAL_TO_LOAD;
+import static com.powsybl.loadflow.LoadFlowParameters.ComponentMode.MAIN_CONNECTED;
+import static com.powsybl.loadflow.LoadFlowResult.ComponentResult.Status.CONVERGED;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
@@ -26,30 +40,31 @@ import static java.util.stream.Collectors.toList;
 public final class LoadFlowUtils {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoadFlowUtils.class);
     private static final String DIVERGENCE_MESSAGE = "%s load flow diverged on network %s";
+    private static final String COMPONENT_NUMBER_ERROR = "Component number parameter should be 0 or 1";
 
     private LoadFlowUtils() {
         /* This utility class should not be instantiated */
     }
 
-    public static void runLoadflow(final Network network,
-                                   final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
-                                   final LoadFlowParameters loadFlowParameters) {
+    public static void runLoadFlow(final Network network,
+                                   final Supplier<LoadFlow.Runner> runnerSupplier,
+                                   final LoadFlowParameters parameters) {
         final String id = network.getId();
 
-        LoadFlowResult result = loadFlowRunnerSupplier.get().run(network, loadFlowParameters);
-        boolean isDc = loadFlowParameters.isDc();
+        LoadFlowResult result = runnerSupplier.get().run(network, parameters);
+        boolean isDc = parameters.isDc();
 
         if (loadFlowHasDiverged(result)) {
             LOGGER.warn(getDivergenceMessage(id, isDc));
 
             Optional.ofNullable(result.getLogs())
-                .map(log -> new String(log.getBytes(US_ASCII)))
-                .ifPresent(LOGGER::error);
+                    .map(log -> new String(log.getBytes(US_ASCII)))
+                    .ifPresent(LOGGER::error);
 
             if (!isDc) { //DC fallback
                 LOGGER.warn("Switching to DC mode for network {}", id);
-                loadFlowParameters.setDc(true);
-                result = loadFlowRunnerSupplier.get().run(network, loadFlowParameters);
+                parameters.setDc(true);
+                result = runnerSupplier.get().run(network, parameters);
 
                 if (loadFlowHasDiverged(result)) {
                     final String errorMessage = getDivergenceMessage(id, true);
@@ -57,14 +72,34 @@ public final class LoadFlowUtils {
                     throw new CeMergingException(errorMessage);
                 }
 
-                loadFlowParameters.setDc(false); //should put in AC for the next computation
+                parameters.setDc(false); //should put in AC for the next computation
             }
         }
-
     }
 
-    private static String getDivergenceMessage(final String networkId, final boolean isDc) {
-        final String loadflowMode = isDc ? "DC" : "AC";
+    public static void runLoadFlowWithBalanceTypeCorrection(final Network network,
+                                                            final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
+                                                            final LoadFlowParameters parameters) {
+
+        LoadFlowParameters actualParameters = parameters;
+        if (parameters.getBalanceType() == PROPORTIONAL_TO_GENERATION_P && hasBalancedGeneration(network)) {
+            // We copy the parameters to not impact the next computation
+            final LoadFlowParameters withBalanceTypeLoad = parameters.copy();
+            withBalanceTypeLoad.setBalanceType(PROPORTIONAL_TO_LOAD);
+            LOGGER.info("Running loadflow with BalanceType PROPORTIONAL_TO_LOAD for network {}", network.getNameOrId());
+            actualParameters = withBalanceTypeLoad;
+        }
+
+        runLoadFlow(network, loadFlowRunnerSupplier, actualParameters);
+    }
+
+    private static boolean hasBalancedGeneration(final Network network) {
+        return 0 == network.getGeneratorStream().mapToDouble(Generator::getTargetP).sum();
+    }
+
+    private static String getDivergenceMessage(final String networkId,
+                                               final boolean isDc) {
+        final String loadflowMode = isDc ? DC : AC;
         return DIVERGENCE_MESSAGE.formatted(loadflowMode, networkId);
     }
 
@@ -73,20 +108,53 @@ public final class LoadFlowUtils {
      */
     private static boolean loadFlowHasDiverged(final LoadFlowResult loadFlowResult) {
         return loadFlowResult.getComponentResults()
-            .stream()
-            .filter(LoadFlowUtils::isMainComponentResult)
-            .collect(collectingAndThen(toList(), LoadFlowUtils::loadFlowHasDiverged));
+                .stream()
+                .filter(LoadFlowUtils::isMainComponentResult)
+                .collect(collectingAndThen(toList(), LoadFlowUtils::loadFlowHasDiverged));
     }
 
     private static boolean isMainComponentResult(final LoadFlowResult.ComponentResult componentResult) {
         return MAIN_NUM == componentResult.getSynchronousComponentNum();
     }
 
-    private static boolean loadFlowHasDiverged(final List<LoadFlowResult.ComponentResult> loadFlowResults) {
-        if (loadFlowResults.size() > 1) {
+    private static boolean loadFlowHasDiverged(final List<LoadFlowResult.ComponentResult> results) {
+        if (results.size() > 1) {
             throw new CeMergingException("Expecting no more than 1 main synchronous component in LoadFlowResult");
         }
-        return loadFlowResults.isEmpty()
-               || loadFlowResults.getFirst().getStatus() != LoadFlowResult.ComponentResult.Status.CONVERGED;
+        return results.isEmpty() || results.getFirst().getStatus() != CONVERGED;
+    }
+
+    public static Predicate<Injection> isConnected(final LoadFlowParameters.ComponentMode componentMode) {
+        return injection -> isTerminalConnected(injection.getTerminal(), componentMode);
+    }
+
+    private static boolean isTerminalConnected(final Terminal terminal,
+                                               final LoadFlowParameters.ComponentMode componentMode) {
+        final Terminal.BusView busView = terminal != null ? terminal.getBusView() : null;
+        final Bus bus = busView != null ? busView.getBus() : null;
+        final boolean terminalConnectedToBus = terminal != null && terminal.isConnected() && bus != null;
+
+        return switch (componentMode) {
+            case MAIN_CONNECTED -> terminalConnectedToBus && bus.isInMainSynchronousComponent();
+            case ALL_CONNECTED -> terminalConnectedToBus;
+            default -> throw new CeMergingException(COMPONENT_NUMBER_ERROR);
+        };
+    }
+
+    public static LoadFlowParameters.ComponentMode getComponentMode(final LoadFlowParameters parameters) {
+        return Optional.ofNullable(parameters.getComponentMode()).orElse(MAIN_CONNECTED);
+    }
+
+    public static double getBorderFlow(final DanglingLine danglingLine,
+                                       final LoadFlowParameters.ComponentMode componentMode) {
+        return switch (componentMode) {
+            case MAIN_CONNECTED -> isInMainConnectedComponent(danglingLine) ? getLeavingFlow(danglingLine) : 0.;
+            case ALL_CONNECTED -> getLeavingFlow(danglingLine);
+            default -> throw new CeMergingException(COMPONENT_NUMBER_ERROR);
+        };
+    }
+
+    public static double getLeavingFlow(final DanglingLine danglingLine) {
+        return danglingLine.getTerminal().isConnected() ? zeroIfNaN(-danglingLine.getBoundary().getP()) : 0;
     }
 }
