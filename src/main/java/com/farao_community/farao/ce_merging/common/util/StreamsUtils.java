@@ -8,6 +8,12 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import java.util.Collection;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.ToDoubleFunction;
 
 public final class StreamsUtils {
 
@@ -15,8 +21,41 @@ public final class StreamsUtils {
         // utility class
     }
 
+    /**
+     * Predicate used to eliminate duplicates by property of class T
+     *
+     * @param getter getter is the property's getter
+     * @param <T>          T any type
+     * @return <T> T same type as input
+     */
+    public static <T> Predicate<T> distinctByProperty(final Function<? super T, ?> getter) {
+        final Set<Object> seen = ConcurrentHashMap.newKeySet();
+        return t -> seen.add(getter.apply(t));
+    }
+
+    public static Double sumCollection(final Collection<Double> collection) {
+        return sumProperty(collection, d -> d);
+    }
+
+    public static <T> Double sumProperty(final Collection<T> collection,
+                                         final ToDoubleFunction<T> getter) {
+        return collection
+            .stream()
+            .mapToDouble(getter)
+            .sum();
+    }
+
+    public static <T> Double sumPropertyFiltered(final Collection<T> collection,
+                                                 final ToDoubleFunction<T> getter,
+                                                 final Predicate<T> filter) {
+        return collection
+            .stream()
+            .filter(filter)
+            .mapToDouble(getter)
+            .sum();
+    }
+
     public static <T> Stream<T> streamIterable(final Iterable<T> iterable) {
         return StreamSupport.stream(iterable.spliterator(), false);
     }
-
 }

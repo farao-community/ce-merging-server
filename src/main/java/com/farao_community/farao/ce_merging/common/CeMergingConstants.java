@@ -12,10 +12,6 @@ import java.time.format.DateTimeFormatter;
 
 public final class CeMergingConstants {
 
-    private CeMergingConstants() {
-        // constants class
-    }
-
     // app configuration
     public static final String TAG_VERSION = "1.0.0";
     public static final String CE_MERGING_URL = "/ce-merging/";
@@ -64,27 +60,29 @@ public final class CeMergingConstants {
     public static final String VIRTUAL_HUB_ALEGRO_DE_CODE = "DE_ALEGrO";
     public static final String VIRTUAL_HUB_ALEGRO_BE_EIC = "22Y201903144---9";
     public static final String VIRTUAL_HUB_ALEGRO_DE_EIC = "22Y201903145---4";
-    public static final String GERMAN_COUNTRY_CODE = "DE";
+    public static final String ALEGRO_BE_NODE_NAME = "BE_AL";
+    public static final String ALEGRO_DE_NODE_NAME = "DE_AL";
     public static final String DANISH_TSO = "D1";
     public static final String UCTE_FORMAT = "UCTE";
     public static final String XIIDM_FORMAT = "XIIDM";
     public static final String DC = "DC";
     public static final String AC = "AC";
-    public static final String DENMARK_COUNTRY_CODE = "DK";
     public static final String REPORT_BASE_NAME = "i18n.reports";
     public static final String SENDER_ID = "22XCORESO------S";
     public static final String RECEIVER_ID = "17XTSO-CS------W";
     public static final String CORE_REGION_ID = "10Y1001C--00059P";
-
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;
     public static final double MAX_FICTITIOUS_Q = 99999.;
-
     // Date management
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
     public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
     public static final DateTimeFormatter FILENAME_DATETIME_FMT = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+
+    private CeMergingConstants() {
+        // constants class
+    }
 
 }

@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<FeasibilityRangeDocument DtdRelease="0" DtdVersion="1" xmlns="bci" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="feasibility-range-document.xsd">
+  <DocumentIdentification v="FeasibilityRange-for-Core-Bci" />
+  <DocumentVersion v="1" />
+  <DocumentType v="A45" />
+  <SenderIdentification codingScheme="A01" v="WHO_MERGES" />
+  <SenderRole v="A04"/>
+  <ReceiverIdentification codingScheme="A01" v="GRID_OPERATOR"/>
+  <ReceiverRole v="A36"/>
+  <CreationDateTime v="2019-10-08T18:51:00Z"/>
+  <PublicationTimeInterval v="2015-03-31T22:00Z/2015-04-01T22:00Z"/>
+  <Constraints>
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER11_EIC"/>
+		<Min v="-1000"/>
+		<Max v="1000"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER2_EIC"/>
+		<Min v="-200"/>
+		<Max v="200"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER8_EIC"/>
+		<Min v="-5000"/>
+		<Max v="5000"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER13_EIC"/>
+		<Min v="-300"/>
+		<Max v="300"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>       
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER12_EIC"/>
+		<Min v="-2000"/>
+		<Max v="2000"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>       
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER10_EIC"/>
+		<Min v="-150"/>
+		<Max v="150"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>       
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER3_EIC"/>
+		<Min v="-500"/>
+		<Max v="500"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>    
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER26_EIC"/>
+		<Min v="-300"/>
+		<Max v="1000"/>
+		<Type v="ABSOLUTE"/>
+	</FeasibilityRangeConstraint>  
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER1_EIC"/>
+		<Min v="-4000"/>
+		<Max v="3000"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>  
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER5_EIC"/>
+		<Min v="-100"/>
+		<Max v="100"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>  
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER23_EIC"/>
+		<Min v="-200"/>
+		<Max v="200"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>  
+	<FeasibilityRangeConstraint>
+		<Area codingScheme="A01" v="AREA_NUMBER25_EIC"/>
+		<Min v="-1500"/>
+		<Max v="1500"/>
+		<Type v="RELATIVE"/>
+	</FeasibilityRangeConstraint>  
+  </Constraints>
+</FeasibilityRangeDocument>

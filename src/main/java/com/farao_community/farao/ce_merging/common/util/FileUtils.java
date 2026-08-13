@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -87,5 +89,13 @@ public final class FileUtils {
         }
 
         return resolved;
+    }
+
+    public static byte[] readBytesFromPath(final String path) {
+        try {
+            return Files.readAllBytes(Paths.get(path));
+        } catch (final Exception e) {
+            throw new CeMergingException("error while reading from %s".formatted(path), e);
+        }
     }
 }
