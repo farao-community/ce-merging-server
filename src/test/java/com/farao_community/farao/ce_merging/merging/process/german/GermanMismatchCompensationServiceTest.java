@@ -34,7 +34,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -63,7 +62,7 @@ public class GermanMismatchCompensationServiceTest {
     @BeforeEach
     void setUp() throws IOException {
 
-        final List<IgmData> germanIgms = Arrays.stream(GermanTso.values())
+        final List<IgmData> germanIgms = GermanTso.stream()
                 .map(GermanTso::name)
                 .map(tso -> {
                     final IgmData igm = new IgmData();
@@ -135,14 +134,14 @@ public class GermanMismatchCompensationServiceTest {
         assertEquals(3820, sumInitialNetPositionWithoutVirtualHubs, 1); //values from convergence
         assertEquals(otherWayToSumInitialNpWoVh, sumInitialNetPositionWithoutVirtualHubs, 1);
 
-        double sumInitialGeneration = Arrays.stream(GermanTso.values())
+        double sumInitialGeneration = GermanTso.stream()
                 .map(GermanTso::name)
                 .map(results::get).filter(Objects::nonNull)
                 .map(NetPositions::getGenerationAndLoadQuantity)
                 .mapToDouble(GenerationAndLoadQuantity::generation)
                 .sum();
 
-        double sumInitialLoad = Arrays.stream(GermanTso.values())
+        double sumInitialLoad = GermanTso.stream()
                 .map(GermanTso::name)
                 .map(results::get).filter(Objects::nonNull)
                 .map(NetPositions::getGenerationAndLoadQuantity)

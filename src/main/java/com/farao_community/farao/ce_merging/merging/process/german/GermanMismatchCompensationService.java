@@ -14,7 +14,6 @@ import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositio
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.process.netpositions.NetPositionService;
-import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
@@ -48,16 +47,13 @@ import static java.util.function.Predicate.not;
 public class GermanMismatchCompensationService {
     private final NetPositionService netPositionService;
     private static final Logger LOGGER = LoggerFactory.getLogger(GermanMismatchCompensationService.class);
-    private final MergingTaskRepository tasksRepository;
     private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
     private final CeMergingConfiguration configuration;
 
-    public GermanMismatchCompensationService(final MergingTaskRepository tasksRepository,
-                                             final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
+    public GermanMismatchCompensationService(final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
                                              final NetPositionService netPositionService,
                                              final CeMergingConfiguration configuration) {
         this.netPositionService = netPositionService;
-        this.tasksRepository = tasksRepository;
         this.loadFlowRunnerSupplier = loadFlowRunnerSupplier;
         this.configuration = configuration;
     }
@@ -118,19 +114,18 @@ public class GermanMismatchCompensationService {
                                           final LoadFlowParameters.ComponentMode componentMode) {
 
         final List<DanglingLine> externalDanglingLines = network.getDanglingLineStream()
-                .filter(isGermanExternalNode(xnodes)
-                                .and(NetworkUtil::hasActivePower)
-                                .and(not(isPairedWithVirtualHub(virtualHubs))))
+                .filter(isGermanExternalNode(xnodes).and(NetworkUtil::hasActivePower).and(not(isPairedWithVirtualHub(virtualHubs))))
                 .toList();
 
         LOGGER.info("Absolute proportional share is applied to compensate German mismatch ({} MW)", mismatch);
         final double totalExternalNetPosition = externalDanglingLines.stream()
-                .mapToDouble(danglingLine -> abs(getBorderFlow(danglingLine, componentMode)))
+                .map(line -> getBorderFlow(line, componentMode))
+                .mapToDouble(Math::abs)
                 .sum();
 
-        LOGGER.info("Sum of external Net positions for germany is {} MW", totalExternalNetPosition);
+        LOGGER.info("Sum of external Net positions for Germany is {} MW", totalExternalNetPosition);
         if (totalExternalNetPosition != 0) {
-            externalDanglingLines.forEach(l -> updateBoundaryLineFlow(l, mismatch, totalExternalNetPosition, componentMode));
+            externalDanglingLines.forEach(line -> updateBoundaryLineFlow(line, mismatch, totalExternalNetPosition, componentMode));
         }
     }
 

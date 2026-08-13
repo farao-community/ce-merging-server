@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Properties;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
@@ -51,17 +50,17 @@ public class GermanPreMergeService {
 
     public void preMergeGermanCountries(final MergingTask task) {
         try {
-            final Network mergedNetwork = mergeGermanRegions(task);
+            final Network germanNetwork = mergeGermanRegions(task);
             LOGGER.info("German network files merged with success");
             // Save the german merged network file for investigation in case of exception in mismatch step
-            saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, mergedNetwork, task, UCTE_FORMAT, configuration);
-            germanMismatchCompensationService.apply(task, mergedNetwork);
-            LOGGER.info("Replacement of German TSO's network element names by common German identifiers for network: {}", mergedNetwork);
-            replaceXnodesWithLines(mergedNetwork);
-            saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, mergedNetwork, task, UCTE_FORMAT, configuration);
-            tasksRepository.save(task);
-        } catch (Exception e) {
-            String errorMessage = String.format("German pre-merge failed for task %d with target date %s, cause: %s",
+            saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, germanNetwork, task, UCTE_FORMAT, configuration);
+            germanMismatchCompensationService.apply(task, germanNetwork);
+
+            LOGGER.info("Replacement of German TSO's network element names by common German identifiers for network: {}", germanNetwork);
+            replaceXnodesWithLines(germanNetwork);
+            saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, germanNetwork, task, UCTE_FORMAT, configuration);
+        } catch (final Exception e) {
+            final String errorMessage = String.format("German pre-merge failed for task %d with target date %s, cause: %s",
                                                 task.getId(), task.getInputs().getTargetDate(), e.getMessage());
             LOGGER.error(errorMessage);
             throw new CeMergingException(errorMessage, e);
@@ -69,7 +68,7 @@ public class GermanPreMergeService {
     }
 
     static Network mergeGermanRegions(final MergingTask task) {
-        final Network[] networksToMerge = Arrays.stream(GermanTso.values())
+        final Network[] networksToMerge = GermanTso.stream()
                 .map(tso -> readGermanNetwork(tso, task))
                 .toArray(Network[]::new);
 
@@ -78,7 +77,10 @@ public class GermanPreMergeService {
 
     private static Network readGermanNetwork(final GermanTso tso,
                                              final MergingTask task) {
-        return Network.read(Path.of(task.getInputs().getIgm(tso.name()).getIgmFile().getPath()), getDefault(), CACHE.get(), PARAMETERS);
+        return Network.read(Path.of(task.getInputs().getIgm(tso.name()).getIgmFile().getPath()),
+                            getDefault(),
+                            CACHE.get(),
+                            PARAMETERS);
     }
 
 }
