@@ -13,10 +13,10 @@ import java.util.Map;
 
 import static test_utils.assertions.NetworkAssert.assertThat;
 
-public class GermanXnodesReplacementTest {
+class GermanXnodesReplacerTest {
 
     @Test
-    public void shouldModifyPreMergedGermanIgm() {
+    void shouldModifyPreMergedGermanIgm() {
         final Network mergedGermanNetwork = Network.read(getClass().getResource("/german/mergeFakeFile.uct").getPath());
         GermanXnodesReplacer.replaceXnodesWithLines(mergedGermanNetwork);
 

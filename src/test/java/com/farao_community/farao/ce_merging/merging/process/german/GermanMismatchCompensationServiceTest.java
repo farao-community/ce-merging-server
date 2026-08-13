@@ -46,7 +46,7 @@ import static test_utils.CeTestUtils.stringPathOf;
 
 @SpringBootTest
 @ActiveProfiles("OpenLoadFlow")
-public class GermanMismatchCompensationServiceTest {
+class GermanMismatchCompensationServiceTest {
     @Autowired
     private GermanMismatchCompensationService service;
 
@@ -92,7 +92,7 @@ public class GermanMismatchCompensationServiceTest {
     }
 
     @Test
-    public void applyMismatchTest() throws FileNotFoundException {
+    void applyMismatchTest() throws FileNotFoundException {
         final Network mergedNetwork = GermanPreMergeService.mergeGermanRegions(task);
         service.apply(task, mergedNetwork);
         checkInitialGermanNetPositions(task);

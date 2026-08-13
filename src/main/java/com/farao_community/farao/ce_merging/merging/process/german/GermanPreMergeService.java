@@ -9,7 +9,6 @@ package com.farao_community.farao.ce_merging.merging.process.german;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
 import com.powsybl.iidm.network.Network;
@@ -37,14 +36,11 @@ public class GermanPreMergeService {
     }
 
     private final GermanMismatchCompensationService germanMismatchCompensationService;
-    private final MergingTaskRepository tasksRepository;
     private final CeMergingConfiguration configuration;
 
     public GermanPreMergeService(final GermanMismatchCompensationService germanMismatchCompensationService,
-                                 final MergingTaskRepository tasksRepository,
                                  final CeMergingConfiguration configuration) {
         this.germanMismatchCompensationService = germanMismatchCompensationService;
-        this.tasksRepository = tasksRepository;
         this.configuration = configuration;
     }
 
