@@ -67,20 +67,6 @@ class SlackCompensationServiceTest {
     private MergingTask task2;
     private MergingTask task3;
 
-    private static Network createNetworkWithBus(final String busId) {
-        final Network network = Network.create("network", "source");
-
-        final VoltageLevel vl = network.newVoltageLevel()
-                .setId("VL_" + busId)
-                .setNominalV(225)
-                .setTopologyKind(BUS_BREAKER)
-                .add();
-        vl.getBusBreakerView().newBus().setId(busId).add();
-        vl.newLoad().setId("L_" + busId).setBus(busId).setP0(0).setQ0(0).add();
-
-        return network;
-    }
-
     @BeforeEach
     void setUp() {
         final Inputs inputsWoSlackNode = singletonIgmInputs(ES, "20190617_0030_FO1_ES1.UCT");
@@ -113,14 +99,6 @@ class SlackCompensationServiceTest {
         final List<SlackTerminal> slackTerminals = getSlackTerminals(cgm);
         assertEquals(1, slackTerminals.size());
         assertEquals("VL_ELA MU1", slackTerminals.getFirst().getTerminal().getVoltageLevel().getId());
-    }
-
-    private List<SlackTerminal> getSlackTerminals(final Network network) {
-        return network.getVoltageLevelStream()
-                .map(vl -> vl.getExtension(SlackTerminal.class))
-                .filter(Objects::nonNull)
-                .map(SlackTerminal.class::cast)
-                .toList();
     }
 
     @Test
@@ -160,6 +138,28 @@ class SlackCompensationServiceTest {
         slackCompensationService.compensateFinalCgmSlackImbalance(task1);
 
         verify(mockRunner).run(argThat(cgm -> cgm.getId().equals(cgmBeforeCompensation.getId())), any(LoadFlowParameters.class));
+    }
+
+    private static Network createNetworkWithBus(final String busId) {
+        final Network network = Network.create("network", "source");
+
+        final VoltageLevel vl = network.newVoltageLevel()
+                .setId("VL_" + busId)
+                .setNominalV(225)
+                .setTopologyKind(BUS_BREAKER)
+                .add();
+        vl.getBusBreakerView().newBus().setId(busId).add();
+        vl.newLoad().setId("L_" + busId).setBus(busId).setP0(0).setQ0(0).add();
+
+        return network;
+    }
+
+    private static List<SlackTerminal> getSlackTerminals(final Network network) {
+        return network.getVoltageLevelStream()
+                .map(vl -> vl.getExtension(SlackTerminal.class))
+                .filter(Objects::nonNull)
+                .map(SlackTerminal.class::cast)
+                .toList();
     }
 
     @TestConfiguration
