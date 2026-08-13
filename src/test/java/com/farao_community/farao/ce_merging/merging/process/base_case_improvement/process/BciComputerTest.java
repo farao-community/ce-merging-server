@@ -45,54 +45,75 @@ import static test_utils.mockdata.ReferenceProgramTestData.mockRefProg7;
 @SpringBootTest
 @ActiveProfiles("BciComputationTest")
 class BciComputerTest {
-    private static final double EPSILON = 0.01;
-    private static final List<BciTestCase> TEST_CASES = List.of(
-            scenario(mockRefProg1(), mockRange123(), false, false,
-                     Map.of("N1", values(false, 1000, 1000, 0, 0, 4000, 4000),
-                            "N12", values(false, -1800, -1800, -2500, -2500, -500, -500),
-                            "N8", values(false, 1000, 1000, -700, -700, 1300, 1300),
-                            "N25", values(false, -200, -200, -1000, -1000, 0, 0))),
-            scenario(mockRefProg2(), mockRange123(), true, false,
-                     Map.of("N1", values(false, 500, 1103.45, 0, 0, 4000, 4000),
-                            "N12", values(true, 500, -500, -2500, -2500, -500, -500),
-                            "N8", values(false, -500, -189.66, -700, -700, 1300, 1300),
-                            "N25", values(false, -500, -413.79, -1000, -1000, 0, 0))),
-            scenario(mockRefProg3(), mockRange123(), true, false,
-                     Map.of("N1", values(true, -1000, 0, 0, 0, 4000, 4000),
-                            "N12", values(true, 0, -712.77, -2500, -2500, -500, -500),
-                            "N8", values(false, 1000, 819.15, -700, -700, 1300, 1300),
-                            "N25", values(false, 0, -106.38, -1000, -1000, 0, 0))),
-            scenario(mockRefProg4(), mockRange4(), true, false,
-                     Map.of("N1", values(true, -1500, 0, 0, 0, 4000, 4000),
-                            "N12", values(true, 0, -1300, -2500, -2500, -500, -500),
-                            "N8", values(false, 1000, 880, 700, 700, 2700, 2700),
-                            "N25", values(false, 500, 420, 300, 300, 1300, 1300))),
-            scenario(mockRefProg5(), mockRange5(), true, true,
-                     Map.of("N1", values(true, -3000, -755.56, 0, -755.56, 4000, 4000),
-                            "N12", values(false, -2200, -3577.78, -3200, -3577.78, -1200, -1200),
-                            "N8", values(false, 1500, 922.22, 1300, 922.22, 3300, 3300),
-                            "N25", values(false, 3700, 3411.11, 3600, 3411.11, 4600, 4600))),
-            scenario(mockRefProg6(), mockRange6(), true, false,
-                     Map.of("N1", values(true, 400, 200, -200, -200, 200, 200),
-                            "N12", values(true, -400, -200, -200, -200, 200, 200),
-                            "N8", values(false, 0, 0, -200, -200, 200, 200),
-                            "N25", values(false, 0, 0, -1000, -1000, 1000, 1000))),
-            scenario(mockRefProg7(), mockRange7(), true, true,
-                     Map.of("N1", values(true, 800, 371.43, -200, -200, 200, 371.43),
-                            "N12", values(false, 200, 371.43, -200, -200, 200, 371.43),
-                            "N8", values(false, 200, 371.43, -200, -200, 200, 371.43),
-                            "N25", values(false, -1200, -1114.29, -1400, -1400, -1200, -1114.29)))
-    );
     @Autowired
     private RegionConfiguration regionConfiguration;
 
-    private static BciTestCase scenario(final ReferenceProgram referenceProgram,
-                                        final Map<String, Interval> feasibilityRange,
-                                        final boolean bciActive,
-                                        final boolean extendedRanges,
-                                        final Map<String, ExpectedBciResults> expectedByCountry) {
-        return new BciTestCase(referenceProgram, feasibilityRange, bciActive, extendedRanges, expectedByCountry);
-    }
+    private static final double EPSILON = 0.01;
+    private static final List<BciTestCase> TEST_CASES = List.of(
+            scenario(mockRefProg1(), mockRange123(), false, false,
+                     Map.of("N1", values(false, 1000, 1000,
+                                         0, 0, 4000, 4000),
+                            "N12", values(false, -1800, -1800,
+                                          -2500, -2500, -500, -500),
+                            "N8", values(false, 1000, 1000,
+                                         -700, -700, 1300, 1300),
+                            "N25", values(false, -200, -200,
+                                          -1000, -1000, 0, 0))),
+            scenario(mockRefProg2(), mockRange123(), true, false,
+                     Map.of("N1", values(false, 500, 1103.45,
+                                         0, 0, 4000, 4000),
+                            "N12", values(true, 500, -500,
+                                          -2500, -2500, -500, -500),
+                            "N8", values(false, -500, -189.66,
+                                         -700, -700, 1300, 1300),
+                            "N25", values(false, -500, -413.79,
+                                          -1000, -1000, 0, 0))),
+            scenario(mockRefProg3(), mockRange123(), true, false,
+                     Map.of("N1", values(true, -1000, 0,
+                                         0, 0, 4000, 4000),
+                            "N12", values(true, 0, -712.77,
+                                          -2500, -2500, -500, -500),
+                            "N8", values(false, 1000, 819.15,
+                                         -700, -700, 1300, 1300),
+                            "N25", values(false, 0, -106.38,
+                                          -1000, -1000, 0, 0))),
+            scenario(mockRefProg4(), mockRange4(), true, false,
+                     Map.of("N1", values(true, -1500, 0,
+                                         0, 0, 4000, 4000),
+                            "N12", values(true, 0, -1300,
+                                          -2500, -2500, -500, -500),
+                            "N8", values(false, 1000, 880,
+                                         700, 700, 2700, 2700),
+                            "N25", values(false, 500, 420,
+                                          300, 300, 1300, 1300))),
+            scenario(mockRefProg5(), mockRange5(), true, true,
+                     Map.of("N1", values(true, -3000, -755.56,
+                                         0, -755.56, 4000, 4000),
+                            "N12", values(false, -2200, -3577.78,
+                                          -3200, -3577.78, -1200, -1200),
+                            "N8", values(false, 1500, 922.22,
+                                         1300, 922.22, 3300, 3300),
+                            "N25", values(false, 3700, 3411.11,
+                                          3600, 3411.11, 4600, 4600))),
+            scenario(mockRefProg6(), mockRange6(), true, false,
+                     Map.of("N1", values(true, 400, 200,
+                                         -200, -200, 200, 200),
+                            "N12", values(true, -400, -200,
+                                          -200, -200, 200, 200),
+                            "N8", values(false, 0, 0,
+                                         -200, -200, 200, 200),
+                            "N25", values(false, 0, 0,
+                                          -1000, -1000, 1000, 1000))),
+            scenario(mockRefProg7(), mockRange7(), true, true,
+                     Map.of("N1", values(true, 800, 371.43,
+                                         -200, -200, 200, 371.43),
+                            "N12", values(false, 200, 371.43,
+                                          -200, -200, 200, 371.43),
+                            "N8", values(false, 200, 371.43,
+                                         -200, -200, 200, 371.43),
+                            "N25", values(false, -1200, -1114.29,
+                                          -1400, -1400, -1200, -1114.29)))
+    );
 
     @ParameterizedTest
     @FieldSource("TEST_CASES")
@@ -106,10 +127,10 @@ class BciComputerTest {
     }
 
     private void assertApplyBci(final ReferenceProgram referenceProgram,
-                        final Map<String, Interval> feasibilityRange,
-                        final boolean bciActive,
-                        final boolean extendedRanges,
-                        final Map<String, ExpectedBciResults> expectedByCountry) {
+                                final Map<String, Interval> feasibilityRange,
+                                final boolean bciActive,
+                                final boolean extendedRanges,
+                                final Map<String, ExpectedBciResults> expectedByCountry) {
         final BciComputer bciComputer = new BciComputer(regionConfiguration, referenceProgram, feasibilityRange);
 
         final BciComputationResult result = bciComputer.run(new FlowByAreaMap(), 0, 0);
@@ -117,16 +138,16 @@ class BciComputerTest {
         assertEquals(result.bciFeasibilityRangesExtended(), extendedRanges);
         final Map<String, BciAreaResults> results = result.bciResults();
 
-        expectedByCountry.forEach((country, expected) -> {
-            assertThat(results.get(country))
-                    .hadBciApplied(expected.bciApplied)
-                    .hasForecast(expected.forecast)
-                    .hasTarget(expected.target)
-                    .hasInFinalMax(expected.finalMax)
-                    .hasInInitialMax(expected.initialMax)
-                    .hasInFinalMin(expected.finalMin)
-                    .hasInInitialMin(expected.initialMin);
-        });
+        expectedByCountry.forEach((country, expected) ->
+                                          assertThat(results.get(country))
+                                                  .hadBciApplied(expected.bciApplied)
+                                                  .hasForecast(expected.forecast)
+                                                  .hasTarget(expected.target)
+                                                  .hasInFinalMax(expected.finalMax)
+                                                  .hasInInitialMax(expected.initialMax)
+                                                  .hasInFinalMin(expected.finalMin)
+                                                  .hasInInitialMin(expected.initialMin)
+        );
 
         assertRegionIsBalanced(results);
     }
@@ -165,6 +186,14 @@ class BciComputerTest {
                                boolean bciActive,
                                boolean extendedRanges,
                                Map<String, ExpectedBciResults> expectedByCountry) {
+    }
+
+    private static BciTestCase scenario(final ReferenceProgram referenceProgram,
+                                        final Map<String, Interval> feasibilityRange,
+                                        final boolean bciActive,
+                                        final boolean extendedRanges,
+                                        final Map<String, ExpectedBciResults> expectedByCountry) {
+        return new BciTestCase(referenceProgram, feasibilityRange, bciActive, extendedRanges, expectedByCountry);
     }
 
     record ExpectedBciResults(boolean bciApplied, double forecast, double target,
