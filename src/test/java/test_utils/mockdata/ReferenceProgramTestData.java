@@ -18,8 +18,8 @@ public final class ReferenceProgramTestData {
         throw new AssertionError("No default constructor in utility class");
     }
 
-    public static ReferenceProgram createReferenceProgram() {
-        List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
+    public static ReferenceProgram mockRefProg() {
+        final List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
         referenceExchangeDataList.add(new ReferenceExchangeData("ONE", "CE", 1500.));
         referenceExchangeDataList.add(new ReferenceExchangeData("ONE", "NINE", -1000.));
         referenceExchangeDataList.add(new ReferenceExchangeData("ONE", "ELEVEN", 900.));
@@ -31,8 +31,8 @@ public final class ReferenceProgramTestData {
         return new ReferenceProgram(referenceExchangeDataList);
     }
 
-    public static ReferenceProgram createReferenceProgramCase1() {
-        List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
+    public static ReferenceProgram mockRefProg1() {
+        final List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
         referenceExchangeDataList.add(new ReferenceExchangeData("ONE", "CE", 1000.0));
         referenceExchangeDataList.add(new ReferenceExchangeData("TWELVE", "CE", -1800.0));
         referenceExchangeDataList.add(new ReferenceExchangeData("EIGHT", "CE", 1000.0));
@@ -40,8 +40,8 @@ public final class ReferenceProgramTestData {
         return new ReferenceProgram(referenceExchangeDataList);
     }
 
-    public static ReferenceProgram createReferenceProgramCase2() {
-        List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
+    public static ReferenceProgram mockRefProg2() {
+        final List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
         referenceExchangeDataList.add(new ReferenceExchangeData("ONE", "CE", 500.0));
         referenceExchangeDataList.add(new ReferenceExchangeData("TWELVE", "CE", 500.0));
         referenceExchangeDataList.add(new ReferenceExchangeData("EIGHT", "CE", -500.0));
@@ -50,8 +50,8 @@ public final class ReferenceProgramTestData {
         return new ReferenceProgram(referenceExchangeDataList);
     }
 
-    public static ReferenceProgram createReferenceProgramCase3() {
-        List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
+    public static ReferenceProgram mockRefProg3() {
+        final List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
         referenceExchangeDataList.add(new ReferenceExchangeData("ONE", "CE", -1000.0));
         referenceExchangeDataList.add(new ReferenceExchangeData("TWELVE", "CE", 0.0));
         referenceExchangeDataList.add(new ReferenceExchangeData("EIGHT", "CE", 1000.0));
@@ -60,7 +60,7 @@ public final class ReferenceProgramTestData {
         return new ReferenceProgram(referenceExchangeDataList);
     }
 
-    public static ReferenceProgram createReferenceProgramCase4() {
+    public static ReferenceProgram mockRefProg4() {
         List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
         referenceExchangeDataList.add(new ReferenceExchangeData("ONE", "CE", -1500.0));
         referenceExchangeDataList.add(new ReferenceExchangeData("TWELVE", "CE", 0.0));
@@ -70,7 +70,7 @@ public final class ReferenceProgramTestData {
         return new ReferenceProgram(referenceExchangeDataList);
     }
 
-    public static ReferenceProgram createReferenceProgramCase5() {
+    public static ReferenceProgram mockRefProg5() {
         List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
         referenceExchangeDataList.add(new ReferenceExchangeData("ONE", "CE", -3000.0));
         referenceExchangeDataList.add(new ReferenceExchangeData("TWELVE", "CE", -2200.0));
@@ -80,7 +80,7 @@ public final class ReferenceProgramTestData {
         return new ReferenceProgram(referenceExchangeDataList);
     }
 
-    public static ReferenceProgram createReferenceProgramCase6() {
+    public static ReferenceProgram mockRefProg6() {
         List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
         referenceExchangeDataList.add(new ReferenceExchangeData("ONE", "CE", 400.0));
         referenceExchangeDataList.add(new ReferenceExchangeData("TWELVE", "CE", -400.0));
@@ -90,7 +90,7 @@ public final class ReferenceProgramTestData {
         return new ReferenceProgram(referenceExchangeDataList);
     }
 
-    public static ReferenceProgram createReferenceProgramCase7() {
+    public static ReferenceProgram mockRefProg7() {
         List<ReferenceExchangeData> referenceExchangeDataList = new ArrayList<>();
         referenceExchangeDataList.add(new ReferenceExchangeData("ONE", "CE", 800.0));
         referenceExchangeDataList.add(new ReferenceExchangeData("TWELVE", "CE", 200.0));

@@ -22,7 +22,7 @@ class ReferenceProgramTest {
 
     @BeforeEach
     void setUp() {
-        refProgram = ReferenceProgramTestData.createReferenceProgram();
+        refProgram = ReferenceProgramTestData.mockRefProg();
         final RegionConfiguration cfg = new RegionConfiguration();
         final Map<String, String> areasId = new HashMap<>();
         areasId.put("N1", "ONE");

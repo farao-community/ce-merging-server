@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 package test_utils.assertions;
 
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAreaResults;
@@ -5,8 +12,6 @@ import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.util.CanIgnoreReturnValue;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, BciAreaResults> {
     private static final double EPSILON = 0.01;
@@ -26,6 +31,16 @@ public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, B
         }
         assertEquals(expected, actual.getInRegionNetPositions().forecast(), EPSILON);
         return this;
+    }
+
+    @CanIgnoreReturnValue
+    public BciAreaResultsAssert hasForecast(final double expected) {
+        return hasGlobalNpf(expected).hasInNpf(expected);
+    }
+
+    @CanIgnoreReturnValue
+    public BciAreaResultsAssert hasTarget(final double expected) {
+        return hasGlobalTargetNp(expected).hasInTargetNp(expected);
     }
 
     @CanIgnoreReturnValue
@@ -56,14 +71,8 @@ public class BciAreaResultsAssert extends AbstractAssert<BciAreaResultsAssert, B
     }
 
     @CanIgnoreReturnValue
-    public BciAreaResultsAssert hadBciApplied() {
-        assertTrue(actual.getBciApplied());
-        return this;
-    }
-
-    @CanIgnoreReturnValue
-    public BciAreaResultsAssert hadNoBciApplied() {
-        assertFalse(actual.getBciApplied());
+    public BciAreaResultsAssert hadBciApplied(final boolean bciApplied) {
+        assertEquals(bciApplied, actual.getBciApplied());
         return this;
     }
 

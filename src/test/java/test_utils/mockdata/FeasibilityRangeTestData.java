@@ -17,7 +17,7 @@ public final class FeasibilityRangeTestData {
         throw new AssertionError("No default constructor in utility class");
     }
 
-    public static Map<String, Interval> createFeasibilityRangeCase123() {
+    public static Map<String, Interval> mockRange123() {
         Map<String, Interval> exchangeFeasibilityRanges = new HashMap<>();
 
         exchangeFeasibilityRanges.put("ONE", new Interval(0.0, 4000.0));
@@ -28,7 +28,7 @@ public final class FeasibilityRangeTestData {
         return exchangeFeasibilityRanges;
     }
 
-    public static Map<String, Interval> createFeasibilityRangeCase4() {
+    public static Map<String, Interval> mockRange4() {
         Map<String, Interval> exchangeFeasibilityRanges = new HashMap<>();
 
         exchangeFeasibilityRanges.put("ONE", new Interval(0.0, 4000.0));
@@ -39,7 +39,7 @@ public final class FeasibilityRangeTestData {
         return exchangeFeasibilityRanges;
     }
 
-    public static Map<String, Interval> createFeasibilityRangeCase5() {
+    public static Map<String, Interval> mockRange5() {
         Map<String, Interval> exchangeFeasibilityRanges = new HashMap<>();
 
         exchangeFeasibilityRanges.put("ONE", new Interval(0.0, 4000.0));
@@ -50,7 +50,7 @@ public final class FeasibilityRangeTestData {
         return exchangeFeasibilityRanges;
     }
 
-    public static Map<String, Interval> createFeasibilityRangeCase6() {
+    public static Map<String, Interval> mockRange6() {
         Map<String, Interval> exchangeFeasibilityRanges = new HashMap<>();
 
         exchangeFeasibilityRanges.put("ONE", new Interval(-200.0, 200.0));
@@ -61,7 +61,7 @@ public final class FeasibilityRangeTestData {
         return exchangeFeasibilityRanges;
     }
 
-    public static Map<String, Interval> createFeasibilityRangeCase7() {
+    public static Map<String, Interval> mockRange7() {
         Map<String, Interval> exchangeFeasibilityRanges = new HashMap<>();
 
         exchangeFeasibilityRanges.put("ONE", new Interval(-200.0, 200.0));

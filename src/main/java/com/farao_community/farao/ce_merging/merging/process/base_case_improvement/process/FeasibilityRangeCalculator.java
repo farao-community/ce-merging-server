@@ -20,7 +20,6 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.distinctByProperty;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval.infinity;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.ExternalConstraintsImporter.calculateConstraints;
 import static java.util.function.Function.identity;
@@ -106,8 +105,7 @@ public class FeasibilityRangeCalculator {
             .getConstraints()
             .getFeasibilityRangeConstraint()
             .stream()
-            .filter(distinctByProperty(getRangeArea()))
-            .collect(toMap(getRangeArea(), frc -> computeIntervalWithNetPositions(frc, netPositionMap)));
+            .collect(toMap(getRangeArea(), frc -> computeIntervalWithNetPositions(frc, netPositionMap), (a, b) -> b));
 
         feasibilityRangesMap.putAll(fromDocument);
 
