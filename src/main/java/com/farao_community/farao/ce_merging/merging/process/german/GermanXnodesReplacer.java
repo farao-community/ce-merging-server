@@ -34,6 +34,7 @@ public final class GermanXnodesReplacer {
     private static final String ELEMENT_NAME_PREFIX = "elementName_";
     private static final String TIE_LINE_LIMITS = "tieLineLimits_";
     private static final String LINE_ID_FORMAT = "%s %s 1";
+    private static final String GERMAN_UCTE_NODE_PREFIX = "D";
     private static final int SUBSTATION_ID_LENGTH = 6;
     private static final int VOLTAGE_LEVEL_ID_LENGTH = 7;
     private static final int BUS_ID_LENGTH = 8;
@@ -80,15 +81,12 @@ public final class GermanXnodesReplacer {
                 .setId(toGermanElementId(tieLine, BUS_ID_LENGTH))
                 .add();
 
-        addTieLineSideAsNewLine(ONE, tieLine, xNodeBus, xNodeVoltageLevel);
-        addTieLineSideAsNewLine(TWO, tieLine, xNodeBus, xNodeVoltageLevel);
+        replaceTieSideWithLine(ONE, tieLine, xNodeBus, xNodeVoltageLevel);
+        replaceTieSideWithLine(TWO, tieLine, xNodeBus, xNodeVoltageLevel);
 
     }
 
-    private void addTieLineSideAsNewLine(final TwoSides side,
-                                         final TieLine tieLine,
-                                         final Bus xNodeBus,
-                                         final VoltageLevel xNodeVoltageLevel) {
+    private void replaceTieSideWithLine(final TwoSides side, final TieLine tieLine, final Bus xNodeBus, final VoltageLevel xNodeVoltageLevel) {
         final String sideNb = String.valueOf(side.getNum());
         final DanglingLine danglingLine = tieLine.getDanglingLine(side);
         final Terminal terminal = tieLine.getTerminal(side);
@@ -116,7 +114,8 @@ public final class GermanXnodesReplacer {
                 .add();
 
         tieLine.getCurrentLimits(side).map(LoadingLimits::getPermanentLimit)
-                .map(line.newOperationalLimitsGroup1(TIE_LINE_LIMITS + sideNb).newCurrentLimits()::setPermanentLimit)
+                .map(line.newOperationalLimitsGroup1(TIE_LINE_LIMITS + sideNb)
+                             .newCurrentLimits()::setPermanentLimit)
                 .ifPresent(CurrentLimitsAdder::add);
 
         Optional.ofNullable(tieLine.getProperty(ELEMENT_NAME_PREFIX + sideNb))
@@ -127,8 +126,7 @@ public final class GermanXnodesReplacer {
         return getConnectedBusIdOrElse(terminal, getConnectableBusId(terminal));
     }
 
-    private String getConnectedBusIdOrElse(final Terminal terminal,
-                                           final String defaultValue) {
+    private String getConnectedBusIdOrElse(final Terminal terminal, final String defaultValue) {
         return terminal.isConnected() ?
                 terminal.getBusBreakerView().getBus().getId() :
                 defaultValue;
@@ -145,8 +143,7 @@ public final class GermanXnodesReplacer {
                 .add();
     }
 
-    private VoltageLevel getDefaultVoltageLevel(final TieLine tieLine,
-                                                final Substation substation) {
+    private VoltageLevel getDefaultVoltageLevel(final TieLine tieLine, final Substation substation) {
         return substation.newVoltageLevel()
                 .setId(toGermanElementId(tieLine, VOLTAGE_LEVEL_ID_LENGTH))
                 .setNominalV(tieLine.getTerminal1().getVoltageLevel().getNominalV())
@@ -154,8 +151,8 @@ public final class GermanXnodesReplacer {
                 .add();
     }
 
-    private String toGermanElementId(final TieLine tieLine,
-                                     final int endIndex) {
-        return "D" + tieLine.getPairingKey().substring(1, endIndex);
+    private String toGermanElementId(final TieLine tieLine, final int endIndex) {
+        // 1 because we replace the first character (= country identifier) with the German one
+        return GERMAN_UCTE_NODE_PREFIX + tieLine.getPairingKey().substring(1, endIndex);
     }
 }

@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.powsybl.iidm.network.Country;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.Map;import java.util.Optional;
 
 /**
  * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
@@ -29,7 +29,10 @@ public record NetPositionsResults(Map<String, NetPositions> netPositionsByCountr
     }
 
     public NetPositions get(final Country country) {
-        return get(country.name());
+        return Optional.ofNullable(country)
+                .map(Country::getName)
+                .map(this::get)
+                .orElse(null);
     }
 
     public NetPositions get(final String country) {

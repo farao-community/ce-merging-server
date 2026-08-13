@@ -129,7 +129,9 @@ public class GermanMismatchCompensationService {
                 .sum();
 
         LOGGER.info("Sum of external Net positions for germany is {} MW", totalExternalNetPosition);
-        externalDanglingLines.forEach(l -> updateBoundaryLineFlow(l, mismatch, totalExternalNetPosition, componentMode));
+        if (totalExternalNetPosition != 0) {
+            externalDanglingLines.forEach(l -> updateBoundaryLineFlow(l, mismatch, totalExternalNetPosition, componentMode));
+        }
     }
 
     private void updateBoundaryLineFlow(final DanglingLine line,
