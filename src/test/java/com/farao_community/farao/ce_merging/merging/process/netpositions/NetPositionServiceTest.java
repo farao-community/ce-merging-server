@@ -10,6 +10,7 @@ package com.farao_community.farao.ce_merging.merging.process.netpositions;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
@@ -150,18 +151,18 @@ class NetPositionServiceTest {
         assertAllPositionsEqual(netPositions.get(SK), -110);
         assertAllPositionsEqual(netPositions.get(DE), 200);
 
-        final SoftAssertions soft = new SoftAssertions();
-
         final NetPositions danishNetPositions = netPositions.get(DK);
         assertNotNull(danishNetPositions);
+
+        final SoftAssertions soft = new SoftAssertions();
         soft.assertThat(danishNetPositions.getGlobalNetPosition().getWithVirtualHubs())
                 .isCloseTo(20., PERCENT_TOLERANCE);
-        soft.assertThat(danishNetPositions.getGlobalNetPosition().getWithoutVirtualHubs())
-                .isCloseTo(0., PERCENT_TOLERANCE);
-        soft.assertThat(danishNetPositions.getInRegionNetPosition().getWithVirtualHubs())
-                .isCloseTo(0., PERCENT_TOLERANCE);
-        soft.assertThat(danishNetPositions.getInRegionNetPosition().getWithoutVirtualHubs())
-                .isCloseTo(0., PERCENT_TOLERANCE);
+
+        Stream.of(danishNetPositions.getGlobalNetPosition().getWithoutVirtualHubs(),
+                  danishNetPositions.getInRegionNetPosition().getWithVirtualHubs(),
+                  danishNetPositions.getInRegionNetPosition().getWithoutVirtualHubs())
+                .map(soft::assertThat)
+                .forEach(d -> d.isCloseTo(0, PERCENT_TOLERANCE));
 
         soft.assertAll();
     }
@@ -206,15 +207,17 @@ class NetPositionServiceTest {
     private void assertAllPositionsEqual(final NetPositions netPositions,
                                          final double expected) {
         assertNotNull(netPositions);
+        final NetPositionsValues global = netPositions.getGlobalNetPosition();
+        final NetPositionsValues inRegion = netPositions.getInRegionNetPosition();
         final SoftAssertions soft = new SoftAssertions();
-        soft.assertThat(netPositions.getGlobalNetPosition().getWithVirtualHubs())
-                .isCloseTo(expected, PERCENT_TOLERANCE);
-        soft.assertThat(netPositions.getGlobalNetPosition().getWithoutVirtualHubs())
-                .isCloseTo(expected, PERCENT_TOLERANCE);
-        soft.assertThat(netPositions.getInRegionNetPosition().getWithVirtualHubs())
-                .isCloseTo(expected, PERCENT_TOLERANCE);
-        soft.assertThat(netPositions.getInRegionNetPosition().getWithoutVirtualHubs())
-                .isCloseTo(expected, PERCENT_TOLERANCE);
+
+        Stream.of(global.getWithVirtualHubs(),
+                  global.getWithoutVirtualHubs(),
+                  inRegion.getWithVirtualHubs(),
+                  inRegion.getWithoutVirtualHubs())
+                .map(soft::assertThat)
+                .forEach(d -> d.isCloseTo(expected, PERCENT_TOLERANCE));
+
         soft.assertAll();
     }
 }

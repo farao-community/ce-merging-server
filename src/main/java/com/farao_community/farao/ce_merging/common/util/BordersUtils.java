@@ -108,7 +108,7 @@ public final class BordersUtils {
 
     public static double getBorderFlow(final HvdcLine hvdcLine, final Country country) {
         final double side1Flow = getTerminalFlow(hvdcLine.getConverterStation1().getTerminal());
-        final double side2Flow = getTerminalFlow(hvdcLine.getConverterStation1().getTerminal());
+        final double side2Flow = getTerminalFlow(hvdcLine.getConverterStation2().getTerminal());
         final double directFlow = (side1Flow - side2Flow) / 2;
         return country.equals(getCountry(hvdcLine.getConverterStation1().getTerminal())) ? directFlow : -directFlow;
     }
