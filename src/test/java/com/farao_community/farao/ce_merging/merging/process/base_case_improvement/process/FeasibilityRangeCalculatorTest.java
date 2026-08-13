@@ -57,50 +57,50 @@ class FeasibilityRangeCalculatorTest {
     void calculateExternalConstraintsTest() throws IOException {
         externalConstraints = getBciTestFile("externalConstraints.xml");
 
-        final Map<String, Interval> ecs = calculateConstraints(externalConstraints, regionConfiguration, TARGET_DATE);
+        final Map<String, Interval> constraints = calculateConstraints(externalConstraints, regionConfiguration, TARGET_DATE);
 
-        assertEquals(12, ecs.size());
+        assertEquals(12, constraints.size());
 
-        assertThat(ecs.get("AREA_NUMBER12_EIC")).rangeIs(0, MAX_VALUE);
-        assertThat(ecs.get("AREA_NUMBER25_EIC")).rangeIs(0, 11285);
-        assertThat(ecs.get("AREA_NUMBER26_EIC")).rangeIs(0, 11285);
-        assertThat(ecs.get("AREA_NUMBER2_EIC")).rangeIs(-MAX_VALUE, MAX_VALUE);
+        assertThat(constraints.get("AREA_NUMBER12_EIC")).rangeIs(0, MAX_VALUE);
+        assertThat(constraints.get("AREA_NUMBER25_EIC")).rangeIs(0, 11285);
+        assertThat(constraints.get("AREA_NUMBER26_EIC")).rangeIs(0, 11285);
+        assertThat(constraints.get("AREA_NUMBER2_EIC")).rangeIs(-MAX_VALUE, MAX_VALUE);
     }
 
     @Test
     void shouldCalculateFeasibilityRangesWithoutNetPosition() throws IOException {
-        final Map<String, Interval> frs = feasibilityRangeCalculator.getRegionFeasibilityRanges(getBciTestFile("externalConstraints.xml"),
+        final Map<String, Interval> feasibilityRanges = feasibilityRangeCalculator.getRegionFeasibilityRanges(getBciTestFile("externalConstraints.xml"),
                                                                                           TARGET_DATE,
                                                                                           EMPTY_NETPOSITIONS_MAP,
                                                                                           EMPTY_FEASIBILITY_RANGE);
-        assertEquals(12, frs.size());
+        assertEquals(12, feasibilityRanges.size());
 
-        assertThat(frs.get("AREA_NUMBER12_EIC")).rangeIs(0, MAX_VALUE);
-        assertThat(frs.get("AREA_NUMBER25_EIC")).rangeIs(0, 11285);
-        assertThat(frs.get("AREA_NUMBER26_EIC")).rangeIs(0, 11285);
-        assertThat(frs.get("AREA_NUMBER2_EIC")).rangeIs(-MAX_VALUE, MAX_VALUE);
+        assertThat(feasibilityRanges.get("AREA_NUMBER12_EIC")).rangeIs(0, MAX_VALUE);
+        assertThat(feasibilityRanges.get("AREA_NUMBER25_EIC")).rangeIs(0, 11285);
+        assertThat(feasibilityRanges.get("AREA_NUMBER26_EIC")).rangeIs(0, 11285);
+        assertThat(feasibilityRanges.get("AREA_NUMBER2_EIC")).rangeIs(-MAX_VALUE, MAX_VALUE);
 
     }
 
     @Test
     void calculateFeasibilityRangeWithNetPosition() throws IOException {
         bciFeasibilityRange = getBciTestFile("bciFeasibilityRange.xml");
-        final Map<String, Interval> frs = feasibilityRangeCalculator.importFeasibilityRangesFile(bciFeasibilityRange, netPositionsMap);
+        final Map<String, Interval> feasibilityRanges = feasibilityRangeCalculator.importFeasibilityRangesFile(bciFeasibilityRange, netPositionsMap);
 
-        assertEquals(12, frs.size());
+        assertEquals(12, feasibilityRanges.size());
 
-        assertThat(frs.get("AREA_NUMBER11_EIC")).rangeIs(-900, 1100);
-        assertThat(frs.get("AREA_NUMBER2_EIC")).rangeIs(0, 400);
-        assertThat(frs.get("AREA_NUMBER8_EIC")).rangeIs(-4700, 5300);
-        assertThat(frs.get("AREA_NUMBER13_EIC")).rangeIs(100, 700);
-        assertThat(frs.get("AREA_NUMBER12_EIC")).rangeIs(-1500, 2500);
-        assertThat(frs.get("AREA_NUMBER10_EIC")).rangeIs(-50, 250);
-        assertThat(frs.get("AREA_NUMBER3_EIC")).rangeIs(-300, 700);
-        assertThat(frs.get("AREA_NUMBER26_EIC")).rangeIs(-300, 1000);
-        assertThat(frs.get("AREA_NUMBER1_EIC")).rangeIs(-3700, 3300);
-        assertThat(frs.get("AREA_NUMBER5_EIC")).rangeIs(300, 500);
-        assertThat(frs.get("AREA_NUMBER23_EIC")).rangeIs(300, 700);
-        assertThat(frs.get("AREA_NUMBER25_EIC")).rangeIs(-900, 2100);
+        assertThat(feasibilityRanges.get("AREA_NUMBER11_EIC")).rangeIs(-900, 1100);
+        assertThat(feasibilityRanges.get("AREA_NUMBER2_EIC")).rangeIs(0, 400);
+        assertThat(feasibilityRanges.get("AREA_NUMBER8_EIC")).rangeIs(-4700, 5300);
+        assertThat(feasibilityRanges.get("AREA_NUMBER13_EIC")).rangeIs(100, 700);
+        assertThat(feasibilityRanges.get("AREA_NUMBER12_EIC")).rangeIs(-1500, 2500);
+        assertThat(feasibilityRanges.get("AREA_NUMBER10_EIC")).rangeIs(-50, 250);
+        assertThat(feasibilityRanges.get("AREA_NUMBER3_EIC")).rangeIs(-300, 700);
+        assertThat(feasibilityRanges.get("AREA_NUMBER26_EIC")).rangeIs(-300, 1000);
+        assertThat(feasibilityRanges.get("AREA_NUMBER1_EIC")).rangeIs(-3700, 3300);
+        assertThat(feasibilityRanges.get("AREA_NUMBER5_EIC")).rangeIs(300, 500);
+        assertThat(feasibilityRanges.get("AREA_NUMBER23_EIC")).rangeIs(300, 700);
+        assertThat(feasibilityRanges.get("AREA_NUMBER25_EIC")).rangeIs(-900, 2100);
     }
 
     @Test
@@ -116,23 +116,23 @@ class FeasibilityRangeCalculatorTest {
     void getRegionFeasibilityRangesTest() throws IOException {
         externalConstraints = getBciTestFile("externalConstraints.xml");
         bciFeasibilityRange = getBciTestFile("bciFeasibilityRange.xml");
-        Map<String, Interval> frs = feasibilityRangeCalculator.getRegionFeasibilityRanges(externalConstraints,
+        Map<String, Interval> feasibilityRanges = feasibilityRangeCalculator.getRegionFeasibilityRanges(externalConstraints,
                                                                                           TARGET_DATE,
                                                                                           netPositionsMap,
                                                                                           bciFeasibilityRange);
 
-        assertThat(frs.get("AREA_NUMBER11_EIC")).rangeIs(-900, 1100);
-        assertThat(frs.get("AREA_NUMBER2_EIC")).rangeIs(0, 400);
-        assertThat(frs.get("AREA_NUMBER8_EIC")).rangeIs(-4700, 5300);
-        assertThat(frs.get("AREA_NUMBER13_EIC")).rangeIs(100, 700);
-        assertThat(frs.get("AREA_NUMBER12_EIC")).rangeIs(0, 2500);
-        assertThat(frs.get("AREA_NUMBER10_EIC")).rangeIs(-50, 250);
-        assertThat(frs.get("AREA_NUMBER3_EIC")).rangeIs(-300, 700);
-        assertThat(frs.get("AREA_NUMBER26_EIC")).rangeIs(0, 1000);
-        assertThat(frs.get("AREA_NUMBER1_EIC")).rangeIs(-3700, 3300);
-        assertThat(frs.get("AREA_NUMBER5_EIC")).rangeIs(300, 500);
-        assertThat(frs.get("AREA_NUMBER23_EIC")).rangeIs(300, 700);
-        assertThat(frs.get("AREA_NUMBER25_EIC")).rangeIs(0, 2100);
+        assertThat(feasibilityRanges.get("AREA_NUMBER11_EIC")).rangeIs(-900, 1100);
+        assertThat(feasibilityRanges.get("AREA_NUMBER2_EIC")).rangeIs(0, 400);
+        assertThat(feasibilityRanges.get("AREA_NUMBER8_EIC")).rangeIs(-4700, 5300);
+        assertThat(feasibilityRanges.get("AREA_NUMBER13_EIC")).rangeIs(100, 700);
+        assertThat(feasibilityRanges.get("AREA_NUMBER12_EIC")).rangeIs(0, 2500);
+        assertThat(feasibilityRanges.get("AREA_NUMBER10_EIC")).rangeIs(-50, 250);
+        assertThat(feasibilityRanges.get("AREA_NUMBER3_EIC")).rangeIs(-300, 700);
+        assertThat(feasibilityRanges.get("AREA_NUMBER26_EIC")).rangeIs(0, 1000);
+        assertThat(feasibilityRanges.get("AREA_NUMBER1_EIC")).rangeIs(-3700, 3300);
+        assertThat(feasibilityRanges.get("AREA_NUMBER5_EIC")).rangeIs(300, 500);
+        assertThat(feasibilityRanges.get("AREA_NUMBER23_EIC")).rangeIs(300, 700);
+        assertThat(feasibilityRanges.get("AREA_NUMBER25_EIC")).rangeIs(0, 2100);
     }
 
     private byte[] getBciTestFile(final String name) throws IOException {

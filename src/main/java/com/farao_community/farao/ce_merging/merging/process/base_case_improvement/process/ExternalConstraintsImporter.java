@@ -139,7 +139,7 @@ public final class ExternalConstraintsImporter {
         return !targetDate.isBefore(start) && !targetDate.isAfter(end);
     }
 
-    public enum ExternalConstraintDirection {
+    private enum ExternalConstraintDirection {
         EXPORT,
         IMPORT;
     }
