@@ -37,14 +37,14 @@ public class GermanPreMergeService {
         PARAMETERS.put("ucte.import.create-areas", "false");
     }
 
-    private final GermanMismatchCompensation germanMismatchCompensation;
+    private final GermanMismatchCompensationService germanMismatchCompensationService;
     private final MergingTaskRepository tasksRepository;
     private final CeMergingConfiguration configuration;
 
-    public GermanPreMergeService(final GermanMismatchCompensation germanMismatchCompensation,
+    public GermanPreMergeService(final GermanMismatchCompensationService germanMismatchCompensationService,
                                  final MergingTaskRepository tasksRepository,
                                  final CeMergingConfiguration configuration) {
-        this.germanMismatchCompensation = germanMismatchCompensation;
+        this.germanMismatchCompensationService = germanMismatchCompensationService;
         this.tasksRepository = tasksRepository;
         this.configuration = configuration;
     }
@@ -55,7 +55,7 @@ public class GermanPreMergeService {
             LOGGER.info("German network files merged with success");
             // Save the german merged network file for investigation in case of exception in mismatch step
             saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, mergedNetwork, task, UCTE_FORMAT, configuration);
-            germanMismatchCompensation.apply(task, mergedNetwork);
+            germanMismatchCompensationService.apply(task, mergedNetwork);
             LOGGER.info("Replacement of German TSO's network element names by common German identifiers for network: {}", mergedNetwork);
             replaceXnodesWithLines(mergedNetwork);
             saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, mergedNetwork, task, UCTE_FORMAT, configuration);
@@ -68,7 +68,7 @@ public class GermanPreMergeService {
         }
     }
 
-    public Network mergeGermanRegions(final MergingTask task) {
+    static Network mergeGermanRegions(final MergingTask task) {
         final Network[] networksToMerge = Arrays.stream(GermanTso.values())
                 .map(tso -> readGermanNetwork(tso, task))
                 .toArray(Network[]::new);
@@ -76,8 +76,8 @@ public class GermanPreMergeService {
         return Network.merge(GERMAN_PRE_MERGED_IGM.getFileName(task.getTargetDate()), networksToMerge);
     }
 
-    private Network readGermanNetwork(final GermanTso tso,
-                                      final MergingTask task) {
+    private static Network readGermanNetwork(final GermanTso tso,
+                                             final MergingTask task) {
         return Network.read(Path.of(task.getInputs().getIgm(tso.name()).getIgmFile().getPath()), getDefault(), CACHE.get(), PARAMETERS);
     }
 

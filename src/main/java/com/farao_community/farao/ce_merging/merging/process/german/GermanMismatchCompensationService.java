@@ -7,6 +7,7 @@
 
 package com.farao_community.farao.ce_merging.merging.process.german;
 
+import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
@@ -34,26 +35,31 @@ import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWithVirtualHub;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getBorderFlow;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE;
 import static com.powsybl.iidm.network.Country.DE;
 import static java.lang.Math.abs;
 import static java.util.function.Predicate.not;
 
 @Service
-public class GermanMismatchCompensation {
+public class GermanMismatchCompensationService {
     private final NetPositionService netPositionService;
-    private static final Logger LOGGER = LoggerFactory.getLogger(GermanMismatchCompensation.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(GermanMismatchCompensationService.class);
     private final MergingTaskRepository tasksRepository;
     private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
+    private final CeMergingConfiguration configuration;
 
-    public GermanMismatchCompensation(final MergingTaskRepository tasksRepository,
-                                      final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
-                                      final NetPositionService netPositionService) {
+    public GermanMismatchCompensationService(final MergingTaskRepository tasksRepository,
+                                             final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
+                                             final NetPositionService netPositionService,
+                                             final CeMergingConfiguration configuration) {
         this.netPositionService = netPositionService;
         this.tasksRepository = tasksRepository;
         this.loadFlowRunnerSupplier = loadFlowRunnerSupplier;
+        this.configuration = configuration;
     }
 
     private static Predicate<DanglingLine> isGermanExternalNode(final List<XnodeConfig> xnodesConfigList) {
@@ -78,7 +84,7 @@ public class GermanMismatchCompensation {
         try {
             LOGGER.info("Mismatch compensation on german network {}", mergedNetwork.getNameOrId());
             final NetPositionsResults germanNetPositionResults = netPositionService.computeGermanNetPositions(task);
-            //saveInArtifacts(germanNetPositionResults, taskEntity);
+            saveArtifactFile(GERMAN_IGMS_NET_POSITIONS_FILE, germanNetPositionResults, task, configuration);
             final Configurations config = task.getConfigurations();
             final double initialInternalNPs = getInitialInternalNetPosition(germanNetPositionResults);
             final LoadFlowParameters lfParams = config.getLoadFlowParameters();
@@ -88,7 +94,6 @@ public class GermanMismatchCompensation {
                                      config.getVirtualHubList(),
                                      config.getXnodeList(),
                                      getComponentMode(lfParams));
-            tasksRepository.save(task);
         } catch (final Exception e) {
             String errorMessage = "Mismatch compensation failed, cause: " + e.getMessage();
             LOGGER.error(errorMessage);
