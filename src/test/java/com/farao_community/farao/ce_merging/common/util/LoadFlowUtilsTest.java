@@ -53,7 +53,7 @@ class LoadFlowUtilsTest {
             .thenReturn(divergeResult)
             .thenReturn(convergeResult);
 
-        assertDoesNotThrow(() -> LoadFlowUtils.runLoadflow(network, runnerSupplier, parameters));
+        assertDoesNotThrow(() -> LoadFlowUtils.runLoadFlow(network, runnerSupplier, parameters));
 
         assertFalse(parameters.isDc());
         verify(runner, times(2)).run(eq(network), any(LoadFlowParameters.class));
@@ -74,7 +74,7 @@ class LoadFlowUtilsTest {
         when(divergeResult.getComponentResults()).thenReturn(Collections.emptyList());
         when(runner.run(eq(network), any(LoadFlowParameters.class))).thenReturn(divergeResult);
 
-        assertThatThrownBy(() -> LoadFlowUtils.runLoadflow(network, runnerSupplier, parameters))
+        assertThatThrownBy(() -> LoadFlowUtils.runLoadFlow(network, runnerSupplier, parameters))
             .isValidServiceException()
             .hasMessageContaining("DC load flow diverged on network test-net");
 

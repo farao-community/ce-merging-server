@@ -14,13 +14,14 @@ import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Line;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TwoSides;
 
 import java.util.List;
 import java.util.function.Predicate;
 
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 import static com.powsybl.iidm.network.TwoSides.ONE;
 import static com.powsybl.iidm.network.TwoSides.TWO;
 
@@ -31,7 +32,12 @@ public final class BordersUtils {
     }
 
     public static Predicate<DanglingLine> isPairedWithVirtualHub(final List<VirtualHubRecord> virtualHubList) {
-        return danglingLine -> virtualHubList.stream()
+        return danglingLine -> isPairedWithVirtualHub(danglingLine, virtualHubList);
+    }
+
+    public static boolean isPairedWithVirtualHub(final DanglingLine danglingLine,
+                                                 final List<VirtualHubRecord> virtualHubList) {
+        return virtualHubList.stream()
                 .map(VirtualHubRecord::getNodeName)
                 .anyMatch(danglingLine.getPairingKey().substring(0, 8)::equals);
     }
@@ -56,11 +62,13 @@ public final class BordersUtils {
         return getCountry(injection.getTerminal());
     }
 
-    public static Country getCountry(final Branch<?> branch, final TwoSides side) {
+    public static Country getCountry(final Branch<?> branch,
+                                     final TwoSides side) {
         return getCountry(branch.getTerminal(side));
     }
 
-    public static Country getCountry(final HvdcLine hvdcLine, final TwoSides side) {
+    public static Country getCountry(final HvdcLine hvdcLine,
+                                     final TwoSides side) {
         return getCountry(hvdcLine.getConverterStation(side).getTerminal());
     }
 
@@ -79,7 +87,9 @@ public final class BordersUtils {
         return line -> isCountrySameAsOneSide(country, getCountry(line, ONE), getCountry(line, TWO));
     }
 
-    private static boolean isCountrySameAsOneSide(final Country country, final Country country1, final Country country2) {
+    private static boolean isCountrySameAsOneSide(final Country country,
+                                                  final Country country1,
+                                                  final Country country2) {
         return country1 == country && country2 != country || country1 != country && country2 == country;
     }
 
@@ -87,12 +97,14 @@ public final class BordersUtils {
         return danglingLine -> getCountry(danglingLine) == country;
     }
 
-    public static double getBorderFlow(final Line line, final Country country) {
+    public static double getBorderFlow(final Line line,
+                                       final Country country) {
         final double directFlow = (getTerminalFlow(line.getTerminal1()) - getTerminalFlow(line.getTerminal2())) / 2;
         return country.equals(getCountry(line, ONE)) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(final HvdcLine hvdcLine, final Country country) {
+    public static double getBorderFlow(final HvdcLine hvdcLine,
+                                       final Country country) {
         final double side1Flow = getTerminalFlow(hvdcLine.getConverterStation1().getTerminal());
         final double side2Flow = getTerminalFlow(hvdcLine.getConverterStation2().getTerminal());
         final double directFlow = (side1Flow - side2Flow) / 2;
@@ -100,16 +112,18 @@ public final class BordersUtils {
     }
 
     public static Double getTerminalFlow(final Terminal terminal) {
-        return terminal.isConnected() ? zeroIfNan(terminal.getP()) : 0;
+        return terminal.isConnected() ? zeroIfNaN(terminal.getP()) : 0;
     }
 
-    public static Country getCountryOnOtherSide(final Line line, final Country country) {
+    public static Country getCountryOnOtherSide(final Line line,
+                                                final Country country) {
         final Country side1Country = getCountry(line, ONE);
         final Country side2Country = getCountry(line, TWO);
         return country == side1Country ? side2Country : side1Country;
     }
 
-    public static Country getCountryOnOtherSide(final HvdcLine hvdcLine, final Country country) {
+    public static Country getCountryOnOtherSide(final HvdcLine hvdcLine,
+                                                final Country country) {
         final Country side1Country = getCountry(hvdcLine, ONE);
         final Country side2Country = getCountry(hvdcLine, TWO);
         return country == side1Country ? side2Country : side1Country;

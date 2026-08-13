@@ -34,9 +34,9 @@ import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.save;
-import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentModeLfParameter;
+import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isConnected;
-import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadflow;
+import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
 import static com.powsybl.iidm.network.Country.ES;
@@ -82,9 +82,9 @@ public class SlackCompensationService {
         final Network cgm = Network.read(cgmFileToCompensate.getPath());
         final LoadFlowParameters loadFlowParameters = task.getConfigurations().getLoadFlowParameters();
 
-        runLoadflow(cgm, loadFlowRunnerSupplier, loadFlowParameters);
+        runLoadFlow(cgm, loadFlowRunnerSupplier, loadFlowParameters);
 
-        final LoadFlowParameters.ComponentMode componentMode = getComponentModeLfParameter(loadFlowParameters);
+        final LoadFlowParameters.ComponentMode componentMode = getComponentMode(loadFlowParameters);
 
         cgm.getLoadStream()
                 .filter(isConnected(componentMode).and(NetworkUtil::hasActivePower))

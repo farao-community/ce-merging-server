@@ -21,7 +21,7 @@ public final class NetworkUtil {
         // utility
     }
 
-    public static boolean hasActivePower(final Injection<?> injection) {
+    public static boolean hasActivePower(final Injection injection) {
         return !isNaN(injection.getTerminal().getP());
     }
 
@@ -29,7 +29,7 @@ public final class NetworkUtil {
         return isNaN(value) ? 0 : value;
     }
 
-    public static boolean isConnected(final Branch<?> branch) {
+    public static boolean isConnected(final Branch branch) {
         return branch.getTerminal1().isConnected() && branch.getTerminal2().isConnected();
     }
 
@@ -41,7 +41,7 @@ public final class NetworkUtil {
         return branch -> branch.getId().contains(nodeId);
     }
 
-    public static Country getCountry(final Injection<?> injection) {
+    public static Country getCountry(final Injection injection) {
         return injection.getTerminal()
             .getVoltageLevel()
             .getSubstation()

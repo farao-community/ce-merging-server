@@ -12,6 +12,7 @@ import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositio
 import com.farao_community.farao.ce_merging.common.util.BordersUtils;
 import com.farao_community.farao.ce_merging.common.util.CountryUtils;
 import com.farao_community.farao.ce_merging.common.util.LoadFlowUtils;
+import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
@@ -44,12 +45,12 @@ import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getC
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isBranchBorderOf;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isDanglingLineBorderOf;
 import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isHvdcLineBorderOf;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isInCountry;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isVirtualHubDanglingLine;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.zeroIfNan;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWithVirtualHub;
 import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isConnected;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInCountry;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.streamIterable;
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.Country.DK;
@@ -166,7 +167,7 @@ public class CountryNetPositionHandler {
                 .filter(isInCountry(country).and(isConnected(componentMode)))
                 .map(Injection::getTerminal)
                 .map(Terminal::getP)
-                .mapToDouble(BordersUtils::zeroIfNan)
+                .mapToDouble(NetworkUtil::zeroIfNaN)
                 .sum();
     }
 
@@ -201,7 +202,7 @@ public class CountryNetPositionHandler {
     }
 
     private void handleVirtualHubBus(final Bus bus) {
-        final double flow = zeroIfNan(bus.getP());
+        final double flow = zeroIfNaN(bus.getP());
         globalPosition += flow;
         outBciNetPosition += flow;
 
@@ -226,9 +227,9 @@ public class CountryNetPositionHandler {
         final double borderFlow = LoadFlowUtils.getBorderFlow(danglingLine, componentMode);
         final Country countryOnOtherSide = otherCountry(danglingLine);
 
-        updatePositions(borderFlow, countryOnOtherSide, !isVirtualHubDanglingLine(danglingLine, virtualHubList));
+        updatePositions(borderFlow, countryOnOtherSide, !isPairedWithVirtualHub(danglingLine, virtualHubList));
 
-        if (isVirtualHubDanglingLine(danglingLine, virtualHubList)) {
+        if (isPairedWithVirtualHub(danglingLine, virtualHubList)) {
             outBciNetPosition += borderFlow;
             addToVirtualHubExchange(danglingLine.getPairingKey(), borderFlow);
         } else if (!bciCountries.contains(countryOnOtherSide)) {

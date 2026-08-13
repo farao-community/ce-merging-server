@@ -13,6 +13,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
@@ -28,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GERMAN_AND_DANISH_TSO;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
@@ -109,7 +110,8 @@ public class TopologicalMergeService {
     }
 
     private static boolean isNotPreTreated(final MergingTask task, final IgmData igmData) {
-        return !GERMAN_AND_DANISH_TSO.contains(igmData.getCountry())
-                && !task.hasPreTreatedIgm(igmData.getCountry());
+        final String country = igmData.getCountry();
+        return !GermanTso.includes(country) && !DANISH_TSO.equals(country)
+                && !task.hasPreTreatedIgm(country);
     }
 }

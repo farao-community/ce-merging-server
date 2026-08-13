@@ -142,9 +142,4 @@ public final class TaskTestUtils {
             borderDirectionRecord.setBorderTo(mapKsToXk(borderDirectionRecord.getBorderTo()));
         });
     }
-
-    public static void setLoadflowParameters(MergingTask task, String loadflowParametersFile) throws IOException {
-        LoadFlowParameters loadFlowParameters = JsonLoadFlowParameters.read(new ClassPathResource(loadflowParametersFile).getInputStream());
-        task.getConfigurations().setLoadFlowParameters(loadFlowParameters);
-    }
 }
