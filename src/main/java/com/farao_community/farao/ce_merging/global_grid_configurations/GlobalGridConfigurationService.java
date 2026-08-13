@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.BecByBoundaryMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.BorderDirectionMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.HvdcAlignmentXNodeCoupleMapper;
@@ -23,12 +24,11 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.services.
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.RegionConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.VirtualHubsConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.XNodeConfigurationService;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.BorderDirectionRecord;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
-import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectionRecord;
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.json.JsonLoadFlowParameters;
 import com.powsybl.openrao.virtualhubs.VirtualHub;

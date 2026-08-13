@@ -8,10 +8,10 @@ package com.farao_community.farao.ce_merging.merging.process.forecast_netpositio
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,8 +25,8 @@ import java.nio.file.Path;
 import java.time.OffsetDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 

@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.mapper;
 
-import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectionRecord;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.BorderDirectionRecord;
 import com.powsybl.openrao.virtualhubs.BorderDirection;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

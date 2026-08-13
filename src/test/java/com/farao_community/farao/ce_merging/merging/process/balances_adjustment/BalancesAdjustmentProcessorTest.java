@@ -7,9 +7,9 @@
 package com.farao_community.farao.ce_merging.merging.process.balances_adjustment;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
 import com.powsybl.iidm.network.Network;
@@ -31,9 +31,9 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.function.Supplier;
 
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 import static java.lang.Double.isNaN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;

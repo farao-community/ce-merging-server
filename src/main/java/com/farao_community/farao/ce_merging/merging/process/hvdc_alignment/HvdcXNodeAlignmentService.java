@@ -8,15 +8,15 @@ package com.farao_community.farao.ce_merging.merging.process.hvdc_alignment;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import com.farao_community.farao.ce_merging.common.util.CountryUtils;
+import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
-import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.DK_CONVERTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
 
 @Service
 public class HvdcXNodeAlignmentService {

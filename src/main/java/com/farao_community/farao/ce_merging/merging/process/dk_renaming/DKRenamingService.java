@@ -8,9 +8,9 @@ package com.farao_community.farao.ce_merging.merging.process.dk_renaming;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +28,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_NAMING_STRATEGY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_EXPORT_NAMING_STRATEGY_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.DK_CONVERTED_FILE;
 
 @Service
 public class DKRenamingService {

@@ -8,12 +8,12 @@ package com.farao_community.farao.ce_merging.merging.process.topologicalMerge;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
-import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType;
+import com.farao_community.farao.ce_merging.merging.model.hourly.enums.GermanTso;
 import com.powsybl.computation.local.LocalComputationManager;
 import com.powsybl.iidm.network.ImportConfig;
 import com.powsybl.iidm.network.Network;
@@ -31,8 +31,8 @@ import java.util.Properties;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.DK_CONVERTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
 
 @Service
 public class TopologicalMergeService {

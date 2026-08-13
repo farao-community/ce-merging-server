@@ -7,10 +7,10 @@
 package com.farao_community.farao.ce_merging.merging;
 
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import com.farao_community.farao.ce_merging.common.util.FileUtils;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskManagementService;
-import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.http.HttpStatus;
@@ -25,30 +25,29 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
+import static com.farao_community.farao.ce_merging.common.model.TaskStatus.CREATED;
+import static com.farao_community.farao.ce_merging.common.model.TaskStatus.ERROR;
+import static com.farao_community.farao.ce_merging.common.model.TaskStatus.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
-
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.ID_1;
 import static test_utils.CeTestUtils.ID_2;
-import static test_utils.CeTestUtils.MIME_ZIP;
-import static test_utils.CeTestUtils.INPUTS_ZIP_NAME;
-import static test_utils.CeTestUtils.taskDtoWithIdAndStatus;
-import static test_utils.CeTestUtils.anyFile;
-import static test_utils.CeTestUtils.stringContentOf;
-import static test_utils.CeTestUtils.byteContentOf;
-import static test_utils.CeTestUtils.METADATA;
 import static test_utils.CeTestUtils.INPUTS;
+import static test_utils.CeTestUtils.INPUTS_ZIP_NAME;
+import static test_utils.CeTestUtils.METADATA;
+import static test_utils.CeTestUtils.MIME_ZIP;
+import static test_utils.CeTestUtils.anyFile;
+import static test_utils.CeTestUtils.byteContentOf;
+import static test_utils.CeTestUtils.stringContentOf;
+import static test_utils.CeTestUtils.taskDtoWithIdAndStatus;
 
 class MergingControllerTest {
 

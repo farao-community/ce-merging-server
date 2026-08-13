@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions;
 
-import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
+import com.farao_community.farao.ce_merging.merging.model.hourly.enums.GermanTso;
 import com.powsybl.iidm.network.Country;
 import jakarta.persistence.MappedSuperclass;
 import org.apache.commons.lang3.builder.EqualsBuilder;

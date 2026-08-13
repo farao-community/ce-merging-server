@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.request_metadata.model;
 
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Configurations;
 
 public class Data {
     private String type;

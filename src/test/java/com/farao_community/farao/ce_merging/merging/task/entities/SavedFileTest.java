@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;

@@ -6,9 +6,9 @@
  */
 package test_utils.assertions;
 
-import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import com.farao_community.farao.ce_merging.common.model.TaskStatus;
+import com.farao_community.farao.ce_merging.merging.model.hourly.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.util.CanIgnoreReturnValue;
 

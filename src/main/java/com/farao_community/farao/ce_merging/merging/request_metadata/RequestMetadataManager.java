@@ -8,13 +8,13 @@ package com.farao_community.farao.ce_merging.merging.request_metadata;
 
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.request_metadata.model.Data;
 import com.farao_community.farao.ce_merging.merging.request_metadata.model.RequestMetadata;
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
-import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ import java.util.function.Function;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.getPathInParent;
-import static com.farao_community.farao.ce_merging.merging.task.entities.Configurations.RECESSIVITY_DEFAULT_CONFIGURATION;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.entities.Configurations.RECESSIVITY_DEFAULT_CONFIGURATION;
 
 public class RequestMetadataManager {
     private final String inputsPath;

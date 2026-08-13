@@ -7,9 +7,9 @@
 package com.farao_community.farao.ce_merging.merging.process.slack_compensation;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.model.SavedFile;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 import com.powsybl.commons.report.ReportNodeNoOp;
 import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Load;
@@ -38,7 +38,7 @@ import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.get
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isConnected;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
+import static com.farao_community.farao.ce_merging.merging.model.hourly.enums.ArtifactType.CGM_FILE_AFTER_PST;
 import static com.powsybl.iidm.network.Country.ES;
 import static com.powsybl.ucte.network.UcteNodeTypeCode.UT;
 
