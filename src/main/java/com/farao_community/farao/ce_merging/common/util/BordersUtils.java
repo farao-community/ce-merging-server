@@ -62,7 +62,7 @@ public final class BordersUtils {
         return getCountry(injection.getTerminal());
     }
 
-    public static Country getCountry(final Branch<?> branch,
+    public static Country getCountry(final Branch branch,
                                      final TwoSides side) {
         return getCountry(branch.getTerminal(side));
     }
