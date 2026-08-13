@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.post_process;
 
 import com.farao_community.farao.ce_merging.common.GenericMergingRequest;
-import com.farao_community.farao.ce_merging.merging.model.daily.entities.DailyTask;
+import com.farao_community.farao.ce_merging.merging.model.daily.DailyTask;
 import com.farao_community.farao.ce_merging.merging.model.hourly.entities.MergingTask;
 
 import java.time.OffsetDateTime;

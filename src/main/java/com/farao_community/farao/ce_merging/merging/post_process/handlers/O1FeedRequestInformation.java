@@ -9,7 +9,7 @@ package com.farao_community.farao.ce_merging.merging.post_process.handlers;
 import com.farao_community.farao.ce_merging.common.chain.Handler;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
-import com.farao_community.farao.ce_merging.merging.model.daily.entities.DailyTask;
+import com.farao_community.farao.ce_merging.merging.model.daily.DailyTask;
 import com.farao_community.farao.ce_merging.merging.post_process.PostProcessRequest;
 import com.farao_community.farao.ce_merging.xsd.xnodes.HeaderType;
 import com.farao_community.farao.ce_merging.xsd.xnodes.PayloadType;
