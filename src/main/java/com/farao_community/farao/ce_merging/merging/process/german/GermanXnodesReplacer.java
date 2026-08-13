@@ -33,6 +33,7 @@ public final class GermanXnodesReplacer {
     private static final String ELEMENT_NAME_PROPERTY = "elementName";
     private static final String ELEMENT_NAME_PREFIX = "elementName_";
     private static final String TIE_LINE_LIMITS = "tieLineLimits_";
+    private static final String LINE_ID_FORMAT = "%s %s 1";
     private static final int SUBSTATION_ID_LENGTH = 6;
     private static final int VOLTAGE_LEVEL_ID_LENGTH = 7;
     private static final int BUS_ID_LENGTH = 8;
@@ -98,7 +99,7 @@ public final class GermanXnodesReplacer {
 
         final Line line = network.newLine()
                 .setEnsureIdUnicity(true)
-                .setId(String.format("%s %s 1", getBusId(terminal), xNodeBus))
+                .setId(String.format(LINE_ID_FORMAT, getBusId(terminal), xNodeBus))
                 .setVoltageLevel1(terminal.getVoltageLevel().getId())
                 .setVoltageLevel2(xNodeVoltageLevel.getId())
                 .setBus1(getConnectedBusIdOrElse(terminal, null))

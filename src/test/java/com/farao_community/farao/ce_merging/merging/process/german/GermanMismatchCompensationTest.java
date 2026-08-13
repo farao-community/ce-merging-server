@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.merging.process.german;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
+import com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
@@ -39,6 +40,8 @@ import java.util.List;
 import java.util.Properties;
 import java.util.function.Supplier;
 
+import static com.powsybl.iidm.network.Country.DE;
+import static com.powsybl.loadflow.LoadFlowParameters.ComponentMode.MAIN_CONNECTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static test_utils.CeTestUtils.stringPathOf;
@@ -100,7 +103,7 @@ public class GermanMismatchCompensationTest {
         TaskTestUtils.setTaskDefaultConfigurations(task);
 
         String loadflowParametersFile = "loadflow_parameters/ac-load-flow-parameters_main_component.json";
-        //TaskTestUtils.setLoadflowParameters(task, loadflowParametersFile);
+        TaskTestUtils.setLoadflowParameters(task, loadflowParametersFile);
 
         Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(task)));
         Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(task)));
@@ -116,9 +119,10 @@ public class GermanMismatchCompensationTest {
         NetPositionsResults netPositionsFile = new NetPositionsResults(new HashMap<>());
         LoadFlowParameters loadFlowParameters = task.getConfigurations().getLoadFlowParameters();
         loadFlowRunnerSupplier.get().run(mergedNetwork, loadFlowParameters);
-        //NetPositionCalculationHandler netPositionCalculationHandler = new NetPositionCalculationHandler();
-        //netPositionCalculationHandler.computeNetPositions(task.getConfigurations().getRegionConfiguration(), mergedNetwork, Country.DE, netPositionsFile, virtualHubList, xnodeList, LoadFlowParameters.ComponentMode.MAIN_CONNECTED);
-        assertEquals(1, netPositionsFile.netPositionsByCountryMap().size());
+        CountryNetPositionHandler handler = new CountryNetPositionHandler(
+                task.getConfigurations().getRegionConfiguration(), mergedNetwork, DE, virtualHubList, xnodeList, MAIN_CONNECTED
+        );
+        netPositionsFile.put(DE, handler.computeNetPositions());
         assertEquals(-587.94, netPositionsFile.get("DE").getVirtualHubsExchanges().get("XBW_BJ1D"), 0.01); //check virtual hubs exchanges didn't change
         double sumInitialNetPositionWithoutVirtualHubs = -1926.55;
         double sumInitialNetPositionWithVirtualHubs = -2514.49;

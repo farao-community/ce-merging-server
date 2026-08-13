@@ -29,11 +29,15 @@ public record NetPositionsResults(Map<String, NetPositions> netPositionsByCountr
     }
 
     public NetPositions get(final Country country) {
+        return get(country.name());
+    }
+
+    public NetPositions get(final String country) {
         if (netPositionsByCountryMap == null || country == null) {
             return null;
         }
 
-        return netPositionsByCountryMap.get(country.name());
+        return netPositionsByCountryMap.get(country);
     }
 
     public void put(final Country country, final NetPositions netPositions) {

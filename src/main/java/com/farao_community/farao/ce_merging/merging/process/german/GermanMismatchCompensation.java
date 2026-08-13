@@ -10,7 +10,9 @@ package com.farao_community.farao.ce_merging.merging.process.german;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
+import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
+import com.farao_community.farao.ce_merging.merging.process.netpositions.NetPositionService;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
@@ -31,38 +33,33 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isVirtualHubDanglingLine;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.hasActivePower;
+import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWithVirtualHub;
+import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getBorderFlow;
+import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentMode;
+import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection;
 import static com.powsybl.iidm.network.Country.DE;
 import static java.lang.Math.abs;
+import static java.util.function.Predicate.not;
 
 @Service
 public class GermanMismatchCompensation {
-    //private final NetPositionService netPositionService;
+    private final NetPositionService netPositionService;
     private static final Logger LOGGER = LoggerFactory.getLogger(GermanMismatchCompensation.class);
     private final MergingTaskRepository tasksRepository;
     private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
 
     public GermanMismatchCompensation(final MergingTaskRepository tasksRepository,
-                                      final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier) {
-        //this.netPositionService = netPositionService;
+                                      final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
+                                      final NetPositionService netPositionService) {
+        this.netPositionService = netPositionService;
         this.tasksRepository = tasksRepository;
         this.loadFlowRunnerSupplier = loadFlowRunnerSupplier;
     }
 
-    private static Predicate<DanglingLine> isExternalConnectedDanglingLine(final List<VirtualHubRecord> virtualHubs,
-                                                                           final List<XnodeConfig> xnodes) {
-        //TODO simplify after merge of slack compensation
-        return danglingLine -> !isVirtualHubDanglingLine(danglingLine, virtualHubs)
-                               && isGermanExternalNode(danglingLine.getPairingKey(), xnodes)
-                               && hasActivePower(danglingLine);
-    }
+    private static Predicate<DanglingLine> isGermanExternalNode(final List<XnodeConfig> xnodesConfigList) {
 
-    private static boolean isGermanExternalNode(final String ucteXnodeCode,
-                                                final List<XnodeConfig> xnodesConfigList) {
-
-        return xnodesConfigList.stream()
-                .filter(xnode -> xnode.getName().equals(ucteXnodeCode))
+        return danglingLine -> xnodesConfigList.stream()
+                .filter(xnode -> xnode.getName().equals(danglingLine.getPairingKey()))
                 .findFirst()
                 .filter(isNotDeOnBothSides().or(isLinkedToDenmark()))
                 .isPresent();
@@ -116,7 +113,9 @@ public class GermanMismatchCompensation {
                                           final LoadFlowParameters.ComponentMode componentMode) {
 
         final List<DanglingLine> externalDanglingLines = network.getDanglingLineStream()
-                .filter(isExternalConnectedDanglingLine(virtualHubs, xnodes))
+                .filter(isGermanExternalNode(xnodes)
+                                .and(NetworkUtil::hasActivePower)
+                                .and(not(isPairedWithVirtualHub(virtualHubs))))
                 .toList();
 
         LOGGER.info("Absolute proportional share is applied to compensate German mismatch ({} MW)", mismatch);
