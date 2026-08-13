@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static test_utils.assertions.UcteNodeCodeAssert.assertThat;
 
-public class DKNamingStrategyTest {
+class DKNamingStrategyTest {
     private static final String DK_HVDC_XNODES = "FG_HK,TJ_K1,TJ_K2,TJ_K3,TJ_K4,VH_L1,VH_L2,BI_R1,BI_R2";
 
     private static NamingStrategy strategy;

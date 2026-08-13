@@ -24,10 +24,14 @@ import java.io.FileNotFoundException;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATETIME_FMT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.AUTO;
+import static java.util.Locale.FRANCE;
 
 /**
  * WARNING: this class is used by the merging supervisor (EMERGE).
@@ -105,6 +109,10 @@ public class MergingTask implements Serializable {
         return artifacts;
     }
 
+    public void setArtifacts(final Artifacts artifacts) {
+        this.artifacts = artifacts;
+    }
+
     public <T> T getArtifact(final ArtifactType artifactType, final Class<T> clazz) throws FileNotFoundException {
         final String path = getArtifactPath(artifactType);
         return switch (artifactType.getFormat()) {
@@ -112,10 +120,6 @@ public class MergingTask implements Serializable {
             case XML -> JaxbUtils.readFromPath(clazz, path);
             case UCT, XIIDM -> clazz == Network.class ? (T) Network.read(path) : null; // NOSONAR this is a Network
         };
-    }
-
-    public void setArtifacts(final Artifacts artifacts) {
-        this.artifacts = artifacts;
     }
 
     public Configurations getConfigurations() {
@@ -155,5 +159,15 @@ public class MergingTask implements Serializable {
 
     public boolean hasPreTreatedIgm(final String country) {
         return artifacts.getPreTreatedIgmMap().containsKey(country);
+    }
+
+    public String getOutputCgmFileName() {
+        final ZonedDateTime targetZdtParis = getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
+        final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
+
+        /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                Be careful when modifying this file name because it's interfaced with CCCTool
+           !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+        return String.format("%s_2D%s_UX0.uct", dateAndTime, targetZdtParis.getDayOfWeek().getValue());
     }
 }

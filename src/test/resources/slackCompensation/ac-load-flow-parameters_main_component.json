@@ -1,0 +1,19 @@
+{
+  "version": "1.15",
+  "voltageInitMode": "DC_VALUES",
+  "transformerVoltageControlOn": false,
+  "phaseShifterRegulationOn": true,
+  "useReactiveLimits": false,
+  "twtSplitShuntAdmittance": false,
+  "componentMode": "MAIN_CONNECTED",
+  "dcUseTransformerRatio": false,
+  "balanceType": "PROPORTIONAL_TO_GENERATION_P",
+  "countriesToBalance": ["IT", "BG", "HR", "PL", "SK", "CH", "PT", "SI", "BA", "NL", "DE", "AT", "CZ", "HU", "UA", "MK", "TR", "RO", "FR", "RS", "ME", "GR", "ES", "AL", "BE", "DK"],
+  "dcPowerFactor": 1.0,
+  "writeSlackBus": false,
+  "extensions": {
+    "open-load-flow-parameters": {
+      "slackDistributionFailureBehavior": "LEAVE_ON_SLACK_BUS"
+    }
+  }
+}
