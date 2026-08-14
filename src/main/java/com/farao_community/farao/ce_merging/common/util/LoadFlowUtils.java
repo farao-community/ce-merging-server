@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.powsybl.commons.report.ReportNode;
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Generator;
@@ -16,6 +17,7 @@ import com.powsybl.iidm.network.Terminal;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
+import com.powsybl.loadflow.LoadFlowRunParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,16 +48,23 @@ public final class LoadFlowUtils {
         /* This utility class should not be instantiated */
     }
 
-    public static void runLoadFlow(final Network network,
+    public static LoadFlowResult runLoadFlow(final Network network,
                                    final Supplier<LoadFlow.Runner> runnerSupplier,
                                    final LoadFlowParameters parameters) {
+        return runLoadFlow(network, runnerSupplier, new LoadFlowRunParameters().setParameters(parameters));
+    }
+
+    public static LoadFlowResult runLoadFlow(final Network network,
+                                   final Supplier<LoadFlow.Runner> runnerSupplier,
+                                   final LoadFlowRunParameters runParameters) {
         final String id = network.getId();
 
-        LoadFlowResult result = runnerSupplier.get().run(network, parameters);
+        final LoadFlowParameters parameters = runParameters.getLoadFlowParameters();
+        LoadFlowResult result = runnerSupplier.get().run(network, runParameters);
         boolean isDc = parameters.isDc();
 
         if (loadFlowHasDiverged(result)) {
-            LOGGER.warn(getDivergenceMessage(id, isDc));
+            LOGGER.warn(getDivergenceMessage(id, parameters));
 
             Optional.ofNullable(result.getLogs())
                     .map(log -> new String(log.getBytes(US_ASCII)))
@@ -64,10 +73,10 @@ public final class LoadFlowUtils {
             if (!isDc) { //DC fallback
                 LOGGER.warn("Switching to DC mode for network {}", id);
                 parameters.setDc(true);
-                result = runnerSupplier.get().run(network, parameters);
+                result = runnerSupplier.get().run(network, runParameters);
 
                 if (loadFlowHasDiverged(result)) {
-                    final String errorMessage = getDivergenceMessage(id, true);
+                    final String errorMessage = getDivergenceMessage(id, parameters);
                     LOGGER.error(errorMessage);
                     throw new CeMergingException(errorMessage);
                 }
@@ -75,6 +84,8 @@ public final class LoadFlowUtils {
                 parameters.setDc(false); //should put in AC for the next computation
             }
         }
+
+        return result;
     }
 
     public static void runLoadFlowWithBalanceTypeCorrection(final Network network,
@@ -93,14 +104,31 @@ public final class LoadFlowUtils {
         runLoadFlow(network, loadFlowRunnerSupplier, actualParameters);
     }
 
+    public static LoadFlowResult runLoadFlowWithLogs(Network network,
+                                                     Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
+                                                     LoadFlowParameters loadFlowParameters,
+                                                     ReportNode reportNode) {
+        loadFlowParameters.setReadSlackBus(true); // the loadflow will use the slack node of the network for compensation,
+        return runLoadFlow(
+                network,
+                loadFlowRunnerSupplier,
+                new LoadFlowRunParameters()
+                        .setParameters(loadFlowParameters)
+                        .setReportNode(reportNode)
+        );
+    }
+
     private static boolean hasBalancedGeneration(final Network network) {
         return 0 == network.getGeneratorStream().mapToDouble(Generator::getTargetP).sum();
     }
 
     private static String getDivergenceMessage(final String networkId,
-                                               final boolean isDc) {
-        final String loadflowMode = isDc ? DC : AC;
-        return DIVERGENCE_MESSAGE.formatted(loadflowMode, networkId);
+                                               final LoadFlowParameters parameters) {
+        return DIVERGENCE_MESSAGE.formatted(getLoadFlowMode(parameters), networkId);
+    }
+
+    public static String getLoadFlowMode(final LoadFlowParameters parameters) {
+        return parameters.isDc() ? DC : AC;
     }
 
     /**

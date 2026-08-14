@@ -43,6 +43,7 @@ import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_BASE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XIIDM_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
@@ -66,7 +67,6 @@ public class BalancesAdjustmentProcessor {
     private static final double MAXIMUM_NET_POSITION_MISMATCH_BEFORE_REDISPATCH = 1.;
     private static final double DEFAULT_PMAX = 9999.0;
     private static final double DEFAULT_PMIN = -9999.0;
-    public static final String BUNDLE_BASE_NAME = "i18n.reports";
     public static final String BUNDLE_TEMPLATE = "balance.report";
     private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
     private final BalanceComputationParameters balanceComputationParameters;
@@ -280,7 +280,7 @@ public class BalancesAdjustmentProcessor {
         final String loadflowMode = balanceComputationParameters.getLoadFlowParameters().isDc() ? DC : AC;
 
         final ReportNode rootReportNode = ReportNode.newRootReportNode()
-            .withResourceBundles(BUNDLE_BASE_NAME)
+            .withResourceBundles(REPORT_BASE_NAME)
             .withMessageTemplate(BUNDLE_TEMPLATE)
             .build();
 

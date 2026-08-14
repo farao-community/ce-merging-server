@@ -102,6 +102,19 @@
                             <outputDirectory>${project.build.directory}/generated-sources/jaxb/glsk_fix</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>xlog</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/xsd/exec_logs/exec-logs.xsd</source>
+                            </sources>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.execution_logs</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb/exec_logs</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -285,7 +298,6 @@
             <groupId>com.powsybl</groupId>
             <artifactId>powsybl-open-loadflow</artifactId>
             <version>${powsybl.open-loadflow.version}</version>
-            <scope>runtime</scope>
         </dependency>
 
         <!-- TEST DEPENDENCIES -->
