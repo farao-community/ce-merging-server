@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.merging.process.german;
+package com.farao_community.farao.ce_merging.merging.process.german_pre_merge;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -20,8 +20,9 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_IMPORT_CREATE_AREAS_KEY;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
-import static com.farao_community.farao.ce_merging.merging.process.german.GermanXnodesReplacer.replaceXnodesWithLines;
+import static com.farao_community.farao.ce_merging.merging.process.german_pre_merge.GermanXnodesReplacer.replaceXnodesWithLines;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
 import static com.powsybl.computation.local.LocalComputationManager.getDefault;
 import static com.powsybl.iidm.network.ImportConfig.CACHE;
@@ -29,10 +30,10 @@ import static com.powsybl.iidm.network.ImportConfig.CACHE;
 @Service
 public class GermanPreMergeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(GermanPreMergeService.class);
-    private static final Properties PARAMETERS = new Properties();
+    private static final Properties PROPERTIES = new Properties();
 
     static {
-        PARAMETERS.put("ucte.import.create-areas", "false");
+        PROPERTIES.put(UCTE_IMPORT_CREATE_AREAS_KEY, "false");
     }
 
     private final GermanMismatchCompensationService germanMismatchCompensationService;
@@ -52,7 +53,7 @@ public class GermanPreMergeService {
             saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, germanNetwork, task, UCTE_FORMAT, configuration);
             germanMismatchCompensationService.apply(task, germanNetwork);
 
-            LOGGER.info("Replacement of German TSO's network element names by common German identifiers for network: {}", germanNetwork);
+            LOGGER.info("Replacement of German TSO's network element names by common German identifiers for network: {}", germanNetwork.getId());
             replaceXnodesWithLines(germanNetwork);
             saveArtifactNetwork(GERMAN_PRE_MERGED_IGM, germanNetwork, task, UCTE_FORMAT, configuration);
         } catch (final Exception e) {
@@ -76,7 +77,7 @@ public class GermanPreMergeService {
         return Network.read(Path.of(task.getInputs().getIgm(tso.name()).getIgmFile().getPath()),
                             getDefault(),
                             CACHE.get(),
-                            PARAMETERS);
+                            PROPERTIES);
     }
 
 }

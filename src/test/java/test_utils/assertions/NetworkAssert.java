@@ -12,8 +12,6 @@ import com.powsybl.iidm.network.Network;
 import org.assertj.core.api.AbstractAssert;
 import org.assertj.core.util.CanIgnoreReturnValue;
 
-import java.util.Map;
-
 public class NetworkAssert extends AbstractAssert<NetworkAssert, Network> {
 
     protected NetworkAssert(final Network network) {
@@ -26,24 +24,9 @@ public class NetworkAssert extends AbstractAssert<NetworkAssert, Network> {
 
     @CanIgnoreReturnValue
     public NetworkAssert hasLine(final String lineId) {
-        return hasLineWithProperties(lineId, Map.of());
-    }
-
-    @CanIgnoreReturnValue
-    public NetworkAssert hasLineWithProperties(final String lineId,
-                                               final Map<String, String> properties) {
         final Line line = actual.getLine(lineId);
         if (line == null) {
             failWithMessage("line %s doesn't exist in network %s".formatted(lineId, actual.getId()));
-        } else {
-            properties.forEach((key, expectedValue) -> {
-                final String linePropValue = line.getProperty(key);
-                if (linePropValue == null) {
-                    failWithMessage("line %s doesn't have property %s".formatted(lineId, key));
-                } else if (!linePropValue.equals(expectedValue)) {
-                    failWithMessage("line %s has %s:%s, but expected %s".formatted(lineId, key, linePropValue, expectedValue));
-                }
-            });
         }
         return this;
     }

@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.merging.process.german;
+package com.farao_community.farao.ce_merging.merging.process.german_pre_merge;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -97,7 +97,7 @@ public class GermanMismatchCompensationService {
         }
     }
 
-    Double getInitialInternalNetPosition(final NetPositionsResults germanNetPositions) {
+    double getInitialInternalNetPosition(final NetPositionsResults germanNetPositions) {
         return Stream.of(GermanTso.values())
                 .map(GermanTso::name)
                 .map(germanNetPositions::get)
@@ -126,6 +126,8 @@ public class GermanMismatchCompensationService {
         LOGGER.info("Sum of external Net positions for Germany is {} MW", totalExternalNetPosition);
         if (totalExternalNetPosition != 0) {
             externalDanglingLines.forEach(line -> updateBoundaryLineFlow(line, mismatch, totalExternalNetPosition, componentMode));
+        } else {
+            LOGGER.warn("German dangling lines not updated because total external NP = 0");
         }
     }
 

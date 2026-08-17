@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.german;
+package com.farao_community.farao.ce_merging.merging.process.german_pre_merge;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.model.netpositions.GenerationAndLoadQuantity;
@@ -37,7 +37,9 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumProperty;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE;
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.loadflow.LoadFlowParameters.ComponentMode.MAIN_CONNECTED;
@@ -47,6 +49,7 @@ import static test_utils.CeTestUtils.stringPathOf;
 @SpringBootTest
 @ActiveProfiles("OpenLoadFlow")
 class GermanMismatchCompensationServiceTest {
+    private static final double VALUE_TOLERANCE = 1;
     @Autowired
     private GermanMismatchCompensationService service;
 
@@ -103,10 +106,10 @@ class GermanMismatchCompensationServiceTest {
         final GenerationAndLoadQuantity generationAndLoad = germanNetPositions.getGenerationAndLoadQuantity();
         final NetPositionsValues globalNetPosition = germanNetPositions.getGlobalNetPosition();
 
-        assertEquals(-10, generationAndLoad.generation(), 1);
-        assertEquals(1000, generationAndLoad.load(), 1);
-        assertEquals(510, globalNetPosition.getWithoutVirtualHubs(), 1);
-        assertEquals(510, globalNetPosition.getWithVirtualHubs(), 1);
+        assertEquals(-10, generationAndLoad.generation(), VALUE_TOLERANCE);
+        assertEquals(1000, generationAndLoad.load(), VALUE_TOLERANCE);
+        assertEquals(510, globalNetPosition.getWithoutVirtualHubs(), VALUE_TOLERANCE);
+        assertEquals(510, globalNetPosition.getWithVirtualHubs(), VALUE_TOLERANCE);
     }
 
     private NetPositions computeGermanNetPositions(final Network mergedNetwork) {
@@ -129,27 +132,24 @@ class GermanMismatchCompensationServiceTest {
                 .stream().mapToDouble(netPositions -> netPositions.getGlobalNetPosition()
                         .getWithoutVirtualHubs()).sum();
 
-        assertEquals(0, sumIntNetPositions, 1);
-        assertEquals(3820, sumExtNetPositions, 1);
-        assertEquals(3820, sumInitialNetPositionWithoutVirtualHubs, 1); //values from convergence
-        assertEquals(otherWayToSumInitialNpWoVh, sumInitialNetPositionWithoutVirtualHubs, 1);
+        assertEquals(0, sumIntNetPositions, VALUE_TOLERANCE);
+        assertEquals(3820, sumExtNetPositions, VALUE_TOLERANCE);
+        assertEquals(3820, sumInitialNetPositionWithoutVirtualHubs, VALUE_TOLERANCE); //values from convergence
+        assertEquals(otherWayToSumInitialNpWoVh, sumInitialNetPositionWithoutVirtualHubs, VALUE_TOLERANCE);
 
-        double sumInitialGeneration = GermanTso.stream()
+        double sumInitialGeneration = sumProperty(getInjectionValues(results), GenerationAndLoadQuantity::generation);
+        double sumInitialLoad = sumProperty(getInjectionValues(results), GenerationAndLoadQuantity::load);
+
+        assertEquals(-40, sumInitialGeneration, VALUE_TOLERANCE);
+        assertEquals(1580, sumInitialLoad, VALUE_TOLERANCE);
+    }
+
+    private Stream<GenerationAndLoadQuantity> getInjectionValues(final NetPositionsResults results) {
+        return GermanTso.stream()
                 .map(GermanTso::name)
-                .map(results::get).filter(Objects::nonNull)
-                .map(NetPositions::getGenerationAndLoadQuantity)
-                .mapToDouble(GenerationAndLoadQuantity::generation)
-                .sum();
-
-        double sumInitialLoad = GermanTso.stream()
-                .map(GermanTso::name)
-                .map(results::get).filter(Objects::nonNull)
-                .map(NetPositions::getGenerationAndLoadQuantity)
-                .mapToDouble(GenerationAndLoadQuantity::load)
-                .sum();
-
-        assertEquals(-40, sumInitialGeneration, 1);
-        assertEquals(1580, sumInitialLoad, 1);
+                .map(results::get)
+                .filter(Objects::nonNull)
+                .map(NetPositions::getGenerationAndLoadQuantity);
     }
 
     private Double getInitialExternalNetPosition(final NetPositionsResults germanNetPositionResults) {

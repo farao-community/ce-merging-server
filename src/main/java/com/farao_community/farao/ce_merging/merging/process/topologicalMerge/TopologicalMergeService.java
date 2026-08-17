@@ -31,6 +31,7 @@ import java.util.Properties;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_IMPORT_CREATE_AREAS_KEY;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
 
@@ -38,7 +39,6 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 public class TopologicalMergeService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TopologicalMergeService.class);
-    private static final String UCTE_IMPORT_CREATE_AREAS_KEY = "ucte.import.create-areas";
     private final CeMergingConfiguration configuration;
 
     public TopologicalMergeService(CeMergingConfiguration configuration) {

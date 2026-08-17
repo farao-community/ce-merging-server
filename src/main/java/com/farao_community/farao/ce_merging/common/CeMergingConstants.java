@@ -75,7 +75,7 @@ public final class CeMergingConstants {
     public static final String SENDER_ID = "22XCORESO------S";
     public static final String RECEIVER_ID = "17XTSO-CS------W";
     public static final String CORE_REGION_ID = "10Y1001C--00059P";
-
+    public static final String UCTE_IMPORT_CREATE_AREAS_KEY = "ucte.import.create-areas";
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;

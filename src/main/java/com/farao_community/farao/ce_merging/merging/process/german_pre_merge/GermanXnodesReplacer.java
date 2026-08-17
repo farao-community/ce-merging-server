@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.merging.process.german;
+package com.farao_community.farao.ce_merging.merging.process.german_pre_merge;
 
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.CurrentLimitsAdder;
