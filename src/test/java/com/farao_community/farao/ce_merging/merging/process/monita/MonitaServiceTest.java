@@ -34,6 +34,7 @@ import java.util.stream.Stream;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.savePreTreatedIgm;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInCountry;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.ME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -120,6 +121,7 @@ class MonitaServiceTest {
             when(monita1.getP0()).thenReturn(100.0);
             when(monita2.getPairingKey()).thenReturn(MONITA2_ME_NODE_NAME);
             when(monita2.getP0()).thenReturn(200.0);
+            networkUtil.when(() -> isPairedWith(anyString())).thenCallRealMethod();
             networkUtil.when(() -> isInCountry(IT)).thenReturn(Predicates.truePredicate());
             when(network.getDanglingLineStream()).thenAnswer(i -> Stream.of(monita1, monita2));
 

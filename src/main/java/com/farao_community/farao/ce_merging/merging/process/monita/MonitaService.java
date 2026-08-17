@@ -23,8 +23,8 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MON
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MONITA_NAMING_STRATEGY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_EXPORT_NAMING_STRATEGY_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWith;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInCountry;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.ME;
 

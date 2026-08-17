@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.powsybl.iidm.network.Country;
 
-import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.getCountryFromCode;
 
 @JsonPropertyOrder({"area1Information", "area2Information", "mergedInformation"})
 public class XnodeInformation {
@@ -70,7 +70,7 @@ public class XnodeInformation {
     }
 
     public boolean isInternalNodeOf(final Country country) {
-        return area1Information != null && getCountry(area1Information.getCountry()) == country
-               && area2Information != null && getCountry(area2Information.getCountry()) == country;
+        return area1Information != null && getCountryFromCode(area1Information.getCountry()) == country
+               && area2Information != null && getCountryFromCode(area2Information.getCountry()) == country;
     }
 }

@@ -26,8 +26,8 @@ import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isInMainConnectedComponent;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getLeavingFlow;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInMainConnectedComponent;
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
 import static com.powsybl.loadflow.LoadFlowParameters.BalanceType.PROPORTIONAL_TO_GENERATION_P;
 import static com.powsybl.loadflow.LoadFlowParameters.BalanceType.PROPORTIONAL_TO_LOAD;
@@ -152,9 +152,5 @@ public final class LoadFlowUtils {
             case ALL_CONNECTED -> getLeavingFlow(danglingLine);
             default -> throw new CeMergingException(COMPONENT_NUMBER_ERROR);
         };
-    }
-
-    public static double getLeavingFlow(final DanglingLine danglingLine) {
-        return danglingLine.getTerminal().isConnected() ? zeroIfNaN(-danglingLine.getBoundary().getP()) : 0;
     }
 }

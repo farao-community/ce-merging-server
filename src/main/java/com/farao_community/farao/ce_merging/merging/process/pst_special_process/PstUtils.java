@@ -16,6 +16,7 @@ import com.powsybl.iidm.network.TwoWindingsTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -31,6 +32,17 @@ public final class PstUtils {
     }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PstUtils.class);
+
+    private static final String GENERIC_PROCEDURE_MESSAGE = "Special PST procedure %d was applied";
+    private static final Map<Integer, String> PROCEDURE_DETAIL_BY_NUMBER = Map.of(
+            3, ", PST Divaca and Padriciano are in outage",
+            4, ", Lienz PST has no target flow",
+            6, ", Lienz PST is in outage",
+            7, ", no target flow defined",
+            8, ", both Nauders PSTs are active",
+            9, ", %s is active",
+            10, ", both Nauders PSTs are in outage"
+    );
 
     public static void regulatePst(final TwoWindingsTransformer pst, final double targetFlow) {
         applyIfHasTap(pst, phaseTapChanger -> {
@@ -96,6 +108,20 @@ public final class PstUtils {
         } else {
             return danglingLine.getP0() - danglingLine.getGeneration().getTargetP();
         }
+    }
+
+    public static void halveRegulationValue(final TwoWindingsTransformer pst) {
+        applyIfHasTap(pst, phaseTapChanger -> {
+            phaseTapChanger.setRegulating(true);
+            phaseTapChanger.setRegulationValue(phaseTapChanger.getRegulationValue() / 2);
+        });
+    }
+
+    public static void logProcedure(final int number, final String node) {
+        // 2nd formatted is only useful for case 9
+        LOGGER.info("{}{}",
+                    GENERIC_PROCEDURE_MESSAGE.formatted(number),
+                    PROCEDURE_DETAIL_BY_NUMBER.getOrDefault(number, "").formatted(node));
     }
 
 }

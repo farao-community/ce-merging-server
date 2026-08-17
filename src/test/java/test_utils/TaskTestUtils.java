@@ -33,7 +33,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.common.util.CountryUtils.mapKsToXk;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapKsToXk;
 import static com.powsybl.openrao.virtualhubs.xml.XmlVirtualHubsConfiguration.importConfiguration;
 
 public final class TaskTestUtils {
@@ -143,8 +143,4 @@ public final class TaskTestUtils {
         });
     }
 
-    public static void setLoadflowParameters(MergingTask task, String loadflowParametersFile) throws IOException {
-        LoadFlowParameters loadFlowParameters = JsonLoadFlowParameters.read(new ClassPathResource(loadflowParametersFile).getInputStream());
-        task.getConfigurations().setLoadFlowParameters(loadFlowParameters);
-    }
 }

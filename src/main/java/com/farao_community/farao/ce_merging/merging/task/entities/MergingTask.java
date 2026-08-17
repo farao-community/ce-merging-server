@@ -11,6 +11,7 @@ import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -113,7 +114,8 @@ public class MergingTask implements Serializable {
         this.artifacts = artifacts;
     }
 
-    public <T> T getArtifact(final ArtifactType artifactType, final Class<T> clazz) throws FileNotFoundException {
+    public <T> T getArtifact(final ArtifactType artifactType,
+                             final Class<T> clazz) throws FileNotFoundException {
         final String path = getArtifactPath(artifactType);
         return switch (artifactType.getFormat()) {
             case JSON -> JsonUtils.read(clazz, path);
@@ -140,15 +142,16 @@ public class MergingTask implements Serializable {
 
     public String getArtifactPath(final ArtifactType artifactType) {
         return Optional.ofNullable(artifacts.getFile(artifactType))
-            .map(SavedFile::getPath)
-            .orElse(null);
+                .map(SavedFile::getPath)
+                .orElse(null);
     }
 
     public File getArtifactFile(final ArtifactType artifactType) {
         return Paths.get(getArtifactPath(artifactType)).toFile();
     }
 
-    public void setArtifact(final ArtifactType artifactType, final SavedFile artifact) {
+    public void setArtifact(final ArtifactType artifactType,
+                            final SavedFile artifact) {
         artifacts.putFile(artifactType, artifact);
     }
 
@@ -176,6 +179,6 @@ public class MergingTask implements Serializable {
     }
 
     public SavedFile getIgmFile(final Country country) {
-        return  inputs.getIgm(country.toString()).getIgmFile();
+        return inputs.getIgm(country.toString()).getIgmFile();
     }
 }

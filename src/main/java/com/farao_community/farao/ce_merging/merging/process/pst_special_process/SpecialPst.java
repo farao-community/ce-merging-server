@@ -55,8 +55,8 @@ public enum SpecialPst {
         return isIdentifiedBy(idRegex).test(identifiable);
     }
 
-    public static Stream<SpecialPst> austrianSpecialPsts() {
-        return Stream.of(LIENZ, NAUDERS1, NAUDERS2);
+    public static void forAustrianPsts(final Consumer<SpecialPst> action) {
+        Stream.of(LIENZ, NAUDERS1, NAUDERS2).forEach(action);
     }
 
     public static <T> Map<SpecialPst, T> toPstMap(final Function<SpecialPst, T> valueMapper) {
