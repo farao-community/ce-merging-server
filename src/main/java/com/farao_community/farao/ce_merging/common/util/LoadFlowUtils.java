@@ -49,14 +49,14 @@ public final class LoadFlowUtils {
     }
 
     public static LoadFlowResult runLoadFlow(final Network network,
-                                   final Supplier<LoadFlow.Runner> runnerSupplier,
-                                   final LoadFlowParameters parameters) {
+                                             final Supplier<LoadFlow.Runner> runnerSupplier,
+                                             final LoadFlowParameters parameters) {
         return runLoadFlow(network, runnerSupplier, new LoadFlowRunParameters().setParameters(parameters));
     }
 
     public static LoadFlowResult runLoadFlow(final Network network,
-                                   final Supplier<LoadFlow.Runner> runnerSupplier,
-                                   final LoadFlowRunParameters runParameters) {
+                                             final Supplier<LoadFlow.Runner> runnerSupplier,
+                                             final LoadFlowRunParameters runParameters) {
         final String id = network.getId();
 
         final LoadFlowParameters parameters = runParameters.getLoadFlowParameters();
@@ -89,7 +89,7 @@ public final class LoadFlowUtils {
     }
 
     public static void runLoadFlowWithBalanceTypeCorrection(final Network network,
-                                                            final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
+                                                            final Supplier<LoadFlow.Runner> runnerSupplier,
                                                             final LoadFlowParameters parameters) {
 
         LoadFlowParameters actualParameters = parameters;
@@ -101,21 +101,16 @@ public final class LoadFlowUtils {
             actualParameters = withBalanceTypeLoad;
         }
 
-        runLoadFlow(network, loadFlowRunnerSupplier, actualParameters);
+        runLoadFlow(network, runnerSupplier, actualParameters);
     }
 
-    public static LoadFlowResult runLoadFlowWithLogs(Network network,
-                                                     Supplier<LoadFlow.Runner> loadFlowRunnerSupplier,
-                                                     LoadFlowParameters loadFlowParameters,
-                                                     ReportNode reportNode) {
-        loadFlowParameters.setReadSlackBus(true); // the loadflow will use the slack node of the network for compensation,
-        return runLoadFlow(
-                network,
-                loadFlowRunnerSupplier,
-                new LoadFlowRunParameters()
-                        .setParameters(loadFlowParameters)
-                        .setReportNode(reportNode)
-        );
+    public static LoadFlowResult runLoadFlowWithLogs(final Network network,
+                                                     final Supplier<LoadFlow.Runner> runnerSupplier,
+                                                     final LoadFlowParameters parameters,
+                                                     final ReportNode reportNode) {
+        parameters.setReadSlackBus(true); // the loadflow will use the slack node of the network for compensation,
+        final LoadFlowRunParameters runParameters = new LoadFlowRunParameters().setParameters(parameters).setReportNode(reportNode);
+        return runLoadFlow(network, runnerSupplier, runParameters);
     }
 
     private static boolean hasBalancedGeneration(final Network network) {

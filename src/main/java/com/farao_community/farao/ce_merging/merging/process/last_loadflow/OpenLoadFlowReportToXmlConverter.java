@@ -13,13 +13,10 @@ import com.powsybl.commons.report.TypedValue;
 
 import java.util.Optional;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toStringNoTz;
 import static java.time.LocalDateTime.now;
 
-/**
- * Converts an OpenLoadFlow {@link ReportNode} tree into the JAXB XML Logs structure.
- *
- */
 public final class OpenLoadFlowReportToXmlConverter {
     private static final String REPORT_SEVERITY = "reportSeverity";
 
@@ -35,7 +32,7 @@ public final class OpenLoadFlowReportToXmlConverter {
         }
 
         final Context rootContext = createContext(root.getMessage());
-        root.getChildren().forEach(child -> addRecordOrContext(child, rootContext, toStringNoTz(now())));
+        root.getChildren().forEach(child -> addRecordOrContext(child, rootContext, toStringNoTz(now(UTC_ZONE_ID))));
 
         logs.getCtxt().add(rootContext);
 
@@ -79,12 +76,12 @@ public final class OpenLoadFlowReportToXmlConverter {
     private static com.farao_community.farao.ce_merging.xsd.execution_logs.Record createRecord(final String timestamp,
                                                                                                final String level,
                                                                                                final String value) {
-        final com.farao_community.farao.ce_merging.xsd.execution_logs.Record record =
+        final com.farao_community.farao.ce_merging.xsd.execution_logs.Record logRecord =
                 new com.farao_community.farao.ce_merging.xsd.execution_logs.Record();
-        record.setDt(timestamp);
-        record.setLevel(level);
-        record.setValue(value);
-        return record;
+        logRecord.setDt(timestamp);
+        logRecord.setLevel(level);
+        logRecord.setValue(value);
+        return logRecord;
     }
 
 }
