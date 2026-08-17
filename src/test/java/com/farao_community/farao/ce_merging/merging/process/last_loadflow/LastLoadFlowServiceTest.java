@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.final_result;
+package com.farao_community.farao.ce_merging.merging.process.last_loadflow;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
@@ -30,6 +30,7 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
 import static com.powsybl.loadflow.LoadFlowResult.ComponentResult.Status.CONVERGED;
+import static java.util.Collections.emptySet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -40,11 +41,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.taskWithIdAndStatus;
 
-class FinalResultServiceTest {
+class LastLoadFlowServiceTest {
 
     private CeMergingConfiguration configuration;
     private LoadFlow.Runner loadFlowRunner;
-    private FinalResultService service;
+    private LastLoadFlowService service;
     private MergingTask task;
 
     @BeforeEach
@@ -52,7 +53,7 @@ class FinalResultServiceTest {
         configuration = mock(CeMergingConfiguration.class);
         loadFlowRunner = mock(LoadFlow.Runner.class);
         final XnodesCalculation xnodesCalculation = mock(XnodesCalculation.class);
-        service = new FinalResultService(configuration, () -> loadFlowRunner, xnodesCalculation);
+        service = new LastLoadFlowService(configuration, () -> loadFlowRunner, xnodesCalculation);
 
         task = taskWithIdAndStatus(1L, CREATED);
         task.getOutputs().setCgm(new SavedFile("cgm.xiidm", "/path/to/cgm.xiidm", "cgm"));
@@ -64,7 +65,7 @@ class FinalResultServiceTest {
         final Network network = mock(Network.class);
         final LoadFlowResult loadFlowResult = mock(LoadFlowResult.class);
         final LoadFlowResult.ComponentResult componentResult = mock(LoadFlowResult.ComponentResult.class);
-        when(network.getCountries()).thenReturn(Collections.emptySet());
+        when(network.getCountries()).thenReturn(emptySet());
         when(componentResult.getSynchronousComponentNum()).thenReturn(MAIN_NUM);
         when(componentResult.getStatus()).thenReturn(CONVERGED);
         when(componentResult.getSlackBusResults()).thenReturn(Collections.emptyList());
@@ -72,20 +73,20 @@ class FinalResultServiceTest {
         when(loadFlowResult.isOk()).thenReturn(true);
         when(loadFlowRunner.run(eq(network), any(LoadFlowRunParameters.class))).thenReturn(loadFlowResult);
 
-        try (MockedStatic<Network> networkMock = mockStatic(Network.class);
-             MockedStatic<FileStorageUtils> fileStorageUtilsMock = mockStatic(FileStorageUtils.class)) {
-            networkMock.when(() -> Network.read(anyString())).thenReturn(network);
+        try (final MockedStatic<Network> networkMock = mockStatic(Network.class);
+             final MockedStatic<FileStorageUtils> fsMock = mockStatic(FileStorageUtils.class)) {
 
-            service.computeCgmResults(task);
+            networkMock.when(() -> Network.read(anyString())).thenReturn(network);
+            service.runLoadFlowOnCgm(task);
 
             verify(loadFlowRunner).run(eq(network), any(LoadFlowRunParameters.class));
 
             final ArgumentCaptor<Logs> logsCaptor = ArgumentCaptor.forClass(Logs.class);
-            final ArgumentCaptor<FinalCgmResult> cgmResultCaptor = ArgumentCaptor.forClass(FinalCgmResult.class);
-            fileStorageUtilsMock.verify(() -> saveArtifactFile(eq(LOAD_FLOW_ON_FINAL_CGM_LOGS), logsCaptor.capture(),
-                                                               eq(task), eq(configuration)));
-            fileStorageUtilsMock.verify(() -> saveArtifactFile(eq(CGM_NET_POSITIONS_FILE), cgmResultCaptor.capture(),
-                                                               eq(task), eq(configuration)));
+            final ArgumentCaptor<LastLoadFlowResult> cgmResultCaptor = ArgumentCaptor.forClass(LastLoadFlowResult.class);
+            fsMock.verify(() -> saveArtifactFile(eq(LOAD_FLOW_ON_FINAL_CGM_LOGS), logsCaptor.capture(),
+                                                 eq(task), eq(configuration)));
+            fsMock.verify(() -> saveArtifactFile(eq(CGM_NET_POSITIONS_FILE), cgmResultCaptor.capture(),
+                                                 eq(task), eq(configuration)));
 
             assertThat(logsCaptor.getValue()).isNotNull();
             assertThat(cgmResultCaptor.getValue().getLoadFlowResults().getCgmFileName()).isEqualTo("cgm.xiidm");

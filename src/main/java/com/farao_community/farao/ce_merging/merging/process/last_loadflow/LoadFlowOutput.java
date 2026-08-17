@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.merging.process.final_result;
+package com.farao_community.farao.ce_merging.merging.process.last_loadflow;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,14 +22,14 @@ public class LoadFlowOutput {
     private double slackNodeGap;
 
     @JsonCreator
-    public LoadFlowOutput(@JsonProperty("cgmFileName") String cgmFileName,
-                           @JsonProperty("loadflowStatus") boolean loadflowStatus,
-                           @JsonProperty("loadflowMode") String loadflowMode,
-                           @JsonProperty("iterationNumber") int iterationNumber,
-                           @JsonProperty("componentNumber") int componentNumber,
-                           @JsonProperty("slackNode") String slackNode,
-                           @JsonProperty("slackCompensation") double slackCompensation,
-                           @JsonProperty("slackNodeGap") double slackNodeGap) {
+    public LoadFlowOutput(@JsonProperty("cgmFileName") final String cgmFileName,
+                          @JsonProperty("loadflowStatus") final boolean loadflowStatus,
+                          @JsonProperty("loadflowMode") final String loadflowMode,
+                          @JsonProperty("iterationNumber") final int iterationNumber,
+                          @JsonProperty("componentNumber") final int componentNumber,
+                          @JsonProperty("slackNode") final String slackNode,
+                          @JsonProperty("slackCompensation") final double slackCompensation,
+                          @JsonProperty("slackNodeGap") final double slackNodeGap) {
         this.cgmFileName = cgmFileName;
         this.loadflowStatus = loadflowStatus;
         this.loadflowMode = loadflowMode;
@@ -40,7 +40,7 @@ public class LoadFlowOutput {
         this.slackNodeGap = slackNodeGap;
     }
 
-    public LoadFlowOutput(@JsonProperty("cgmFileName") String cgmFileName) {
+    public LoadFlowOutput(@JsonProperty("cgmFileName") final String cgmFileName) {
         this(cgmFileName, false, "", 0, 0, "", 0.f, 0.f);
     }
 
@@ -105,20 +105,20 @@ public class LoadFlowOutput {
     }
 
     public static LoadFlowOutput from(final String fileName,
-                                       final String loadFlowMode,
-                                       final LoadFlowResult powsyblLfResult) {
+                                      final String loadFlowMode,
+                                      final LoadFlowResult loadFlowResult) {
         final LoadFlowOutput loadflowOutput = new LoadFlowOutput(fileName);
-        loadflowOutput.setLoadflowStatus(powsyblLfResult.isOk());
-        final LoadFlowResult.ComponentResult result = powsyblLfResult.getComponentResults().getFirst(); // result for the main component
+        loadflowOutput.setLoadflowStatus(loadFlowResult.isOk());
+        final LoadFlowResult.ComponentResult result = loadFlowResult.getComponentResults().getFirst(); // result for the main component
         loadflowOutput.setIterationNumber(result.getIterationCount());
         loadflowOutput.setComponentNumber(result.getConnectedComponentNum()); // default connected component Number: 0 == componentMode: ALL_CONNECTED
         loadflowOutput.setSlackCompensation(result.getDistributedActivePower());
         loadflowOutput.setSlackNode(result.getSlackBusResults().stream().findFirst()
-                                             .map(LoadFlowResult.SlackBusResult::getId)
-                                             .orElse("SLACK_NODE_NOT_FOUND"));
+                                            .map(LoadFlowResult.SlackBusResult::getId)
+                                            .orElse("SLACK_NODE_NOT_FOUND"));
         loadflowOutput.setSlackNodeGap(result.getSlackBusResults().stream().findFirst()
-                                                .map(LoadFlowResult.SlackBusResult::getActivePowerMismatch)
-                                                .orElse(0.));
+                                               .map(LoadFlowResult.SlackBusResult::getActivePowerMismatch)
+                                               .orElse(0.));
         loadflowOutput.setLoadflowMode(loadFlowMode);
 
         return loadflowOutput;

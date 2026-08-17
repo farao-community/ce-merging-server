@@ -16,6 +16,7 @@ import com.powsybl.iidm.network.VoltageLevel;
 import com.powsybl.iidm.network.extensions.SlackTerminal;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.loadflow.LoadFlowRunParameters;
 import com.powsybl.openloadflow.OpenLoadFlowProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -137,7 +138,7 @@ class SlackCompensationServiceTest {
 
         slackCompensationService.compensateFinalCgmSlackImbalance(task1);
 
-        verify(mockRunner).run(argThat(cgm -> cgm.getId().equals(cgmBeforeCompensation.getId())), any(LoadFlowParameters.class));
+        verify(mockRunner).run(argThat(cgm -> cgm.getId().equals(cgmBeforeCompensation.getId())), any(LoadFlowRunParameters.class));
     }
 
     private static Network createNetworkWithBus(final String busId) {

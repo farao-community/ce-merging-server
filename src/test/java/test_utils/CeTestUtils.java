@@ -27,6 +27,7 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
+import com.powsybl.loadflow.LoadFlowRunParameters;
 import org.assertj.core.api.ThrowableAssert;
 
 import java.io.File;
@@ -270,7 +271,9 @@ public final class CeTestUtils {
         when(result.getComponentResults()).thenReturn(singletonList(componentResult));
 
         when(mockRunner.run(any(Network.class), any(LoadFlowParameters.class))).thenReturn(result);
+        when(mockRunner.run(any(Network.class), any(LoadFlowRunParameters.class))).thenReturn(result);
 
         return mockRunner;
     }
+
 }
