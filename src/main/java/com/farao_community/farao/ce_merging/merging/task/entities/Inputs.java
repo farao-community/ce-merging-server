@@ -7,10 +7,11 @@
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
-import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeDeserializer;
-import com.farao_community.farao.ce_merging.common.util.OffsetDateTimeSerializer;
+import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeDeserializer;
+import com.farao_community.farao.ce_merging.common.serialize.OffsetDateTimeSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.powsybl.iidm.network.Country;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToOne;
@@ -62,6 +63,10 @@ public class Inputs implements Serializable {
             .findAny()
             .orElseThrow(() -> new TaskNotValidException(String.format("Task does not contain country '%s' IGM",
                                                                        country)));
+    }
+
+    public IgmData getIgm(final Country country) {
+        return getIgm(country.name());
     }
 
     public ZoneOffset getRealOffset() {

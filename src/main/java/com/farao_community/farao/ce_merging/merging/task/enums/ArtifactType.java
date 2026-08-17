@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.enums;
 
+import org.apache.commons.io.FilenameUtils;
+
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 
@@ -57,7 +59,24 @@ public enum ArtifactType {
         }
     }
 
+    public ArtifactFormat getFormat() {
+        return ArtifactFormat.of(fileName);
+    }
+
     public String getLocation(final long taskId) {
         return String.format("/tasks/%d/artifacts/%s", taskId, location);
+    }
+
+    public enum ArtifactFormat {
+        JSON,
+        XML,
+        XIIDM,
+        UCT;
+
+        public static ArtifactFormat of(final String fileName) {
+            final String extension = FilenameUtils.getExtension(fileName);
+            return valueOf(extension.toUpperCase());
+        }
+
     }
 }

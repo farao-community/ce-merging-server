@@ -7,16 +7,46 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.Identifiable;
-import com.powsybl.iidm.network.Terminal;
+import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Injection;
+import com.powsybl.iidm.network.Substation;
 
 import java.util.function.Predicate;
-import java.util.regex.Pattern;
+
+import static java.lang.Double.isNaN;
 
 public final class NetworkUtil {
 
     private NetworkUtil() {
         // utility
+    }
+
+    public static boolean hasActivePower(final Injection injection) {
+        return !isNaN(injection.getTerminal().getP());
+    }
+
+    public static double zeroIfNaN(final double value) {
+        return isNaN(value) ? 0 : value;
+    }
+
+    public static boolean isConnected(final Branch branch) {
+        return branch.getTerminal1().isConnected() && branch.getTerminal2().isConnected();
+    }
+
+    public static Predicate<Injection> isInCountry(final Country country) {
+        return i -> getCountry(i) == country;
+    }
+
+    public static Predicate<Branch> isConnectedTo(final String nodeId) {
+        return branch -> branch.getId().contains(nodeId);
+    }
+
+    public static Country getCountry(final Injection injection) {
+        return injection.getTerminal()
+            .getVoltageLevel()
+            .getSubstation()
+            .map(Substation::getNullableCountry)
+            .orElse(null);
     }
 
     public static Predicate<Identifiable<?>> isIdentifiedBy(final String idRegex) {

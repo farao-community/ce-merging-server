@@ -1,0 +1,13 @@
+{
+  "alegroInOutage" : false,
+  "aldeFlows" : {
+    "initialFlow" : 205.1999969482422,
+    "targetFlow" : 200.0,
+    "gapNpfInitialFlow" : -5.1999969482421875
+  },
+  "albeFlows" : {
+    "initialFlow" : -190.0,
+    "targetFlow" : -200.0,
+    "gapNpfInitialFlow" : -10.0
+  }
+}

@@ -1,0 +1,34 @@
+{
+      "name" : "CE",
+      "id" : "AREA_OF_CE_EIC",
+      "areasIn" : {
+        "N12" : "AREA_NUMBER12_EIC",
+        "N5" : "AREA_NUMBER5_EIC",
+        "N8" : "AREA_NUMBER8_EIC",
+        "N3" : "AREA_NUMBER3_EIC",
+        "N25" : "AREA_NUMBER25_EIC",
+        "N11" : "AREA_NUMBER11_EIC",
+        "N2" : "AREA_NUMBER2_EIC",
+        "N10" : "AREA_NUMBER10_EIC",
+        "N26" : "AREA_NUMBER26_EIC",
+        "N23" : "AREA_NUMBER23_EIC",
+        "N13" : "AREA_NUMBER13_EIC",
+        "N1" : "AREA_NUMBER1_EIC"
+      },
+      "areasOut" : {
+        "N24" : "AREA_NUMBER24_EIC",
+        "N27" : "AREA_NUMBER27_EIC",
+        "N19" : "AREA_NUMBER19_EIC",
+        "N6" : "AREA_NUMBER6_EIC",
+        "N21" : "AREA_NUMBER21_EIC",
+        "N9" : "AREA_NUMBER9_EIC",
+        "N22" : "AREA_NUMBER22_EIC",
+        "N16" : "AREA_NUMBER16_EIC",
+        "N14" : "AREA_NUMBER14_EIC",
+        "N15" : "AREA_NUMBER15_EIC",
+        "N20" : "AREA_NUMBER20_EIC",
+        "N7" : "AREA_NUMBER7_EIC",
+        "N18" : "AREA_NUMBER18_EIC",
+        "N4" : "AREA_NUMBER4_EIC"
+      }
+}

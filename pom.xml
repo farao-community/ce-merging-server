@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<!--
+  ~ Copyright (c) 2026, RTE (http://www.rte-france.com)
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  -->
+
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -11,8 +18,18 @@
     </parent>
 
     <artifactId>ce-merging-server</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <name>ce-merging-server</name>
+    <description>Server application for the CE merging process.</description>
+    <url>https://github.com/farao-community/ce-merging-server</url>
+
+    <scm>
+        <connection>scm:git:https://github.com/farao-community/ce-merging-server.git</connection>
+        <developerConnection>scm:git:https://github.com/farao-community/ce-merging-server.git</developerConnection>
+        <url>https://github.com/farao-community/ce-merging-server.git</url>
+    </scm>
 
     <properties>
         <sonar.exclusions>**/resources/**</sonar.exclusions>
@@ -32,15 +49,57 @@
                 <artifactId>jaxb2-maven-plugin</artifactId>
                 <executions>
                     <execution>
-                        <id>xjc</id>
+                        <id>bci</id>
                         <goals>
                             <goal>xjc</goal>
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/main/resources/xsd</source>
+                                <source>src/main/resources/xsd/bci</source>
                             </sources>
-                            <packageName>com.farao_community.farao.ce_merging.xsd</packageName>
+                            <arguments>
+                                <argument>-XautoNameResolution</argument>
+                            </arguments>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.bci</packageName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>xnodes</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/xsd/xnodes</source>
+                            </sources>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.xnodes</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb/xnodes</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>forecast_netpositions</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/xsd/forecast_netpositions</source>
+                            </sources>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.forecast_netpositions</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb/forecast_netpositions</outputDirectory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>glsk_fix</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/xsd/glsk_fix</source>
+                            </sources>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.glsk_fix</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb/glsk_fix</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

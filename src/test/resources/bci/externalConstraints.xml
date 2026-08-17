@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<FlowBasedExternalConstraintDocument DtdRelease="4" DtdVersion="0" xmlns="flowbased" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="flowbasedexternalconstraintdocument-06.xsd">
+  <DocumentIdentification v="17XTSO-CS------W-20190302-F229v1" />
+  <DocumentVersion v="1" />
+  <DocumentType v="Z06" />
+  <ProcessType v="A01" />
+  <SenderIdentification codingScheme="A01" v="GRID_OPERATOR" />
+  <SenderRole v="A36" />
+  <ReceiverIdentification codingScheme="A01" v="10X1001C--00003T" />
+  <ReceiverRole v="A44" />
+  <CreationDateTime v="2019-08-15T15:18:54Z" />
+  <ExternalConstraintTimeInterval v="2019-03-01T23:00Z/2019-03-02T23:00Z" />
+  <Domain codingScheme="A01" v="10YDOM-REGION-1V" />
+  <constraints>
+        <netPositionConstraint direction="EXPORT" hub="N12" id="2" name="N12_export" type="ABSOLUTE" value="9999" version="0">
+          <timeInterval v="2019-09-01T23:00Z/2019-03-02T23:00Z"/>
+          <tsoOrigin>N12</tsoOrigin>
+        </netPositionConstraint>
+        <netPositionConstraint direction="IMPORT" hub="N12" id="1" name="N12_import" type="ABSOLUTE" value="0" version="0">
+          <timeInterval v="2019-03-01T23:00Z/2019-03-02T23:00Z"/>
+          <tsoOrigin>N12</tsoOrigin>
+        </netPositionConstraint>
+        <netPositionConstraint direction="EXPORT" hub="N25" id="4" name="N25_export" type="ABSOLUTE" value="11285" version="0">
+          <timeInterval v="2019-03-01T23:00Z/2019-03-02T23:00Z"/>
+          <tsoOrigin>N25</tsoOrigin>
+        </netPositionConstraint>
+        <netPositionConstraint direction="IMPORT" hub="N25" id="3" name="N25_import" type="ABSOLUTE" value="0" version="0">
+          <timeInterval v="2019-03-01T23:00Z/2019-03-02T23:00Z"/>
+          <tsoOrigin>N25</tsoOrigin>
+        </netPositionConstraint>
+        <netPositionConstraint direction="EXPORT" hub="N26" id="6" name="N26_export" type="ABSOLUTE" value="11285" version="0">
+          <timeInterval v="2019-03-01T23:00Z/2019-03-02T23:00Z"/>
+          <tsoOrigin>N26</tsoOrigin>
+        </netPositionConstraint>
+        <netPositionConstraint direction="IMPORT" hub="N26" id="5" name="N26_import" type="ABSOLUTE" value="0" version="0">
+          <timeInterval v="2019-03-01T23:00Z/2019-03-02T23:00Z"/>
+          <tsoOrigin>N26</tsoOrigin>
+        </netPositionConstraint>
+  </constraints>
+</FlowBasedExternalConstraintDocument>

@@ -6,8 +6,11 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
-import com.powsybl.iidm.network.Country;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.powsybl.iidm.network.Network;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
@@ -16,10 +19,19 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.Serializable;
+import java.nio.file.Paths;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
+import java.util.Optional;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATETIME_FMT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.AUTO;
+import static java.util.Locale.FRANCE;
 
 /**
  * WARNING: this class is used by the merging supervisor (EMERGE).
@@ -101,6 +113,15 @@ public class MergingTask implements Serializable {
         this.artifacts = artifacts;
     }
 
+    public <T> T getArtifact(final ArtifactType artifactType, final Class<T> clazz) throws FileNotFoundException {
+        final String path = getArtifactPath(artifactType);
+        return switch (artifactType.getFormat()) {
+            case JSON -> JsonUtils.read(clazz, path);
+            case XML -> JaxbUtils.readFromPath(clazz, path);
+            case UCT, XIIDM -> clazz == Network.class ? (T) Network.read(path) : null; // NOSONAR this is a Network
+        };
+    }
+
     public Configurations getConfigurations() {
         return configurations;
     }
@@ -117,6 +138,39 @@ public class MergingTask implements Serializable {
         this.outputs = outputs;
     }
 
+    public String getArtifactPath(final ArtifactType artifactType) {
+        return Optional.ofNullable(artifacts.getFile(artifactType))
+            .map(SavedFile::getPath)
+            .orElse(null);
+    }
+
+    public File getArtifactFile(final ArtifactType artifactType) {
+        return Paths.get(getArtifactPath(artifactType)).toFile();
+    }
+
+    public void setArtifact(final ArtifactType artifactType, final SavedFile artifact) {
+        artifacts.putFile(artifactType, artifact);
+    }
+
+    @JsonIgnore
+    public OffsetDateTime getTargetDate() {
+        return inputs.getTargetDate();
+    }
+
+    public boolean hasPreTreatedIgm(final String country) {
+        return artifacts.getPreTreatedIgmMap().containsKey(country);
+    }
+
+    public String getOutputCgmFileName() {
+        final ZonedDateTime targetZdtParis = getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
+        final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
+
+        /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                Be careful when modifying this file name because it's interfaced with CCCTool
+           !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! */
+        return String.format("%s_2D%s_UX0.uct", dateAndTime, targetZdtParis.getDayOfWeek().getValue());
+    }
+
     public Network getIgm(final Country country) {
         return Network.read(getIgmFile(country).getPath());
     }
@@ -124,5 +178,4 @@ public class MergingTask implements Serializable {
     public SavedFile getIgmFile(final Country country) {
         return  inputs.getIgm(country.toString()).getIgmFile();
     }
-
 }

@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.powsybl.iidm.network.Country;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Transient;
@@ -39,7 +40,15 @@ public class Artifacts implements Serializable {
         return preTreatedIgmMap;
     }
 
-    public void setPreTreatedIgmMap(Map<String, SavedFile> preTreatedIgmMap) {
+    public SavedFile getPreTreatedIgm(final Country country) {
+        return getPreTreatedIgm(country.name());
+    }
+
+    public SavedFile getPreTreatedIgm(final String country) {
+        return preTreatedIgmMap.get(country);
+    }
+
+    public void setPreTreatedIgmMap(final Map<String, SavedFile> preTreatedIgmMap) {
         this.preTreatedIgmMap = preTreatedIgmMap;
     }
 

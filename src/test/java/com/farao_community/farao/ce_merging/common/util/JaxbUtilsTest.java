@@ -7,8 +7,8 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
-import com.farao_community.farao.ce_merging.xsd.Xnode;
-import com.farao_community.farao.ce_merging.xsd.Xnodes;
+import com.farao_community.farao.ce_merging.xsd.xnodes.Xnode;
+import com.farao_community.farao.ce_merging.xsd.xnodes.Xnodes;
 import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

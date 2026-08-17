@@ -9,15 +9,11 @@ package com.farao_community.farao.ce_merging.common;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Set;
 
 public final class CeMergingConstants {
 
-    private CeMergingConstants() {
-        // constants class
-    }
-
-    // Strings
+    // app configuration
+    public static final String TAG_VERSION = "1.0.0";
     public static final String CE_MERGING_URL = "/ce-merging/";
     public static final String API_VERSION = "v1";
     public static final String JSON_API_MIME_TYPE = "application/vnd.api+json";
@@ -36,38 +32,57 @@ public final class CeMergingConstants {
     public static final String ARTIFACTS_DIR = "artifacts";
     public static final String ARTIFACTS_TAG = "Artifacts";
     public static final String OUTPUTS_TAG = "Outputs";
-    public static final String MERGING_SUPERVISOR_TAG  = "Merging supervisor";
+    public static final String MERGING_SUPERVISOR_TAG = "Merging supervisor";
     public static final String TASK_MANAGEMENT_TAG = "Tasks management";
-    public static final String UCTE_FORMAT = "UCTE";
-    public static final String DK_COUNTRY_CODE = "D1";
-    public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
-    public static final String DK_HVDC_XNODES_PROPERTY = "dk.hvdc.xnodes";
-    public static final String DK_NAMING_STRATEGY = "DKNamingStrategy";
-    public static final String INPUTS_TAG = "Inputs";
     public static final String GLOBAL_CONFIGURATIONS_TAG = "Global Configurations";
     public static final String TASK_CONFIGURATIONS_TAG = "Task Configurations";
-    public static final String ID = "id";
-    public static final String NAME = "name";
-    public static final String CSV_SEPARATOR = ";";
-    public static final String ARROW = "->";
-    public static final String TAG_VERSION = "1.0.0";
-    public static final Set<String> GERMAN_AND_DANISH_TSO = Set.of("D1", "D2", "D4", "D6", "D7", "D8");
-    public static final Set<String> GERMAN_TSO = Set.of("D2", "D4", "D6", "D7", "D8");
+    public static final String INPUTS_TAG = "Inputs";
+    public static final String DK_HVDC_XNODES_PROPERTY = "dk.hvdc.xnodes";
+    public static final String DK_NAMING_STRATEGY = "DKNamingStrategy";
+    public static final String UCTE_EXPORT_NAMING_STRATEGY_PROPERTY = "ucte.export.naming-strategy";
+    public static final String MONITA_NAMING_STRATEGY = "MonitaNamingStrategy";
+    // nodes
+    public static final String ALEGRO_NODE_PREFIX = "XLI_OB1";
     public static final String VIRTUAL_HUB_ALEGRO_BE_NODE_NAME = "XLI_OB1B";
     public static final String VIRTUAL_HUB_ALEGRO_DE_NODE_NAME = "XLI_OB1A";
-    public static final String GERMAN_COUNTRY_CODE = "DE";
-    public static final String DANISH_TSO = "D1";
-    public static final String DENMARK_COUNTRY_CODE = "DK";
+    public static final String MONITA1_ME_NODE_NAME = "XKOTR120";
+    public static final String MONITA2_ME_NODE_NAME = "XKOTR220";
+    // formatting
+    public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
+    public static final String CSV_SEPARATOR = ";";
+    public static final String ARROW = "->";
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
-
+    // other strings
+    public static final String ID = "id";
+    public static final String NAME = "name";
+    public static final String VIRTUAL_HUB_ALEGRO_BE_CODE = "BE_ALEGrO";
+    public static final String VIRTUAL_HUB_ALEGRO_DE_CODE = "DE_ALEGrO";
+    public static final String VIRTUAL_HUB_ALEGRO_BE_EIC = "22Y201903144---9";
+    public static final String VIRTUAL_HUB_ALEGRO_DE_EIC = "22Y201903145---4";
+    public static final String ALEGRO_BE_NODE_NAME = "BE_AL";
+    public static final String ALEGRO_DE_NODE_NAME = "DE_AL";
+    public static final String DANISH_TSO = "D1";
+    public static final String UCTE_FORMAT = "UCTE";
+    public static final String XIIDM_FORMAT = "XIIDM";
+    public static final String DC = "DC";
+    public static final String AC = "AC";
+    public static final String REPORT_BASE_NAME = "i18n.reports";
+    public static final String SENDER_ID = "22XCORESO------S";
+    public static final String RECEIVER_ID = "17XTSO-CS------W";
+    public static final String CORE_REGION_ID = "10Y1001C--00059P";
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
-
+    public static final double MAX_FICTITIOUS_P = 9999.;
+    public static final double MAX_FICTITIOUS_Q = 99999.;
     // Date management
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
     public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
     public static final DateTimeFormatter FILENAME_DATETIME_FMT = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+
+    private CeMergingConstants() {
+        // constants class
+    }
 
 }

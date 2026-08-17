@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="bci" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns1="bci">
+  <xs:element name="FeasibilityRangeDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:DocumentIdentification"/>
+        <xs:element ref="ns1:DocumentVersion"/>
+        <xs:element ref="ns1:DocumentType"/>
+        <xs:element ref="ns1:SenderIdentification"/>
+        <xs:element ref="ns1:SenderRole"/>
+        <xs:element ref="ns1:ReceiverIdentification"/>
+        <xs:element ref="ns1:ReceiverRole"/>
+        <xs:element ref="ns1:CreationDateTime"/>
+        <xs:element ref="ns1:PublicationTimeInterval"/>
+        <xs:element ref="ns1:Constraints"/>
+      </xs:sequence>
+      <xs:attribute name="DtdRelease" use="required" type="xs:integer"/>
+      <xs:attribute name="DtdVersion" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DocumentIdentification">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DocumentVersion">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DocumentType">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SenderIdentification">
+    <xs:complexType>
+      <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+      <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SenderRole">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReceiverIdentification">
+    <xs:complexType>
+      <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+      <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReceiverRole">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreationDateTime">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:dateTime"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="PublicationTimeInterval">
+    <xs:complexType>
+      <xs:attribute name="v" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Constraints">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:FeasibilityRangeConstraint"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="FeasibilityRangeConstraint">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:Area"/>
+        <xs:element ref="ns1:Min"/>
+        <xs:element ref="ns1:Max"/>
+        <xs:element ref="ns1:Type"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Area">
+    <xs:complexType>
+      <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+      <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Min">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Max">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Type">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
