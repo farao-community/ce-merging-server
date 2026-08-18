@@ -137,8 +137,8 @@ class GermanMismatchCompensationServiceTest {
         assertEquals(3820, sumInitialNetPositionWithoutVirtualHubs, VALUE_TOLERANCE); //values from convergence
         assertEquals(otherWayToSumInitialNpWoVh, sumInitialNetPositionWithoutVirtualHubs, VALUE_TOLERANCE);
 
-        double sumInitialGeneration = sumProperty(getInjectionValues(results), GenerationAndLoadQuantity::generation);
-        double sumInitialLoad = sumProperty(getInjectionValues(results), GenerationAndLoadQuantity::load);
+        final double sumInitialGeneration = sumProperty(getInjectionValues(results), GenerationAndLoadQuantity::generation);
+        final double sumInitialLoad = sumProperty(getInjectionValues(results), GenerationAndLoadQuantity::load);
 
         assertEquals(-40, sumInitialGeneration, VALUE_TOLERANCE);
         assertEquals(1580, sumInitialLoad, VALUE_TOLERANCE);
@@ -153,17 +153,13 @@ class GermanMismatchCompensationServiceTest {
     }
 
     private double getInitialExternalNetPosition(final NetPositionsResults germanNetPositionResults) {
-        double sumInitialExternalNP = 0;
-        for (final GermanTso germanTso : GermanTso.values()) {
-            final String tso = germanTso.name();
-            final NetPositions tsoResult = germanNetPositionResults.get(tso);
-            Assertions.assertNotNull(tsoResult);
-            double tsoInternalNP = tsoResult.getGlobalDetailedExchanges().getOrDefault(DE.name(), 0.);
-            // we consider that all virtual hubs exchanges are external exchanges
-            double tsoExternalNP = tsoResult.getGlobalNetPosition().getWithoutVirtualHubs() - tsoInternalNP;
-            sumInitialExternalNP += tsoExternalNP;
-        }
-        return sumInitialExternalNP;
+        return GermanTso.stream()
+                .map(GermanTso::name)
+                .map(germanNetPositionResults::get)
+                .filter(Objects::nonNull)
+                .mapToDouble(res -> res.getGlobalNetPosition().getWithoutVirtualHubs()
+                                    - res.getGlobalDetailedExchanges().getOrDefault(DE.name(), 0.))
+                .sum();
     }
 
 }
