@@ -1,0 +1,185 @@
+{
+  "dailyTimeInterval" : "2020-05-04T22:00Z/2020-05-05T22:00Z",
+  "targetDateTime" : "2020-05-04T23:00Z",
+  "referenceExchangeDataList" : [ {
+    "areaOutId" : "AREA_NUMBER12_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : -1308
+  }, {
+    "areaOutId" : "AREA_NUMBER25_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : -2109
+  }, {
+    "areaOutId" : "AREA_NUMBER1_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : 5855
+  }, {
+    "areaOutId" : "AREA_NUMBER8_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : -4410
+  }, {
+    "areaOutId" : "AREA_NUMBER26_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : 0.0
+  }, {
+    "areaOutId" : "AREA_NUMBER2_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : 338
+  }, {
+    "areaOutId" : "AREA_NUMBER11_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : 702
+  }, {
+    "areaOutId" : "AREA_NUMBER5_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : 246
+  }, {
+    "areaOutId" : "AREA_NUMBER3_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : 173
+  }, {
+    "areaOutId" : "AREA_NUMBER13_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : 224
+  }, {
+    "areaOutId" : "AREA_NUMBER10_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : -111
+  }, {
+    "areaOutId" : "AREA_NUMBER23_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : 400
+  }, {
+    "areaOutId" : "AREA_NUMBER8_EIC",
+    "areaInId" : "AREA_NUMBER21_EIC",
+    "flow" : -1288
+  }, {
+    "areaOutId" : "AREA_NUMBER4_EIC",
+    "areaInId" : "AREA_NUMBER5_EIC",
+    "flow" : 0.0
+  }, {
+    "areaOutId" : "AREA_NUMBER4_EIC",
+    "areaInId" : "AREA_NUMBER3_EIC",
+    "flow" : 290
+  }, {
+    "areaOutId" : "AREA_NUMBER4_EIC",
+    "areaInId" : "AREA_NUMBER23_EIC",
+    "flow" : 0
+  }, {
+    "areaOutId" : "AREA_NUMBER6_EIC",
+    "areaInId" : "AREA_NUMBER8_EIC",
+    "flow" : 1261
+  }, {
+    "areaOutId" : "AREA_NUMBER6_EIC",
+    "areaInId" : "AREA_NUMBER11_EIC",
+    "flow" : -211
+  }, {
+    "areaOutId" : "AREA_NUMBER6_EIC",
+    "areaInId" : "AREA_NUMBER1_EIC",
+    "flow" : -2397
+  }, {
+    "areaOutId" : "AREA_NUMBER6_EIC",
+    "areaInId" : "AREA_NUMBER16_EIC",
+    "flow" : 1400
+  }, {
+    "areaOutId" : "AREA_NUMBER1_EIC",
+    "areaInId" : "AREA_NUMBER9_EIC",
+    "flow" : 1300
+  }, {
+    "areaOutId" : "AREA_NUMBER9_EIC",
+    "areaInId" : "AREA_NUMBER20_EIC",
+    "flow" : 484
+  }, {
+    "areaOutId" : "AREA_NUMBER16_EIC",
+    "areaInId" : "AREA_NUMBER13_EIC",
+    "flow" : 0
+  }, {
+    "areaOutId" : "AREA_NUMBER7_EIC",
+    "areaInId" : "AREA_NUMBER19_EIC",
+    "flow" : -509
+  }, {
+    "areaOutId" : "AREA_NUMBER7_EIC",
+    "areaInId" : "AREA_NUMBER23_EIC",
+    "flow" : -400
+  }, {
+    "areaOutId" : "AREA_NUMBER23_EIC",
+    "areaInId" : "AREA_NUMBER19_EIC",
+    "flow" : 350
+  }, {
+    "areaOutId" : "AREA_NUMBER7_EIC",
+    "areaInId" : "AREA_NUMBER3_EIC",
+    "flow" : 483
+  }, {
+    "areaOutId" : "AREA_NUMBER7_EIC",
+    "areaInId" : "AREA_NUMBER10_EIC",
+    "flow" : 301
+  }, {
+    "areaOutId" : "AREA_NUMBER7_EIC",
+    "areaInId" : "AREA_NUMBER27_EIC",
+    "flow" : 184
+  }, {
+    "areaOutId" : "AREA_NUMBER7_EIC",
+    "areaInId" : "AREA_NUMBER14_EIC",
+    "flow" : 106
+  }, {
+    "areaOutId" : "AREA_NUMBER7_EIC",
+    "areaInId" : "AREA_NUMBER24_EIC",
+    "flow" : 199
+  }, {
+    "areaOutId" : "AREA_NUMBER7_EIC",
+    "areaInId" : "AREA_NUMBER15_EIC",
+    "flow" : 231
+  }, {
+    "areaOutId" : "AREA_NUMBER15_EIC",
+    "areaInId" : "AREA_NUMBER19_EIC",
+    "flow" : -269
+  }, {
+    "areaOutId" : "AREA_NUMBER22_EIC",
+    "areaInId" : "AREA_NUMBER15_EIC",
+    "flow" : -300
+  }, {
+    "areaOutId" : "AREA_NUMBER22_EIC",
+    "areaInId" : "AREA_NUMBER19_EIC",
+    "flow" : -400
+  }, {
+    "areaOutId" : "AREA_NUMBER22_EIC",
+    "areaInId" : "AREA_NUMBER18_EIC",
+    "flow" : 0
+  }, {
+    "areaOutId" : "AREA_NUMBER22_EIC",
+    "areaInId" : "AREA_NUMBER24_EIC",
+    "flow" : -250
+  }, {
+    "areaOutId" : "AREA_NUMBER14_EIC",
+    "areaInId" : "AREA_NUMBER27_EIC",
+    "flow" : -214
+  }, {
+    "areaOutId" : "AREA_NUMBER14_EIC",
+    "areaInId" : "AREA_NUMBER24_EIC",
+    "flow" : 262
+  }, {
+    "areaOutId" : "AREA_NUMBER27_EIC",
+    "areaInId" : "AREA_NUMBER10_EIC",
+    "flow" : 402
+  }, {
+    "areaOutId" : "AREA_NUMBER1_EIC",
+    "areaInId" : "AREA_NUMBER16_EIC",
+    "flow" : 2776
+  }, {
+    "areaOutId" : "AREA_NUMBER16_EIC",
+    "areaInId" : "AREA_NUMBER11_EIC",
+    "flow" : 17
+  }, {
+    "areaOutId" : "AREA_NUMBER19_EIC",
+    "areaInId" : "AREA_NUMBER18_EIC",
+    "flow" : 30
+  }, {
+    "areaOutId" : "AREA_NUMBER17_EIC",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : 0
+  }, {
+    "areaOutId" : "22Y201903145---4",
+    "areaInId" : "AREA_OF_CE_EIC",
+    "flow" : 0
+  } ]
+}

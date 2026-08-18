@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="flowbased" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns1="flowbased">
+  <xs:element name="FlowBasedExternalConstraintDocument">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:DocumentIdentification"/>
+        <xs:element ref="ns1:DocumentVersion"/>
+        <xs:element ref="ns1:DocumentType"/>
+        <xs:element ref="ns1:ProcessType"/>
+        <xs:element ref="ns1:SenderIdentification"/>
+        <xs:element ref="ns1:SenderRole"/>
+        <xs:element ref="ns1:ReceiverIdentification"/>
+        <xs:element ref="ns1:ReceiverRole"/>
+        <xs:element ref="ns1:CreationDateTime"/>
+        <xs:element ref="ns1:ExternalConstraintTimeInterval"/>
+        <xs:element ref="ns1:Domain"/>
+        <xs:element ref="ns1:constraints"/>
+      </xs:sequence>
+      <xs:attribute name="DtdRelease" use="required" type="xs:integer"/>
+      <xs:attribute name="DtdVersion" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DocumentIdentification">
+    <xs:complexType>
+      <xs:attribute name="v" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DocumentVersion">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="DocumentType">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ProcessType">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SenderIdentification">
+    <xs:complexType>
+      <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+      <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="SenderRole">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReceiverIdentification">
+    <xs:complexType>
+      <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+      <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ReceiverRole">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CreationDateTime">
+    <xs:complexType>
+      <xs:attribute name="v" use="required" type="xs:dateTime"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ExternalConstraintTimeInterval">
+    <xs:complexType>
+      <xs:attribute name="v" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Domain">
+    <xs:complexType>
+      <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+      <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="constraints">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="ns1:netPositionConstraint"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="netPositionConstraint">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ns1:timeInterval"/>
+        <xs:element ref="ns1:tsoOrigin"/>
+      </xs:sequence>
+      <xs:attribute name="direction" use="required" type="xs:NCName"/>
+      <xs:attribute name="hub" use="required" type="xs:NCName"/>
+      <xs:attribute name="id" type="xs:string"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+      <xs:attribute name="type" use="required" type="xs:NCName"/>
+      <xs:attribute name="value" use="required" type="xs:integer"/>
+      <xs:attribute name="version" use="required" type="xs:integer"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="timeInterval">
+    <xs:complexType>
+      <xs:attribute name="v" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="tsoOrigin" type="xs:NCName"/>
+</xs:schema>

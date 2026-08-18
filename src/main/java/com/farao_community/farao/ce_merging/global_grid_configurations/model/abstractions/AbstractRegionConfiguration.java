@@ -101,4 +101,9 @@ public abstract class AbstractRegionConfiguration<T extends AbstractTsoInfos> {
         BiMap<String, String> biMapAreas = HashBiMap.create(getAreasAll());
         return biMapAreas.inverse();
     }
+
+    @JsonIgnore
+    public String getAreaInEic(final String eic) {
+        return areasIn.get(eic);
+    }
 }
