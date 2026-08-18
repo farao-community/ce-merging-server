@@ -152,7 +152,7 @@ class GermanMismatchCompensationServiceTest {
                 .map(NetPositions::getGenerationAndLoadQuantity);
     }
 
-    private Double getInitialExternalNetPosition(final NetPositionsResults germanNetPositionResults) {
+    private double getInitialExternalNetPosition(final NetPositionsResults germanNetPositionResults) {
         double sumInitialExternalNP = 0;
         for (final GermanTso germanTso : GermanTso.values()) {
             final String tso = germanTso.name();

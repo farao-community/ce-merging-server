@@ -45,8 +45,8 @@ import static java.util.function.Predicate.not;
 
 @Service
 public class GermanMismatchCompensationService {
-    private final NetPositionService netPositionService;
     private static final Logger LOGGER = LoggerFactory.getLogger(GermanMismatchCompensationService.class);
+    private final NetPositionService netPositionService;
     private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
     private final CeMergingConfiguration configuration;
 

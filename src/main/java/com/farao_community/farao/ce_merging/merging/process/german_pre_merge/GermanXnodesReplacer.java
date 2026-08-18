@@ -70,12 +70,11 @@ public final class GermanXnodesReplacer {
 
     private void createCorrespondingLines(final TieLine tieLine) {
         final String substationId = toGermanElementId(tieLine, SUBSTATION_ID_LENGTH);
-        final String voltageLevelId = toGermanElementId(tieLine, VOLTAGE_LEVEL_ID_LENGTH);
-        final Substation xNodeSubstation = Optional.ofNullable(network.getSubstation(substationId))
-                .orElse(getDefaultSubstation(substationId));
+        final Substation substation = network.getSubstation(substationId);
+        final VoltageLevel voltageLevel = network.getVoltageLevel(toGermanElementId(tieLine, VOLTAGE_LEVEL_ID_LENGTH));
 
-        final VoltageLevel xNodeVoltageLevel = Optional.ofNullable(network.getVoltageLevel(voltageLevelId))
-                .orElse(getDefaultVoltageLevel(tieLine, xNodeSubstation));
+        final Substation xNodeSubstation = substation != null ? substation : getDefaultSubstation(substationId);
+        final VoltageLevel xNodeVoltageLevel = voltageLevel != null ? voltageLevel : getDefaultVoltageLevel(tieLine, xNodeSubstation);
 
         final Bus xNodeBus = xNodeVoltageLevel.getBusBreakerView().newBus()
                 .setId(toGermanElementId(tieLine, BUS_ID_LENGTH))
