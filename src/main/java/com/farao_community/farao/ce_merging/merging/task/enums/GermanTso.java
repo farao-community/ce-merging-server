@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.task.enums;
 
 import java.util.Arrays;
+import java.util.stream.Stream;
 
 public enum GermanTso {
     D2,
@@ -17,5 +18,9 @@ public enum GermanTso {
 
     public static boolean includes(final String tsoCode) {
         return tsoCode != null && Arrays.stream(values()).map(GermanTso::name).anyMatch(tsoCode::equals);
+    }
+
+    public static Stream<GermanTso> stream() {
+        return Arrays.stream(values());
     }
 }

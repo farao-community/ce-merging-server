@@ -12,6 +12,10 @@ import java.time.format.DateTimeFormatter;
 
 public final class CeMergingConstants {
 
+    private CeMergingConstants() {
+        // constants class
+    }
+
     // app configuration
     public static final String TAG_VERSION = "1.0.0";
     public static final String CE_MERGING_URL = "/ce-merging/";
@@ -71,6 +75,7 @@ public final class CeMergingConstants {
     public static final String SENDER_ID = "22XCORESO------S";
     public static final String RECEIVER_ID = "17XTSO-CS------W";
     public static final String CORE_REGION_ID = "10Y1001C--00059P";
+    public static final String UCTE_IMPORT_CREATE_AREAS_KEY = "ucte.import.create-areas";
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;
@@ -80,9 +85,5 @@ public final class CeMergingConstants {
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
     public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
     public static final DateTimeFormatter FILENAME_DATETIME_FMT = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
-
-    private CeMergingConstants() {
-        // constants class
-    }
 
 }
