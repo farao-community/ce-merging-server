@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.last_load_flow;
+package com.farao_community.farao.ce_merging.merging.process.final_cgm_result;
 
 import com.farao_community.farao.ce_merging.xsd.execution_logs.Context;
 import com.farao_community.farao.ce_merging.xsd.execution_logs.Logs;

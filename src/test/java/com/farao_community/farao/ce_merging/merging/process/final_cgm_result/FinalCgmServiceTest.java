@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.last_load_flow;
+package com.farao_community.farao.ce_merging.merging.process.final_cgm_result;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
@@ -41,11 +41,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.taskWithIdAndStatus;
 
-class LastLoadFlowServiceTest {
+class FinalCgmServiceTest {
 
     private CeMergingConfiguration configuration;
     private LoadFlow.Runner loadFlowRunner;
-    private LastLoadFlowService service;
+    private FinalCgmService service;
     private MergingTask task;
 
     @BeforeEach
@@ -53,7 +53,7 @@ class LastLoadFlowServiceTest {
         configuration = mock(CeMergingConfiguration.class);
         loadFlowRunner = mock(LoadFlow.Runner.class);
         final XnodesCalculation xnodesCalculation = mock(XnodesCalculation.class);
-        service = new LastLoadFlowService(configuration, () -> loadFlowRunner, xnodesCalculation);
+        service = new FinalCgmService(configuration, () -> loadFlowRunner, xnodesCalculation);
 
         task = taskWithIdAndStatus(1L, CREATED);
         task.getOutputs().setCgm(new SavedFile("cgm.xiidm", "/path/to/cgm.xiidm", "cgm"));
@@ -77,12 +77,12 @@ class LastLoadFlowServiceTest {
              final MockedStatic<FileStorageUtils> fsMock = mockStatic(FileStorageUtils.class)) {
 
             networkMock.when(() -> Network.read(anyString())).thenReturn(network);
-            service.runLoadFlowOnCgm(task);
+            service.computeFinalCgmResult(task);
 
             verify(loadFlowRunner).run(eq(network), any(LoadFlowRunParameters.class));
 
             final ArgumentCaptor<Logs> logsCaptor = ArgumentCaptor.forClass(Logs.class);
-            final ArgumentCaptor<LastLoadFlowResult> cgmResultCaptor = ArgumentCaptor.forClass(LastLoadFlowResult.class);
+            final ArgumentCaptor<FinalCgmResult> cgmResultCaptor = ArgumentCaptor.forClass(FinalCgmResult.class);
             fsMock.verify(() -> saveArtifactFile(eq(LOAD_FLOW_ON_FINAL_CGM_LOGS), logsCaptor.capture(),
                                                  eq(task), eq(configuration)));
             fsMock.verify(() -> saveArtifactFile(eq(CGM_NET_POSITIONS_FILE), cgmResultCaptor.capture(),

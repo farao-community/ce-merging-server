@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.merging.process.last_load_flow;
+package com.farao_community.farao.ce_merging.merging.process.final_cgm_result;
 
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -14,14 +14,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 /**
  * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
  */
-public class LastLoadFlowResult {
+public class FinalCgmResult {
 
     private final LoadFlowOutput loadFlowOutput;
     private final NetPositionsResults netPositionsResults;
 
     @JsonCreator
-    public LastLoadFlowResult(@JsonProperty("loadflowResults") final LoadFlowOutput loadFlowOutput,
-                              @JsonProperty("netPositionsByCountryMap") final NetPositionsResults netPositionsResults) {
+    public FinalCgmResult(@JsonProperty("loadflowResults") final LoadFlowOutput loadFlowOutput,
+                          @JsonProperty("netPositionsByCountryMap") final NetPositionsResults netPositionsResults) {
         this.loadFlowOutput = loadFlowOutput;
         this.netPositionsResults = netPositionsResults;
     }

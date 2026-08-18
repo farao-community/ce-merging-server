@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.last_load_flow;
+package com.farao_community.farao.ce_merging.merging.process.final_cgm_result;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -32,7 +32,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REP
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getLoadFlowMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithLogs;
-import static com.farao_community.farao.ce_merging.merging.process.last_load_flow.OpenLoadFlowReportToXmlConverter.fromOlfReportToXmlLogs;
+import static com.farao_community.farao.ce_merging.merging.process.final_cgm_result.OpenLoadFlowReportToXmlConverter.fromOlfReportToXmlLogs;
 import static com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler.computeCountryNetPositions;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS;
@@ -40,23 +40,23 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static java.util.function.Predicate.not;
 
 @Service
-public class LastLoadFlowService {
+public class FinalCgmService {
 
     private static final String LOADFLOW_LOGS = "loadflow.logs";
-    private static final Logger LOGGER = LoggerFactory.getLogger(LastLoadFlowService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(FinalCgmService.class);
     private final CeMergingConfiguration configuration;
     private final Supplier<LoadFlow.Runner> runnerSupplier;
     private final XnodesCalculation xnodesCalculation;
 
-    public LastLoadFlowService(final CeMergingConfiguration configuration,
-                               final Supplier<LoadFlow.Runner> runnerSupplier,
-                               final XnodesCalculation xnodesCalculation) {
+    public FinalCgmService(final CeMergingConfiguration configuration,
+                           final Supplier<LoadFlow.Runner> runnerSupplier,
+                           final XnodesCalculation xnodesCalculation) {
         this.configuration = configuration;
         this.runnerSupplier = runnerSupplier;
         this.xnodesCalculation = xnodesCalculation;
     }
 
-    public void runLoadFlowOnCgm(final MergingTask task) {
+    public void computeFinalCgmResult(final MergingTask task) {
         try {
             final Configurations taskCfg = task.getConfigurations();
             final LoadFlowParameters loadFlowParameters = taskCfg.getLoadFlowParameters();
@@ -80,7 +80,7 @@ public class LastLoadFlowService {
 
             network.getCountries().forEach(country -> computeCountryNetPositions(country, network, taskCfg));
 
-            final LastLoadFlowResult cgmResult = new LastLoadFlowResult(loadflowOutput, netPositionsFile);
+            final FinalCgmResult cgmResult = new FinalCgmResult(loadflowOutput, netPositionsFile);
 
             saveArtifactFile(CGM_NET_POSITIONS_FILE, cgmResult, task, configuration);
             updateXnodesInformations(network, task);
