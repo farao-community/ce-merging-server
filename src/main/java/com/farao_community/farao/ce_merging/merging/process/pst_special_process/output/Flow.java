@@ -9,11 +9,14 @@ package com.farao_community.farao.ce_merging.merging.process.pst_special_process
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.powsybl.iidm.network.Branch;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
 
 import java.io.Serializable;
 import java.util.Optional;
 
+import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.getBoundaryP;
+import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.getPstTieLine;
 import static java.lang.Double.NaN;
 import static java.lang.Double.isNaN;
 
@@ -37,6 +40,14 @@ public class Flow implements Serializable {
     @JsonIgnore
     public void setCgmFlowFromBranch(final Branch<?> branch) {
         this.flowCGM = getBranchFlow(branch);
+    }
+
+    public void setCgmFlowFromTieLine(final String tieLineIdRegex, final Network cgm) {
+        this.flowCGM = getBranchFlow(getPstTieLine(tieLineIdRegex, cgm));
+    }
+
+    public void setIgmFlowFromDanglingLine(final String danglingLineIdRegex, final Network igm) {
+        this.flowIGM = getBoundaryP(danglingLineIdRegex, igm);
     }
 
     private double getBranchFlow(final Branch<?> branch) {
