@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.last_loadflow;
+package com.farao_community.farao.ce_merging.merging.process.last_load_flow;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -32,7 +32,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REP
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getLoadFlowMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithLogs;
-import static com.farao_community.farao.ce_merging.merging.process.last_loadflow.OpenLoadFlowReportToXmlConverter.fromOlfReportToXmlLogs;
+import static com.farao_community.farao.ce_merging.merging.process.last_load_flow.OpenLoadFlowReportToXmlConverter.fromOlfReportToXmlLogs;
 import static com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler.computeCountryNetPositions;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS;
