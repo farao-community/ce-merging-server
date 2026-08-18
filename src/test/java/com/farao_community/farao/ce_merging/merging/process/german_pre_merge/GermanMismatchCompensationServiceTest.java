@@ -20,7 +20,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +43,7 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.loadflow.LoadFlowParameters.ComponentMode.MAIN_CONNECTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static test_utils.CeTestUtils.stringPathOf;
 
 @SpringBootTest
@@ -95,14 +95,14 @@ class GermanMismatchCompensationServiceTest {
     }
 
     @Test
-    void applyMismatchTest() throws FileNotFoundException {
+    void shouldCompensateGermanMismatch() throws FileNotFoundException {
         final Network mergedNetwork = GermanPreMergeService.mergeGermanRegions(task);
         service.apply(task, mergedNetwork);
         checkInitialGermanNetPositions(task);
 
         loadFlowRunnerSupplier.get().run(mergedNetwork, configurations.getLoadFlowParameters());
         final NetPositions germanNetPositions = computeGermanNetPositions(mergedNetwork);
-        Assertions.assertNotNull(germanNetPositions);
+        assertNotNull(germanNetPositions);
         final GenerationAndLoadQuantity generationAndLoad = germanNetPositions.getGenerationAndLoadQuantity();
         final NetPositionsValues globalNetPosition = germanNetPositions.getGlobalNetPosition();
 
