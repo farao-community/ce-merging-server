@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
@@ -28,8 +29,13 @@ public final class DateTimeUtils {
     private static final DateTimeFormatter TARGET_DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withLocale(Locale.FRANCE);
     private static final DateTimeFormatter DAY_OF_WEEK_FORMATTER = DateTimeFormatter.ofPattern("e").withLocale(Locale.FRANCE);
     private static final int UTC_TIMEZONE_OFFSET = 0;
+    private static final DateTimeFormatter SIMPLE_DATETIME_NO_TIMEZONE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 
     private DateTimeUtils() {
+    }
+
+    public static String toStringNoTimeZone(final Temporal dateTime) {
+        return SIMPLE_DATETIME_NO_TIMEZONE_FORMATTER.format(dateTime);
     }
 
     public static String formatTargetDate(final MergingTask task) {

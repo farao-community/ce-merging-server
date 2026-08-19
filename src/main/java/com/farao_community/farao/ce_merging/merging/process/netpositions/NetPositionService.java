@@ -33,7 +33,7 @@ import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection;
-import static com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler.initHandler;
+import static com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler.computeCountryNetPositions;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.IGMS_NET_POSITIONS_FILE;
@@ -96,8 +96,7 @@ public class NetPositionService {
         final Network network = prepareNetwork(task, savedNetwork);
         final Country country = EntsoeGeographicalCode.valueOf(countryCode).getCountry();
 
-        final CountryNetPositionHandler handler = initHandler(country, network, task.getConfigurations());
-        return handler.computeNetPositions();
+        return computeCountryNetPositions(country, network, task.getConfigurations());
     }
 
     private Network prepareNetwork(final MergingTask task,
@@ -131,9 +130,9 @@ public class NetPositionService {
         final Network network = Network.read(igmFile.getPath());
         runLoadFlowWithBalanceTypeCorrection(network, loadFlowRunnerSupplier, loadFlowParameters);
         final NetPositionsResults netPositionsFile = new NetPositionsResults(
-                Map.of(DE.name(), initHandler(DE, network, task.getConfigurations()).computeNetPositions())
+                Map.of(DE.name(), computeCountryNetPositions(DE, network, task.getConfigurations()))
         );
-        return netPositionsFile.netPositionsByCountryMap().getOrDefault("DE", null);
+        return netPositionsFile.netPositionsByCountryMap().getOrDefault(DE.name(), null);
     }
 
 }

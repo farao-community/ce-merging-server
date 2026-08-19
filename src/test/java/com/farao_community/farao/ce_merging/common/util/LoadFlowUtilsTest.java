@@ -10,6 +10,7 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
+import com.powsybl.loadflow.LoadFlowRunParameters;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
@@ -49,14 +50,14 @@ class LoadFlowUtilsTest {
         when(mainComponentConverged.getStatus()).thenReturn(CONVERGED);
         when(convergeResult.getComponentResults()).thenReturn(Collections.singletonList(mainComponentConverged));
 
-        when(runner.run(eq(network), any(LoadFlowParameters.class)))
+        when(runner.run(eq(network), any(LoadFlowRunParameters.class)))
             .thenReturn(divergeResult)
             .thenReturn(convergeResult);
 
         assertDoesNotThrow(() -> LoadFlowUtils.runLoadFlow(network, runnerSupplier, parameters));
 
         assertFalse(parameters.isDc());
-        verify(runner, times(2)).run(eq(network), any(LoadFlowParameters.class));
+        verify(runner, times(2)).run(eq(network), any(LoadFlowRunParameters.class));
     }
 
     @Test
@@ -72,12 +73,12 @@ class LoadFlowUtilsTest {
 
         final LoadFlowResult divergeResult = mock(LoadFlowResult.class);
         when(divergeResult.getComponentResults()).thenReturn(Collections.emptyList());
-        when(runner.run(eq(network), any(LoadFlowParameters.class))).thenReturn(divergeResult);
+        when(runner.run(eq(network), any(LoadFlowRunParameters.class))).thenReturn(divergeResult);
 
         assertThatThrownBy(() -> LoadFlowUtils.runLoadFlow(network, runnerSupplier, parameters))
             .isValidServiceException()
             .hasMessageContaining("DC load flow diverged on network test-net");
 
-        verify(runner, times(2)).run(eq(network), any(LoadFlowParameters.class));
+        verify(runner, times(2)).run(eq(network), any(LoadFlowRunParameters.class));
     }
 }

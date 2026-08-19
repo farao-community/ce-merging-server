@@ -56,7 +56,7 @@ import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.Country.DK;
 import static java.util.stream.Collectors.toSet;
 
-public class CountryNetPositionHandler {
+public final class CountryNetPositionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(CountryNetPositionHandler.class);
     private final Map<String, Double> globalDetailedExchanges;
     private final Map<String, Double> virtualHubsExchanges;
@@ -74,12 +74,12 @@ public class CountryNetPositionHandler {
     private double regionPositionNoVh;
     private double outBciNetPosition;
 
-    public CountryNetPositionHandler(final RegionConfiguration regionConfiguration,
-                                     final Network network,
-                                     final Country country,
-                                     final List<VirtualHubRecord> virtualHubList,
-                                     final List<XnodeConfig> xnodeList,
-                                     final LoadFlowParameters.ComponentMode componentMode) {
+    private CountryNetPositionHandler(final RegionConfiguration regionConfiguration,
+                                      final Network network,
+                                      final Country country,
+                                      final List<VirtualHubRecord> virtualHubList,
+                                      final List<XnodeConfig> xnodeList,
+                                      final LoadFlowParameters.ComponentMode componentMode) {
         this.globalPosition = 0.;
         this.globalPositionNoVh = 0.;
         this.regionPosition = 0.;
@@ -107,15 +107,32 @@ public class CountryNetPositionHandler {
                 .collect(toSet());
     }
 
-    public static CountryNetPositionHandler initHandler(final Country country,
-                                                        final Network network,
-                                                        final Configurations configurations) {
-        return new CountryNetPositionHandler(configurations.getRegionConfiguration(),
-                                             network,
-                                             country,
-                                             configurations.getVirtualHubList(),
-                                             configurations.getXnodeList(),
-                                             getComponentMode(configurations.getLoadFlowParameters()));
+    public static NetPositions computeCountryNetPositions(final Country country,
+                                                          final Network network,
+                                                          final Configurations configurations) {
+        final CountryNetPositionHandler handler = new CountryNetPositionHandler(configurations.getRegionConfiguration(),
+                                                                                network,
+                                                                                country,
+                                                                                configurations.getVirtualHubList(),
+                                                                                configurations.getXnodeList(),
+                                                                                getComponentMode(configurations.getLoadFlowParameters()));
+
+        return handler.computeNetPositions();
+    }
+
+    private NetPositions computeNetPositions() {
+        fillNetPositionsFromDanglingLines();
+        fillNetPositionsFromLines();
+        fillNetPositionsFromVirtualHubNodes();
+        fillNetPositionsFromHvdcLines();
+
+        return new NetPositions(new NetPositionsValues(globalPosition, globalPositionNoVh),
+                                new NetPositionsValues(regionPosition, regionPositionNoVh),
+                                outBciNetPosition,
+                                virtualHubsExchanges,
+                                globalDetailedExchanges,
+                                new GenerationAndLoadQuantity(-sumOverCountry(network.getGeneratorStream()),
+                                                              sumOverCountry(network.getLoadStream())));
     }
 
     //In the xnode config, the xnodes with area DE should have a subarea to differentiate DE and DK
@@ -145,21 +162,6 @@ public class CountryNetPositionHandler {
     private static void updateIfKosovoXnode(final XnodeConfig xnode) {
         xnode.setArea1(CountryUtils.mapKsToXk(xnode.getArea1()));
         xnode.setArea2(CountryUtils.mapKsToXk(xnode.getArea2()));
-    }
-
-    public NetPositions computeNetPositions() {
-        fillNetPositionsFromDanglingLines();
-        fillNetPositionsFromLines();
-        fillNetPositionsFromVirtualHubNodes();
-        fillNetPositionsFromHvdcLines();
-
-        return new NetPositions(new NetPositionsValues(globalPosition, globalPositionNoVh),
-                                new NetPositionsValues(regionPosition, regionPositionNoVh),
-                                outBciNetPosition,
-                                virtualHubsExchanges,
-                                globalDetailedExchanges,
-                                new GenerationAndLoadQuantity(-sumOverCountry(network.getGeneratorStream()),
-                                                              sumOverCountry(network.getLoadStream())));
     }
 
     private double sumOverCountry(final Stream<? extends Injection<?>> injectionStream) {
