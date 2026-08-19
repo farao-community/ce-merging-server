@@ -41,7 +41,6 @@ import java.util.stream.Stream;
 import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumProperty;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE;
 import static com.powsybl.iidm.network.Country.DE;
-import static com.powsybl.loadflow.LoadFlowParameters.ComponentMode.MAIN_CONNECTED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static test_utils.CeTestUtils.stringPathOf;
@@ -113,14 +112,7 @@ class GermanMismatchCompensationServiceTest {
     }
 
     private NetPositions computeGermanNetPositions(final Network mergedNetwork) {
-        final CountryNetPositionHandler handler = new CountryNetPositionHandler(configurations.getRegionConfiguration(),
-                                                                                mergedNetwork,
-                                                                                DE,
-                                                                                configurations.getVirtualHubList(),
-                                                                                configurations.getXnodeList(),
-                                                                                MAIN_CONNECTED);
-
-        return handler.computeNetPositions();
+        return CountryNetPositionHandler.computeCountryNetPositions(DE, mergedNetwork, configurations);
     }
 
     private void checkInitialGermanNetPositions(final MergingTask task) throws FileNotFoundException {
