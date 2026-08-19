@@ -14,7 +14,7 @@ import com.powsybl.commons.report.TypedValue;
 import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
-import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toStringNoTz;
+import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toStringNoTimeZone;
 import static java.time.LocalDateTime.now;
 
 public final class OpenLoadFlowReportToXmlConverter {
@@ -32,7 +32,7 @@ public final class OpenLoadFlowReportToXmlConverter {
         }
 
         final Context rootContext = createContext(root.getMessage());
-        root.getChildren().forEach(child -> addRecordOrContext(child, rootContext, toStringNoTz(now(UTC_ZONE_ID))));
+        root.getChildren().forEach(child -> addRecordOrContext(child, rootContext, toStringNoTimeZone(now(UTC_ZONE_ID))));
 
         logs.getCtxt().add(rootContext);
 

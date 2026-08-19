@@ -109,7 +109,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/main/resources/xsd/exec_logs/exec-logs.xsd</source>
+                                <source>src/main/resources/xsd/final_cgm_result/exec-logs.xsd</source>
                             </sources>
                             <packageName>com.farao_community.farao.ce_merging.xsd.execution_logs</packageName>
                             <outputDirectory>${project.build.directory}/generated-sources/jaxb/exec_logs</outputDirectory>

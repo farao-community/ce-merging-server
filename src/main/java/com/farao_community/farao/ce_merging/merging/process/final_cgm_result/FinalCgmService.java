@@ -58,8 +58,8 @@ public class FinalCgmService {
 
     public void computeFinalCgmResult(final MergingTask task) {
         try {
-            final Configurations taskCfg = task.getConfigurations();
-            final LoadFlowParameters loadFlowParameters = taskCfg.getLoadFlowParameters();
+            final Configurations taskConfiguration = task.getConfigurations();
+            final LoadFlowParameters loadFlowParameters = taskConfiguration.getLoadFlowParameters();
             final NetPositionsResults netPositionsFile = new NetPositionsResults();
 
             final SavedFile cgm = task.getOutputs().getCgm();
@@ -78,7 +78,7 @@ public class FinalCgmService {
 
             saveArtifactFile(LOAD_FLOW_ON_FINAL_CGM_LOGS, fromOlfReportToXmlLogs(rootReportNode), task, configuration);
 
-            network.getCountries().forEach(country -> computeCountryNetPositions(country, network, taskCfg));
+            network.getCountries().forEach(country -> computeCountryNetPositions(country, network, taskConfiguration));
 
             final FinalCgmResult cgmResult = new FinalCgmResult(loadflowOutput, netPositionsFile);
 

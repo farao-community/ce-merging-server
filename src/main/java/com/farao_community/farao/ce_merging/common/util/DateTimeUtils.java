@@ -34,7 +34,7 @@ public final class DateTimeUtils {
     private DateTimeUtils() {
     }
 
-    public static String toStringNoTz(final Temporal dateTime) {
+    public static String toStringNoTimeZone(final Temporal dateTime) {
         return SIMPLE_DATETIME_NO_TIMEZONE_FORMATTER.format(dateTime);
     }
 
