@@ -26,12 +26,11 @@ import static com.powsybl.iidm.network.PhaseTapChanger.RegulationMode.ACTIVE_POW
 import static java.lang.Double.isNaN;
 
 public final class PstUtils {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PstUtils.class);
 
     private PstUtils() {
         throw new AssertionError("Utility class should not be constructed");
     }
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(PstUtils.class);
 
     private static final String GENERIC_PROCEDURE_MESSAGE = "Special PST procedure %d was applied";
     private static final Map<Integer, String> PROCEDURE_DETAIL_BY_NUMBER = Map.of(
@@ -88,12 +87,11 @@ public final class PstUtils {
         return getPstIdentifiable(idRegex, network.getTieLineStream());
     }
 
-    public static <T extends Identifiable<?>> T getPstIdentifiable(final String idRegex, final Stream<T> stream) {
+    public static <T extends Identifiable> T getPstIdentifiable(final String idRegex, final Stream<T> stream) {
         final T identifiable = stream.filter(isIdentifiedBy(idRegex)).findFirst().orElse(null);
 
         if (identifiable == null) {
-            LOGGER.warn("Cannot find element matching the regex: '{}', default flow value 0 will be used",
-                        idRegex);
+            LOGGER.warn("Cannot find element matching the regex: '{}'", idRegex);
         }
 
         return identifiable;

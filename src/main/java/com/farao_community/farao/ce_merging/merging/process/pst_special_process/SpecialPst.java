@@ -8,6 +8,8 @@ package com.farao_community.farao.ce_merging.merging.process.pst_special_process
 
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Identifiable;
+import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.TwoWindingsTransformer;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -33,7 +35,9 @@ public enum SpecialPst {
     private final String idRegex;
     private final Country country;
 
-    SpecialPst(final String fullName, final String idRegex, final Country country) {
+    SpecialPst(final String fullName,
+               final String idRegex,
+               final Country country) {
         this.fullName = fullName;
         this.idRegex = idRegex;
         this.country = country;
@@ -55,15 +59,24 @@ public enum SpecialPst {
         return isIdentifiedBy(idRegex).test(identifiable);
     }
 
+    public TwoWindingsTransformer findInNetwork(final Network network) {
+        return network.getTwoWindingsTransformerStream()
+                .filter(this::matches)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static <T> Map<SpecialPst, T> toPstMap(final Function<SpecialPst, T> valueMapper) {
+        return Arrays.stream(values())
+                .filter(pst -> valueMapper.apply(pst) != null)
+                .collect(Collectors.toMap(identity(), valueMapper));
+    }
+
     public static void forAustrianPsts(final Consumer<SpecialPst> action) {
         Stream.of(LIENZ, NAUDERS1, NAUDERS2).forEach(action);
     }
 
-    public static <T> Map<SpecialPst, T> toPstMap(final Function<SpecialPst, T> valueMapper) {
-        return Arrays.stream(SpecialPst.values()).collect(Collectors.toMap(identity(), valueMapper));
-    }
-
     public static void forAllSpecialPst(final Consumer<SpecialPst> action) {
-        Arrays.stream(SpecialPst.values()).forEach(action);
+        Arrays.stream(values()).forEach(action);
     }
 }

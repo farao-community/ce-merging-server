@@ -36,9 +36,10 @@ import static com.farao_community.farao.ce_merging.merging.process.pst_special_p
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.PADRICIANO;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.PST_OUTPUT_FILE;
-import static java.lang.Double.NaN;
+import static java.lang.Double.isNaN;
 import static java.nio.file.Files.createDirectories;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static test_utils.TaskTestUtils.setLoadflowParameters;
 
 @SpringBootTest
@@ -141,8 +142,8 @@ class PstSpecialServiceTest {
         assertEquals(0., result.getTotalTargetFlowDivaca());
         assertEquals(0., result.getTargetFlowDivacaPadriciano());
         assertEquals(0., result.getTargetFlowDivacaRedipuglia());
-        assertEquals(NaN, result.getTap(DIVACA).getTapIGM());
-        assertEquals(NaN, result.getTap(DIVACA).getTapCGM());
+        assertTrue(isNaN(result.getTap(DIVACA).getTapIGM()));
+        assertTrue(isNaN(result.getTap(DIVACA).getTapCGM()));
         assertEquals(-6., result.getTap(PADRICIANO).getTapIGM());
         assertEquals(0., result.getTap(PADRICIANO).getTapCGM());
     }

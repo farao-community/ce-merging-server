@@ -53,10 +53,9 @@ import static com.powsybl.iidm.network.util.Networks.applySolvedTapPositionAndSo
 
 @Service
 public class PstSpecialService {
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(PstSpecialService.class);
     private final CeMergingConfiguration configuration;
     private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
-    private static final Logger LOGGER = LoggerFactory.getLogger(PstSpecialService.class);
 
     private static final String DIVACA_PADRICIANO_DANGLING_LINE = "LDIVAC2[0-9A-Z] XPA_DI21 1";
     private static final String DIVACA_REDIPULGIA_DANGLING_LINE = "LDIVAC1[0-9A-Z] XRE_DI11 1";
@@ -72,44 +71,7 @@ public class PstSpecialService {
 
     public void fixPst(final MergingTask task) {
         try {
-            // prepare all the data
-            final LoadFlowParameters lfParameters = task.getConfigurations().getLoadFlowParameters();
-            final SavedFile cgmFile = task.getArtifacts().getFile(BALANCED_CGM_FILE);
-            final Network cgm = Network.read(cgmFile.getPath());
-            final PstOutput pstOutput = new PstOutput();
-
-            final Map<SpecialPst, TwoWindingsTransformer> pstsInIgms = toPstMap(pst -> getIgmPst(pst, task));
-            final Map<SpecialPst, String> pstIds = toPstMap(
-                    pst -> Optional.ofNullable(pstsInIgms.get(pst)).map(TwoWindingsTransformer::getId).orElse("")
-            );
-
-            fillPstOutputsFromIgms(task, pstIds, pstOutput, lfParameters);
-
-            // handle IT-SI border Special PSTs
-            final TwoWindingsTransformer divaca = cgm.getTwoWindingsTransformer(pstIds.get(DIVACA));
-            final TwoWindingsTransformer padriciano = cgm.getTwoWindingsTransformer(pstIds.get(PADRICIANO));
-
-            if (isInOutage(divaca) && isInOutage(padriciano)) {
-                pstOutput.setAndLogProcedure(DIVACA, 3);
-            } else if (hasTargetFlow(divaca)) {
-                applyProcess2(divaca, padriciano, pstOutput);
-            } else {
-                applyProcess1(padriciano, pstOutput);
-            }
-
-            // handle AT Special PSTs
-            final Network austria = task.getIgm(AT);
-            applyLienzProcess(cgm.getTwoWindingsTransformer(pstIds.get(LIENZ)), pstOutput, austria);
-            applyNaudersProcess(cgm.getTwoWindingsTransformer(pstIds.get(NAUDERS1)),
-                                cgm.getTwoWindingsTransformer(pstIds.get(NAUDERS2)),
-                                pstOutput,
-                                austria);
-            fillPstOutputsFromCgm(cgm, pstIds, pstOutput, lfParameters);
-
-            // save results
-            saveArtifactFile(PST_OUTPUT_FILE, pstOutput, task, configuration);
-            saveArtifactNetwork(CGM_FILE_AFTER_PST, cgm, task, UCTE_FORMAT, configuration);
-
+            doFixPst(task);
         } catch (final Exception e) {
             final String errorMessage = String.format("Error during fix PST special process for task '%d', cause : %s",
                                                       task.getId(), e.getMessage());
@@ -118,36 +80,62 @@ public class PstSpecialService {
         }
     }
 
-    private TwoWindingsTransformer getIgmPst(final SpecialPst pst,
-                                             final MergingTask task) {
-        final TwoWindingsTransformer twoWindingsTransformer = task.getIgm(pst.getCountry())
-                .getTwoWindingsTransformerStream()
-                .filter(pst::matches)
-                .findFirst()
-                .orElse(null);
+    private void doFixPst(final MergingTask task) {
+        // prepare all the data
+        final LoadFlowParameters loadFlowParameters = task.getConfigurations().getLoadFlowParameters();
+        final SavedFile cgmFile = task.getArtifacts().getFile(BALANCED_CGM_FILE);
+        final Network cgm = Network.read(cgmFile.getPath());
+        final PstOutput pstOutput = new PstOutput();
 
-        if (twoWindingsTransformer == null) {
-            LOGGER.warn("PST {} is not present in network of {}", pst.getFullName(), pst.getCountry().getName());
-        }
+        final Map<SpecialPst, TwoWindingsTransformer> pstsInIgms = toPstMap(
+                pst -> pst.findInNetwork(task.getIgm(pst.getCountry()))
+        );
+        final Map<SpecialPst, String> pstIds = toPstMap(pst -> pstsInIgms.get(pst).getId());
 
-        return twoWindingsTransformer;
+        fillPstOutputsFromIgms(task, pstIds, pstOutput, loadFlowParameters);
+
+        // handle IT-SI border Special PSTs
+        applyDivacaPadricianoProcess(cgm.getTwoWindingsTransformer(pstIds.get(DIVACA)),
+                                     cgm.getTwoWindingsTransformer(pstIds.get(PADRICIANO)),
+                                     pstOutput);
+
+        // handle AT Special PSTs
+        final Network austria = task.getIgm(AT);
+        applyLienzProcess(cgm.getTwoWindingsTransformer(pstIds.get(LIENZ)), pstOutput, austria);
+        applyNaudersProcess(cgm.getTwoWindingsTransformer(pstIds.get(NAUDERS1)),
+                            cgm.getTwoWindingsTransformer(pstIds.get(NAUDERS2)),
+                            pstOutput,
+                            austria);
+
+        // save results
+        fillPstOutputsFromCgm(cgm, pstIds, pstOutput, loadFlowParameters);
+        saveArtifactFile(PST_OUTPUT_FILE, pstOutput, task, configuration);
+        saveArtifactNetwork(CGM_FILE_AFTER_PST, cgm, task, UCTE_FORMAT, configuration);
+
     }
 
-    private void applyProcess1(final TwoWindingsTransformer padriciano,
-                               final PstOutput pstOutput) {
-        pstOutput.setAndLogProcedure(DIVACA, 1);
-        pstOutput.setTotalTargetFlowDivaca(0);
-        pstOutput.setTargetFlowDivacaPadriciano(0);
-        pstOutput.setTargetFlowDivacaRedipuglia(0);
-        if (!isInOutage(padriciano)) {
-            Optional.ofNullable(padriciano.getPhaseTapChanger())
-                    .ifPresent(changer -> changer.setTapPosition(0));
+    private void applyDivacaPadricianoProcess(final TwoWindingsTransformer divaca,
+                                              final TwoWindingsTransformer padriciano,
+                                              final PstOutput pstOutput) {
+        if (isInOutage(divaca) && isInOutage(padriciano)) {
+            pstOutput.setAndLogProcedure(DIVACA, 3);
+        } else if (hasTargetFlow(divaca)) {
+            divacaTargetFlowProcess(divaca, padriciano, pstOutput);
+        } else {
+            pstOutput.setAndLogProcedure(DIVACA, 1);
+            pstOutput.setTotalTargetFlowDivaca(0);
+            pstOutput.setTargetFlowDivacaPadriciano(0);
+            pstOutput.setTargetFlowDivacaRedipuglia(0);
+            if (!isInOutage(padriciano)) {
+                Optional.ofNullable(padriciano.getPhaseTapChanger())
+                        .ifPresent(changer -> changer.setTapPosition(0));
+            }
         }
     }
 
-    private void applyProcess2(final TwoWindingsTransformer divaca,
-                               final TwoWindingsTransformer padriciano,
-                               final PstOutput pstOutput) {
+    private void divacaTargetFlowProcess(final TwoWindingsTransformer divaca,
+                                         final TwoWindingsTransformer padriciano,
+                                         final PstOutput pstOutput) {
         // minus because in the XIIDM model :
         //      - regulation value follows load convention
         //      - target flow follows UCTE generator convention
@@ -168,7 +156,7 @@ public class PstSpecialService {
             divacaToPadriciano = DIVACA_PADRICIANO_TARGET_FLOW;
             divacaToRedipulgia = 0;
             regulatePst(padriciano, divacaToPadriciano);
-            LOGGER.info("PST Divaca is in outage");
+            LOGGER.info("PST Divača is in outage");
         } else {
             divacaToRedipulgia = totalDivacaFlow - DIVACA_PADRICIANO_TARGET_FLOW;
             divacaToPadriciano = DIVACA_PADRICIANO_TARGET_FLOW;
@@ -181,7 +169,7 @@ public class PstSpecialService {
     }
 
     private void applyLienzProcess(final TwoWindingsTransformer lienz,
-                                   final PstOutput output,
+                                   final PstOutput pstOutput,
                                    final Network austrianGrid) {
 
         Integer procedure = null;
@@ -195,25 +183,25 @@ public class PstSpecialService {
                 setPstRegulating(lienz, false);
             } else {
                 setPstRegulating(lienz, true);
-                output.setTargetFlowLipst(-getTargetFlow(lienz));
+                pstOutput.setTargetFlowLipst(-getTargetFlow(lienz));
                 procedure = 5;
             }
         }
 
-        Optional.ofNullable(procedure).ifPresent(nb -> output.setAndLogProcedure(LIENZ, nb));
+        Optional.ofNullable(procedure).ifPresent(nb -> pstOutput.setAndLogProcedure(LIENZ, nb));
     }
 
     private void applyNaudersProcess(final TwoWindingsTransformer nrpst21,
                                      final TwoWindingsTransformer nrpst22,
-                                     final PstOutput output,
+                                     final PstOutput pstOutput,
                                      final Network austrianGrid) {
         final boolean pst21OutInCgm = isInOutage(nrpst21);
         final boolean pst22OutInCgm = isInOutage(nrpst22);
 
         if (pst21OutInCgm && pst22OutInCgm) {
-            output.setAndLogProcedure(NAUDERS1, 10);
+            pstOutput.setAndLogProcedure(NAUDERS1, 10);
         } else if (!hasTargetFlow(nrpst21) || !hasTargetFlow(nrpst22)) {
-            output.setAndLogProcedure(NAUDERS1, 7);
+            pstOutput.setAndLogProcedure(NAUDERS1, 7);
         } else if (!pst21OutInCgm && !pst22OutInCgm) {
             // if out in IGM
             if (isInOutage(getPstBranch(NAUDERS1, austrianGrid)) || isInOutage(getPstBranch(NAUDERS2, austrianGrid))) {
@@ -228,18 +216,18 @@ public class PstSpecialService {
             } else {
                 halveRegulationValue(nrpst21);
                 halveRegulationValue(nrpst22);
-                output.setAndLogProcedure(NAUDERS1, 8);
-                output.setTargetFlowNrpst21(-getTargetFlow(nrpst21));
-                output.setTargetFlowNrpst22(-getTargetFlow(nrpst22));
+                pstOutput.setAndLogProcedure(NAUDERS1, 8);
+                pstOutput.setTargetFlowNrpst21(-getTargetFlow(nrpst21));
+                pstOutput.setTargetFlowNrpst22(-getTargetFlow(nrpst22));
             }
         } else if (!pst21OutInCgm) {
             setPstRegulating(nrpst21, true);
-            output.setAndLogProcedure(NAUDERS1, 9);
-            output.setTargetFlowNrpst21(-getTargetFlow(nrpst21));
+            pstOutput.setAndLogProcedure(NAUDERS1, 9);
+            pstOutput.setTargetFlowNrpst21(-getTargetFlow(nrpst21));
         } else {
             setPstRegulating(nrpst22, true);
-            output.setAndLogProcedure(NAUDERS2, 9);
-            output.setTargetFlowNrpst22(-getTargetFlow(nrpst22));
+            pstOutput.setAndLogProcedure(NAUDERS2, 9);
+            pstOutput.setTargetFlowNrpst22(-getTargetFlow(nrpst22));
         }
     }
 
