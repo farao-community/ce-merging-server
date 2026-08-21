@@ -11,7 +11,6 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
-import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroData;
 import com.farao_community.farao.ce_merging.merging.process.target_net_positions.balances_adjustment.AreaNetPosition;
@@ -33,7 +32,7 @@ import static com.farao_community.farao.ce_merging.merging.process.base_case_imp
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BCI_OUTPUT_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.IGMS_NET_POSITIONS_FILE;import static com.powsybl.iidm.network.Country.BE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.IGMS_NET_POSITIONS_FILE;
 
 @Service
 public class TargetNetPositionsCalculationService {
@@ -81,7 +80,7 @@ public class TargetNetPositionsCalculationService {
         final FlowByAreaMap adjustedOutBciNetPositions = initialNetPosition.netPositionsByCountryMap()
                 .entrySet().stream()
                 .collect(toFlowByAreaMap(Map.Entry::getKey,
-                                         e-> calculateOutBciNetPosition(e.getKey(), e.getValue(), alegroNetPosition)));
+                                         e -> calculateOutBciNetPosition(e.getKey(), e.getValue(), alegroNetPosition)));
 
         // Adapt target after virtual hubs shifting
         applyVirtualHubsGaps(adjustedOutBciNetPositions, virtualHubsGaps);
@@ -123,7 +122,7 @@ public class TargetNetPositionsCalculationService {
                 .getBciResults()
                 .entrySet().stream()
                 .collect(toFlowByAreaMap(Map.Entry::getKey,
-                                         e->e.getValue().getJsonGlobalNetPositions().getTarget()));
+                                         e -> e.getValue().getJsonGlobalNetPositions().getTarget()));
 
         targetNetPositions.putAll(bciOutput.getJsonOutRegionResults().getGlobalForecastNetPositions());
 
