@@ -31,11 +31,11 @@ import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getCountryOfSide;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWith;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWithVirtualHub;
-import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.getCountryFromCode;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isConnected;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWithVirtualHub;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.CLOSE;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
@@ -160,7 +160,7 @@ public class XnodesCalculation {
         final boolean isConnected = isConnected(branch);
         final MergedXnodeInformation mergedXnodeInformation = new MergedXnodeInformation(isConnected ? CLOSE : OPEN, 0, 0, 0, 0);
         if (isConnected) {
-            final Country country1 = getCountry(xnodeInformation.getArea1Information().getCountry());
+            final Country country1 = getCountryFromCode(xnodeInformation.getArea1Information().getCountry());
             final boolean country1IsSideOne = country1.equals(getCountryOfSide(branch, TwoSides.ONE));
             //We take the xnode flow in the direction country 1 to country 2
             final Terminal terminalFrom = country1IsSideOne ? branch.getTerminal1() : branch.getTerminal2();

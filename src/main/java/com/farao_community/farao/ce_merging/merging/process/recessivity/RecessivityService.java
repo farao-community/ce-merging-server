@@ -39,10 +39,10 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALE
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getCountryOfSide;
-import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.getCountryFromCode;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isConnectedTo;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
@@ -178,11 +178,11 @@ public class RecessivityService {
         if (xNode.isRecessive1() && !xNode.isRecessive2()) {
             final String country1 = xNode.getCountry1();
             getBranchToCorrect(network, name, country1, german)
-                .ifPresent(branch -> alignBranchStatusWithXnode(xNode.getStatus2(), getCountry(country1), branch));
+                .ifPresent(branch -> alignBranchStatusWithXnode(xNode.getStatus2(), getCountryFromCode(country1), branch));
         } else if (xNode.isRecessive2() && !xNode.isRecessive1()) {
             final String country2 = xNode.getCountry2();
             getBranchToCorrect(network, name, country2, german)
-                .ifPresent(branch -> alignBranchStatusWithXnode(xNode.getStatus1(), getCountry(country2), branch));
+                .ifPresent(branch -> alignBranchStatusWithXnode(xNode.getStatus1(), getCountryFromCode(country2), branch));
         }
 
         return xNode;

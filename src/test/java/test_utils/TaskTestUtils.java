@@ -33,7 +33,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.common.util.CountryUtils.mapKsToXk;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapKsToXk;
 import static com.powsybl.openrao.virtualhubs.xml.XmlVirtualHubsConfiguration.importConfiguration;
 
 public final class TaskTestUtils {
@@ -55,7 +55,7 @@ public final class TaskTestUtils {
     }
 
     private static InputStream getGridConfigStream(final String fileName) throws IOException {
-        return new ClassPathResource("gridDefaultConfigurations/%s".formatted(fileName)).getInputStream();
+        return new ClassPathResource("gridDefaultConfigurations/" + fileName).getInputStream();
     }
 
     public static List<XnodeConfig> importXnodeConfiguration(final InputStream is) throws IOException {
@@ -142,4 +142,5 @@ public final class TaskTestUtils {
             borderDirectionRecord.setBorderTo(mapKsToXk(borderDirectionRecord.getBorderTo()));
         });
     }
+
 }

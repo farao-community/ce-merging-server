@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.merging.process.virtuals_hubs;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.util.CountryUtils;
+import com.farao_community.farao.ce_merging.common.util.CountryCodeUtils;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.process.forecast_netpositions.ReferenceExchangeData;
@@ -53,7 +53,7 @@ public class VirtualHubsShifting {
             final double targetFlow = computeTargetFlow(virtualHubRecord, referenceExchangeData);
             final double virtualHubFlowGap = targetFlow - initialFlow;
             if (virtualHubFlowGap != 0.0) {
-                final String country = CountryUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
+                final String country = CountryCodeUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
                 virtualHubsGaps.put(country, virtualHubFlowGap);
                 setDanglingLineFlow(danglingLine, targetFlow);
                 LOGGER.info("Shift virtual hub {}: {} -> {} (gap={})", nodeName, initialFlow, targetFlow, virtualHubFlowGap);

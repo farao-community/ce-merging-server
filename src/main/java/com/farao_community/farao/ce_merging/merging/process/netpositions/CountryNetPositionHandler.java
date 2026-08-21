@@ -9,8 +9,7 @@ package com.farao_community.farao.ce_merging.merging.process.netpositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.GenerationAndLoadQuantity;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
-import com.farao_community.farao.ce_merging.common.util.BordersUtils;
-import com.farao_community.farao.ce_merging.common.util.CountryUtils;
+import com.farao_community.farao.ce_merging.common.util.CountryCodeUtils;
 import com.farao_community.farao.ce_merging.common.util.LoadFlowUtils;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
@@ -40,16 +39,17 @@ import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getBorderFlow;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getCountryOnOtherSide;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isBranchBorderOf;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isDanglingLineBorderOf;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isHvdcLineBorderOf;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWithVirtualHub;
-import static com.farao_community.farao.ce_merging.common.util.CountryUtils.getCountry;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.getCountryFromCode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isConnected;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getBorderFlow;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountry;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOnOtherSide;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isBranchBorderOf;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isDanglingLineBorderOf;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isHvdcLineBorderOf;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInCountry;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWithVirtualHub;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
 import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.streamIterable;
 import static com.powsybl.iidm.network.Country.DE;
@@ -160,8 +160,8 @@ public final class CountryNetPositionHandler {
     }
 
     private static void updateIfKosovoXnode(final XnodeConfig xnode) {
-        xnode.setArea1(CountryUtils.mapKsToXk(xnode.getArea1()));
-        xnode.setArea2(CountryUtils.mapKsToXk(xnode.getArea2()));
+        xnode.setArea1(CountryCodeUtils.mapKsToXk(xnode.getArea1()));
+        xnode.setArea2(CountryCodeUtils.mapKsToXk(xnode.getArea2()));
     }
 
     private double sumOverCountry(final Stream<? extends Injection<?>> injectionStream) {
@@ -217,7 +217,7 @@ public final class CountryNetPositionHandler {
 
     private void handleHvdcLine(final HvdcLine hvdcLine) {
         double borderFlow = getBorderFlow(hvdcLine, country);
-        updatePositions(borderFlow, BordersUtils.getCountryOnOtherSide(hvdcLine, country), false);
+        updatePositions(borderFlow, getCountryOnOtherSide(hvdcLine, country), false);
         outBciNetPosition += borderFlow;
     }
 
@@ -289,7 +289,7 @@ public final class CountryNetPositionHandler {
     }
 
     private Country otherCountry(final DanglingLine danglingLine) {
-        final Country danglingLineCountry = BordersUtils.getCountry(danglingLine);
+        final Country danglingLineCountry = getCountry(danglingLine);
         final Optional<XnodeConfig> optionalXnode = getDanglingLineXnode(danglingLine);
 
         if (optionalXnode.isEmpty()) {
@@ -312,9 +312,9 @@ public final class CountryNetPositionHandler {
         updateIfKosovoXnode(xnode);
 
         if (areSameArea(danglingLineCountry, area1, subArea1)) {
-            return getCountry(subArea2 != null ? subArea2 : xnode.getArea2());
+            return getCountryFromCode(subArea2 != null ? subArea2 : xnode.getArea2());
         } else if (areSameArea(danglingLineCountry, area2, subArea2)) {
-            return getCountry(subArea1 != null ? subArea1 : xnode.getArea1());
+            return getCountryFromCode(subArea1 != null ? subArea1 : xnode.getArea1());
         } else {
             LOGGER.warn("Error in xnodes configuration file : the node {} is not associated to country {}", xnode.getName(), danglingLineCountry);
             return null;

@@ -14,17 +14,17 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAN
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.Country.DK;
 
-public final class CountryUtils {
+public final class CountryCodeUtils {
     public static final String DK1_CODE = "DK1";
 
-    private CountryUtils() {
+    private CountryCodeUtils() {
     }
 
     public static String mapKsToXk(final String country) {
         return UcteCountryCode.KS.name().equals(country) ? Country.XK.name() : country;
     }
 
-    public static Country getCountry(final String countryName) {
+    public static Country getCountryFromCode(final String countryName) {
         if (GermanTso.includes(countryName)) {
             return DE;
         } else if (DANISH_TSO.equals(countryName)) {
