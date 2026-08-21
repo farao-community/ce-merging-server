@@ -23,9 +23,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import com.powsybl.iidm.network.Country;
 
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
@@ -34,15 +36,13 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 
 @Service
 public class TargetNetPositionsCalculationService {
-    private static final String VIRTUAL_HUB_PREFIX = "X";
-    private static final String BELGIUM_COUNTRY_CODE = "BE";
-    private static final String GERMANY_COUNTRY_CODE = "DE";
     private static final Logger LOGGER = LoggerFactory.getLogger(TargetNetPositionsCalculationService.class);
+    private static final String XNODES_PREFIX = "X";
     private final MergingTaskRepository repository;
     private final CeMergingConfiguration configuration;
 
-    public TargetNetPositionsCalculationService(MergingTaskRepository repository,
-                                                CeMergingConfiguration configuration) {
+    public TargetNetPositionsCalculationService(final MergingTaskRepository repository,
+                                                final CeMergingConfiguration configuration) {
         this.repository = repository;
         this.configuration = configuration;
     }
@@ -50,7 +50,7 @@ public class TargetNetPositionsCalculationService {
     public void computeTargetNetPositions(final MergingTask task) {
         try {
             final Map<String, Double> virtualHubsGaps = VirtualHubsShifting.applyVirtualHubFlows(task, configuration);
-            final Map<String, Double> targetNetPositionsWithoutHvdc = getTargetNetPositionsFromBciOutput(task.getArtifactPath(BCI_OUTPUT_FILE));
+            final Map<String, Double> targetNetPositionsWithoutHvdc = getTargetNetPositionsFromBciOutput(task);
             final Map<String, Double> outBciFlowsByCountry = getAdjustedOutBciNetPositions(task.getArtifactPath(IGMS_NET_POSITIONS_FILE), task.getArtifactPath(ALEGRO_NET_POSITIONS), virtualHubsGaps);
             final List<AreaNetPosition> targetNetPositionsWithHvdc = calculateTargetNetPositionsWithHvdc(targetNetPositionsWithoutHvdc, outBciFlowsByCountry);
             final BalancesAdjustmentTarget balancesAdjustmentTarget = new BalancesAdjustmentTarget(targetNetPositionsWithHvdc);
@@ -99,33 +99,38 @@ public class TargetNetPositionsCalculationService {
     }
 
     private static double calculateOutBciNetPosition(final String country, final NetPositions netPositions, final AlegroData alegroNetPosition) {
-        return switch (country) {
-            case BELGIUM_COUNTRY_CODE ->
-                    netPositions.getOutBciNetPosition() + alegroNetPosition.albeFlows().gapNpfInitialFlow();
-            case GERMANY_COUNTRY_CODE ->
+        final double outBciNetPosition = netPositions.getOutBciNetPosition();
+        return switch (Country.valueOf(country)) {
+            case Country.BE ->
+                    outBciNetPosition + alegroNetPosition.albeFlows().gapNpfInitialFlow();
+            case Country.DE ->
                     // DE contains a virtual hub that does not start with "X" (e.g. D2HWKR1D)
                     // powsybl-balances-adjustment excludes such nodes when calculating the net position
                     // Therefore, their flow must be subtracted from the DE target Balance net position
                     // to remain consistent with powsybl-balances-adjustment
-                    netPositions.getOutBciNetPosition() + alegroNetPosition.aldeFlows().gapNpfInitialFlow() - getGermanNonXVirtualHubFlows(netPositions);
+                    outBciNetPosition + alegroNetPosition.aldeFlows().gapNpfInitialFlow() - getGermanNonXVirtualHubFlows(netPositions);
 
-            default -> netPositions.getOutBciNetPosition();
+            default -> outBciNetPosition;
         };
     }
 
     private static double getGermanNonXVirtualHubFlows(final NetPositions netPositions) {
         return netPositions.getVirtualHubsExchanges().entrySet().stream()
-                .filter(entry -> !entry.getKey().startsWith(VIRTUAL_HUB_PREFIX))
+                .filter(entry -> !entry.getKey().startsWith(XNODES_PREFIX))
                 .mapToDouble(Map.Entry::getValue)
                 .sum();
     }
 
-    private static Map<String, Double> getTargetNetPositionsFromBciOutput(final String bciOutputPath) {
+    private static Map<String, Double> getTargetNetPositionsFromBciOutput(final MergingTask task) {
         final Map<String, Double> targetNetPositions = new TreeMap<>();
-        final JsonBciOutputStructure bciOutput = JsonUtils.read(JsonBciOutputStructure.class, bciOutputPath);
-
-        bciOutput.getJsonBciComputationResult().getBciResults().forEach((key, value) -> {
-            targetNetPositions.put(key, value.getJsonGlobalNetPositions().getTarget());
+        final JsonBciOutputStructure bciOutput;
+        try {
+            bciOutput = task.getArtifact(BCI_OUTPUT_FILE, JsonBciOutputStructure.class);
+        } catch (final FileNotFoundException e) {
+            throw new CeMergingException(String.format("BCI output file not found for task '%d'", task.getId()), e);
+        }
+        bciOutput.getJsonBciComputationResult().getBciResults().forEach((country, bciResult) -> {
+            targetNetPositions.put(country, bciResult.getJsonGlobalNetPositions().getTarget());
         });
         targetNetPositions.putAll(bciOutput.getJsonOutRegionResults().getGlobalForecastNetPositions());
 
