@@ -33,11 +33,11 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.isPairedWithVirtualHub;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getBorderFlow;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWithVirtualHub;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE;
 import static com.powsybl.iidm.network.Country.DE;
 import static java.lang.Math.abs;

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.common.util.BordersUtils.getCountryOfSide;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.TopologyKind.BUS_BREAKER;
 import static com.powsybl.iidm.network.TwoSides.ONE;
