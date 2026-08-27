@@ -1,0 +1,14 @@
+{
+  "dailyTimeInterval" : "2020-05-04T22:00Z/2020-05-05T22:00Z",
+  "targetDateTime" : "2025-12-31T23:00Z",
+  "referenceExchangeDataList" : [
+{
+    "areaOutId" : "22Y201903144---9",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : 210.0
+  }, {
+    "areaOutId" : "22Y201903145---4",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : -210.0
+  } ]
+}
