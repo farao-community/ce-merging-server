@@ -90,7 +90,7 @@ public class AlegroService {
         network.write("UCTE", null, Path.of(tgmPath));
     }
 
-     boolean isAlegroInOutage(final List<DanglingLine> alegroDanglingLinesList) {
+    boolean isAlegroInOutage(final List<DanglingLine> alegroDanglingLinesList) {
         final long numberOfConnectedAlegroXnodes = alegroDanglingLinesList.stream().filter(danglingLine -> danglingLine.getTerminal().isConnected()).count();
         if (numberOfConnectedAlegroXnodes == 0) {
             LOGGER.info("Both X nodes are disconnected, Alegro in outage");
@@ -103,7 +103,7 @@ public class AlegroService {
         return false;
     }
 
-     void correctOutage(final Network network, final List<DanglingLine> alegroDanglingLinesList, final String filePath) {
+    void correctOutage(final Network network, final List<DanglingLine> alegroDanglingLinesList, final String filePath) {
         alegroDanglingLinesList.forEach(danglingLine -> {
             danglingLine.setP0(0);
             if (danglingLine.getGeneration() != null) {
@@ -114,7 +114,7 @@ public class AlegroService {
         network.write("UCTE", null, Path.of(filePath));
     }
 
-     void checkFlowDirection(final double albeFlow, final double aldeFlow, final int alegroThreshold) {
+    void checkFlowDirection(final double albeFlow, final double aldeFlow, final int alegroThreshold) {
         if (!isAlegroLoadsBelowOrEqualToThreshold(albeFlow, aldeFlow, alegroThreshold) && isAlegroLoadsHasSameSign(albeFlow, aldeFlow)) {
             LOGGER.error("ALBE load and ALDE load have the same sign");
             throw new CeMergingException("ALBE load and ALDE load have the same sign");
@@ -122,7 +122,7 @@ public class AlegroService {
     }
 
     void checkFlowCompliance(final double albeFlow, final double aldeFlow, final int threshold) {
-        final double differenceBetweenFlows = Math.abs(Math.abs(albeFlow) - Math.abs(aldeFlow));;
+        final double differenceBetweenFlows = Math.abs(Math.abs(albeFlow) - Math.abs(aldeFlow));
         if (differenceBetweenFlows > threshold) {
             final String formattedDifference = String.format(Locale.ROOT, "%.2f", differenceBetweenFlows);
             LOGGER.error("The difference between the two flows is {}. It's greater than the threshold which is {}", formattedDifference, threshold);
@@ -147,7 +147,7 @@ public class AlegroService {
     }
 
     private boolean isAlegroLoadsHasSameSign(final double albeFlow, final double aldeFlow) {
-        return (albeFlow > 0 && aldeFlow > 0) || (albeFlow < 0 && aldeFlow < 0);
+        return albeFlow > 0 && aldeFlow > 0 || albeFlow < 0 && aldeFlow < 0;
     }
 
     private boolean isAlegroLoadsBelowOrEqualToThreshold(final double albeFlow, final double aldeFlow, final int threshold) {

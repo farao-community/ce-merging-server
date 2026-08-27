@@ -4,11 +4,11 @@
   "referenceExchangeDataList" : [
 {
     "areaOutId" : "22Y201903144---9",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "XXXXXXXX",
     "flow" : 210.0
   }, {
     "areaOutId" : "22Y201903145---4",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "YYYYYYY",
     "flow" : -210.0
   } ]
 }
