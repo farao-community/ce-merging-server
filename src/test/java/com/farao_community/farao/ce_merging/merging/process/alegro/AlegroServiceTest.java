@@ -136,7 +136,7 @@ class AlegroServiceTest {
         //EC limit = [-100 MW, +100 MW]
         final MergingTask task = new MergingTask();
         task.setArtifact(BCI_OUTPUT_FILE, copyResource("bciOutputs.json"));
-        task.setArtifact(TGM_FILE_AFTER_RECESSIVITY, copyResource("12nodes_alegro.uct"));
+        task.setArtifact(TGM_FILE_AFTER_RECESSIVITY, copyResource("network_alegro.uct"));
         task.setArtifact(ALEGRO_NET_POSITIONS, copyResource("alegroNetPositions.json"));
         alegroService.updateAlegroP0(task);
         final Network network = Network.read(task.getArtifactPath(TGM_FILE_AFTER_RECESSIVITY));
@@ -147,7 +147,7 @@ class AlegroServiceTest {
 
     @Test
     void shouldSetAlegroP0ToZeroWhenInOutage() {
-        final SavedFile tgmFile = copyResource("12nodes_alegro_outage.uct");
+        final SavedFile tgmFile = copyResource("network_alegro_outage.uct");
         final Network network = Network.read(tgmFile.getPath());
         final List<DanglingLine> alegroDanglingLines = network.getDanglingLineStream()
                 .filter(dl -> VIRTUAL_HUB_ALEGRO_BE_NODE_NAME.equals(dl.getPairingKey()) || VIRTUAL_HUB_ALEGRO_DE_NODE_NAME.equals(dl.getPairingKey()))
