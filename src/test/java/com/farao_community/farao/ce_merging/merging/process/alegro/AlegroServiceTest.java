@@ -23,10 +23,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
@@ -38,13 +39,14 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static test_utils.CeTestUtils.stringPathOf;
 
 @SpringBootTest
 class AlegroServiceTest {
 
-    private static final String FORECAST_REFERENCE_PROGRAM_PATH = Paths.get("src", "test", "resources", "alegro", "forecastReferenceProgram.json").toString();
-    private static final double ASSERTION_DELTA = 0.;
+    private static final double ASSERTION_DELTA = 1e-6;
+    private static final int ALEGRO_FLOW_THRESHOLD_0 = 0;
+    private static final int ALEGRO_FLOW_THRESHOLD_5 = 5;
+    private static final int ALEGRO_FLOW_THRESHOLD_10 = 10;
 
     @TempDir
     Path tempDirectory;
@@ -56,29 +58,31 @@ class AlegroServiceTest {
     void shouldThrowExceptionWhenTwoFlowsHaveTheSameSignAndLoadsNotBelowThreshold() {
         assertThrows(
                 CeMergingException.class,
-                () -> alegroService.checkFlowDirection(200, 210, 0)
+                () -> alegroService.checkFlowDirection(200, 210, ALEGRO_FLOW_THRESHOLD_0)
         );
     }
 
     @Test
     void shouldNotThrowExceptionWhenTwoFlowsHaveTheSameSignAndLoadsBelowThreshold() {
-        alegroService.checkFlowDirection(5, 5, 5);
-    }
-
-    @Test
-    void shouldThrowExceptionWhenTheDifferenceBetweenFlowsExceedTheThreshold() {
-        assertThrows(
-                CeMergingException.class,
-                () -> alegroService.checkFlowCompliance(200, 210, 5)
+        assertDoesNotThrow(
+                () -> alegroService.checkFlowDirection(5, 5, ALEGRO_FLOW_THRESHOLD_5)
         );
     }
 
     @Test
-    void shouldThrowExceptionWhenTheGapNpfInitialFlowExceedTheThreshold() {
+    void shouldThrowExceptionWhenTheDifferenceBetweenFlowsExceedsTheThreshold() {
+        assertThrows(
+                CeMergingException.class,
+                () -> alegroService.checkFlowCompliance(200, 210, ALEGRO_FLOW_THRESHOLD_5)
+        );
+    }
+
+    @Test
+    void shouldThrowExceptionWhenTheGapNpfInitialFlowExceedsTheThreshold() {
         final ReferenceProgram referenceProgram = getReferenceProgram();
         assertThrows(
                 CeMergingException.class,
-                () -> alegroService.getAlegroNetPositions(referenceProgram, false, 200, -200, 5)
+                () -> alegroService.getAlegroNetPositions(referenceProgram, false, 200, -200, ALEGRO_FLOW_THRESHOLD_5)
         );
     }
 
@@ -108,7 +112,7 @@ class AlegroServiceTest {
     @Test
     void shouldGetCorrectAlegroNetPositions() {
         final ReferenceProgram referenceProgram = getReferenceProgram();
-        final AlegroData alegroData = alegroService.getAlegroNetPositions(referenceProgram, false, -200, 200, 10);
+        final AlegroData alegroData = alegroService.getAlegroNetPositions(referenceProgram, false, -200, 200, ALEGRO_FLOW_THRESHOLD_10);
         assertEquals(200, alegroData.aldeFlows().initialFlow(), ASSERTION_DELTA);
         assertEquals(210, alegroData.aldeFlows().targetFlow(), ASSERTION_DELTA);
         assertEquals(10, alegroData.aldeFlows().gapNpfInitialFlow(), ASSERTION_DELTA);
@@ -122,51 +126,51 @@ class AlegroServiceTest {
         final ReferenceProgram referenceProgram = getReferenceProgram();
         assertDoesNotThrow(
                 () ->
-                alegroService.getAlegroNetPositions(referenceProgram, true, 1000, -1000, 5)
+                alegroService.getAlegroNetPositions(referenceProgram, true, 1000, -1000, ALEGRO_FLOW_THRESHOLD_5)
         );
     }
 
     @Test
     void shouldLimitAlegroP0ToCommonEcLimit() {
-        // Given
         // ALDE target flow = 200 MW, ALBE target flow = -200 MW
         //EC limit = [-100 MW, +100 MW]
         final MergingTask task = new MergingTask();
-        task.setArtifact(BCI_OUTPUT_FILE, new SavedFile("bciOutputs.json", stringPathOf("alegro/bciOutputs.json"), "bciOutputs.json"));
+        task.setArtifact(BCI_OUTPUT_FILE, copyResource("bciOutputs.json"));
         task.setArtifact(TGM_FILE_AFTER_RECESSIVITY, copyResource("12nodes_alegro.uct"));
-        task.setArtifact(ALEGRO_NET_POSITIONS, new SavedFile("alegroNetPositions.json", stringPathOf("alegro/alegroNetPositions.json"), "alegroNetPositions.json"));
+        task.setArtifact(ALEGRO_NET_POSITIONS, copyResource("alegroNetPositions.json"));
         alegroService.updateAlegroP0(task);
-        Network network = Network.read(task.getArtifactPath(TGM_FILE_AFTER_RECESSIVITY));
+        final Network network = Network.read(task.getArtifactPath(TGM_FILE_AFTER_RECESSIVITY));
         assertEquals(-100., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME), ASSERTION_DELTA);
         assertEquals(100., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_DE_NODE_NAME), ASSERTION_DELTA);
 
     }
 
     @Test
-    void shouldSetAlegroP0AndTargetPToZeroWhenInOutage() {
+    void shouldSetAlegroP0ToZeroWhenInOutage() {
         final SavedFile tgmFile = copyResource("12nodes_alegro_outage.uct");
         final Network network = Network.read(tgmFile.getPath());
         final List<DanglingLine> alegroDanglingLines = network.getDanglingLineStream()
                 .filter(dl -> VIRTUAL_HUB_ALEGRO_BE_NODE_NAME.equals(dl.getPairingKey()) || VIRTUAL_HUB_ALEGRO_DE_NODE_NAME.equals(dl.getPairingKey()))
                 .toList();
-        // Before
         assertEquals(-100., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME), ASSERTION_DELTA);
         assertEquals(100., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_DE_NODE_NAME), ASSERTION_DELTA);
 
         alegroService.correctOutage(network, alegroDanglingLines, tgmFile.getPath());
 
-        // After
         assertEquals(0., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME), ASSERTION_DELTA);
         assertEquals(0., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_DE_NODE_NAME), ASSERTION_DELTA);
     }
 
     private SavedFile copyResource(final String fileName) {
-        try {
+        final String resourcePath = "/alegro/" + fileName;
+
+        try (InputStream inputStream = getClass().getResourceAsStream(resourcePath)) {
             final Path destination = tempDirectory.resolve(fileName);
-            Files.copy(Paths.get("src", "test", "resources", "alegro", fileName), destination);
+            Files.copy(inputStream, destination);
             return new SavedFile(fileName, destination.toString(), "test");
         } catch (IOException e) {
-            throw new RuntimeException("Unable to copy test resource: " + fileName, e);
+            throw new UncheckedIOException(
+                    "Unable to copy test resource: " + resourcePath, e);
         }
     }
 
@@ -180,7 +184,12 @@ class AlegroServiceTest {
     }
 
     private ReferenceProgram getReferenceProgram() {
-        return JsonUtils.read(ReferenceProgram.class, FORECAST_REFERENCE_PROGRAM_PATH);
+        try (InputStream inputStream = getClass().getResourceAsStream(
+                "/alegro/forecastReferenceProgram.json")) {
+            return JsonUtils.read(ReferenceProgram.class, inputStream);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
 }
