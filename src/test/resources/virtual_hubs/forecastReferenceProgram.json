@@ -1,6 +1,6 @@
 {
-  "targetDateTime" : "2026-07-29T00:30+01:00",
   "dailyTimeInterval" : "2026-07-29T23:00Z/2026-07-30T23:00Z",
+  "targetDateTime" : "2026-07-29T00:30+01:00",
   "referenceExchangeDataList" : [
  {
     "areaOutId" : "EICODE_02",
