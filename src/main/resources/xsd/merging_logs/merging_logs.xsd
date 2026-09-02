@@ -1,0 +1,231 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="flowbased">
+  <xs:element name="MergingLog">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="DocumentIdentification">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute type="xs:string" name="v"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="DocumentVersion">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute type="xs:byte" name="v"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="DocumentType">
+          <xs:complexType>
+            <xs:attribute name="v" use="required" type="xs:NCName"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ProcessType">
+          <xs:complexType>
+            <xs:attribute name="v" use="required" type="xs:NCName"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="SenderIdentification">
+          <xs:complexType>
+            <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+            <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="SenderRole">
+          <xs:complexType>
+            <xs:attribute name="v" use="required" type="xs:NCName"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReceiverIdentification">
+          <xs:complexType>
+            <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+            <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReceiverRole">
+          <xs:complexType>
+            <xs:attribute name="v" use="required" type="xs:NCName"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="CreationDateTime">
+          <xs:complexType>
+            <xs:simpleContent>
+              <xs:extension base="xs:string">
+                <xs:attribute type="xs:dateTime" name="v"/>
+              </xs:extension>
+            </xs:simpleContent>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ReportTimeInterval">
+          <xs:complexType>
+            <xs:attribute name="v" use="required" type="xs:NCName"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="Domain">
+          <xs:complexType>
+            <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+            <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="TimeSeries">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TimeSeriesIdentification">
+                <xs:complexType>
+                  <xs:attribute name="v" use="required" type="xs:NCName"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="Period">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="TimeInterval">
+                      <xs:complexType>
+                        <xs:attribute name="v" use="required" type="xs:NCName"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Resolution">
+                      <xs:complexType>
+                        <xs:attribute name="v" use="required" type="xs:NCName"/>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="Interval"  maxOccurs="unbounded" minOccurs="0">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Pos">
+                            <xs:complexType>
+                              <xs:attribute name="v" use="required" type="xs:NCName"/>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="MergingReport">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="BCIactive" type="xs:boolean"/>
+                                <xs:element name="BCI_FeasibilityRanges_Extended" minOccurs="0"  type="xs:boolean"/>
+                                <xs:element name="MergeType" type="xs:string"/>
+                                <xs:element name="Report" maxOccurs="unbounded" minOccurs="0">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="BCI" minOccurs="0">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="BCIapplied" type="xs:string"/>
+                                            <xs:element name="CORE_InitialNP_IGM" type="xs:short"/>
+                                            <xs:element name="InitialMinNP_shift" type="xs:short"/>
+                                            <xs:element name="InitialMaxNP_shift" type="xs:short"/>
+                                            <xs:element name="FinalMinNP_shift" type="xs:short"/>
+                                            <xs:element name="FinalMaxNP_shift" type="xs:short"/>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                      <xs:element name="ReferenceProgram" minOccurs="0">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="Core_NPtarget_initial" type="xs:short" minOccurs="0"/>
+                                            <xs:element name="Core_NPtarget_final" type="xs:short" minOccurs="0"/>
+                                            <xs:element name="Global_NPtarget_initial" type="xs:short"/>
+                                            <xs:element name="Global_NPtarget_final" type="xs:short"/>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                      <xs:element name="LoadFlow" >
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="IGM">
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element name="Generation" type="xs:int" minOccurs="0"/>
+                                                  <xs:element name="Load" type="xs:int" minOccurs="0"/>
+                                                  <xs:element name="GlobalBalance" type="xs:int"/>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                            <xs:element name="CGM">
+                                              <xs:complexType>
+                                                <xs:sequence>
+                                                  <xs:element name="Generation" type="xs:int" minOccurs="0"/>
+                                                  <xs:element name="Load" type="xs:int" minOccurs="0"/>
+                                                  <xs:element name="GlobalBalance" type="xs:int"/>
+                                                </xs:sequence>
+                                              </xs:complexType>
+                                            </xs:element>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                    <xs:attribute type="xs:string" name="id" use="optional"/>
+                                    <xs:attribute type="xs:string" name="name" use="optional"/>
+                                    <xs:attribute type="xs:string" name="typeInfo" use="optional"/>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element name="SI-IT_Report" minOccurs="0">
+                                  <xs:complexType>
+                                    <xs:sequence>
+                                      <xs:element name="InArea">
+                                        <xs:complexType>
+                                          <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+                                          <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+                                        </xs:complexType>
+                                      </xs:element>
+                                      <xs:element name="OutArea">
+                                        <xs:complexType>
+                                          <xs:attribute name="codingScheme" use="required" type="xs:NCName"/>
+                                          <xs:attribute name="v" use="required" type="xs:NMTOKEN"/>
+                                        </xs:complexType>
+                                      </xs:element>
+                                      <xs:element name="AppliedProcedure" type="xs:byte"/>
+                                      <xs:element name="TargetFlow">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="TotalFlow" type="xs:float"/>
+                                            <xs:element name="FlowDivacaPadriciano" type="xs:float"/>
+                                            <xs:element name="FlowDivacaRedipuglia" type="xs:float"/>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                      <xs:element name="BeforeTargetFlowCGM">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="TotalFlow" type="xs:float"/>
+                                            <xs:element name="FlowDivacaPadriciano" type="xs:float"/>
+                                            <xs:element name="FlowDivacaRedipuglia" type="xs:float"/>
+                                            <xs:element name="TapsPadriciano" type="xs:double"/>
+                                            <xs:element name="TapsDivaca" type="xs:double"/>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                      <xs:element name="AfterTargetFlowCGM">
+                                        <xs:complexType>
+                                          <xs:sequence>
+                                            <xs:element name="TotalFlow" type="xs:float"/>
+                                            <xs:element name="FlowDivacaPadriciano" type="xs:float"/>
+                                            <xs:element name="FlowDivacaRedipuglia" type="xs:float"/>
+                                            <xs:element name="TapsPadriciano" type="xs:double"/>
+                                            <xs:element name="TapsDivaca" type="xs:double"/>
+                                          </xs:sequence>
+                                        </xs:complexType>
+                                      </xs:element>
+                                    </xs:sequence>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+

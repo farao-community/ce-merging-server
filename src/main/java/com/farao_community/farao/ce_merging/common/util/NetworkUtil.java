@@ -18,6 +18,9 @@ import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TwoSides;
+import com.powsybl.loadflow.LoadFlowParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -28,6 +31,8 @@ import static com.powsybl.iidm.network.TwoSides.TWO;
 import static java.lang.Double.isNaN;
 
 public final class NetworkUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(NetworkUtil.class);
+    private static final String ERROR_COMPONENT_NUMBER_PARAMETER = "Component number parameter is different from 0 or 1";
 
     private NetworkUtil() {
         // utility
@@ -146,6 +151,26 @@ public final class NetworkUtil {
         return country.equals(getCountry(hvdcLine.getConverterStation1().getTerminal())) ? directFlow : -directFlow;
     }
 
+    public static double getBorderFlow(final Line line, final String zone) {
+        final double flowSide1 = getTerminalFlow(line.getTerminal1());
+        final double flowSide2 = getTerminalFlow(line.getTerminal2());
+        final double directFlow = (flowSide1 - flowSide2) / 2;
+        return line.getTerminal(TwoSides.ONE).getVoltageLevel().getId().startsWith(zone) ? directFlow : -directFlow;
+    }
+
+    public static double getBorderFlow(final DanglingLine danglingLine, final LoadFlowParameters.ComponentMode componentModeLfParameter) {
+        return switch (componentModeLfParameter) {
+            case MAIN_CONNECTED -> // Loadflow computed only on main connected component
+                    danglingLine.getTerminal().getBusBreakerView().getConnectableBus().isInMainConnectedComponent() ? getLeavingFlow(danglingLine) : 0.;
+            case ALL_CONNECTED ->
+                    getLeavingFlow(danglingLine);
+            default -> {
+                LOGGER.error(ERROR_COMPONENT_NUMBER_PARAMETER);
+                throw new CeMergingException(ERROR_COMPONENT_NUMBER_PARAMETER);
+            }
+        };
+    }
+
     public static Double getTerminalFlow(final Terminal terminal) {
         return terminal.isConnected() ? zeroIfNaN(terminal.getP()) : 0;
     }
@@ -170,5 +195,19 @@ public final class NetworkUtil {
 
     public static double getLeavingFlow(final DanglingLine danglingLine) {
         return danglingLine.getTerminal().isConnected() ? zeroIfNaN(-danglingLine.getBoundary().getP()) : 0;
+    }
+
+    public static boolean isBorderOfZone(final DanglingLine danglingLine, final String zone) {
+        return isBorderOfZone(danglingLine.getId(), zone);
+    }
+
+    public static boolean isBorderOfZone(final Line line, final String zone) {
+        return isBorderOfZone(line.getId(), zone);
+    }
+
+    private static boolean isBorderOfZone(final String lineId, final String zone) {
+        final String nodeFrom = lineId.substring(0, 8);
+        final String nodeTo = lineId.substring(9, 17);
+        return nodeFrom.startsWith(zone) != nodeTo.startsWith(zone);
     }
 }

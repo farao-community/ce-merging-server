@@ -27,7 +27,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 
@@ -139,7 +143,7 @@ public class AlegroService {
             LOGGER.info("ALBE load : initial: {} , target: {}", albeInitialFlow, albeTargetFlow);
             checkAlegroFlowGap(gapNpfInitialFlowForAlegroBe, threshold, "ALBE");
             LOGGER.info("ALDE load : initial: {} , target: {}", aldeInitialFlow, aldeTargetFlow);
-            checkAlegroFlowGap(gapNpfInitialFlowForAlegroDe, threshold, "ALDE");
+            checkAlegroFlowGap(gapNpfInitialFlowForAlegroDe, threshold, ALDE);
         }
         final AlegroFlows aldeFlows = new AlegroFlows(aldeInitialFlow, aldeTargetFlow, gapNpfInitialFlowForAlegroDe);
         final AlegroFlows albeFlows = new AlegroFlows(albeInitialFlow, albeTargetFlow, gapNpfInitialFlowForAlegroBe);
