@@ -115,6 +115,19 @@
                             <outputDirectory>${project.build.directory}/generated-sources/jaxb/exec_logs</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>merging_logs</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/xsd/merging_logs/merging_logs.xsd</source>
+                            </sources>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.merging_logs</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb/merging_logs</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

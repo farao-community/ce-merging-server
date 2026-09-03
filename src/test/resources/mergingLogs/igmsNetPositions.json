@@ -1,0 +1,38 @@
+{
+  "netPositionsByCountryMap" : {
+    "AL" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -24.02,
+        "withoutVirtualHubs" : -4.2
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "generationAndLoadQuantity" : {
+        "generation" : 5.7182956337929,
+        "load" : 0.27
+      }
+    },
+    "BE" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 8.57,
+        "withoutVirtualHubs" : 8.17
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 8.17,
+        "withoutVirtualHubs" : 8.17
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : {
+        "XBE_GB1B" : 0.0
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : "NaN",
+        "load" : "NaN"
+      }
+    }
+  }
+}
