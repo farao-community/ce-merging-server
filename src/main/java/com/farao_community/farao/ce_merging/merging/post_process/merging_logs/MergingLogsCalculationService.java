@@ -84,7 +84,7 @@ public class MergingLogsCalculationService {
         final List<ReportInformationInRegion> reportInformationInRegionList = fillInRegionMergingReports(bciOutputs, cgmNetPositionsResults, igmNetPositionsResults, loadflowMode);
         final List<ReportInformationOutRegion> reportInformationsOutRegionList = fillOutRegionMergingReports(bciOutputs, cgmNetPositionsResults, igmNetPositionsResults);
         final List<ReportCommonsInformation> tsoInformationsList = tsoInformationsService.calculateTsoInformations(task);
-        MergingLogsBuilder mergingLogsBuilder = new MergingLogsBuilder();
+        final MergingLogsBuilder mergingLogsBuilder = new MergingLogsBuilder();
         if (task.getInputs().getMergingWithInternalHvdc()) {
             final List<AlegroReportInformation> alegroReportInformationsList = buildAlegroReports(referenceProgram, cgmNetPositionsResults, igmNetPositionsResults);
             mergingLog = mergingLogsBuilder.buildMergingLog(task, reportInformationInRegionList, referenceProgram, pstOutputs, reportInformationsOutRegionList, tsoInformationsList, alegroReportInformationsList);
