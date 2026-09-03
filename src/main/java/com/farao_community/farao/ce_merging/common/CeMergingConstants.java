@@ -66,6 +66,8 @@ public final class CeMergingConstants {
     public static final String VIRTUAL_HUB_ALEGRO_DE_EIC = "22Y201903145---4";
     public static final String ALEGRO_BE_NODE_NAME = "BE_AL";
     public static final String ALEGRO_DE_NODE_NAME = "DE_AL";
+    public static final String ALDE = "ALDE";
+    public static final String ALBE = "ALBE";
     public static final String DANISH_TSO = "D1";
     public static final String UCTE_FORMAT = "UCTE";
     public static final String XIIDM_FORMAT = "XIIDM";
@@ -76,6 +78,8 @@ public final class CeMergingConstants {
     public static final String RECEIVER_ID = "17XTSO-CS------W";
     public static final String CORE_REGION_ID = "10Y1001C--00059P";
     public static final String UCTE_IMPORT_CREATE_AREAS_KEY = "ucte.import.create-areas";
+    public static final String TSO = "TSO";
+    public static final String RESOLUTION = "PT60M";
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;

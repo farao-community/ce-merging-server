@@ -1,0 +1,30 @@
+{
+  "processDateTime" : "2020-01-30T14:30+01:00",
+  "regionName" : "CE",
+  "bciComputationResult" : {
+    "bciActive" : true,
+    "bciResults" : {
+      "BE" : {
+        "inRegionNetPositions" : {
+          "initial" : 29.18,
+          "initialMin" : -17.81,
+          "initialMax" : 22.18,
+          "finalMin" : -17.81,
+          "finalMax" : 22.18,
+          "forecast" : 23.0,
+          "target" : 33.2
+        },
+        "globalNetPositions" : {
+          "forecast" : 25.0,
+          "target" : 33.29
+        },
+        "bciApplied" : false
+      }
+    }
+  },
+  "outRegionResults" : {
+    "globalForecastNetPositions" : {
+      "AL" : -23.0
+    }
+  }
+}

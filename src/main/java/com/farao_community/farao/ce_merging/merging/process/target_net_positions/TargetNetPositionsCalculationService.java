@@ -129,9 +129,12 @@ public class TargetNetPositionsCalculationService {
         } catch (final FileNotFoundException e) {
             throw new CeMergingException(String.format("BCI output file not found for task '%d'", task.getId()), e);
         }
-        bciOutput.getJsonBciComputationResult().getBciResults().forEach((country, bciResult) -> {
-            targetNetPositions.put(country, bciResult.getJsonGlobalNetPositions().getTarget());
-        });
+        if (bciOutput == null) {
+            throw new CeMergingException(String.format("BCI output not found for task '%d'", task.getId()));
+        }
+        bciOutput.getJsonBciComputationResult().getBciResults()
+                .forEach((country, bciResult) ->
+                        targetNetPositions.put(country, bciResult.getJsonGlobalNetPositions().getTarget()));
         targetNetPositions.putAll(bciOutput.getJsonOutRegionResults().getGlobalForecastNetPositions());
 
         return targetNetPositions;

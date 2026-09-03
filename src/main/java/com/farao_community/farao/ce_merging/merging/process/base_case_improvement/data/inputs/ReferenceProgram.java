@@ -38,9 +38,9 @@ public class ReferenceProgram implements Serializable {
     private List<ReferenceExchangeData> referenceExchangeDataList;
 
     @JsonCreator
-    public ReferenceProgram(@JsonProperty("timeInterval") final String dailyTimeInterval,
+    public ReferenceProgram(@JsonProperty("dailyTimeInterval") final String dailyTimeInterval,
                             @JsonProperty("targetDateTime") final OffsetDateTime targetDateTime,
-                            @JsonProperty("referenceExchangeData") final List<ReferenceExchangeData> referenceExchangeDataList) {
+                            @JsonProperty("referenceExchangeDataList") final List<ReferenceExchangeData> referenceExchangeDataList) {
         this.dailyTimeInterval = dailyTimeInterval;
         this.targetDateTime = targetDateTime;
         this.referenceExchangeDataList = Optional.ofNullable(referenceExchangeDataList).orElse(new ArrayList<>());

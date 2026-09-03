@@ -1,0 +1,21 @@
+{
+  "processNumberDivaca" : 2,
+  "totalTargetFlowDivaca" : 80.0,
+  "targetFlowDivacaPadriciano" : 15.0,
+  "targetFlowDivacaRedipuglia" : 65.0,
+  "targetFlowLipst" : 50.0,
+  "targetFlowNrpst21" : 50.0,
+  "targetFlowNrpst22" : 50.0,
+  "tapPstDivaca" : {
+    "tapIGM" : 0,
+    "tapCGM" : 0
+  },
+  "tapPstPadriciano" : {
+    "tapIGM" : 3,
+    "tapCGM" : 3
+  },
+  "tapPstLienz" : {
+    "tapIGM" : 0,
+    "tapCGM" : 0
+  }
+}

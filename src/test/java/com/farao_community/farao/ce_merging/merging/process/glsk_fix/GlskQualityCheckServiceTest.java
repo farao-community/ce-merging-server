@@ -27,9 +27,9 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_BASE_NAME;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO;
 import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.NODE_ID_KEY;
 import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.TYPE_KEY;
-import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.TSO_KEY;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -121,7 +121,7 @@ public class GlskQualityCheckServiceTest {
         final ReportNode childReport = mock(ReportNode.class);
         when(childReport.getValue(NODE_ID_KEY)).thenReturn(Optional.of(TypedValue.of("NODE_1", "TEST")));
         when(childReport.getValue(TYPE_KEY)).thenReturn(Optional.of(TypedValue.of("INVALID_NODE", "TEST")));
-        when(childReport.getValue(TSO_KEY)).thenReturn(Optional.of(TypedValue.of("FR", "TEST")));
+        when(childReport.getValue(TSO)).thenReturn(Optional.of(TypedValue.of("FR", "TEST")));
         when(childReport.getMessageKey()).thenReturn("CHECK_001");
         when(childReport.getMessage()).thenReturn("Invalid GLSK node");
         final ReportNode reporter = mock(ReportNode.class);
@@ -164,7 +164,7 @@ public class GlskQualityCheckServiceTest {
                 .withMessageTemplate(messageKey)
                 .withTypedValue(NODE_ID_KEY, nodeName, "")
                 .withTypedValue(TYPE_KEY, type, "")
-                .withTypedValue(TSO_KEY, tso, "")
+                .withTypedValue(TSO, tso, "")
                 .withSeverity(TypedValue.WARN_SEVERITY)
                 .add();
     }

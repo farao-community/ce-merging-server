@@ -55,6 +55,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SEN
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RECEIVER_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_BASE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CORE_REGION_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO;
 
 @Service
 public class GlskQualityCheckService {
@@ -63,7 +64,6 @@ public class GlskQualityCheckService {
     static final String NODE_ID_KEY = "NodeId";
     private static final String GLSK = "GLSK";
     static final String TYPE_KEY = "Type";
-    static final String TSO_KEY = "TSO";
     private static final Logger LOGGER = LoggerFactory.getLogger(GlskQualityCheckService.class);
 
     private final CeMergingConfiguration configuration;
@@ -144,7 +144,7 @@ public class GlskQualityCheckService {
     }
 
     private boolean isAlegroReport(final ReportNode reportNode) {
-        final Optional<TypedValue> reportNodeValue = reportNode.getValue(TSO_KEY);
+        final Optional<TypedValue> reportNodeValue = reportNode.getValue(TSO);
         if (reportNodeValue.isEmpty()) {
             return false;
         }
@@ -184,7 +184,7 @@ public class GlskQualityCheckService {
                         .withMessageTemplate("glsk.node.not.found")
                         .withTypedValue(NODE_ID_KEY, nodeName, "")
                         .withTypedValue(TYPE_KEY, getType(gskSeries), "")
-                        .withTypedValue(TSO_KEY, gskSeries.getArea().getV(), "")
+                        .withTypedValue(TSO, gskSeries.getArea().getV(), "")
                         .withUntypedValue("untypedValue", 3.)
                         .withSeverity(TypedValue.WARN_SEVERITY)
                         .add();
@@ -193,7 +193,7 @@ public class GlskQualityCheckService {
                         .withMessageTemplate("glsk.node.connected")
                         .withTypedValue(NODE_ID_KEY, nodeName, "")
                         .withTypedValue(TYPE_KEY, getType(gskSeries), "")
-                        .withTypedValue(TSO_KEY, gskSeries.getArea().getV(), "")
+                        .withTypedValue(TSO, gskSeries.getArea().getV(), "")
                         .withSeverity(TypedValue.WARN_SEVERITY)
                         .add();
             }
@@ -266,7 +266,7 @@ public class GlskQualityCheckService {
         qualityCheckType.setTimeInterval(DateTimeUtils.toHourlyInterval(targetDateTime));
         final AreaType area = new AreaType();
         area.setCodingScheme(CodingSchemeType.A_01);
-        area.setV(getReportValue(reportNode, TSO_KEY));
+        area.setV(getReportValue(reportNode, TSO));
         qualityCheckType.setArea(area);
         return qualityCheckType;
     }

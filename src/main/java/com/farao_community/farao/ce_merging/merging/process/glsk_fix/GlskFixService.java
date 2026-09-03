@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.TSO_KEY;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO;
 
 @Service
 public class GlskFixService {
@@ -84,7 +84,7 @@ public class GlskFixService {
 
     private List<ReportNode> getQualityLogs(final ReportNode reportNode, final String tso) {
         return reportNode.getChildren().stream()
-                .filter(report -> report.getValue(TSO_KEY)
+                .filter(report -> report.getValue(TSO)
                         .map(Object::toString)
                         .filter(tso::equals)
                         .isPresent())

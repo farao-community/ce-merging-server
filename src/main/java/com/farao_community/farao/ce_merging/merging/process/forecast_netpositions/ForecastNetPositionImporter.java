@@ -8,6 +8,8 @@ package com.farao_community.farao.ce_merging.merging.process.forecast_netpositio
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceExchangeData;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.xsd.forecast_netpositions.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.forecast_netpositions;
 
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceExchangeData;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import org.junit.jupiter.api.Test;
 
 import java.time.OffsetDateTime;
