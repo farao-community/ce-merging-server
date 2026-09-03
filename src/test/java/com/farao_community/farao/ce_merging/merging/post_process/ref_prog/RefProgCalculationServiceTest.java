@@ -58,26 +58,26 @@ public class RefProgCalculationServiceTest {
     private static final Map<String, Double> VIRTUAL_HUBS_EXCHANGES = new HashMap<>();
 
     private static final double FORECAST_NET_POSITION_BA_HR = 0.0;
-    private static final double FORECAST_NET_POSITION_BG_TR = -100.0;
-    private static final double FORECAST_NET_POSITION_CH_AT = -783.0;
-    private static final double FORECAST_NET_POSITION_CH_DE = -1047.0;
-    private static final double FORECAST_NET_POSITION_CH_FR = -2680.0;
-    private static final double FORECAST_NET_POSITION_CH_IT = 2016.0;
+    private static final double FORECAST_NET_POSITION_BG_TR = -80.0;
+    private static final double FORECAST_NET_POSITION_CH_AT = -350.0;
+    private static final double FORECAST_NET_POSITION_CH_DE = -920.0;
+    private static final double FORECAST_NET_POSITION_CH_FR = -1400.0;
+    private static final double FORECAST_NET_POSITION_CH_IT = 1500.0;
     private static final double FORECAST_NET_POSITION_DE_DK = 0.0;
-    private static final double FORECAST_NET_POSITION_ES_PT = 1963.0;
+    private static final double FORECAST_NET_POSITION_ES_PT = 999.0;
     private static final double FORECAST_NET_POSITION_FR_ES = 0.0;
-    private static final double FORECAST_NET_POSITION_FR_IT = 2524.0;
-    private static final double FORECAST_NET_POSITION_GR_AL = -242.0;
-    private static final double FORECAST_NET_POSITION_GR_BG = -720.0;
-    private static final double FORECAST_NET_POSITION_GR_MK = -154.0;
-    private static final double FORECAST_NET_POSITION_GR_TR = -50.0;
-    private static final double FORECAST_NET_POSITION_IT_AT = -242.0;
-    private static final double FORECAST_NET_POSITION_IT_SI = -549.0;
-    private static final double FORECAST_NET_POSITION_ME_AL = 86.0;
+    private static final double FORECAST_NET_POSITION_FR_IT = 1300.0;
+    private static final double FORECAST_NET_POSITION_GR_AL = -120.0;
+    private static final double FORECAST_NET_POSITION_GR_BG = -470.0;
+    private static final double FORECAST_NET_POSITION_GR_MK = -74.0;
+    private static final double FORECAST_NET_POSITION_GR_TR = -10.0;
+    private static final double FORECAST_NET_POSITION_IT_AT = -112.0;
+    private static final double FORECAST_NET_POSITION_IT_SI = -254.0;
+    private static final double FORECAST_NET_POSITION_ME_AL = 40.0;
     private static final double FORECAST_NET_POSITION_ME_BA = 0.0;
-    private static final double FORECAST_NET_POSITION_MK_BG = -276.0;
-    private static final double FORECAST_NET_POSITION_MK_KS = 95.0;
-    private static final double FORECAST_NET_POSITION_RO_BG = 702.0;
+    private static final double FORECAST_NET_POSITION_MK_BG = -130.0;
+    private static final double FORECAST_NET_POSITION_MK_KS = 45.0;
+    private static final double FORECAST_NET_POSITION_RO_BG = 300.0;
     private static final double FORECAST_NET_POSITION_RS_BA = 0.0;
     private static final double FORECAST_NET_POSITION_RS_BG = 0.0;
     private static final double FORECAST_NET_POSITION_RS_HR = 0.0;
@@ -89,8 +89,8 @@ public class RefProgCalculationServiceTest {
     private static final double FORECAST_NET_POSITION_UA_HU = 0.0;
     private static final double FORECAST_NET_POSITION_UA_RO = 0.0;
     private static final double FORECAST_NET_POSITION_UA_SK = 0.0;
-    private static final double FORECAST_NET_POSITION_KS_AL = 129.0;
-    private static final double FORECAST_NET_POSITION_KS_ME = -47.0;
+    private static final double FORECAST_NET_POSITION_KS_AL = 70.0;
+    private static final double FORECAST_NET_POSITION_KS_ME = -20.0;
 
     @Autowired
     BECKeyConfigurationService becKeyConfigurationService;
@@ -127,122 +127,71 @@ public class RefProgCalculationServiceTest {
     private void checkCoreExchanges(PublicationDocument refProgResult) {
 
         PublicationDocument.PublicationTimeSeries timeSeriesBeNl = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "BE-NL");
-        BigInteger expectedFlow1 = computeCoreExpectedFlow(
-                -0.041666667, 0.458333333, -0.041666667, -0.041666667,
-                0.208333333, -0.041666667, -0.041666667, -0.291666667,
-                -0.041666667, -0.041666667, -0.041666667, -0.041666667);
+        BigInteger expectedFlow1 = BigInteger.valueOf(161);
         assertEquals(expectedFlow1, timeSeriesBeNl.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesFrBe = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "FR-BE");
-        BigInteger expectedFlow2 = computeCoreExpectedFlow(
-                0.041666667, -0.458333333, 0.041666667, 0.041666667,
-                0.291666667, 0.041666667, 0.041666667, -0.208333333,
-                0.041666667, 0.041666667, 0.041666667, 0.041666667);
+        BigInteger expectedFlow2 = BigInteger.valueOf(1850);
         assertEquals(expectedFlow2, timeSeriesFrBe.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesDeNl = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-NL");
-        BigInteger expectedFlow3 = computeCoreExpectedFlow(
-                0.125, -0.375, 0.125, 0.125,
-                -0.125, 0.125, 0.125, -0.625,
-                0.125, 0.125, 0.125, 0.125);
+        BigInteger expectedFlow3 = BigInteger.valueOf(-1366);
         assertEquals(expectedFlow3, timeSeriesDeNl.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesFrDe = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "FR-DE");
-        BigInteger expectedFlow4 = computeCoreExpectedFlow(
-                -0.125, 0.375, -0.125, -0.125,
-                0.625, -0.125, -0.125, 0.125,
-                -0.125, -0.125, -0.125, -0.125);
+        BigInteger expectedFlow4 = BigInteger.valueOf(3378);
         assertEquals(expectedFlow4, timeSeriesFrDe.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesDePl = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-PL");
-        BigInteger expectedFlow5 = computeCoreExpectedFlow(
-                0.008230453, 0.193415638, -0.0781893, 0.193415638,
-                0.193415638, -0.041152263, -0.065843621, 0.193415638,
-                -0.349794239, -0.065843621, -0.016460905, -0.164609053);
+        BigInteger expectedFlow5 = BigInteger.valueOf(1295);
         assertEquals(expectedFlow5, timeSeriesDePl.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesDeCz = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-CZ");
-        BigInteger expectedFlow6 = computeCoreExpectedFlow(
-                -0.051440329, 0.20781893, -0.261316872, 0.20781893,
-                0.20781893, -0.076131687, -0.088477366, 0.20781893,
-                -0.063786008, -0.088477366, -0.063786008, -0.137860082);
+        BigInteger expectedFlow6 = BigInteger.valueOf(1191);
         assertEquals(expectedFlow6, timeSeriesDeCz.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesDeAt = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-AT");
-        BigInteger expectedFlow7 = computeCoreExpectedFlow(
-                -0.290123457, 0.265432099, 0.00617284, 0.265432099,
-                0.265432099, -0.216049383, -0.179012346, 0.265432099,
-                0.080246914, -0.179012346, -0.25308642, -0.030864198);
+        BigInteger expectedFlow7 = BigInteger.valueOf(2329);
         assertEquals(expectedFlow7, timeSeriesDeAt.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesPlCz = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "PL-CZ");
-        BigInteger expectedFlow8 = computeCoreExpectedFlow(
-                -0.059670782, 0.014403292, -0.183127572, 0.014403292,
-                0.014403292, -0.034979424, -0.022633745, 0.014403292,
-                0.28600823, -0.022633745, -0.047325103, 0.026748971);
+        BigInteger expectedFlow8 = BigInteger.valueOf(-104);
         assertEquals(expectedFlow8, timeSeriesPlCz.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesPlSk = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "PL-SK");
-        BigInteger expectedFlow9 = computeCoreExpectedFlow(
-                -0.015432099, 0.095679012, 0.021604938, 0.095679012,
-                0.095679012, -0.089506173, -0.12654321, 0.095679012,
-                0.280864198, -0.12654321, -0.052469136, -0.274691358);
+        BigInteger expectedFlow9 = BigInteger.valueOf(478);
         assertEquals(expectedFlow9, timeSeriesPlSk.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesAtCz = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "AT-CZ");
-        BigInteger expectedFlow10 = computeCoreExpectedFlow(
-                0.238683128, -0.057613169, -0.267489712, -0.057613169,
-                -0.057613169, 0.139917695, 0.090534979, -0.057613169,
-                -0.144032922, 0.090534979, 0.189300412, -0.106995885);
+        BigInteger expectedFlow10 = BigInteger.valueOf(-1138);
         assertEquals(expectedFlow10, timeSeriesAtCz.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesAtSi = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "AT-SI");
-        BigInteger expectedFlow11 = computeCoreExpectedFlow(
-                0.159465021, 0.122427984, 0.110082305, 0.122427984,
-                0.122427984, -0.297325103, -0.025720165, 0.122427984,
-                0.097736626, -0.025720165, -0.568930041, 0.060699588);
+        BigInteger expectedFlow11 = BigInteger.valueOf(975);
         assertEquals(expectedFlow11, timeSeriesAtSi.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesHrSi = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "HR-SI");
-        BigInteger expectedFlow12 = computeCoreExpectedFlow(
-                -0.076131687, -0.03909465, -0.026748971, -0.03909465,
-                -0.03909465, 0.380658436, 0.109053498, -0.03909465,
-                -0.014403292, 0.109053498, -0.347736626, 0.022633745);
+        BigInteger expectedFlow12 = BigInteger.valueOf(-81);
         assertEquals(expectedFlow12, timeSeriesHrSi.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesAtHu = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "AT-HU");
-        BigInteger expectedFlow13 = computeCoreExpectedFlow(
-                0.228395062, 0.117283951, 0.080246914, 0.117283951,
-                0.117283951, -0.141975309, -0.327160494, 0.117283951,
-                0.043209877, -0.327160494, 0.043209877, -0.067901235);
+        BigInteger expectedFlow13 = BigInteger.valueOf(762);
         assertEquals(expectedFlow13, timeSeriesAtHu.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesCzSk = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "CZ-SK");
-        BigInteger expectedFlow14 = computeCoreExpectedFlow(
-                0.044238683, 0.08127572, 0.20473251, 0.08127572,
-                0.08127572, -0.054526749, -0.103909465, 0.08127572,
-                -0.005144033, -0.103909465, -0.005144033, -0.301440329);
+        BigInteger expectedFlow14 = BigInteger.valueOf(581);
         assertEquals(expectedFlow14, timeSeriesCzSk.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesSkHu = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "SK-HU");
-        BigInteger expectedFlow15 = computeCoreExpectedFlow(
-                -0.054526749, 0.093621399, 0.143004115, 0.093621399,
-                0.093621399, -0.227366255, -0.313786008, 0.093621399,
-                0.192386831, -0.313786008, -0.140946502, 0.340534979);
+        BigInteger expectedFlow15 = BigInteger.valueOf(1318);
         assertEquals(expectedFlow15, timeSeriesSkHu.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesHrHu = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "HR-HU");
-        BigInteger expectedFlow16 = computeCoreExpectedFlow(
-                -0.007201646, -0.044238683, -0.056584362, -0.044238683,
-                -0.044238683, 0.53600823, -0.192386831, -0.044238683,
-                -0.068930041, -0.192386831, 0.264403292, -0.105967078);
+        BigInteger expectedFlow16 = BigInteger.valueOf(-294);
         assertEquals(expectedFlow16, timeSeriesHrHu.getPeriod().getInterval().get(0).getQty().getV());
 
         PublicationDocument.PublicationTimeSeries timeSeriesRoHu = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RO-HU");
-        BigInteger expectedFlow17 = computeCoreExpectedFlow(
-                -0.083333333, -0.083333333, -0.083333333, -0.083333333,
-                -0.083333333, -0.083333333, -0.083333333, -0.083333333,
-                -0.083333333, 0.916666667, -0.083333333, -0.083333333);
+        BigInteger expectedFlow17 = BigInteger.valueOf(-503);
         assertEquals(expectedFlow17, timeSeriesRoHu.getPeriod().getInterval().get(0).getQty().getV());
     }
 

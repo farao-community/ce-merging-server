@@ -36,7 +36,7 @@ import java.util.Map;
 public class FinalRefProgBuilder {
 
     public PublicationDocument buildFinalRefProgResult(final RefProgResult refProgResult, final MergingTask taskEntity) {
-        final String dailyTimeInterval = refProgResult.getDailyTimeInterval();
+        final String dailyTimeInterval = refProgResult.dailyTimeInterval();
         final OffsetDateTime periodStart = OffsetDateTime.parse(dailyTimeInterval.substring(0, 17), DateTimeFormatter.ISO_DATE_TIME);
         final OffsetDateTime periodEnd = OffsetDateTime.parse(dailyTimeInterval.substring(18, 35), DateTimeFormatter.ISO_DATE_TIME);
         final int position = OutputUtils.calculateTargetPosition(taskEntity.getInputs().getTargetDate(), periodStart, periodEnd);
@@ -100,8 +100,8 @@ public class FinalRefProgBuilder {
                                                                                  final String dailyTimeInterval,
                                                                                  final int position) {
         final List<PublicationDocument.PublicationTimeSeries> pubTimeSeriesList = new ArrayList<>();
-        refProgResult.getAcExchanges().entrySet().forEach(entry -> pubTimeSeriesList.add(computePublicationTimeSeries(entry, CurrentType.AC, taskEntity, dailyTimeInterval, position)));
-        refProgResult.getVirtualHubsExchanges().entrySet().forEach(entry -> pubTimeSeriesList.add(computePublicationTimeSeries(entry, CurrentType.DC, taskEntity, dailyTimeInterval, position)));
+        refProgResult.acExchanges().entrySet().forEach(entry -> pubTimeSeriesList.add(computePublicationTimeSeries(entry, CurrentType.AC, taskEntity, dailyTimeInterval, position)));
+        refProgResult.virtualHubsExchanges().entrySet().forEach(entry -> pubTimeSeriesList.add(computePublicationTimeSeries(entry, CurrentType.DC, taskEntity, dailyTimeInterval, position)));
         return pubTimeSeriesList;
     }
 
@@ -167,8 +167,8 @@ public class FinalRefProgBuilder {
         return countryFrom + "-" + countryTo;
     }
 
-    private String getDcTimeSeriesIdentification(final Map.Entry<Border, Double> entry, final MergingTask taskEntity) {
-        final List<VirtualHubRecord> virtualHubList = taskEntity.getConfigurations().getVirtualHubList();
+    private String getDcTimeSeriesIdentification(final Map.Entry<Border, Double> entry, final MergingTask mergingTask) {
+        final List<VirtualHubRecord> virtualHubList = mergingTask.getConfigurations().getVirtualHubList();
 
         final String eicCodeFrom = entry.getKey().getOutArea();
         final String eicCodeTo = entry.getKey().getInArea();

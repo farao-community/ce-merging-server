@@ -56,18 +56,16 @@ public class RefProgCalculationService {
     private final CeMergingConfiguration configuration;
     private final MergingTaskRepository mergingTaskRepository;
     //TODO private final LogsCustomisationService logsCustomisationService;
-    private final VirtualHubsConfigurationService virtualHubsConfigurationService;
 
     public RefProgCalculationService(final MergingTaskRepository mergingTaskRepository,
                                      final CeMergingConfiguration configuration,
-                                     final FinalRefProgBuilder finalRefProgBuilder,
+                                     final FinalRefProgBuilder finalRefProgBuilder
                                      // TODO final LogsCustomisationService logsCustomisationService,
-                                     final VirtualHubsConfigurationService virtualHubsConfigurationService) {
+                                     ) {
         this.configuration = configuration;
         this.finalRefProgBuilder = finalRefProgBuilder;
         this.mergingTaskRepository = mergingTaskRepository;
         //TODO this.logsCustomisationService = logsCustomisationService;
-        this.virtualHubsConfigurationService = virtualHubsConfigurationService;
     }
 
     public void computeRefProg(final MergingTask mergingTask) {
