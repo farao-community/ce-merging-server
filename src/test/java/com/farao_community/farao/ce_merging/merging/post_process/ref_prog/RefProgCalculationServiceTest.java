@@ -1,0 +1,611 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package com.farao_community.farao.ce_merging.merging.post_process.ref_prog;
+
+import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecCoefficients;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
+import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import test_utils.TaskTestUtils;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.OffsetDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+/**
+ * @author Oualid Aloui {@literal <oualid.aloui at rte-france.com>}
+ */
+
+@SpringBootTest
+public class RefProgCalculationServiceTest {
+    private static final String RESOURCES_PATH = "src/test/resources/refProg";
+    private static final String CGM_NET_POSITION_FILE_NAME = "cgmNetPositions.json";
+    private static final String PEVF_FILE_NAME = "20231103_0030_FO5_UX1.PEVF";
+    private static final String FORECAST_REFERENCE_PROGRAM_FILE_NAME = "forecastReferenceProgram.json";
+    private static final OffsetDateTime TARGET_DATE = OffsetDateTime.parse("2023-11-03T00:30Z");
+
+    private static final Map<String, Double> GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS = new HashMap<>();
+    private static final Map<String, Double> AC_NET_POSITION_OUT_COUNTRY = new HashMap<>();
+    private static final Map<String, Double> VIRTUAL_HUBS_EXCHANGES = new HashMap<>();
+
+    private static final double FORECAST_NET_POSITION_BA_HR = 0.0;
+    private static final double FORECAST_NET_POSITION_BG_TR = -100.0;
+    private static final double FORECAST_NET_POSITION_CH_AT = -783.0;
+    private static final double FORECAST_NET_POSITION_CH_DE = -1047.0;
+    private static final double FORECAST_NET_POSITION_CH_FR = -2680.0;
+    private static final double FORECAST_NET_POSITION_CH_IT = 2016.0;
+    private static final double FORECAST_NET_POSITION_DE_DK = 0.0;
+    private static final double FORECAST_NET_POSITION_ES_PT = 1963.0;
+    private static final double FORECAST_NET_POSITION_FR_ES = 0.0;
+    private static final double FORECAST_NET_POSITION_FR_IT = 2524.0;
+    private static final double FORECAST_NET_POSITION_GR_AL = -242.0;
+    private static final double FORECAST_NET_POSITION_GR_BG = -720.0;
+    private static final double FORECAST_NET_POSITION_GR_MK = -154.0;
+    private static final double FORECAST_NET_POSITION_GR_TR = -50.0;
+    private static final double FORECAST_NET_POSITION_IT_AT = -242.0;
+    private static final double FORECAST_NET_POSITION_IT_SI = -549.0;
+    private static final double FORECAST_NET_POSITION_ME_AL = 86.0;
+    private static final double FORECAST_NET_POSITION_ME_BA = 0.0;
+    private static final double FORECAST_NET_POSITION_MK_BG = -276.0;
+    private static final double FORECAST_NET_POSITION_MK_KS = 95.0;
+    private static final double FORECAST_NET_POSITION_RO_BG = 702.0;
+    private static final double FORECAST_NET_POSITION_RS_BA = 0.0;
+    private static final double FORECAST_NET_POSITION_RS_BG = 0.0;
+    private static final double FORECAST_NET_POSITION_RS_HR = 0.0;
+    private static final double FORECAST_NET_POSITION_RS_HU = 0.0;
+    private static final double FORECAST_NET_POSITION_RS_ME = 0.0;
+    private static final double FORECAST_NET_POSITION_RS_MK = 0.0;
+    private static final double FORECAST_NET_POSITION_RS_RO = 0.0;
+    private static final double FORECAST_NET_POSITION_RS_KS = 0.0;
+    private static final double FORECAST_NET_POSITION_UA_HU = 0.0;
+    private static final double FORECAST_NET_POSITION_UA_RO = 0.0;
+    private static final double FORECAST_NET_POSITION_UA_SK = 0.0;
+    private static final double FORECAST_NET_POSITION_KS_AL = 129.0;
+    private static final double FORECAST_NET_POSITION_KS_ME = -47.0;
+
+    @Autowired
+    BECKeyConfigurationService becKeyConfigurationService;
+
+    @Autowired
+    private CeMergingConfiguration configuration;
+
+    @Autowired
+    RefProgCalculationService refProgCalculationService;
+
+    MergingTask task = new MergingTask();
+
+    @BeforeEach
+    void setUp() throws Exception {
+        initCoreMergingTaskEntity();
+        initGlobalNetPositionWithoutVirtualHubs();
+        initAcNetPositionOutCountry();
+        initVirtualHubsExchanges();
+    }
+
+    @Test
+    public void computeRefProg() {
+        refProgCalculationService.computeRefProg(task);
+        PublicationDocument refProgResult = JaxbUtils.readFromPath(PublicationDocument.class, task.getOutputs().getRefProg().getPath());
+
+        assertNotNull(refProgResult);
+        assertFalse(refProgResult.getPublicationTimeSeries().isEmpty());
+
+        checkCoreExchanges(refProgResult);
+        checkNonCoreExchanges(refProgResult);
+        checkVirtualHubsExchanges(refProgResult);
+    }
+
+    private void checkCoreExchanges(PublicationDocument refProgResult) {
+
+        PublicationDocument.PublicationTimeSeries timeSeriesBeNl = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "BE-NL");
+        BigInteger expectedFlow1 = computeCoreExpectedFlow(
+                -0.041666667, 0.458333333, -0.041666667, -0.041666667,
+                0.208333333, -0.041666667, -0.041666667, -0.291666667,
+                -0.041666667, -0.041666667, -0.041666667, -0.041666667);
+        assertEquals(expectedFlow1, timeSeriesBeNl.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesFrBe = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "FR-BE");
+        BigInteger expectedFlow2 = computeCoreExpectedFlow(
+                0.041666667, -0.458333333, 0.041666667, 0.041666667,
+                0.291666667, 0.041666667, 0.041666667, -0.208333333,
+                0.041666667, 0.041666667, 0.041666667, 0.041666667);
+        assertEquals(expectedFlow2, timeSeriesFrBe.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesDeNl = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-NL");
+        BigInteger expectedFlow3 = computeCoreExpectedFlow(
+                0.125, -0.375, 0.125, 0.125,
+                -0.125, 0.125, 0.125, -0.625,
+                0.125, 0.125, 0.125, 0.125);
+        assertEquals(expectedFlow3, timeSeriesDeNl.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesFrDe = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "FR-DE");
+        BigInteger expectedFlow4 = computeCoreExpectedFlow(
+                -0.125, 0.375, -0.125, -0.125,
+                0.625, -0.125, -0.125, 0.125,
+                -0.125, -0.125, -0.125, -0.125);
+        assertEquals(expectedFlow4, timeSeriesFrDe.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesDePl = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-PL");
+        BigInteger expectedFlow5 = computeCoreExpectedFlow(
+                0.008230453, 0.193415638, -0.0781893, 0.193415638,
+                0.193415638, -0.041152263, -0.065843621, 0.193415638,
+                -0.349794239, -0.065843621, -0.016460905, -0.164609053);
+        assertEquals(expectedFlow5, timeSeriesDePl.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesDeCz = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-CZ");
+        BigInteger expectedFlow6 = computeCoreExpectedFlow(
+                -0.051440329, 0.20781893, -0.261316872, 0.20781893,
+                0.20781893, -0.076131687, -0.088477366, 0.20781893,
+                -0.063786008, -0.088477366, -0.063786008, -0.137860082);
+        assertEquals(expectedFlow6, timeSeriesDeCz.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesDeAt = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-AT");
+        BigInteger expectedFlow7 = computeCoreExpectedFlow(
+                -0.290123457, 0.265432099, 0.00617284, 0.265432099,
+                0.265432099, -0.216049383, -0.179012346, 0.265432099,
+                0.080246914, -0.179012346, -0.25308642, -0.030864198);
+        assertEquals(expectedFlow7, timeSeriesDeAt.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesPlCz = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "PL-CZ");
+        BigInteger expectedFlow8 = computeCoreExpectedFlow(
+                -0.059670782, 0.014403292, -0.183127572, 0.014403292,
+                0.014403292, -0.034979424, -0.022633745, 0.014403292,
+                0.28600823, -0.022633745, -0.047325103, 0.026748971);
+        assertEquals(expectedFlow8, timeSeriesPlCz.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesPlSk = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "PL-SK");
+        BigInteger expectedFlow9 = computeCoreExpectedFlow(
+                -0.015432099, 0.095679012, 0.021604938, 0.095679012,
+                0.095679012, -0.089506173, -0.12654321, 0.095679012,
+                0.280864198, -0.12654321, -0.052469136, -0.274691358);
+        assertEquals(expectedFlow9, timeSeriesPlSk.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesAtCz = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "AT-CZ");
+        BigInteger expectedFlow10 = computeCoreExpectedFlow(
+                0.238683128, -0.057613169, -0.267489712, -0.057613169,
+                -0.057613169, 0.139917695, 0.090534979, -0.057613169,
+                -0.144032922, 0.090534979, 0.189300412, -0.106995885);
+        assertEquals(expectedFlow10, timeSeriesAtCz.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesAtSi = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "AT-SI");
+        BigInteger expectedFlow11 = computeCoreExpectedFlow(
+                0.159465021, 0.122427984, 0.110082305, 0.122427984,
+                0.122427984, -0.297325103, -0.025720165, 0.122427984,
+                0.097736626, -0.025720165, -0.568930041, 0.060699588);
+        assertEquals(expectedFlow11, timeSeriesAtSi.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesHrSi = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "HR-SI");
+        BigInteger expectedFlow12 = computeCoreExpectedFlow(
+                -0.076131687, -0.03909465, -0.026748971, -0.03909465,
+                -0.03909465, 0.380658436, 0.109053498, -0.03909465,
+                -0.014403292, 0.109053498, -0.347736626, 0.022633745);
+        assertEquals(expectedFlow12, timeSeriesHrSi.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesAtHu = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "AT-HU");
+        BigInteger expectedFlow13 = computeCoreExpectedFlow(
+                0.228395062, 0.117283951, 0.080246914, 0.117283951,
+                0.117283951, -0.141975309, -0.327160494, 0.117283951,
+                0.043209877, -0.327160494, 0.043209877, -0.067901235);
+        assertEquals(expectedFlow13, timeSeriesAtHu.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesCzSk = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "CZ-SK");
+        BigInteger expectedFlow14 = computeCoreExpectedFlow(
+                0.044238683, 0.08127572, 0.20473251, 0.08127572,
+                0.08127572, -0.054526749, -0.103909465, 0.08127572,
+                -0.005144033, -0.103909465, -0.005144033, -0.301440329);
+        assertEquals(expectedFlow14, timeSeriesCzSk.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesSkHu = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "SK-HU");
+        BigInteger expectedFlow15 = computeCoreExpectedFlow(
+                -0.054526749, 0.093621399, 0.143004115, 0.093621399,
+                0.093621399, -0.227366255, -0.313786008, 0.093621399,
+                0.192386831, -0.313786008, -0.140946502, 0.340534979);
+        assertEquals(expectedFlow15, timeSeriesSkHu.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesHrHu = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "HR-HU");
+        BigInteger expectedFlow16 = computeCoreExpectedFlow(
+                -0.007201646, -0.044238683, -0.056584362, -0.044238683,
+                -0.044238683, 0.53600823, -0.192386831, -0.044238683,
+                -0.068930041, -0.192386831, 0.264403292, -0.105967078);
+        assertEquals(expectedFlow16, timeSeriesHrHu.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesRoHu = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RO-HU");
+        BigInteger expectedFlow17 = computeCoreExpectedFlow(
+                -0.083333333, -0.083333333, -0.083333333, -0.083333333,
+                -0.083333333, -0.083333333, -0.083333333, -0.083333333,
+                -0.083333333, 0.916666667, -0.083333333, -0.083333333);
+        assertEquals(expectedFlow17, timeSeriesRoHu.getPeriod().getInterval().get(0).getQty().getV());
+    }
+
+    private void checkNonCoreExchanges(PublicationDocument refProgResult) {
+        PublicationDocument.PublicationTimeSeries timeSeriesDeDk = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-DK");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_DE_DK), timeSeriesDeDk.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesUaSk = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "UA-SK");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_UA_SK), timeSeriesUaSk.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesUaHu = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "UA-HU");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_UA_HU), timeSeriesUaHu.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesUaRo = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "UA-RO");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_UA_RO), timeSeriesUaRo.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesChDe = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "CH-DE");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_CH_DE), timeSeriesChDe.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesChAt = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "CH-AT");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_CH_AT), timeSeriesChAt.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesChFr = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "CH-FR");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_CH_FR), timeSeriesChFr.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesChIt = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "CH-IT");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_CH_IT), timeSeriesChIt.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesFrEs = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "FR-ES");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_FR_ES), timeSeriesFrEs.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesEsPt = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "ES-PT");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_ES_PT), timeSeriesEsPt.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesItSi = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "IT-SI");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_IT_SI), timeSeriesItSi.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesRsBg = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RS-BG");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_RS_BG), timeSeriesRsBg.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesRsRo = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RS-RO");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_RS_RO), timeSeriesRsRo.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesRoBg = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RO-BG");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_RO_BG), timeSeriesRoBg.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesRsHu = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RS-HU");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_RS_HU), timeSeriesRsHu.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesRsHr = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RS-HR");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_RS_HR), timeSeriesRsHr.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesRsBa = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RS-BA");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_RS_BA), timeSeriesRsBa.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesRsMe = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RS-ME");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_RS_ME), timeSeriesRsMe.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesRsMk = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RS-MK");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_RS_MK), timeSeriesRsMk.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesMkBg = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "MK-BG");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_MK_BG), timeSeriesMkBg.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesGrMk = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "GR-MK");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_GR_MK), timeSeriesGrMk.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesGrBg = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "GR-BG");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_GR_BG), timeSeriesGrBg.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesGrTr = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "GR-TR");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_GR_TR), timeSeriesGrTr.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesGrAl = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "GR-AL");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_GR_AL), timeSeriesGrAl.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesMeBa = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "ME-BA");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_ME_BA), timeSeriesMeBa.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesMeAl = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "ME-AL");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_ME_AL), timeSeriesMeAl.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesBaHr = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "BA-HR");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_BA_HR), timeSeriesBaHr.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesFrIt = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "FR-IT");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_FR_IT), timeSeriesFrIt.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesItAt = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "IT-AT");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_IT_AT), timeSeriesItAt.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesBgTr = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "BG-TR");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_BG_TR), timeSeriesBgTr.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesRsKs = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "RS-KS");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_RS_KS), timeSeriesRsKs.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesMkKs = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "MK-KS");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_MK_KS), timeSeriesMkKs.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesKsMe = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "KS-ME");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_KS_ME), timeSeriesKsMe.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeriesKsAl = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "KS-AL");
+        assertEquals(roundAndConvertToBigInteger(FORECAST_NET_POSITION_KS_AL), timeSeriesKsAl.getPeriod().getInterval().get(0).getQty().getV());
+    }
+
+    private void checkVirtualHubsExchanges(PublicationDocument refProgResult) {
+        PublicationDocument.PublicationTimeSeries timeSeries1 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "NL-UK_BritNed");
+        assertEquals(computeVirtualHubsExpectedFlow("XGR_MA1N"), timeSeries1.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries2 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "BE-UK_Nemolink");
+        assertEquals(computeVirtualHubsExpectedFlow("XBE_GB1B"), timeSeries2.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries3 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "FR-UK_IFA2000_link1");
+        assertEquals(computeVirtualHubsExpectedFlow("XMA_SE11"), timeSeries3.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries4 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "FR-UK_IFA2000_link2");
+        assertEquals(computeVirtualHubsExpectedFlow("XMA_SE13"), timeSeries4.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries5 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "NL-NO_NorNed");
+        assertEquals(computeVirtualHubsExpectedFlow("XEE_FE1N"), timeSeries5.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries6 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "NL-DK1_COBRA");
+        assertEquals(computeVirtualHubsExpectedFlow("XED_EE1N"), timeSeries6.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries7 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DK1-NL_COBRA");
+        assertEquals(computeVirtualHubsExpectedFlow("XED_EE1D"), timeSeries7.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries8 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-DK2_Kontek");
+        assertEquals(computeVirtualHubsExpectedFlow("XBW_BJ1D"), timeSeries8.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries9 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-SE_Baltic");
+        assertEquals(computeVirtualHubsExpectedFlow("D2HWKR1D"), timeSeries9.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries10 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "PL-SE_SwePol");
+        assertEquals(computeVirtualHubsExpectedFlow("XSL_SW11"), timeSeries10.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries11 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "PL-LT_LitPol1");
+        assertEquals(computeVirtualHubsExpectedFlow("XEL_AL11"), timeSeries11.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries12 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "PL-LT_LitPol2");
+        assertEquals(computeVirtualHubsExpectedFlow("XEL_AL12"), timeSeries12.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries13 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "PL-UA_Dobrotwor");
+        assertEquals(computeVirtualHubsExpectedFlow("XZA_DO21"), timeSeries13.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries14 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DK1-SE_Kontiskan1");
+        assertEquals(computeVirtualHubsExpectedFlow("XVH_L11K"), timeSeries14.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries15 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DK1-SE_Kontiskan2");
+        assertEquals(computeVirtualHubsExpectedFlow("XVH_L21K"), timeSeries15.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries16 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DK1-DK2_GreatBelt");
+        assertEquals(computeVirtualHubsExpectedFlow("XFG_HK11"), timeSeries16.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries17 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DK1-NO_Skagerrak1");
+        assertEquals(computeVirtualHubsExpectedFlow("XTJ_K13K"), timeSeries17.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries18 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DK1-NO_Skagerrak2");
+        assertEquals(computeVirtualHubsExpectedFlow("XTJ_K23K"), timeSeries18.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries19 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "IT-GR_GrIt");
+        assertEquals(computeVirtualHubsExpectedFlow("XAR_GA1I"), timeSeries19.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries20 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "GR-IT_GrIt");
+        assertEquals(computeVirtualHubsExpectedFlow("XAR_GA1G"), timeSeries20.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries21 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "IT-ME_MONITA1");
+        assertEquals(computeVirtualHubsExpectedFlow("XCEPR120"), timeSeries21.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries22 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "ME-IT_MONITA1");
+        assertEquals(computeVirtualHubsExpectedFlow("XKOTR120"), timeSeries22.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries23 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-NO_Nordlink_link1");
+        assertEquals(computeVirtualHubsExpectedFlow("XWI_ET11"), timeSeries23.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries24 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-NO_Nordlink_link2");
+        assertEquals(computeVirtualHubsExpectedFlow("XWI_ET12"), timeSeries24.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries25 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "FR-UK_IFA2");
+        assertEquals(computeVirtualHubsExpectedFlow("XTO_CH11"), timeSeries25.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries26 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DK1-NO_Skagerrak3");
+        assertEquals(computeVirtualHubsExpectedFlow("XTJ_K31K"), timeSeries26.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries27 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DK1-NO_Skagerrak4");
+        assertEquals(computeVirtualHubsExpectedFlow("XTJ_K41K"), timeSeries27.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries28 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-DK2_CGS");
+        assertEquals(computeVirtualHubsExpectedFlow("D8BWW_25"), timeSeries28.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries29 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "FR-UK_Eleclink");
+        assertEquals(computeVirtualHubsExpectedFlow("XMA_SE15"), timeSeries29.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries30 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "BE-BE_AL");
+        assertEquals(computeVirtualHubsExpectedFlow("XLI_OB1B"), timeSeries30.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries31 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "DE-DE_AL");
+        assertEquals(computeVirtualHubsExpectedFlow("XLI_OB1A"), timeSeries31.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries32 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "IT-ME_MONITA2");
+        assertEquals(computeVirtualHubsExpectedFlow("XCEPR220"), timeSeries32.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries33 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "ME-IT_MONITA2");
+        assertEquals(computeVirtualHubsExpectedFlow("XKOTR220"), timeSeries33.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries34 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "ES-MA_ESMA_link1");
+        assertEquals(computeVirtualHubsExpectedFlow("XTA_FA11"), timeSeries34.getPeriod().getInterval().get(0).getQty().getV());
+
+        PublicationDocument.PublicationTimeSeries timeSeries35 = getPublicationTimeSeriesByTimeSeriesIdentification(refProgResult, "ES-MA_ESMA_link2");
+        assertEquals(computeVirtualHubsExpectedFlow("XTA_FA12"), timeSeries35.getPeriod().getInterval().get(0).getQty().getV());
+    }
+
+    private static PublicationDocument.PublicationTimeSeries getPublicationTimeSeriesByTimeSeriesIdentification(PublicationDocument refProgResult, String timeSeriesIdentification) {
+        return refProgResult.getPublicationTimeSeries().stream()
+                .filter(publicationTimeSeries -> publicationTimeSeries.getTimeSeriesIdentification().getV().equals(timeSeriesIdentification))
+                .findFirst()
+                .orElseThrow(() -> new CeMergingException("Unable to find timeserie " + timeSeriesIdentification + " in refProg result"));
+    }
+
+    private static BigInteger computeCoreExpectedFlow(double factorAT, double factorBE, double factorCZ, double factorDE,
+                                                      double factorFR, double factorHR, double factorHU, double factorNL,
+                                                      double factorPL, double factorRO, double factorSI, double factorSK) {
+        double coreExpectedFlow = factorAT * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("AT") - AC_NET_POSITION_OUT_COUNTRY.get("AT")) +
+                factorBE * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("BE") - AC_NET_POSITION_OUT_COUNTRY.get("BE")) +
+                factorCZ * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("CZ") - AC_NET_POSITION_OUT_COUNTRY.get("CZ")) +
+                factorDE * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("DE") - AC_NET_POSITION_OUT_COUNTRY.get("DE")) +
+                factorFR * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("FR") - AC_NET_POSITION_OUT_COUNTRY.get("FR")) +
+                factorHR * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("HR") - AC_NET_POSITION_OUT_COUNTRY.get("HR")) +
+                factorHU * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("HU") - AC_NET_POSITION_OUT_COUNTRY.get("HU")) +
+                factorNL * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("NL") - AC_NET_POSITION_OUT_COUNTRY.get("NL")) +
+                factorPL * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("PL") - AC_NET_POSITION_OUT_COUNTRY.get("PL")) +
+                factorRO * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("RO") - AC_NET_POSITION_OUT_COUNTRY.get("RO")) +
+                factorSI * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("SI") - AC_NET_POSITION_OUT_COUNTRY.get("SI")) +
+                factorSK * (GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.get("SK") - AC_NET_POSITION_OUT_COUNTRY.get("SK"));
+
+        return roundAndConvertToBigInteger(coreExpectedFlow);
+    }
+
+    private static BigInteger computeVirtualHubsExpectedFlow(String nodeName) {
+        return roundAndConvertToBigInteger(VIRTUAL_HUBS_EXCHANGES.get(nodeName));
+    }
+
+    private static BigInteger roundAndConvertToBigInteger(double value) {
+        return BigDecimal.valueOf(value).setScale(0, RoundingMode.HALF_UP).toBigInteger();
+    }
+
+    private static void initGlobalNetPositionWithoutVirtualHubs() {
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("AT", -1025.725426260948);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("BE", -1322.773618710382);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("CZ", 1117.6163716316223);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("DE", 1360.3519231784344);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("FR", 8296.383736384256);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("HR", -7.692972660064697);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("HU", -914.1336374282837);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("NL", 1573.8933925628662);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("PL", -552.1899824142456);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("RO", 165.53404235839844);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("SI", -271.2135249376297);
+        GLOBAL_NET_POSITION_WITHOUT_VIRTUAL_HUBS.put("SK", 628.4385685920715);
+    }
+
+    private static void initAcNetPositionOutCountry() {
+        AC_NET_POSITION_OUT_COUNTRY.put("AT", -(FORECAST_NET_POSITION_CH_AT + FORECAST_NET_POSITION_IT_AT));
+        AC_NET_POSITION_OUT_COUNTRY.put("BE", 0.0);
+        AC_NET_POSITION_OUT_COUNTRY.put("CZ", 0.0);
+        AC_NET_POSITION_OUT_COUNTRY.put("DE", FORECAST_NET_POSITION_DE_DK - FORECAST_NET_POSITION_CH_DE);
+        AC_NET_POSITION_OUT_COUNTRY.put("FR", (FORECAST_NET_POSITION_FR_ES + FORECAST_NET_POSITION_FR_IT) - FORECAST_NET_POSITION_CH_FR);
+        AC_NET_POSITION_OUT_COUNTRY.put("HR", -(FORECAST_NET_POSITION_BA_HR + FORECAST_NET_POSITION_RS_HR));
+        AC_NET_POSITION_OUT_COUNTRY.put("HU", -(FORECAST_NET_POSITION_RS_HU + FORECAST_NET_POSITION_UA_HU));
+        AC_NET_POSITION_OUT_COUNTRY.put("NL", 0.0);
+        AC_NET_POSITION_OUT_COUNTRY.put("PL", 0.0);
+        AC_NET_POSITION_OUT_COUNTRY.put("RO", FORECAST_NET_POSITION_RO_BG - (FORECAST_NET_POSITION_RS_RO + FORECAST_NET_POSITION_UA_RO));
+        AC_NET_POSITION_OUT_COUNTRY.put("SI", -FORECAST_NET_POSITION_IT_SI);
+        AC_NET_POSITION_OUT_COUNTRY.put("SK", -FORECAST_NET_POSITION_UA_SK);
+    }
+
+    private static void initVirtualHubsExchanges() {
+        VIRTUAL_HUBS_EXCHANGES.put("XGR_MA1N", -1031.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XBE_GB1B", 243.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XMA_SE11", 751.919);
+        VIRTUAL_HUBS_EXCHANGES.put("XMA_SE13", 760.918);
+        VIRTUAL_HUBS_EXCHANGES.put("XEE_FE1N", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XED_EE1N", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XED_EE1D", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XBW_BJ1D", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("D2HWKR1D", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XSL_SW11", -392.5);
+        VIRTUAL_HUBS_EXCHANGES.put("XEL_AL11", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XEL_AL12", 28.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XZA_DO21", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XVH_L11K", 369.4);
+        VIRTUAL_HUBS_EXCHANGES.put("XVH_L21K", 371.9);
+        VIRTUAL_HUBS_EXCHANGES.put("XFG_HK11", -588.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XTJ_K13K", 251.2);
+        VIRTUAL_HUBS_EXCHANGES.put("XTJ_K23K", 251.2);
+        VIRTUAL_HUBS_EXCHANGES.put("XAR_GA1I", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XAR_GA1G", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XCEPR120", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XKOTR120", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XWI_ET11", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XWI_ET12", 0.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XTO_CH11", 1029.21);
+        VIRTUAL_HUBS_EXCHANGES.put("XTJ_K31K", 501.2);
+        VIRTUAL_HUBS_EXCHANGES.put("XTJ_K41K", 683.8);
+        VIRTUAL_HUBS_EXCHANGES.put("D8BWW_25", -296.33636474609375);
+        VIRTUAL_HUBS_EXCHANGES.put("XMA_SE15", 1028.7);
+        VIRTUAL_HUBS_EXCHANGES.put("XLI_OB1B", 3.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XLI_OB1A", -3.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XCEPR220", -519.8);
+        VIRTUAL_HUBS_EXCHANGES.put("XKOTR220", 530.0);
+        VIRTUAL_HUBS_EXCHANGES.put("XTA_FA11", 581.9);
+        VIRTUAL_HUBS_EXCHANGES.put("XTA_FA12", -258.7);
+    }
+
+    private void initCoreMergingTaskEntity() throws Exception {
+        TaskTestUtils.setTaskDefaultConfigurations(task);
+
+        initArtifacts();
+        initInputs();
+        initBecByBoundary();
+
+        Files.createDirectories(Paths.get(configuration.getInputsDirectoryPath(task)));
+        Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(task)));
+        Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(task)));
+    }
+
+    private void initArtifacts() {
+        Artifacts artifacts = new Artifacts();
+
+        SavedFile cgmNetPositionsFile = new SavedFile(CGM_NET_POSITION_FILE_NAME, RESOURCES_PATH + "/" + CGM_NET_POSITION_FILE_NAME, "mock");
+        SavedFile forecastReferenceProgram = new SavedFile(FORECAST_REFERENCE_PROGRAM_FILE_NAME, RESOURCES_PATH + "/" + FORECAST_REFERENCE_PROGRAM_FILE_NAME, "mock");
+
+        artifacts.putFile(ArtifactType.CGM_NET_POSITIONS_FILE, cgmNetPositionsFile);
+        artifacts.putFile(ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE, forecastReferenceProgram);
+
+        task.setArtifacts(artifacts);
+    }
+
+    private void initInputs() {
+        Inputs inputs = new Inputs();
+
+        SavedFile pevfFile = new SavedFile(PEVF_FILE_NAME, RESOURCES_PATH + "/" + PEVF_FILE_NAME, "mock");
+
+        inputs.setNetPositionForecast(pevfFile);
+        inputs.setTargetDate(TARGET_DATE);
+
+        task.setInputs(inputs);
+    }
+
+    private void initBecByBoundary() throws Exception {
+        List<BecByBoundaryDto> becByBoundaryDtos = becKeyConfigurationService.getConfiguration(TARGET_DATE).getBecByBoundaries();
+        List<BecByBoundary> becByBoundaryList = becByBoundaryDtos.stream()
+                .map(becByBoundaryDto -> {
+                    Border border = new Border(becByBoundaryDto.getBorder().getOutArea(), becByBoundaryDto.getBorder().getInArea());
+                    List<BecCoefficients> becCoefficients = becByBoundaryDto.getCoefficientByCountry().stream()
+                            .map(becCoefficientsDto -> new BecCoefficients(becCoefficientsDto.getCountryCode(), becCoefficientsDto.getCoefficient()))
+                            .collect(Collectors.toList());
+                    return new BecByBoundary(border, becCoefficients);
+                })
+                .collect(Collectors.toList());
+
+        task.getConfigurations().setBecMatrixConfig(becByBoundaryList);
+    }
+}
