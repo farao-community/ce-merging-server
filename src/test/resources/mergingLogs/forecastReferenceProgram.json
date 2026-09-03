@@ -1,0 +1,9 @@
+{
+  "dailyTimeInterval" : "2020-01-29T23:00Z/2020-01-30T23:00Z",
+  "targetDateTime" : "2020-01-30T13:00Z",
+  "referenceExchangeDataList" : [ {
+    "areaOutId" : "XXXXXXXXXXXXXX",
+    "areaInId" : "YYYYYYYYYYYYYY",
+    "flow" : 0.0
+  } ]
+}
