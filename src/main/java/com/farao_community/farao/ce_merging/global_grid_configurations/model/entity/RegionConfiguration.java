@@ -38,12 +38,6 @@ public class RegionConfiguration extends AbstractRegionConfiguration<TsoInfos> i
     @GeneratedValue(strategy = AUTO)
     private Long ref;
 
-    @Column(name = "name")
-    protected String name;
-
-    @Column(name = "id")
-    protected String id;
-
     @ElementCollection
     @CollectionTable(name = "regionconfiguration_areasin_code_mapping",
         joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
@@ -62,6 +56,22 @@ public class RegionConfiguration extends AbstractRegionConfiguration<TsoInfos> i
     @JsonProperty(value = "germanyZones")
     protected Map<String, TsoInfos> germanyZone;
 
+    public Map<String, TsoInfos> getGermanyZone() {
+        return germanyZone;
+    }
+
+    public void setGermanyZone(final Map<String, TsoInfos> germanyZone) {
+        this.germanyZone = germanyZone;
+    }
+
+    public Long getRef() {
+        return ref;
+    }
+
+    public void setRef(final Long ref) {
+        this.ref = ref;
+    }
+
     @Override
     public String toString() {
         ObjectMapper mapper = new ObjectMapper();
@@ -71,13 +81,5 @@ public class RegionConfiguration extends AbstractRegionConfiguration<TsoInfos> i
             LOGGER.error("Error during json parse regions configuration");
             throw new ServiceIOException("Error during json parse regions configuration", e);
         }
-    }
-
-    public Long getRef() {
-        return ref;
-    }
-
-    public void setRef(final Long ref) {
-        this.ref = ref;
     }
 }
