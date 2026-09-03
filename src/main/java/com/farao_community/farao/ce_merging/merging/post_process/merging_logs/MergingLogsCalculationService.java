@@ -73,7 +73,6 @@ public class MergingLogsCalculationService {
     }
 
     private MergingLog buildMergingLog(final MergingTask task) {
-        MergingLog mergingLog;
         final JsonBciOutputStructure bciOutputs = JsonUtils.read(JsonBciOutputStructure.class, task.getArtifactPath(ArtifactType.BCI_OUTPUT_FILE));
         final PstOutput pstOutputs = JsonUtils.read(PstOutput.class, task.getArtifactPath(ArtifactType.PST_OUTPUT_FILE));
         final NetPositionsResults igmNetPositionsResults = JsonUtils.read(NetPositionsResults.class, task.getArtifactPath(ArtifactType.IGMS_NET_POSITIONS_FILE));
@@ -87,11 +86,10 @@ public class MergingLogsCalculationService {
         final MergingLogsBuilder mergingLogsBuilder = new MergingLogsBuilder();
         if (task.getInputs().getMergingWithInternalHvdc()) {
             final List<AlegroReportInformation> alegroReportInformationsList = buildAlegroReports(referenceProgram, cgmNetPositionsResults, igmNetPositionsResults);
-            mergingLog = mergingLogsBuilder.buildMergingLog(task, reportInformationInRegionList, referenceProgram, pstOutputs, reportInformationsOutRegionList, tsoInformationsList, alegroReportInformationsList);
+            return mergingLogsBuilder.buildMergingLog(task, reportInformationInRegionList, referenceProgram, pstOutputs, reportInformationsOutRegionList, tsoInformationsList, alegroReportInformationsList);
         } else {
-            mergingLog = mergingLogsBuilder.buildMergingLog(task, reportInformationInRegionList, referenceProgram, pstOutputs, reportInformationsOutRegionList, tsoInformationsList, null);
+            return mergingLogsBuilder.buildMergingLog(task, reportInformationInRegionList, referenceProgram, pstOutputs, reportInformationsOutRegionList, tsoInformationsList, null);
         }
-        return mergingLog;
     }
 
     private List<AlegroReportInformation> buildAlegroReports(final ReferenceProgram referenceProgram, final NetPositionsResults cgmNetPositionsResults, final NetPositionsResults igmNetPositionsResults) {
