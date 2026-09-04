@@ -10,6 +10,7 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.util.CountryCodeUtils;
+import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
@@ -23,23 +24,16 @@ import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectionRecord;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-//TODO import com.farao_community.farao.ce_merging.LogsCustomisationService;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
-//TODO import com.farao_community.farao.ce_merging.post_process.merging_supervisor_logs.MergingCoreStep;
+import com.farao_community.farao.ce_merging.merging.task.enums.OutputType;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -257,13 +251,17 @@ public class RefProgCalculationService {
                 areaInId.equals(countryEicCode) && !regionId.equals(areaOutId) && areasAll.containsValue(areaOutId);
     }
 
-    private void saveRefProgFileInOutputs(final PublicationDocument finalRefProgResult, final MergingTask taskEntity) {
-        final ZonedDateTime targetDateInEuropeZone = taskEntity.getInputs().getTargetDate().atZoneSameInstant(ZoneId.of("Europe/Paris"));
-        final String dateAndTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withLocale(Locale.FRANCE).format(targetDateInEuropeZone);
-        final Path filePath = Paths.get(configuration.getOutputsDirectoryPath(taskEntity), dateAndTime + "_CORESO_RefProg.xml");
-        JaxbUtils.writeToPath(PublicationDocument.class, finalRefProgResult, filePath);
-        final SavedFile refProgSavedFile = new SavedFile("refprog.xml", filePath.toString(), String.format("/tasks/%d/outputs/ref-prog", taskEntity.getId()));
-        taskEntity.getOutputs().setRefProg(refProgSavedFile);
-        LOGGER.info("Ref prog file '{}' is saved in task '{}' outputs", filePath.getFileName(), taskEntity.getId());
+    private void saveRefProgFileInOutputs(final PublicationDocument finalRefProgResult, final MergingTask mergingTask) {
+        final OutputType outputType = OutputType.REF_PROG;
+        final String fileName = outputType.getFileName(mergingTask.getInputs().getTargetDate());
+        final String location = outputType.getLocation(mergingTask.getId());
+        final SavedFile refProgSavedFile = FileStorageUtils.save(
+                configuration.getOutputsDirectoryPath(mergingTask),
+                fileName,
+                location,
+                path -> JaxbUtils.writeToPath(PublicationDocument.class, finalRefProgResult, path)
+        );
+
+        mergingTask.getOutputs().setRefProg(refProgSavedFile);
     }
 }

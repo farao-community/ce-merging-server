@@ -46,8 +46,8 @@ class BECKeyConfigurationServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        File resource = new ClassPathResource("gridDefaultConfigurations/region_configuration.json").getFile();
-        String jsonConfig = new String(Files.readAllBytes(resource.toPath()));
+        final File resource = new ClassPathResource("gridDefaultConfigurations/region_configuration.json").getFile();
+        final String jsonConfig = new String(Files.readAllBytes(resource.toPath()));
         ObjectMapper objectMapper = new ObjectMapper();
         RegionConfigurationDto regionConfiguration = objectMapper.readValue(jsonConfig, RegionConfigurationDto.class);
         when(regionConfigurationService.getConfiguration(Mockito.any())).thenReturn(new JsonRegionConfiguration(regionConfiguration));
@@ -55,7 +55,7 @@ class BECKeyConfigurationServiceTest {
 
     @Test
     void parseSharingKeysBEC() throws Exception {
-        List<BecByBoundaryDto> sharingKeysBEC = becKeyConfigurationService.getConfiguration(OffsetDateTime.now()).getBecByBoundaries();
+        final List<BecByBoundaryDto> sharingKeysBEC = becKeyConfigurationService.getConfiguration(OffsetDateTime.now()).getBecByBoundaries();
         assertEquals(17, sharingKeysBEC.size());
         sharingKeysBEC.forEach(becByBoundary -> assertEquals(12, becByBoundary.getCoefficientByCountry().size()));
         assertEquals(3, sharingKeysBEC.stream().filter(becByBoundary -> becByBoundary.getBorder().getOutArea().equals("10YAT-APG------L")).count());
