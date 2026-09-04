@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 
 @SpringBootTest
-public class RefProgCalculationServiceTest {
+class RefProgCalculationServiceTest {
     private static final String RESOURCES_PATH = "src/test/resources/refProg";
     private static final String CGM_NET_POSITION_FILE_NAME = "cgmNetPositions.json";
     private static final String PEVF_FILE_NAME = "20231103_0030_FO5_UX1.PEVF";
@@ -111,7 +111,7 @@ public class RefProgCalculationServiceTest {
     }
 
     @Test
-    public void computeRefProg() {
+    void computeRefProg() {
         refProgCalculationService.computeRefProg(task);
         PublicationDocument refProgResult = JaxbUtils.readFromPath(PublicationDocument.class, task.getOutputs().getRefProg().getPath());
 
