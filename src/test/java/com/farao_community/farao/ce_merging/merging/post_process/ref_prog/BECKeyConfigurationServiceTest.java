@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.io.File;
 import java.io.IOException;
@@ -40,6 +41,7 @@ class BECKeyConfigurationServiceTest {
     @Autowired
     private BECKeyConfigurationService becKeyConfigurationService;
 
+    @MockitoBean
     RegionConfigurationService regionConfigurationService = mock(RegionConfigurationService.class);
 
     @BeforeEach
