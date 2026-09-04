@@ -26,6 +26,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
@@ -33,12 +35,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Oualid Aloui {@literal <oualid.aloui at rte-france.com>}
  */
 @SpringBootTest
-public class BECKeyConfigurationServiceTest {
+class BECKeyConfigurationServiceTest {
 
     @Autowired
     private BECKeyConfigurationService becKeyConfigurationService;
 
-    RegionConfigurationService regionConfigurationService = Mockito.mock(RegionConfigurationService.class);
+    RegionConfigurationService regionConfigurationService = mock(RegionConfigurationService.class);
 
     @BeforeEach
     void setUp() throws IOException {
@@ -46,11 +48,11 @@ public class BECKeyConfigurationServiceTest {
         String jsonConfig = new String(Files.readAllBytes(resource.toPath()));
         ObjectMapper objectMapper = new ObjectMapper();
         RegionConfigurationDto regionConfiguration = objectMapper.readValue(jsonConfig, RegionConfigurationDto.class);
-        Mockito.when(regionConfigurationService.getConfiguration(Mockito.any())).thenReturn(new JsonRegionConfiguration(regionConfiguration));
+        when(regionConfigurationService.getConfiguration(Mockito.any())).thenReturn(new JsonRegionConfiguration(regionConfiguration));
     }
 
     @Test
-    public void parseSharingKeysBEC() throws Exception {
+    void parseSharingKeysBEC() throws Exception {
         List<BecByBoundaryDto> sharingKeysBEC = becKeyConfigurationService.getConfiguration(OffsetDateTime.now()).getBecByBoundaries();
         assertEquals(17, sharingKeysBEC.size());
         sharingKeysBEC.forEach(becByBoundary -> assertEquals(12, becByBoundary.getCoefficientByCountry().size()));
