@@ -37,11 +37,12 @@ public final class OutputUtils {
         }
     }
 
+    private static boolean isValidInterval(OffsetDateTime targetDate, OffsetDateTime intervalStart, OffsetDateTime intervalEnd) {
+        return !targetDate.isBefore(intervalStart) && targetDate.isBefore(intervalEnd);
+    }
+
     public static String getDocumentIdentificationDate(String dailyTimeInterval) {
         return dailyTimeInterval.substring(18, 28).replace("-", "");
     }
 
-    private static boolean isValidInterval(OffsetDateTime targetDate, OffsetDateTime intervalStart, OffsetDateTime intervalEnd) {
-        return !targetDate.isBefore(intervalStart) && targetDate.isBefore(intervalEnd);
-    }
 }

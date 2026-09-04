@@ -15,7 +15,8 @@ import static java.util.Locale.FRANCE;
 
 public enum OutputType {
 
-    MERGING_LOGS("%s_CORESO_MergingLogs.xml", "merging-logs");
+    MERGING_LOGS("%s_CORESO_MergingLogs.xml", "merging-logs"),
+    REF_PROG("%s_CORESO_RefProg.xml", "ref-prog");
 
     private final String fileName;
     private final String location;
