@@ -39,37 +39,34 @@ public class ExportTaskResultsService {
     private final CeMergingConfiguration configuration;
     private final MergingTaskRepository mergingTaskRepository;
     private static final String IGM_QUALITY_CHECK_DIRECTORY_NAME = "igm_quality_check";
-    // TODO private final LogsCustomisationService logsCustomisationService;
 
-    public ExportTaskResultsService(MergingTaskRepository mergingTaskRepository, CeMergingConfiguration configuration) { //TODO , LogsCustomisationService logsCustomisationService) {
+    public ExportTaskResultsService(final MergingTaskRepository mergingTaskRepository, final CeMergingConfiguration configuration) {
         this.mergingTaskRepository = mergingTaskRepository;
         this.configuration = configuration;
-        //TODO this.logsCustomisationService = logsCustomisationService;
     }
 
     public void generateOutPutFiles(MergingTask mergingTask) {
-        // TODO logsCustomisationService.setExtraFieldsInLogsMdc(mergingTask.getTaskId(), MergingCoreStep.RESULTS_EXPORT.toString());
         try {
-            String outputsDirectoryPath = configuration.getOutputsDirectoryPath(mergingTask);
+            final String outputsDirectoryPath = configuration.getOutputsDirectoryPath(mergingTask);
             mergingTask.getOutputs().setRealGlsk(copyFileToOutputDirectory(mergingTask, mergingTask.getArtifacts().getFile(ArtifactType.GLSK_QUALITY_REPORT), outputsDirectoryPath));
             copyIgmQualityReportInOutputDirectory(mergingTask);
             mergingTaskRepository.save(mergingTask);
         } catch (Exception e) {
-            String errorMessage = String.format("Results export failed for task %d with target date %s, cause: %s", mergingTask.getId(), mergingTask.getInputs().getTargetDate(), e.getMessage());
+            final String errorMessage = String.format("Results export failed for task %d with target date %s, cause: %s", mergingTask.getId(), mergingTask.getInputs().getTargetDate(), e.getMessage());
             LOGGER.error(errorMessage);
             throw new CeMergingException(errorMessage, e);
         }
     }
 
     private String getIgmQualityReportFileName(OffsetDateTime dateTime) {
-        String dateAndTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withLocale(Locale.FRANCE).format(dateTime);
+        final String dateAndTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withLocale(Locale.FRANCE).format(dateTime);
         return String.format("/%s_%s/", dateAndTime, IGM_QUALITY_CHECK_DIRECTORY_NAME);
     }
 
     private void copyIgmQualityReportInOutputDirectory(MergingTask mergingTask) {
-        List<IgmData> igmsData = mergingTask.getInputs().getIgms();
-        Map<String, SavedFile> qualityChecksData = new HashMap<>();
-        String outputDirectoryPath = String.format("%s/%s", configuration.getOutputsDirectoryPath(mergingTask), getIgmQualityReportFileName(mergingTask.getInputs().getTargetDate()));
+        final List<IgmData> igmsData = mergingTask.getInputs().getIgms();
+        final Map<String, SavedFile> qualityChecksData = new HashMap<>();
+        final String outputDirectoryPath = String.format("%s/%s", configuration.getOutputsDirectoryPath(mergingTask), getIgmQualityReportFileName(mergingTask.getInputs().getTargetDate()));
         igmsData.forEach(igm -> {
             SavedFile savedFileIgm = copyFileToOutputDirectory(mergingTask, igm.getIgmQualityReportFile(), outputDirectoryPath);
             qualityChecksData.put(igm.getCountry(), savedFileIgm);
@@ -86,10 +83,10 @@ public class ExportTaskResultsService {
     }
 
     private SavedFile saveInOutput(String fileName, MergingTask mergingTask, InputStream inputStream, String path) {
-        Path filePath = Paths.get(path, fileName);
+        final Path filePath = Paths.get(path, fileName);
         try {
-            byte[] file = IOUtils.toByteArray(inputStream);
-            File files = new File(filePath.toString());
+            final byte[] file = IOUtils.toByteArray(inputStream);
+            final File files = new File(filePath.toString());
             files.getParentFile().mkdirs();
             Files.write(filePath, file);
         } catch (IOException e) {
