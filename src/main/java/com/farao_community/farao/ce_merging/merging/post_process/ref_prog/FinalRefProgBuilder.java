@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.post_process.ref_prog;
 
+import com.farao_community.farao.ce_merging.common.CeMergingConstants;
+import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.common.util.OutputUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
 import com.farao_community.farao.ce_merging.merging.post_process.common.CurrentType;
@@ -58,7 +60,7 @@ public class FinalRefProgBuilder {
 
         final PublicationDocument.SenderIdentification senderIdentification = new PublicationDocument.SenderIdentification();
         senderIdentification.setCodingScheme("A01");
-        senderIdentification.setV("22XCORESO------S");
+        senderIdentification.setV(CeMergingConstants.SENDER_ID);
         publicationDocument.setSenderIdentification(senderIdentification);
 
         final PublicationDocument.SenderRole senderRole = new PublicationDocument.SenderRole();
@@ -67,7 +69,7 @@ public class FinalRefProgBuilder {
 
         final PublicationDocument.ReceiverIdentification receiverIdentification = new PublicationDocument.ReceiverIdentification();
         receiverIdentification.setCodingScheme("A01");
-        receiverIdentification.setV("17XTSO-CS------W");
+        receiverIdentification.setV(CeMergingConstants.RECEIVER_ID);
         publicationDocument.setReceiverIdentification(receiverIdentification);
 
         final PublicationDocument.ReceiverRole receiverRole = new PublicationDocument.ReceiverRole();
@@ -75,7 +77,7 @@ public class FinalRefProgBuilder {
         publicationDocument.setReceiverRole(receiverRole);
 
         final PublicationDocument.CreationDateTime creationDateTime = new PublicationDocument.CreationDateTime();
-        creationDateTime.setV(OutputUtils.getXMLGregorianCurrentTime());
+        creationDateTime.setV(DateTimeUtils.getNowDate());
         publicationDocument.setCreationDateTime(creationDateTime);
 
         final PublicationDocument.PublicationTimeInterval publicationTimeInterval = new PublicationDocument.PublicationTimeInterval();
@@ -84,7 +86,7 @@ public class FinalRefProgBuilder {
 
         final PublicationDocument.Domain domain = new PublicationDocument.Domain();
         domain.setCodingScheme("A01");
-        domain.setV("10Y1001C--00059P");
+        domain.setV(CeMergingConstants.CORE_REGION_ID);
         publicationDocument.setDomain(domain);
 
         final List<PublicationDocument.PublicationTimeSeries> publicationTimeSeries = computeAllTimeSeries(refProgResult,
@@ -125,7 +127,7 @@ public class FinalRefProgBuilder {
         final PublicationDocument.PublicationTimeSeries.Period period = new PublicationDocument.PublicationTimeSeries.Period();
         period.getInterval().addAll(intervalList);
         final PublicationDocument.PublicationTimeSeries.Period.Resolution resol = new PublicationDocument.PublicationTimeSeries.Period.Resolution();
-        resol.setV("PT60M");
+        resol.setV(CeMergingConstants.RESOLUTION);
         period.setResolution(resol);
         final PublicationDocument.PublicationTimeSeries.Period.TimeInterval timeInter = new PublicationDocument.PublicationTimeSeries.Period.TimeInterval();
         timeInter.setV(dailyTimeInterval);
