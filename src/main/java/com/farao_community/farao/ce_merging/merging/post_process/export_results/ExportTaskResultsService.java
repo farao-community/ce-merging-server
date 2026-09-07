@@ -28,9 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Marc Erkol {@literal <marc.erkol at rte-france.com>}
- */
 @Service
 public class ExportTaskResultsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportTaskResultsService.class);
