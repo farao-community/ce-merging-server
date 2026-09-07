@@ -43,9 +43,10 @@ class ExportTaskResultsServiceTest {
 
     @Test
     void generateOutPutFilesWithException() {
+        final MergingTask mergingTask = initMergingTask();
         when(configuration.getOutputsDirectoryPath(any(MergingTask.class))).thenThrow(new RuntimeException("my error"));
-        Throwable throwable = catchThrowable(() -> exportTaskResultsService.generateOutPutFiles(new MergingTask()));
-        assertThat(throwable).hasMessage("Results export failed for task null with target date null, cause: my error");
+        Throwable throwable = catchThrowable(() -> exportTaskResultsService.generateOutPutFiles(mergingTask));
+        assertThat(throwable).hasMessage("Results export failed for task 123 with target date 2026-07-03T10:15Z, cause: my error");
     }
 
     @Test
@@ -56,10 +57,17 @@ class ExportTaskResultsServiceTest {
         assertThat(mergingTask.getOutputs().getIgmQualityChecks()).hasSize(2);
         assertThat(mergingTask.getOutputs().getRealGlsk()).isNotNull();
         assertThat(FileUtils.contentEquals(mergingTask.getArtifactFile(ArtifactType.GLSK_QUALITY_REPORT), new File(mergingTask.getOutputs().getRealGlsk().getPath()))).isTrue();
-        assertThat(FileUtils.contentEquals(new File(mergingTask.getInputs().getIgm("FR").getIgmQualityReportFile().getPath()),
-                                           new File(mergingTask.getOutputs().getIgmQualityChecks().get("FR").getPath()))).isTrue();
-        assertThat(FileUtils.contentEquals(new File(mergingTask.getInputs().getIgm("BE").getIgmQualityReportFile().getPath()),
-                                           new File(mergingTask.getOutputs().getIgmQualityChecks().get("BE").getPath()))).isTrue();
+        final SavedFile inputSavedFileIgmFr = mergingTask.getInputs().getIgm("FR").getIgmQualityReportFile();
+        final SavedFile outputSavedFileFr = mergingTask.getOutputs().getIgmQualityChecks().get("FR");
+        assertThat(FileUtils.contentEquals(new File(inputSavedFileIgmFr.getPath()),
+                                           new File(outputSavedFileFr.getPath()))).isTrue();
+        assertThat(inputSavedFileIgmFr.getOriginalName()).isEqualTo(outputSavedFileFr.getOriginalName());
+
+        final SavedFile inputSavedFileIgmBe = mergingTask.getInputs().getIgm("BE").getIgmQualityReportFile();
+        final SavedFile outputSavedFileBe = mergingTask.getOutputs().getIgmQualityChecks().get("BE");
+        assertThat(FileUtils.contentEquals(new File(inputSavedFileIgmBe.getPath()),
+                                           new File(outputSavedFileBe.getPath()))).isTrue();
+        assertThat(inputSavedFileIgmBe.getOriginalName()).isEqualTo(outputSavedFileBe.getOriginalName());
     }
 
     private MergingTask initMergingTask() {

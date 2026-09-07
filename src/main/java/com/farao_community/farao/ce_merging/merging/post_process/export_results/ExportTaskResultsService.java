@@ -6,11 +6,13 @@ package com.farao_community.farao.ce_merging.merging.post_process.export_results
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.farao_community.farao.ce_merging.merging.task.enums.OutputType;
 import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,12 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -38,17 +36,15 @@ public class ExportTaskResultsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExportTaskResultsService.class);
     private final CeMergingConfiguration configuration;
     private final MergingTaskRepository mergingTaskRepository;
-    private static final String IGM_QUALITY_CHECK_DIRECTORY_NAME = "igm_quality_check";
 
     public ExportTaskResultsService(final MergingTaskRepository mergingTaskRepository, final CeMergingConfiguration configuration) {
         this.mergingTaskRepository = mergingTaskRepository;
         this.configuration = configuration;
     }
 
-    public void generateOutPutFiles(MergingTask mergingTask) {
+    public void generateOutPutFiles(final MergingTask mergingTask) {
         try {
-            final String outputsDirectoryPath = configuration.getOutputsDirectoryPath(mergingTask);
-            mergingTask.getOutputs().setRealGlsk(copyFileToOutputDirectory(mergingTask, mergingTask.getArtifacts().getFile(ArtifactType.GLSK_QUALITY_REPORT), outputsDirectoryPath));
+            mergingTask.getOutputs().setRealGlsk(copyFileToOutputDirectory(mergingTask, mergingTask.getArtifacts().getFile(ArtifactType.GLSK_QUALITY_REPORT), OutputType.GLSK_QUALITY_REPORT));
             copyIgmQualityReportInOutputDirectory(mergingTask);
             mergingTaskRepository.save(mergingTask);
         } catch (Exception e) {
@@ -58,32 +54,39 @@ public class ExportTaskResultsService {
         }
     }
 
-    private String getIgmQualityReportFileName(OffsetDateTime dateTime) {
-        final String dateAndTime = DateTimeFormatter.ofPattern("yyyyMMdd_HHmm").withLocale(Locale.FRANCE).format(dateTime);
-        return String.format("/%s_%s/", dateAndTime, IGM_QUALITY_CHECK_DIRECTORY_NAME);
-    }
-
-    private void copyIgmQualityReportInOutputDirectory(MergingTask mergingTask) {
+    private void copyIgmQualityReportInOutputDirectory(final MergingTask mergingTask) {
         final List<IgmData> igmsData = mergingTask.getInputs().getIgms();
         final Map<String, SavedFile> qualityChecksData = new HashMap<>();
-        final String outputDirectoryPath = String.format("%s/%s", configuration.getOutputsDirectoryPath(mergingTask), getIgmQualityReportFileName(mergingTask.getInputs().getTargetDate()));
         igmsData.forEach(igm -> {
-            SavedFile savedFileIgm = copyFileToOutputDirectory(mergingTask, igm.getIgmQualityReportFile(), outputDirectoryPath);
+            SavedFile savedFileIgm = copyFileToOutputDirectory(mergingTask, igm.getIgmQualityReportFile(), OutputType.IGM_DATA);
             qualityChecksData.put(igm.getCountry(), savedFileIgm);
         });
         mergingTask.getOutputs().setIgmQualityChecks(qualityChecksData);
     }
 
-    private SavedFile copyFileToOutputDirectory(MergingTask mergingTask, SavedFile savedFile, String outPutDirectoryPath) {
+    private SavedFile copyFileToOutputDirectory(final MergingTask mergingTask, final SavedFile savedFile, final OutputType outputType) {
         try (InputStream inputStream = new FileInputStream(savedFile.getPath())) {
-            return saveInOutput(savedFile.getOriginalName(), mergingTask, inputStream, outPutDirectoryPath);
+            final String fileName;
+            final String location;
+            if (outputType == OutputType.IGM_DATA) {
+                fileName = savedFile.getOriginalName();
+                location = outputType.getLocation(mergingTask.getId(), mergingTask.getTargetDate());
+            } else {
+                fileName = outputType.getFileName(mergingTask.getInputs().getTargetDate());
+                location = outputType.getLocation(mergingTask.getId());
+            }
+            return FileStorageUtils.save(
+                    configuration.getOutputsDirectoryPath(mergingTask),
+                    fileName,
+                    location,
+                    path -> saveInOutput(inputStream, path)
+            );
         } catch (IOException e) {
             throw new ServiceIOException(String.format("Error while copying %s file name in output folder  for task '%d' In Export results process.", savedFile.getOriginalName(), mergingTask.getId()), e);
         }
     }
 
-    private SavedFile saveInOutput(String fileName, MergingTask mergingTask, InputStream inputStream, String path) {
-        final Path filePath = Paths.get(path, fileName);
+    private void saveInOutput(final InputStream inputStream, final Path filePath) {
         try {
             final byte[] file = IOUtils.toByteArray(inputStream);
             final File files = new File(filePath.toString());
@@ -92,6 +95,5 @@ public class ExportTaskResultsService {
         } catch (IOException e) {
             throw new ServiceIOException(String.format("Error while writing file in path %s", filePath.toString()), e);
         }
-        return new SavedFile(fileName, filePath.toString(), String.format("/tasks/%d/outputs/%s", mergingTask.getId(), fileName.toLowerCase()));
     }
 }
