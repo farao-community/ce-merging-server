@@ -29,11 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Mohamed Ben Rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
- * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
- * @author Oualid Aloui {@literal <oualid.aloui at rte-france.com>}
- */
 @Service
 public class FinalRefProgBuilder {
 
