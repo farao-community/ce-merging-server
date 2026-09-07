@@ -38,9 +38,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * @author Oualid Aloui {@literal <oualid.aloui at rte-france.com>}
- */
 @Service
 public class RefProgCalculationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RefProgCalculationService.class);

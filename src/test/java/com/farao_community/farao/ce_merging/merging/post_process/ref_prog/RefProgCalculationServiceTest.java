@@ -40,10 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-/**
- * @author Oualid Aloui {@literal <oualid.aloui at rte-france.com>}
- */
-
 @SpringBootTest
 class RefProgCalculationServiceTest {
     private static final String RESOURCES_PATH = "src/test/resources/refProg";

@@ -10,5 +10,4 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 
 import java.util.Map;
 
-
 public record RefProgResult(String dailyTimeInterval, Map<Border, Double> acExchanges, Map<Border, Double> virtualHubsExchanges) { }

@@ -30,11 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
- * @author Mohamed Ben Rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
- * @author Oualid Aloui {@literal <oualid.aloui at rte-france.com>}
- */
 @SpringBootTest
 class BECKeyConfigurationServiceTest {
 
