@@ -27,22 +27,23 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
 class BECKeyConfigurationServiceTest {
 
+    private static final String REGION_CONFIGURATION_JSON = "gridDefaultConfigurations/region_configuration.json";
+    private static final OffsetDateTime TEST_DATE = OffsetDateTime.parse("2023-11-03T00:30Z");
     @Autowired
     private BECKeyConfigurationService becKeyConfigurationService;
 
     @MockitoBean
-    RegionConfigurationService regionConfigurationService = mock(RegionConfigurationService.class);
+    RegionConfigurationService regionConfigurationService;
 
     @BeforeEach
     void setUp() throws IOException {
-        final File resource = new ClassPathResource("gridDefaultConfigurations/region_configuration.json").getFile();
-        final String jsonConfig = new String(Files.readAllBytes(resource.toPath()));
+        final File resource = new ClassPathResource(REGION_CONFIGURATION_JSON).getFile();
+        final String jsonConfig = Files.readString(resource.toPath());
         ObjectMapper objectMapper = new ObjectMapper();
         RegionConfigurationDto regionConfiguration = objectMapper.readValue(jsonConfig, RegionConfigurationDto.class);
         when(regionConfigurationService.getConfiguration(Mockito.any())).thenReturn(new JsonRegionConfiguration(regionConfiguration));
@@ -50,7 +51,7 @@ class BECKeyConfigurationServiceTest {
 
     @Test
     void parseSharingKeysBEC() throws Exception {
-        final List<BecByBoundaryDto> sharingKeysBEC = becKeyConfigurationService.getConfiguration(OffsetDateTime.now()).getBecByBoundaries();
+        final List<BecByBoundaryDto> sharingKeysBEC = becKeyConfigurationService.getConfiguration(TEST_DATE).getBecByBoundaries();
         assertEquals(17, sharingKeysBEC.size());
         sharingKeysBEC.forEach(becByBoundary -> assertEquals(12, becByBoundary.getCoefficientByCountry().size()));
         assertEquals(3, sharingKeysBEC.stream().filter(becByBoundary -> becByBoundary.getBorder().getOutArea().equals("10YAT-APG------L")).count());
