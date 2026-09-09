@@ -1,0 +1,8 @@
+<QualityCheckReport>
+    <MessageIdentification v="id"/>
+    <MessageVersion v="1"/>
+    <MessageType>Z_02</MessageType>
+    <ProcessType>Z_02</ProcessType>
+    <SenderIdentification v="" codingScheme="A_01"/>
+
+</QualityCheckReport>
