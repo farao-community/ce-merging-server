@@ -20,7 +20,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -88,11 +87,10 @@ public class ExportTaskResultsService {
 
     private void saveInOutput(final InputStream inputStream, final Path filePath) {
         try {
-            final File file = new File(filePath.toString());
-            file.getParentFile().mkdirs();
+            Files.createDirectories(filePath.getParent());
             Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new ServiceIOException(String.format("Error while writing file in path %s", filePath.toString()), e);
+            throw new ServiceIOException(String.format("Error while writing file in path %s", filePath), e);
         }
     }
 }
