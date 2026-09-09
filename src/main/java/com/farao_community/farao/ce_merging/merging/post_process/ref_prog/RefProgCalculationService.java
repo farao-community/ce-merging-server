@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,26 +43,18 @@ import java.util.stream.Collectors;
 public class RefProgCalculationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(RefProgCalculationService.class);
 
-    private final FinalRefProgBuilder finalRefProgBuilder;
     private final CeMergingConfiguration configuration;
     private final MergingTaskRepository mergingTaskRepository;
-    //TODO private final LogsCustomisationService logsCustomisationService;
 
     public RefProgCalculationService(final MergingTaskRepository mergingTaskRepository,
-                                     final CeMergingConfiguration configuration,
-                                     final FinalRefProgBuilder finalRefProgBuilder
-                                     // TODO final LogsCustomisationService logsCustomisationService,
+                                     final CeMergingConfiguration configuration
                                      ) {
         this.configuration = configuration;
-        this.finalRefProgBuilder = finalRefProgBuilder;
         this.mergingTaskRepository = mergingTaskRepository;
-        //TODO this.logsCustomisationService = logsCustomisationService;
     }
 
     public void computeRefProg(final MergingTask mergingTask) {
         try {
-            //TODO logsCustomisationService.setExtraFieldsInLogsMdc(mergingTask.getTaskId(), MergingCoreStep.REF_PROG.toString());
-
             final Map<Border, Double> virtualHubsExchanges = new HashMap<>();
             final Map<Border, Double> acExchanges = new HashMap<>();
             final ReferenceProgram referenceProgram = JsonUtils.read(ReferenceProgram.class, mergingTask.getArtifacts().getFile(ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE).getPath());
@@ -70,12 +63,12 @@ public class RefProgCalculationService {
             computeExchanges(mergingTask, virtualHubsExchanges, acExchanges, referenceProgram, finalCgmResult);
 
             final RefProgResult refProgResult = new RefProgResult(referenceProgram.getDailyTimeInterval(), acExchanges, virtualHubsExchanges);
-            final PublicationDocument finalRefProgResult = finalRefProgBuilder.buildFinalRefProgResult(refProgResult, mergingTask);
+            final PublicationDocument finalRefProgResult = FinalRefProgBuilder.buildFinalRefProgResult(refProgResult, mergingTask);
             saveRefProgFileInOutputs(finalRefProgResult, mergingTask);
             mergingTaskRepository.save(mergingTask);
         } catch (Exception e) {
             final String errorMessage = String.format("RefProg computation failed for task %d with target date %s, cause: %s", mergingTask.getId(), mergingTask.getInputs().getTargetDate(), e.getMessage());
-            LOGGER.error(errorMessage);
+            LOGGER.error(errorMessage, e);
             throw new CeMergingException(errorMessage, e);
         }
     }
@@ -99,9 +92,9 @@ public class RefProgCalculationService {
             String borderFrom = CountryCodeUtils.mapDk1ToDk(borderDirection.getBorderFrom());
             String borderTo = CountryCodeUtils.mapDk1ToDk(borderDirection.getBorderTo());
 
-            if (isVirtualHubsExchange(virtualHubRecords, borderFrom, borderTo)) {
-                final VirtualHubRecord virtualHubRecord = findVirtualHub(borderFrom, borderTo, virtualHubRecords);
-                addVirtualHubExchange(virtualHubsExchanges, virtualHubRecord, virtualHubsExchangesFromCgm);
+            final Optional<VirtualHubRecord> virtualHubRecord = findVirtualHub(borderFrom, borderTo, virtualHubRecords);
+            if (virtualHubRecord.isPresent()) {
+                addVirtualHubExchange(virtualHubsExchanges, virtualHubRecord.get(), virtualHubsExchangesFromCgm);
             } else if (isNonCoreExchange(regionConfiguration, borderFrom, borderTo)) {
                 final String countryFromEicCode = toEicCode(regionConfiguration, borderFrom);
                 final String countryToEicCode = toEicCode(regionConfiguration, borderTo);
@@ -117,16 +110,11 @@ public class RefProgCalculationService {
     }
 
     private static String toEicCode(final RegionConfiguration regionConfiguration, final String country) {
-        return regionConfiguration.getAreasAll().get(country);
-    }
-
-    private static boolean isVirtualHubsExchange(final List<VirtualHubRecord> virtualHubRecords, final String borderFrom, final String borderTo) {
-        for (VirtualHubRecord virtualHubRecord : virtualHubRecords) {
-            if (virtualHubRecord.getCode().equals(borderFrom) || virtualHubRecord.getCode().equals(borderTo)) {
-                return true;
-            }
+        final String eicCode = regionConfiguration.getAreasAll().get(country);
+        if (eicCode == null) {
+            throw new CeMergingException("EIC code cannot be found for country: " + country);
         }
-        return false;
+        return eicCode;
     }
 
     private static boolean isNonCoreExchange(final RegionConfiguration regionConfiguration, final String borderFrom, final String borderTo) {
@@ -187,13 +175,13 @@ public class RefProgCalculationService {
         acExchanges.put(border, flow);
     }
 
-    private static VirtualHubRecord findVirtualHub(final String borderFrom, final String borderTo, final List<VirtualHubRecord> virtualHubRecords) {
+    private static Optional<VirtualHubRecord> findVirtualHub(final String borderFrom, final String borderTo, final List<VirtualHubRecord> virtualHubRecords) {
         for (VirtualHubRecord virtualHubRecord : virtualHubRecords) {
             if (virtualHubRecord.getCode().equals(borderFrom) || virtualHubRecord.getCode().equals(borderTo)) {
-                return virtualHubRecord;
+                return Optional.of(virtualHubRecord);
             }
         }
-        throw new CeMergingException("Unable to find border from " + borderFrom + " to " + borderTo + " in virtualHubs");
+        return Optional.empty();
     }
 
     private static Map<String, Double> getVirtualHubsFromCgm(final FinalCgmResult finalCgmResult) {

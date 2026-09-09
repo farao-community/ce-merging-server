@@ -80,6 +80,7 @@ public final class CeMergingConstants {
     public static final String UCTE_IMPORT_CREATE_AREAS_KEY = "ucte.import.create-areas";
     public static final String TSO = "TSO";
     public static final String RESOLUTION = "PT60M";
+    public static final String CODING_SCHEME = "A01";
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;
