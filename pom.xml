@@ -128,6 +128,19 @@
                             <outputDirectory>${project.build.directory}/generated-sources/jaxb/merging_logs</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>refprog</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/xsd/refprog/refprog.xsd</source>
+                            </sources>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.ref_prog</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb/ref_prog</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
