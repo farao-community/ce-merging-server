@@ -1,5 +1,8 @@
 /*
- * Copyright (c) 2020, RTE (http://www.rte-france.com)
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 package com.farao_community.farao.ce_merging.merging.post_process.export_results;
 
@@ -13,7 +16,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.OutputType;
-import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +42,7 @@ public class ExportTaskResultsService {
         this.configuration = configuration;
     }
 
-    public void generateOutPutFiles(final MergingTask mergingTask) {
+    public void generateOutputFiles(final MergingTask mergingTask) {
         try {
             mergingTask.getOutputs().setRealGlsk(copyFileToOutputDirectory(mergingTask, mergingTask.getArtifacts().getFile(ArtifactType.GLSK_QUALITY_REPORT), OutputType.GLSK_QUALITY_REPORT));
             copyIgmQualityReportInOutputDirectory(mergingTask);
@@ -85,10 +88,9 @@ public class ExportTaskResultsService {
 
     private void saveInOutput(final InputStream inputStream, final Path filePath) {
         try {
-            final byte[] file = IOUtils.toByteArray(inputStream);
-            final File files = new File(filePath.toString());
-            files.getParentFile().mkdirs();
-            Files.write(filePath, file);
+            final File file = new File(filePath.toString());
+            file.getParentFile().mkdirs();
+            Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
             throw new ServiceIOException(String.format("Error while writing file in path %s", filePath.toString()), e);
         }

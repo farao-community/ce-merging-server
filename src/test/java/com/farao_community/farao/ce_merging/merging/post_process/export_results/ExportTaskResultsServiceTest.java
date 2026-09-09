@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
 package com.farao_community.farao.ce_merging.merging.post_process.export_results;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
@@ -22,6 +28,8 @@ import static java.io.File.separator;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -42,47 +50,51 @@ class ExportTaskResultsServiceTest {
     CeMergingConfiguration configuration;
 
     @Test
-    void generateOutPutFilesWithException() {
+    void generateOutputFilesWithException() {
         final MergingTask mergingTask = initMergingTask();
         when(configuration.getOutputsDirectoryPath(any(MergingTask.class))).thenThrow(new RuntimeException("my error"));
-        Throwable throwable = catchThrowable(() -> exportTaskResultsService.generateOutPutFiles(mergingTask));
+        Throwable throwable = catchThrowable(() -> exportTaskResultsService.generateOutputFiles(mergingTask));
         assertThat(throwable).hasMessage("Results export failed for task 123 with target date 2026-07-03T10:15Z, cause: my error");
     }
 
     @Test
-    void generateOutPutFiles() throws IOException {
+    void generateOutputFiles() throws IOException {
         when(configuration.getOutputsDirectoryPath(any(MergingTask.class))).thenReturn(tempDirectory.getPath() + separator + OUTPUT_PATH);
         final MergingTask mergingTask = initMergingTask();
-        exportTaskResultsService.generateOutPutFiles(mergingTask);
+        exportTaskResultsService.generateOutputFiles(mergingTask);
+        verify(mergingTaskRepository, atMostOnce()).save(mergingTask);
         assertThat(mergingTask.getOutputs().getIgmQualityChecks()).hasSize(2);
         assertThat(mergingTask.getOutputs().getRealGlsk()).isNotNull();
         assertThat(FileUtils.contentEquals(mergingTask.getArtifactFile(ArtifactType.GLSK_QUALITY_REPORT), new File(mergingTask.getOutputs().getRealGlsk().getPath()))).isTrue();
-        final SavedFile inputSavedFileIgmFr = mergingTask.getInputs().getIgm("FR").getIgmQualityReportFile();
-        final SavedFile outputSavedFileFr = mergingTask.getOutputs().getIgmQualityChecks().get("FR");
-        assertThat(FileUtils.contentEquals(new File(inputSavedFileIgmFr.getPath()),
-                                           new File(outputSavedFileFr.getPath()))).isTrue();
-        assertThat(inputSavedFileIgmFr.getOriginalName()).isEqualTo(outputSavedFileFr.getOriginalName());
 
-        final SavedFile inputSavedFileIgmBe = mergingTask.getInputs().getIgm("BE").getIgmQualityReportFile();
-        final SavedFile outputSavedFileBe = mergingTask.getOutputs().getIgmQualityChecks().get("BE");
-        assertThat(FileUtils.contentEquals(new File(inputSavedFileIgmBe.getPath()),
-                                           new File(outputSavedFileBe.getPath()))).isTrue();
-        assertThat(inputSavedFileIgmBe.getOriginalName()).isEqualTo(outputSavedFileBe.getOriginalName());
+        for (IgmData igmData : mergingTask.getInputs().getIgms()) {
+            checkFiles(mergingTask, igmData.getCountry());
+        }
+    }
+
+    private static void checkFiles(final MergingTask mergingTask, final String countryCode) throws IOException {
+        final SavedFile inputSavedFileIgm = mergingTask.getInputs().getIgm(countryCode).getIgmQualityReportFile();
+        final SavedFile outputSavedFile = mergingTask.getOutputs().getIgmQualityChecks().get(countryCode);
+        assertThat(FileUtils.contentEquals(new File(inputSavedFileIgm.getPath()),
+                                           new File(outputSavedFile.getPath()))).isTrue();
+        assertThat(inputSavedFileIgm.getOriginalName()).isEqualTo(outputSavedFile.getOriginalName());
     }
 
     private MergingTask initMergingTask() {
-        MergingTask mergingTask = new MergingTask();
+        final MergingTask mergingTask = new MergingTask();
         mergingTask.setId(123L);
         mergingTask.getInputs().setTargetDate(TARGET_DATE);
-        IgmData igm1 = new IgmData();
+        final IgmData igm1 = new IgmData();
         igm1.setCountry("FR");
-        igm1.setIgmQualityReportFile(new SavedFile("testIgm1.txt", "src/test/resources/export_results/testIgm1.txt", "mock"));
+        final SavedFile igmQualityReportFile1 = new SavedFile("testIgm1.txt", "src/test/resources/export_results/testIgm1.txt", "mock");
+        igm1.setIgmQualityReportFile(igmQualityReportFile1);
         mergingTask.getInputs().getIgms().add(igm1);
-        IgmData igm2 = new IgmData();
+        final IgmData igm2 = new IgmData();
         igm2.setCountry("BE");
-        igm2.setIgmQualityReportFile(new SavedFile("testIgm2.txt", "src/test/resources/export_results/testIgm2.txt", "mock"));
+        final SavedFile igmQualityReportFile2 = new SavedFile("testIgm2.txt", "src/test/resources/export_results/testIgm2.txt", "mock");
+        igm2.setIgmQualityReportFile(igmQualityReportFile2);
         mergingTask.getInputs().getIgms().add(igm2);
-        SavedFile glskQuality = new SavedFile("qualityCheckTest.xml", "src/test/resources/export_results/qualityCheckTest.xml", "mock");
+        final SavedFile glskQuality = new SavedFile("qualityCheckTest.xml", "src/test/resources/export_results/qualityCheckTest.xml", "mock");
         mergingTask.setArtifact(ArtifactType.GLSK_QUALITY_REPORT, glskQuality);
         return mergingTask;
     }
