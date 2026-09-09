@@ -37,6 +37,9 @@ import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog
 
 public final class FinalRefProgBuilder {
 
+    private static final String MAW = "MAW";
+    private static final String BUSINESS_TYPE = "A66";
+
     private FinalRefProgBuilder() {
     }
 
@@ -147,11 +150,11 @@ public final class FinalRefProgBuilder {
             publTimeSeries.setTimeSeriesIdentification(timeSeriesIdentif);
         }
         final PublicationDocument.PublicationTimeSeries.BusinessType businessType = new PublicationDocument.PublicationTimeSeries.BusinessType();
-        businessType.setV("A66");
+        businessType.setV(BUSINESS_TYPE);
         publTimeSeries.setBusinessType(businessType);
 
         final PublicationDocument.PublicationTimeSeries.MeasureUnitQuantity measureUnitQuant = new PublicationDocument.PublicationTimeSeries.MeasureUnitQuantity();
-        measureUnitQuant.setV("MAW");
+        measureUnitQuant.setV(MAW);
         publTimeSeries.setMeasureUnitQuantity(measureUnitQuant);
 
         final PublicationDocument.PublicationTimeSeries.InArea inArea = new PublicationDocument.PublicationTimeSeries.InArea();

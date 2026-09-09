@@ -6,10 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.merging.post_process.common;
 
-/**
- * @author Amira Kahya {@literal <amira.kahya at rte-france.com>}
- * @author Mohamed BenRejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
- */
 public enum CurrentType {
     AC,
     DC
