@@ -6,9 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.merging.post_process.common;
 
-/**
- * @author Ameni Walha {@literal <ameni.walha at rte-france.com>}
- */
 public enum SchemaLocationNamespace {
 
     GLSK_QUALITY_CHECK_XSD("quality-check-report-08.xsd"),
