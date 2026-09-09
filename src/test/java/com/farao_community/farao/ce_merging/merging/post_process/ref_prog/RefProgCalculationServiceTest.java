@@ -83,9 +83,9 @@ class RefProgCalculationServiceTest {
 
         indexedTimeSeries = indexTimeSeries(refProgResult);
 
-        checkCoreExchanges(refProgResult);
-        checkNonCoreExchanges(refProgResult);
-        checkVirtualHubsExchanges(refProgResult);
+        checkCoreExchanges();
+        checkNonCoreExchanges();
+        checkVirtualHubsExchanges();
     }
 
     private Map<String, PublicationDocument.PublicationTimeSeries> indexTimeSeries(final PublicationDocument refProgResult) {
@@ -94,15 +94,15 @@ class RefProgCalculationServiceTest {
                 .collect(Collectors.toUnmodifiableMap(ts -> ts.getTimeSeriesIdentification().getV(), ts -> ts, (a, b) -> a));
     }
 
-    private void checkCoreExchanges(final PublicationDocument refProgResult) {
+    private void checkCoreExchanges() {
         coreExchangeResults.forEach((tsId, val) -> assertEquals(val, getPublicationTimeSeriesByTimeSeriesIdentification(tsId).getPeriod().getInterval().getFirst().getQty().getV()));
     }
 
-    private void checkNonCoreExchanges(final PublicationDocument refProgResult) {
+    private void checkNonCoreExchanges() {
         nonCoreExchangeResults.forEach((tsId, val) -> assertEquals(roundAndConvertToBigInteger(val), getPublicationTimeSeriesByTimeSeriesIdentification(tsId).getPeriod().getInterval().getFirst().getQty().getV()));
     }
 
-    private void checkVirtualHubsExchanges(final PublicationDocument refProgResult) {
+    private void checkVirtualHubsExchanges() {
         final PublicationDocument.PublicationTimeSeries timeSeries1 = getPublicationTimeSeriesByTimeSeriesIdentification("NL-UK_BritNed");
         assertEquals(computeVirtualHubsExpectedFlow("XGR_MA1N"), timeSeries1.getPeriod().getInterval().getFirst().getQty().getV());
 
