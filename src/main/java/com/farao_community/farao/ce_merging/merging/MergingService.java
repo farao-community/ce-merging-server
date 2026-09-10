@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.GlobalGridConfigurationService;
+import com.farao_community.farao.ce_merging.merging.post_process.export_results.ExportTaskResultsService;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_logs.MergingLogsCalculationService;
 import com.farao_community.farao.ce_merging.merging.process.alegro.AlegroService;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentService;
@@ -33,45 +34,68 @@ import java.io.IOException;
 @Service
 public class MergingService {
     private final AlegroService alegroService;
-    private final GlobalGridConfigurationService gridConfigurationService;
-    private final BaseCaseImprovementService baseCaseImprovementService;
     private final BalancesAdjustmentService balancesAdjustmentService;
-    private final XnodesService xnodesService;
+    private final BaseCaseImprovementService baseCaseImprovementService;
+    private final DKRenamingService dkRenamingService;
+    private final ExportTaskResultsService exportResultsService;
+    private final FinalCgmService finalCgmService;
     private final ForecastNetPositionService forecastNetPositionService;
     private final GermanPreMergeService germanPreMergeService;
-    private final DKRenamingService dkRenamingService;
+    private final GlobalGridConfigurationService gridConfigurationService;
+    private final GlskQualityCheckService glskQualityCheckService;
     private final HvdcXNodeAlignmentService hvdcXNodeAlignmentService;
+    private final MergingLogsCalculationService mergingLogsCalculationService;
     private final MonitaService monitaService;
     private final NetPositionService netPositionService;
-    private final TopologicalMergeService topologicalMergeService;
-    private final RecessivityService recessivityService;
-    private final GlskQualityCheckService glskQualityCheckService;
-    private final TargetNetPositionsCalculationService targetNetPositionsCalculationService;
     private final PstSpecialService pstSpecialService;
+    private final RecessivityService recessivityService;
     private final SlackCompensationService slackCompensationService;
-    private final FinalCgmService finalCgmService;
-    private final MergingLogsCalculationService mergingLogsCalculationService;
+    private final TargetNetPositionsCalculationService targetNetPositionsCalculationService;
+    private final TopologicalMergeService topologicalMergeService;
+    private final XnodesService xnodesService;
 
-    public MergingService(AlegroService alegroService, BaseCaseImprovementService baseCaseImprovementService, BalancesAdjustmentService balancesAdjustmentService, GlobalGridConfigurationService gridConfigurationService, XnodesService xnodesService, ForecastNetPositionService forecastNetPositionService, GermanPreMergeService germanPreMergeService, DKRenamingService dkRenamingService, HvdcXNodeAlignmentService hvdcXNodeAlignmentService, MonitaService monitaService, NetPositionService netPositionService, TopologicalMergeService topologicalMergeService, RecessivityService recessivityService, GlskQualityCheckService glskQualityCheckService, TargetNetPositionsCalculationService targetNetPositionsCalculationService, PstSpecialService pstSpecialService, SlackCompensationService slackCompensationService, FinalCgmService finalCgmService, MergingLogsCalculationService mergingLogsCalculationService) {
+    public MergingService(
+            AlegroService alegroService,
+            BalancesAdjustmentService balancesAdjustmentService,
+            BaseCaseImprovementService baseCaseImprovementService,
+            DKRenamingService dkRenamingService,
+            ExportTaskResultsService exportResultsService,
+            FinalCgmService finalCgmService,
+            ForecastNetPositionService forecastNetPositionService,
+            GermanPreMergeService germanPreMergeService,
+            GlobalGridConfigurationService gridConfigurationService,
+            GlskQualityCheckService glskQualityCheckService,
+            HvdcXNodeAlignmentService hvdcXNodeAlignmentService,
+            MergingLogsCalculationService mergingLogsCalculationService,
+            MonitaService monitaService,
+            NetPositionService netPositionService,
+            PstSpecialService pstSpecialService,
+            RecessivityService recessivityService,
+            SlackCompensationService slackCompensationService,
+            TargetNetPositionsCalculationService targetNetPositionsCalculationService,
+            TopologicalMergeService topologicalMergeService,
+            XnodesService xnodesService) {
+
         this.alegroService = alegroService;
-        this.baseCaseImprovementService = baseCaseImprovementService;
         this.balancesAdjustmentService = balancesAdjustmentService;
-        this.gridConfigurationService = gridConfigurationService;
-        this.xnodesService = xnodesService;
+        this.baseCaseImprovementService = baseCaseImprovementService;
+        this.dkRenamingService = dkRenamingService;
+        this.exportResultsService = exportResultsService;
+        this.finalCgmService = finalCgmService;
         this.forecastNetPositionService = forecastNetPositionService;
         this.germanPreMergeService = germanPreMergeService;
-        this.dkRenamingService = dkRenamingService;
+        this.gridConfigurationService = gridConfigurationService;
+        this.glskQualityCheckService = glskQualityCheckService;
         this.hvdcXNodeAlignmentService = hvdcXNodeAlignmentService;
+        this.mergingLogsCalculationService = mergingLogsCalculationService;
         this.monitaService = monitaService;
         this.netPositionService = netPositionService;
-        this.topologicalMergeService = topologicalMergeService;
-        this.recessivityService = recessivityService;
-        this.glskQualityCheckService = glskQualityCheckService;
-        this.targetNetPositionsCalculationService = targetNetPositionsCalculationService;
         this.pstSpecialService = pstSpecialService;
+        this.recessivityService = recessivityService;
         this.slackCompensationService = slackCompensationService;
-        this.finalCgmService = finalCgmService;
-        this.mergingLogsCalculationService = mergingLogsCalculationService;
+        this.targetNetPositionsCalculationService = targetNetPositionsCalculationService;
+        this.topologicalMergeService = topologicalMergeService;
+        this.xnodesService = xnodesService;
     }
 
     public void run(final MergingTask task) throws IOException {
@@ -117,5 +141,6 @@ public class MergingService {
 
     private void generateResults(final MergingTask task) {
         mergingLogsCalculationService.computeMergingLogs(task);
+        exportResultsService.generateOutputFiles(task);
     }
 }

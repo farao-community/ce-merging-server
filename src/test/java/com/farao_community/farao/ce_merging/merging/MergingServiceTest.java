@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.GlobalGridConfigurationService;
+import com.farao_community.farao.ce_merging.merging.post_process.export_results.ExportTaskResultsService;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_logs.MergingLogsCalculationService;
 import com.farao_community.farao.ce_merging.merging.process.alegro.AlegroService;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentService;
@@ -49,16 +50,19 @@ class MergingServiceTest {
     private AlegroService alegroService;
 
     @Mock
-    private GlobalGridConfigurationService gridConfigurationService;
+    private BalancesAdjustmentService balancesAdjustmentService;
 
     @Mock
     private BaseCaseImprovementService baseCaseImprovementService;
 
     @Mock
-    private BalancesAdjustmentService balancesAdjustmentService;
+    private DKRenamingService dkRenamingService;
 
     @Mock
-    private XnodesService xnodesService;
+    private ExportTaskResultsService exportResultsService;
+
+    @Mock
+    private FinalCgmService finalCgmService;
 
     @Mock
     private ForecastNetPositionService forecastNetPositionService;
@@ -67,10 +71,16 @@ class MergingServiceTest {
     private GermanPreMergeService germanPreMergeService;
 
     @Mock
-    private DKRenamingService dkRenamingService;
+    private GlobalGridConfigurationService gridConfigurationService;
+
+    @Mock
+    private GlskQualityCheckService glskQualityCheckService;
 
     @Mock
     private HvdcXNodeAlignmentService hvdcXNodeAlignmentService;
+
+    @Mock
+    private MergingLogsCalculationService mergingLogsCalculationService;
 
     @Mock
     private MonitaService monitaService;
@@ -79,28 +89,22 @@ class MergingServiceTest {
     private NetPositionService netPositionService;
 
     @Mock
-    private TopologicalMergeService topologicalMergeService;
+    private PstSpecialService pstSpecialService;
 
     @Mock
     private RecessivityService recessivityService;
 
     @Mock
-    private GlskQualityCheckService glskQualityCheckService;
+    private SlackCompensationService slackCompensationService;
 
     @Mock
     private TargetNetPositionsCalculationService targetNetPositionsCalculationService;
 
     @Mock
-    private PstSpecialService pstSpecialService;
+    private TopologicalMergeService topologicalMergeService;
 
     @Mock
-    private SlackCompensationService slackCompensationService;
-
-    @Mock
-    private FinalCgmService finalCgmService;
-
-    @Mock
-    private MergingLogsCalculationService mergingLogsCalculationService;
+    private XnodesService xnodesService;
 
     @Mock
     private MergingTask task;
@@ -145,6 +149,7 @@ class MergingServiceTest {
         verify(slackCompensationService).compensateFinalCgmSlackImbalance(task);
         verify(finalCgmService).computeFinalCgmResult(task);
         verify(mergingLogsCalculationService).computeMergingLogs(task);
+        verify(exportResultsService).generateOutputFiles(task);
 
         verifyNoInteractions(alegroService);
     }
@@ -180,6 +185,7 @@ class MergingServiceTest {
         verify(slackCompensationService).compensateFinalCgmSlackImbalance(task);
         verify(finalCgmService).computeFinalCgmResult(task);
         verify(mergingLogsCalculationService).computeMergingLogs(task);
+        verify(exportResultsService).generateOutputFiles(task);
     }
 
     @Test
@@ -207,7 +213,8 @@ class MergingServiceTest {
                 pstSpecialService,
                 slackCompensationService,
                 finalCgmService,
-                mergingLogsCalculationService
+                mergingLogsCalculationService,
+                exportResultsService
         );
 
         inOrder.verify(gridConfigurationService).setConfigurations(task);
@@ -235,5 +242,6 @@ class MergingServiceTest {
         inOrder.verify(slackCompensationService).compensateFinalCgmSlackImbalance(task);
         inOrder.verify(finalCgmService).computeFinalCgmResult(task);
         inOrder.verify(mergingLogsCalculationService).computeMergingLogs(task);
+        inOrder.verify(exportResultsService).generateOutputFiles(task);
     }
 }
