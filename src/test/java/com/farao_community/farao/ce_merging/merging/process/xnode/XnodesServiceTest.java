@@ -115,10 +115,10 @@ class XnodesServiceTest {
 
             xnodesService.checkIgmsStatus(task);
 
-            final ArgumentCaptor<Map<String, XnodeInformation>> captor = ArgumentCaptor.forClass(Map.class);
+            final ArgumentCaptor<XnodesCheck> captor = ArgumentCaptor.forClass(XnodesCheck.class);
             fileStorageUtilsMock.verify(() -> FileStorageUtils.saveArtifactFile(eq(XNODES_INFORMATION_FILE), captor.capture(), eq(task), eq(configuration)));
 
-            final Map<String, XnodeInformation> result = captor.getValue();
+            final Map<String, XnodeInformation> result = captor.getValue().getXnodeInformationMap();
             assertEquals(2, result.size());
 
             final XnodeInformation germanInfo = result.get(XDE_NODE);

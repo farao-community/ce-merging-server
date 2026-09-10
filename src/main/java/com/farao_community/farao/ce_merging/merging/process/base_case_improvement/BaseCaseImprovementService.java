@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.BciProcessor;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.springframework.stereotype.Service;
 

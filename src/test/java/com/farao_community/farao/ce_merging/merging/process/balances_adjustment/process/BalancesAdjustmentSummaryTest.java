@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.balances_adjustment;
+package com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process;
 
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.iidm.network.Country;
@@ -17,10 +17,10 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import java.util.List;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_AREA_NAME_KEY;
-import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_BALANCE_KEY;
-import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_MISMATCH_KEY;
-import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentSummary.REPORT_NODE_TARGET_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.BalancesAdjustmentSummary.REPORT_NODE_AREA_NAME_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.BalancesAdjustmentSummary.REPORT_NODE_BALANCE_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.BalancesAdjustmentSummary.REPORT_NODE_MISMATCH_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.BalancesAdjustmentSummary.REPORT_NODE_TARGET_KEY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.mockReportNode;

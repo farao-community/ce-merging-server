@@ -4,14 +4,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.base_case_improvement;
+package com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAlegroFlows;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAreaResults;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciProcessResult;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.BciResultUtil;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
