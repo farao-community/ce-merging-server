@@ -230,10 +230,14 @@ class MergingTaskManagementServiceTest {
             service.getTopologicalMerge(ID_1);
             service.getCgmAfterRecessivity(ID_1);
             service.getActualGlskReport(ID_1);
+            service.getGermanPreMerge(ID_1);
+            service.getIgmsNetPositions(ID_1);
+            service.getActualGlskCorrected(ID_1);
+            service.getBalancesAdjustmentTarget(ID_1);
             service.getRefProg(ID_1);
             service.getMergingLogs(ID_1);
 
-            verify(repository, times(13)).findById(ID_1);
+            verify(repository, times(17)).findById(ID_1);
         }
     }
 
@@ -404,6 +408,10 @@ class MergingTaskManagementServiceTest {
         artifacts.putFile(TOPOLOGICAL_MERGE_FILE, savedFile);
         artifacts.putFile(TGM_FILE_AFTER_RECESSIVITY, savedFile);
         artifacts.putFile(CGM_FILE_AFTER_PST, savedFile);
+        artifacts.putFile(GERMAN_IGMS_NET_POSITIONS_FILE, savedFile);
+        artifacts.putFile(GLSK_QUALITY_CORRECTED_FILE, savedFile);
+        artifacts.putFile(IGMS_NET_POSITIONS_FILE, savedFile);
+        artifacts.putFile(BALANCES_ADJUSTMENT_TARGET_FILE, savedFile);
     }
 
 }
