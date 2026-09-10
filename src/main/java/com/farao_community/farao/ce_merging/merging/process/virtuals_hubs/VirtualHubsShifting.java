@@ -38,10 +38,17 @@ public class VirtualHubsShifting {
         final List<VirtualHubRecord> virtualHubRecords = task.getConfigurations().getVirtualHubList();
         final String tgmPath = task.getArtifactPath(TGM_FILE_AFTER_RECESSIVITY);
         final Network network = Network.read(tgmPath);
-        referenceProgram.getReferenceExchangeDataList()
+        referenceProgram.getReferenceExchangeDataList().stream()
+                .filter(referenceExchangeData -> isVirtualHubsExchange(virtualHubRecords, referenceExchangeData.getAreaOutId(), referenceExchangeData.getAreaInId()))
                 .forEach(referenceExchangeData -> applyVirtualHubFlow(virtualHubsGaps, virtualHubRecords, network, referenceExchangeData));
         FileStorageUtils.saveArtifactNetwork(TGM_FILE_AFTER_RECESSIVITY, network, task, UCTE_FORMAT, configuration);
         return virtualHubsGaps;
+    }
+
+    private static boolean isVirtualHubsExchange(final List<VirtualHubRecord> virtualHubRecords, final String areaOut, final String areaIn) {
+        return virtualHubRecords
+                .stream()
+                .anyMatch(virtualHubRecord -> virtualHubRecord.getEic().equals(areaOut) || virtualHubRecord.getEic().equals(areaIn));
     }
 
     private static void applyVirtualHubFlow(final Map<String, Double> virtualHubsGaps, final List<VirtualHubRecord> virtualHubRecords, final Network network, final ReferenceExchangeData referenceExchangeData) {

@@ -40,6 +40,10 @@ public record NetPositionsResults(Map<String, NetPositions> netPositionsByCountr
         return netPositionsByCountryMap.get(country);
     }
 
+    public Map<String, NetPositions> getNetPositionsByCountryMap() {
+        return netPositionsByCountryMap;
+    }
+
     public void put(final Country country, final NetPositions netPositions) {
         netPositionsByCountryMap.put(country.name(), netPositions);
     }

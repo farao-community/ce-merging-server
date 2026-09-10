@@ -11,7 +11,6 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.OneToMany;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -27,11 +26,9 @@ public abstract class AbstractRegionConfiguration<T extends AbstractTsoInfos> {
     protected String id;
     protected String name;
     @ElementCollection(fetch = LAZY)
-    protected Map<String, String> areasIn;
+    protected Map<String, String> areasIn = new HashMap<>();
     @ElementCollection(fetch = LAZY)
-    protected Map<String, String> areasOut;
-    @OneToMany
-    protected Map<String, T> germanyZone;
+    protected Map<String, String> areasOut = new HashMap<>();
 
     @JsonIgnore
     public Map<String, String> getAreasAll() {
@@ -71,14 +68,6 @@ public abstract class AbstractRegionConfiguration<T extends AbstractTsoInfos> {
 
     public void setAreasOut(final Map<String, String> areasOut) {
         this.areasOut = areasOut;
-    }
-
-    public Map<String, T> getGermanyZone() {
-        return germanyZone;
-    }
-
-    public void setGermanyZone(final Map<String, T> germanyZone) {
-        this.germanyZone = germanyZone;
     }
 
     @Override
