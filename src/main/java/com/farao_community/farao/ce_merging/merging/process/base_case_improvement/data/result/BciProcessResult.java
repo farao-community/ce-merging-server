@@ -25,11 +25,11 @@ public record BciProcessResult(String regionName,
                                OutRegionResults outRegionResults,
                                BciAlegroData bciAlegroData) {
     @JsonCreator
-    public BciProcessResult(@JsonProperty("region") final String regionName,
+    public BciProcessResult(@JsonProperty("regionName") final String regionName,
                             @JsonProperty("processDateTime") final OffsetDateTime processDateTime,
-                            @JsonProperty("BciResults") final BciComputationResult bciComputationResult,
-                            @JsonProperty("OutRegionResults") final OutRegionResults outRegionResults,
-                            @JsonProperty("AlegroData") final BciAlegroData bciAlegroData) {
+                            @JsonProperty("bciComputationResult") final BciComputationResult bciComputationResult,
+                            @JsonProperty("outRegionResults") final OutRegionResults outRegionResults,
+                            @JsonProperty("bciAlegroData") final BciAlegroData bciAlegroData) {
         this.regionName = regionName;
         this.processDateTime = processDateTime;
         this.bciComputationResult = bciComputationResult;

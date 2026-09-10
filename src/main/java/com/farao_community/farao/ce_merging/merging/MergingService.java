@@ -7,9 +7,10 @@
 package com.farao_community.farao.ce_merging.merging;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.GlobalGridConfigurationService;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_logs.MergingLogsCalculationService;
 import com.farao_community.farao.ce_merging.merging.process.alegro.AlegroService;
+import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentService;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.BaseCaseImprovementService;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroData;
 import com.farao_community.farao.ce_merging.merging.process.dk_renaming.DKRenamingService;
 import com.farao_community.farao.ce_merging.merging.process.final_cgm_result.FinalCgmService;
 import com.farao_community.farao.ce_merging.merging.process.forecast_netpositions.ForecastNetPositionService;
@@ -22,16 +23,19 @@ import com.farao_community.farao.ce_merging.merging.process.pst_special_process.
 import com.farao_community.farao.ce_merging.merging.process.recessivity.RecessivityService;
 import com.farao_community.farao.ce_merging.merging.process.slack_compensation.SlackCompensationService;
 import com.farao_community.farao.ce_merging.merging.process.target_net_positions.TargetNetPositionsCalculationService;
-import com.farao_community.farao.ce_merging.merging.process.topologicalMerge.TopologicalMergeService;
+import com.farao_community.farao.ce_merging.merging.process.topological_merge.TopologicalMergeService;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodesService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.springframework.stereotype.Service;
+
+import java.io.IOException;
 
 @Service
 public class MergingService {
     private final AlegroService alegroService;
     private final GlobalGridConfigurationService gridConfigurationService;
     private final BaseCaseImprovementService baseCaseImprovementService;
+    private final BalancesAdjustmentService balancesAdjustmentService;
     private final XnodesService xnodesService;
     private final ForecastNetPositionService forecastNetPositionService;
     private final GermanPreMergeService germanPreMergeService;
@@ -46,11 +50,12 @@ public class MergingService {
     private final PstSpecialService pstSpecialService;
     private final SlackCompensationService slackCompensationService;
     private final FinalCgmService finalCgmService;
+    private final MergingLogsCalculationService mergingLogsCalculationService;
 
-
-    public MergingService(AlegroService alegroService, BaseCaseImprovementService baseCaseImprovementService, GlobalGridConfigurationService gridConfigurationService, XnodesService xnodesService, ForecastNetPositionService forecastNetPositionService, GermanPreMergeService germanPreMergeService, DKRenamingService dkRenamingService, HvdcXNodeAlignmentService hvdcXNodeAlignmentService, MonitaService monitaService, NetPositionService netPositionService, TopologicalMergeService topologicalMergeService, RecessivityService recessivityService, GlskQualityCheckService glskQualityCheckService, TargetNetPositionsCalculationService targetNetPositionsCalculationService, PstSpecialService pstSpecialService, SlackCompensationService slackCompensationService, FinalCgmService finalCgmService) {
+    public MergingService(AlegroService alegroService, BaseCaseImprovementService baseCaseImprovementService, BalancesAdjustmentService balancesAdjustmentService, GlobalGridConfigurationService gridConfigurationService, XnodesService xnodesService, ForecastNetPositionService forecastNetPositionService, GermanPreMergeService germanPreMergeService, DKRenamingService dkRenamingService, HvdcXNodeAlignmentService hvdcXNodeAlignmentService, MonitaService monitaService, NetPositionService netPositionService, TopologicalMergeService topologicalMergeService, RecessivityService recessivityService, GlskQualityCheckService glskQualityCheckService, TargetNetPositionsCalculationService targetNetPositionsCalculationService, PstSpecialService pstSpecialService, SlackCompensationService slackCompensationService, FinalCgmService finalCgmService, MergingLogsCalculationService mergingLogsCalculationService) {
         this.alegroService = alegroService;
         this.baseCaseImprovementService = baseCaseImprovementService;
+        this.balancesAdjustmentService = balancesAdjustmentService;
         this.gridConfigurationService = gridConfigurationService;
         this.xnodesService = xnodesService;
         this.forecastNetPositionService = forecastNetPositionService;
@@ -66,10 +71,41 @@ public class MergingService {
         this.pstSpecialService = pstSpecialService;
         this.slackCompensationService = slackCompensationService;
         this.finalCgmService = finalCgmService;
+        this.mergingLogsCalculationService = mergingLogsCalculationService;
     }
 
-    public void run(final MergingTask task) {
+    public void run(final MergingTask task) throws IOException {
+        configure(task);
+        prepareInputs(task);
+        process(task);
+        generateResults(task);
+    }
+
+    private void configure(final MergingTask task) {
         gridConfigurationService.setConfigurations(task);
+    }
+
+    private void process(final MergingTask task) throws IOException {
+        netPositionService.computeInitialNetPositions(task);
+        topologicalMergeService.mergeInitialIgms(task);
+        recessivityService.applyRecessivity(task);
+        final boolean isMergingWithInternalHvdc = task.getInputs().getMergingWithInternalHvdc();
+        if (isMergingWithInternalHvdc) {
+            alegroService.checkAlegroXnodesQuality(task);
+        }
+        glskQualityCheckService.runQualityCheck(task);
+        baseCaseImprovementService.computeTargetNetPositions(task);
+        if (isMergingWithInternalHvdc) {
+            alegroService.updateAlegroP0(task);
+        }
+        targetNetPositionsCalculationService.computeTargetNetPositions(task);
+        balancesAdjustmentService.shiftCgm(task);
+        pstSpecialService.fixPst(task);
+        slackCompensationService.compensateFinalCgmSlackImbalance(task);
+        finalCgmService.computeFinalCgmResult(task);
+    }
+
+    private void prepareInputs(final MergingTask task) {
         xnodesService.checkIgmsStatus(task);
         forecastNetPositionService.importForecastNetPosition(task);
         germanPreMergeService.preMergeGermanCountries(task);
@@ -77,29 +113,9 @@ public class MergingService {
         hvdcXNodeAlignmentService.applyHvdcXNodeAlignment(task);
         hvdcXNodeAlignmentService.setZeroFlowNodes(task);
         monitaService.renameNode(task);
-        netPositionService.computeInitialNetPositions(task);
-        topologicalMergeService.mergeInitialIgms(task);
-        recessivityService.applyRecessivity(task);
-        if (task.getInputs().getMergingWithInternalHvdc()) {
-           alegroService.checkAlegroXnodesQuality(task);
-            glskQualityCheckService.runQualityCheck(task);
-            baseCaseImprovementService.computeTargetNetPositions(task);
-           alegroService.updateAlegroP0(task);
-        } else {
-            glskQualityCheckService.runQualityCheck(task);
-            baseCaseImprovementService.computeTargetNetPositions(task);
-        }
-        targetNetPositionsCalculationService.computeTargetNetPositions(task);
-       // balancesAdjustmentService.shiftCgm(task);
-        pstSpecialService.fixPst(task);
-        slackCompensationService.compensateFinalCgmSlackImbalance(task);
-        finalCgmService.computeFinalCgmResult(task);
     }
 
-    private void prepareInputs(MergingTask task) {
-        forecastNetPositionService.importForecastNetPosition(task);
-        germanPreMergeService.preMergeGermanCountries(task);
-        dkRenamingService.renameDkCountry(task);
+    private void generateResults(final MergingTask task) {
+        mergingLogsCalculationService.computeMergingLogs(task);
     }
-
 }

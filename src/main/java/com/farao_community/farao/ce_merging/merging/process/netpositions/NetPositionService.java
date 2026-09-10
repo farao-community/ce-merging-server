@@ -64,7 +64,7 @@ public class NetPositionService {
                     .getIgms()
                     .stream()
                     .filter(igmData -> isNotPreTreated(task, igmData.getCountry()))
-                    .collect(toMap(IgmData::getCountry,
+                    .collect(toMap(igmData -> EntsoeGeographicalCode.valueOf(igmData.getCountry()).getCountry().name(),
                                    igmData -> computeNetPositions(task, igmData.getIgmFile(), igmData.getCountry())));
 
             final NetPositionsResults netPositionsFile = new NetPositionsResults(fromPreTreatedInputs);

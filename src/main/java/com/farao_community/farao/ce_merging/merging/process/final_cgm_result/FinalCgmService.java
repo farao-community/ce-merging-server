@@ -8,7 +8,9 @@ package com.farao_community.farao.ce_merging.merging.process.final_cgm_result;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
+import com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodesCalculation;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodesCheck;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
@@ -33,7 +35,6 @@ import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getLoadFlowMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithLogs;
 import static com.farao_community.farao.ce_merging.merging.process.final_cgm_result.OpenLoadFlowReportToXmlConverter.fromOlfReportToXmlLogs;
-import static com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler.computeCountryNetPositions;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
@@ -60,7 +61,7 @@ public class FinalCgmService {
         try {
             final Configurations taskConfiguration = task.getConfigurations();
             final LoadFlowParameters loadFlowParameters = taskConfiguration.getLoadFlowParameters();
-            final NetPositionsResults netPositionsFile = new NetPositionsResults();
+            final NetPositionsResults netPositionsResults = new NetPositionsResults();
 
             final SavedFile cgm = task.getOutputs().getCgm();
             final Network network = Network.read(cgm.getPath());
@@ -77,10 +78,18 @@ public class FinalCgmService {
                                                                       result);
 
             saveArtifactFile(LOAD_FLOW_ON_FINAL_CGM_LOGS, fromOlfReportToXmlLogs(rootReportNode), task, configuration);
+            network.getCountries().forEach(country -> {
+                final NetPositions netPositions = CountryNetPositionHandler.computeCountryNetPositions(
+                        country,
+                        network,
+                        taskConfiguration
+                );
 
-            network.getCountries().forEach(country -> computeCountryNetPositions(country, network, taskConfiguration));
+                netPositionsResults.getNetPositionsByCountryMap()
+                        .put(country.toString(), netPositions);
+            });
 
-            final FinalCgmResult cgmResult = new FinalCgmResult(loadflowOutput, netPositionsFile);
+            final FinalCgmResult cgmResult = new FinalCgmResult(loadflowOutput, netPositionsResults);
 
             saveArtifactFile(CGM_NET_POSITIONS_FILE, cgmResult, task, configuration);
             updateXnodesInformations(network, task);

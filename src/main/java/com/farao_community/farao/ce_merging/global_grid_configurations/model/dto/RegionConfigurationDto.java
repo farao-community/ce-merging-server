@@ -8,18 +8,12 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model.dt
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractRegionConfiguration;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static jakarta.persistence.CascadeType.ALL;
@@ -32,20 +26,6 @@ public class RegionConfigurationDto extends AbstractRegionConfiguration<TsoInfos
     @Id
     @GeneratedValue(strategy = AUTO)
     private Long ref;
-
-    @ElementCollection
-    @CollectionTable(name = "regionconfigurationdto_areasin_code_mapping",
-            joinColumns = {@JoinColumn(name = "regionconfigurationdto_ref", referencedColumnName = "ref")})
-    @MapKeyColumn(name = "areasin_name")
-    @Column(name = "areasin_eic")
-    protected Map<String, String> areasIn = new HashMap<>();
-
-    @ElementCollection
-    @CollectionTable(name = "regionconfigurationdto_areasout_code_mapping",
-            joinColumns = {@JoinColumn(name = "regionconfigurationdto_ref", referencedColumnName = "ref")})
-    @MapKeyColumn(name = "areasout_name")
-    @Column(name = "areasout_eic")
-    protected Map<String, String> areasOut = new HashMap<>();
 
     @OneToMany(cascade = ALL)
     @JsonProperty(value = "germanyZones")

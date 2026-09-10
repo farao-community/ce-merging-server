@@ -130,7 +130,7 @@ class MergingTaskManagementServiceTest {
     }
 
     @Test
-    void shouldRunTask() {
+    void shouldRunTask() throws IOException {
 
         final MergingTask task = taskWithIdAndStatus(ID_1, CREATED);
 
@@ -173,7 +173,7 @@ class MergingTaskManagementServiceTest {
     }
 
     @Test
-    void shouldChangeStatusToErrorIfExceptionThrown() {
+    void shouldChangeStatusToErrorIfExceptionThrown() throws IOException {
         final MergingTask failingTask = taskWithIdAndStatus(ID_1, CREATED);
         when(repository.findById(ID_1))
             .thenReturn(Optional.of(failingTask));
