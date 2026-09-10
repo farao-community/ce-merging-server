@@ -237,7 +237,6 @@ class MergingTaskManagementServiceTest {
         }
     }
 
-
     @ParameterizedTest
     @FieldSource("NOT_FINISHED_STATUSES")
     void shouldNotGetTaskFilesIfTaskNotFinished(final TaskStatus status) {
