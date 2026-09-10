@@ -8,6 +8,12 @@ package com.farao_community.farao.ce_merging.merging.task;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
+import com.farao_community.farao.ce_merging.common.util.FileUtils;
+import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.AbstractGridConfigurationService;
@@ -17,10 +23,6 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.services.
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.VirtualHubsConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.XNodeConfigurationService;
 import com.farao_community.farao.ce_merging.merging.MergingService;
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +44,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.*;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
@@ -211,15 +214,29 @@ class MergingTaskManagementServiceTest {
     @FieldSource("FINISHED_STATUSES")
     void shouldGetTaskFilesIfTaskFinished(final TaskStatus status) {
         final MergingTask task = getMergingTask(status);
+        addTestArtifacts(task);
 
-        service.getCgm(ID_1);
-        service.getCgmNetPositions(ID_1);
-        service.getRefProg(ID_1);
-        service.getMergingLogs(ID_1);
-        service.getXnodesInformation(ID_1);
+        try (final MockedStatic<FileUtils> fileUtils = mockStatic(FileUtils.class)) {
+            fileUtils.when(() -> FileUtils.readBytesFromPath(anyString())).thenReturn(new byte[0]);
 
-        verify(repository, times(5)).findById(ID_1);
+            service.getCgm(ID_1);
+            service.getCgmNetPositions(ID_1);
+            service.getBciOutput(ID_1);
+            service.getBalancedCgm(ID_1);
+            service.getXnodesInformation(ID_1);
+            service.getGermanPreMerge(ID_1);
+            service.getXnodesInconsistencies(ID_1);
+            service.getOpenLoadFlowLogs(ID_1);
+            service.getTopologicalMerge(ID_1);
+            service.getCgmAfterRecessivity(ID_1);
+            service.getActualGlskReport(ID_1);
+            service.getRefProg(ID_1);
+            service.getMergingLogs(ID_1);
+
+            verify(repository, times(13)).findById(ID_1);
+        }
     }
+
 
     @ParameterizedTest
     @FieldSource("NOT_FINISHED_STATUSES")
@@ -379,4 +396,15 @@ class MergingTaskManagementServiceTest {
                                      MIME_ZIP,
                                      byteContentOf(path));
     }
+
+    private void addTestArtifacts(final MergingTask task) {
+        final SavedFile savedFile = new SavedFile("test.uct", "test.uct", "mock");
+        final Artifacts artifacts = task.getArtifacts();
+        artifacts.putFile(BALANCED_CGM_FILE, savedFile);
+        artifacts.putFile(GERMAN_PRE_MERGED_IGM, savedFile);
+        artifacts.putFile(TOPOLOGICAL_MERGE_FILE, savedFile);
+        artifacts.putFile(TGM_FILE_AFTER_RECESSIVITY, savedFile);
+        artifacts.putFile(CGM_FILE_AFTER_PST, savedFile);
+    }
+
 }
