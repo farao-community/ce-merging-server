@@ -15,7 +15,9 @@ import static java.util.Locale.FRANCE;
 
 public enum OutputType {
 
-    MERGING_LOGS("%s_CORESO_MergingLogs.xml", "merging-logs");
+    MERGING_LOGS("%s_CORESO_MergingLogs.xml", "merging-logs"),
+    IGM_DATA("", "igm_quality_check"),
+    GLSK_QUALITY_REPORT("%s_GLSK_QUALITY_CHECK.xml", "glsk-quality-report");
 
     private final String fileName;
     private final String location;
@@ -26,12 +28,21 @@ public enum OutputType {
     }
 
     public String getFileName(final OffsetDateTime targetDate) {
-        final ZonedDateTime targetZdtParis = targetDate.atZoneSameInstant(PARIS_ZONE_ID);
-        final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
+        final String dateAndTime = getDateTimeString(targetDate);
         return fileName.formatted(dateAndTime);
     }
 
     public String getLocation(final long taskId) {
         return String.format("/tasks/%d/outputs/%s", taskId, location);
+    }
+
+    public String getLocation(final long taskId, final OffsetDateTime targetDate) {
+        final String dateAndTime = getDateTimeString(targetDate);
+        return String.format("/tasks/%d/outputs/%s_%s", taskId, dateAndTime, location);
+    }
+
+    private static String getDateTimeString(final OffsetDateTime targetDate) {
+        final ZonedDateTime targetZdtParis = targetDate.atZoneSameInstant(PARIS_ZONE_ID);
+        return FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
     }
 }
