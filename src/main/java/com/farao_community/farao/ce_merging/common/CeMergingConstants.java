@@ -12,10 +12,6 @@ import java.time.format.DateTimeFormatter;
 
 public final class CeMergingConstants {
 
-    private CeMergingConstants() {
-        // constants class
-    }
-
     // app configuration
     public static final String TAG_VERSION = "1.0.0";
     public static final String CE_MERGING_URL = "/ce-merging/";
@@ -93,4 +89,7 @@ public final class CeMergingConstants {
     public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
     public static final DateTimeFormatter FILENAME_DATETIME_FMT = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
 
+    private CeMergingConstants() {
+        // constants class
+    }
 }

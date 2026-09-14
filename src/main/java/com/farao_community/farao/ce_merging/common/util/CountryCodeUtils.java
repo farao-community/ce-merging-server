@@ -19,9 +19,6 @@ public final class CountryCodeUtils {
     private static final String KOSOVO_COUNTRY_CODE = "KS";
     private static final String KOSOVO_ISO_COUNTRY_CODE = "XK";
 
-    private CountryCodeUtils() {
-    }
-
     public static String mapKsToXk(final String country) {
         return UcteCountryCode.KS.name().equals(country) ? Country.XK.name() : country;
     }
@@ -43,4 +40,8 @@ public final class CountryCodeUtils {
     public static String mapXkToKs(final String country) {
         return KOSOVO_ISO_COUNTRY_CODE.equals(country) ? KOSOVO_COUNTRY_CODE : country;
     }
+
+    private CountryCodeUtils() {
+    }
+
 }
