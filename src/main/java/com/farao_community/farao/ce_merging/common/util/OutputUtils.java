@@ -14,10 +14,6 @@ import java.time.OffsetDateTime;
 
 public final class OutputUtils {
 
-    private OutputUtils() {
-        throw new AssertionError("Utility class should not be constructed");
-    }
-
     public static final Logger LOGGER = LoggerFactory.getLogger(OutputUtils.class);
 
     public static int calculateTargetPosition(OffsetDateTime targetDate, OffsetDateTime periodStart, OffsetDateTime periodEnd) {
@@ -39,6 +35,10 @@ public final class OutputUtils {
 
     public static String getDocumentIdentificationDate(String dailyTimeInterval) {
         return dailyTimeInterval.substring(18, 28).replace("-", "");
+    }
+
+    private OutputUtils() {
+        throw new AssertionError("Utility class should not be constructed");
     }
 
     private static boolean isValidInterval(OffsetDateTime targetDate, OffsetDateTime intervalStart, OffsetDateTime intervalEnd) {

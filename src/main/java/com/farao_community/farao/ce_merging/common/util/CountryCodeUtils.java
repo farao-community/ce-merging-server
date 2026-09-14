@@ -16,9 +16,8 @@ import static com.powsybl.iidm.network.Country.DK;
 
 public final class CountryCodeUtils {
     public static final String DK1_CODE = "DK1";
-
-    private CountryCodeUtils() {
-    }
+    private static final String KOSOVO_COUNTRY_CODE = "KS";
+    private static final String KOSOVO_ISO_COUNTRY_CODE = "XK";
 
     public static String mapKsToXk(final String country) {
         return UcteCountryCode.KS.name().equals(country) ? Country.XK.name() : country;
@@ -37,4 +36,12 @@ public final class CountryCodeUtils {
     public static String mapDk1ToDk(final String country) {
         return DK1_CODE.equals(country) ? DK.name() : country;
     }
+
+    public static String mapXkToKs(final String country) {
+        return KOSOVO_ISO_COUNTRY_CODE.equals(country) ? KOSOVO_COUNTRY_CODE : country;
+    }
+
+    private CountryCodeUtils() {
+    }
+
 }
