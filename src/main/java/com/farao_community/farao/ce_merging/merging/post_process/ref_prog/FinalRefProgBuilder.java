@@ -103,8 +103,8 @@ public final class FinalRefProgBuilder {
         final List<PublicationDocument.PublicationTimeSeries> pubTimeSeriesList = new ArrayList<>();
         final BiMap<String, String> allAreasBiMap = HashBiMap.create(mergingTask.getConfigurations().getRegionConfiguration().getAreasAll());
         final List<VirtualHubRecord> virtualHubList = mergingTask.getConfigurations().getVirtualHubList();
-        final Map<String, String> countryMaEicCodeMap = virtualHubList.stream().collect(Collectors.toUnmodifiableMap(VirtualHubRecord::getRelatedMaEic, VirtualHubRecord::getRelatedMaCode, (a, b) -> a));
-        final Map<String, String> countryEicCodeMap = virtualHubList.stream().collect(Collectors.toUnmodifiableMap(VirtualHubRecord::getEic, VirtualHubRecord::getCode, (a, b) -> a));
+        final Map<String, String> countryMaEicCodeMap = virtualHubList.stream().collect(Collectors.toUnmodifiableMap(VirtualHubRecord::getRelatedMaEic, VirtualHubRecord::getRelatedMaCode, (firstConflictingKey, secondConflictingKey) -> firstConflictingKey));
+        final Map<String, String> countryEicCodeMap = virtualHubList.stream().collect(Collectors.toUnmodifiableMap(VirtualHubRecord::getEic, VirtualHubRecord::getCode, (firstConflictingKey, secondConflictingKey) -> firstConflictingKey));
 
         refProgResult.acExchanges().entrySet().forEach(acExchange -> pubTimeSeriesList.add(computePublicationTimeSeries(acExchange, allAreasBiMap, countryMaEicCodeMap, countryEicCodeMap, CurrentType.AC, dailyTimeInterval, position)));
         refProgResult.virtualHubsExchanges().entrySet().forEach(virtualHub -> pubTimeSeriesList.add(computePublicationTimeSeries(virtualHub, allAreasBiMap, countryMaEicCodeMap, countryEicCodeMap, CurrentType.DC, dailyTimeInterval, position)));
