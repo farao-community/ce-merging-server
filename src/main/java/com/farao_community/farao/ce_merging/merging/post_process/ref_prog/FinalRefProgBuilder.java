@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CODING_SCHEME;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RECEIVER_ROLE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SENDER_ROLE;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getDocumentIdentification;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getDocumentVersion;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getPublicationTimeInterval;
@@ -44,9 +47,6 @@ public final class FinalRefProgBuilder {
     }
 
     private static final String DOCUMENT_TYPE = "A45";
-    private static final String CODING_SCHEME = "A01";
-    private static final String SENDER_ROLE = "A44";
-    private static final String RECEIVER_ROLE = "A36";
 
     public static PublicationDocument buildFinalRefProgResult(final RefProgResult refProgResult, final MergingTask taskEntity) {
         final String dailyTimeInterval = refProgResult.dailyTimeInterval();
