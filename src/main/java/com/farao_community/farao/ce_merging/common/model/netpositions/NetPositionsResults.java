@@ -28,6 +28,10 @@ public record NetPositionsResults(Map<String, NetPositions> netPositionsByCountr
         this(new HashMap<>());
     }
 
+    public Map<String, NetPositions> getNetPositionsByCountryMap() {
+        return netPositionsByCountryMap;
+    }
+
     public NetPositions get(final Country country) {
         return get(country.name());
     }
