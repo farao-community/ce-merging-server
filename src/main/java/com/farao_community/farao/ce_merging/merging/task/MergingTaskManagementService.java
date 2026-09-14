@@ -14,6 +14,7 @@ import com.farao_community.farao.ce_merging.common.exception.task.TaskNotFoundEx
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotRunException;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
+import com.farao_community.farao.ce_merging.common.util.FileUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.HvdcAlignmentConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.RegionConfigurationService;
@@ -45,9 +46,7 @@ import java.util.function.Function;
 
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.unzipInputFileInTmp;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirectory;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.*;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
@@ -242,53 +241,43 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getGermanPreMerge(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return FileUtils.readBytesFromPath(getArtifacts(taskId).getFile(GERMAN_PRE_MERGED_IGM).getPath());
     }
 
     public byte[] getTopologicalMerge(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return FileUtils.readBytesFromPath(getArtifacts(taskId).getFile(TOPOLOGICAL_MERGE_FILE).getPath());
     }
 
     public byte[] getCgmAfterRecessivity(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return FileUtils.readBytesFromPath(getArtifacts(taskId).getFile(TGM_FILE_AFTER_RECESSIVITY).getPath());
     }
 
     public SavedFile getActualGlskReport(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(GLSK_QUALITY_REPORT);
     }
 
     public byte[] getCgmAfterPstSpecialProcedure(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return FileUtils.readBytesFromPath(getArtifacts(taskId).getFile(CGM_FILE_AFTER_PST).getPath());
     }
 
     public SavedFile getActualGlskCorrected(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(GLSK_QUALITY_CORRECTED_FILE);
     }
 
     public SavedFile getIgmsNetPositions(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(IGMS_NET_POSITIONS_FILE);
     }
 
     public SavedFile getGermanIgmsNetPositions(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(GERMAN_IGMS_NET_POSITIONS_FILE);
     }
 
     public SavedFile getBciOutput(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(BCI_OUTPUT_FILE);
     }
 
     public SavedFile getBalancesAdjustmentTarget(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(BALANCES_ADJUSTMENT_TARGET_FILE);
     }
 
     public SavedFile getTgmNetPositions(final Long taskId) {
@@ -297,18 +286,15 @@ public class MergingTaskManagementService {
     }
 
     public SavedFile getAlegroNetPositions(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(ALEGRO_NET_POSITIONS);
     }
 
     public byte[] getBalancedCgm(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return FileUtils.readBytesFromPath(getArtifacts(taskId).getFile(BALANCED_CGM_FILE).getPath());
     }
 
     public SavedFile getPstOutput(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(PST_OUTPUT_FILE);
     }
 
     public byte[] getExecutionLogs(final Long taskId) {
@@ -317,13 +303,11 @@ public class MergingTaskManagementService {
     }
 
     public SavedFile getOpenLoadFlowLogs(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(LOAD_FLOW_ON_FINAL_CGM_LOGS);
     }
 
     public SavedFile getXnodesInconsistencies(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(XNODES_INCONSISTENCIES);
     }
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
                     GLOBAL CONFIGURATIONS
@@ -383,20 +367,20 @@ public class MergingTaskManagementService {
                         OUTPUTS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
+    public byte[] getOutputZip(final Long taskId) {
+        return zipDirectory(
+                configuration.getOutputsDirectoryPath(
+                        getFinishedTaskById(taskId)
+                )
+        );
+    }
+
     public SavedFile getCgm(final Long taskId) {
         return getOutputs(taskId).getCgm();
     }
 
     public SavedFile getRefProg(final Long taskId) {
         return getOutputs(taskId).getRefProg();
-    }
-
-    public byte[] getOutputZip(final Long taskId) {
-        return zipDirectory(
-            configuration.getOutputsDirectoryPath(
-                getFinishedTaskById(taskId)
-            )
-        );
     }
 
     public SavedFile getMergingLogs(final Long taskId) {
