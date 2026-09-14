@@ -19,6 +19,7 @@ public final class CeMergingConstants {
     // app configuration
     public static final String TAG_VERSION = "1.0.0";
     public static final String CE_MERGING_URL = "/ce-merging/";
+    public static final String CE_DAILY_MERGING_URL = "/daily-merging/";
     public static final String API_VERSION = "v1";
     public static final String JSON_API_MIME_TYPE = "application/vnd.api+json";
     public static final String ORIGIN_ANY = "*";
@@ -26,6 +27,7 @@ public final class CeMergingConstants {
     public static final String TASK_NOT_RUN = "Merging task with given ID has not been run";
     public static final String OK = "200";
     public static final String CREATED = "201";
+    public static final String NO_CONTENT = "204";
     public static final String BAD_REQUEST = "400";
     public static final String NOT_FOUND = "404";
     public static final String INTERNAL_ERROR = "500";
@@ -41,6 +43,9 @@ public final class CeMergingConstants {
     public static final String GLOBAL_CONFIGURATIONS_TAG = "Global Configurations";
     public static final String TASK_CONFIGURATIONS_TAG = "Task Configurations";
     public static final String INPUTS_TAG = "Inputs";
+    public static final String DAILY_TASK_MANAGEMENT_TAG = "Daily merging tasks management";
+    public static final String DAILY_INPUTS_TAG = "Daily merging inputs";
+    public static final String DAILY_OUTPUTS_TAG = "Daily merging outputs";
     public static final String DK_HVDC_XNODES_PROPERTY = "dk.hvdc.xnodes";
     public static final String DK_NAMING_STRATEGY = "DKNamingStrategy";
     public static final String UCTE_EXPORT_NAMING_STRATEGY_PROPERTY = "ucte.export.naming-strategy";

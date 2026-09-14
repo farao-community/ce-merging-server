@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.config;
 
+import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -70,6 +71,12 @@ public class CeMergingConfiguration {
 
     public String getTaskDirectoryPath(final MergingTask task) {
         return Path.of(ceMergingRoot)
+                .resolve(task.getId().toString())
+                .toString();
+    }
+
+    public String getDailyDirectoryPath(final DailyMergingTask task) {
+        return Path.of(dailyMergingRoot)
                 .resolve(task.getId().toString())
                 .toString();
     }
