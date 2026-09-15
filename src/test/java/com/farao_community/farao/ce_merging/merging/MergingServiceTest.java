@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.merging;
 import com.farao_community.farao.ce_merging.global_grid_configurations.GlobalGridConfigurationService;
 import com.farao_community.farao.ce_merging.merging.post_process.export_results.ExportTaskResultsService;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_logs.MergingLogsCalculationService;
+import com.farao_community.farao.ce_merging.merging.post_process.ref_prog.RefProgCalculationService;
 import com.farao_community.farao.ce_merging.merging.process.alegro.AlegroService;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentService;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.BaseCaseImprovementService;
@@ -95,6 +96,9 @@ class MergingServiceTest {
     private RecessivityService recessivityService;
 
     @Mock
+    private RefProgCalculationService refProgCalculationService;
+
+    @Mock
     private SlackCompensationService slackCompensationService;
 
     @Mock
@@ -148,6 +152,7 @@ class MergingServiceTest {
         verify(pstSpecialService).fixPst(task);
         verify(slackCompensationService).compensateFinalCgmSlackImbalance(task);
         verify(finalCgmService).computeFinalCgmResult(task);
+        verify(refProgCalculationService).computeRefProg(task);
         verify(mergingLogsCalculationService).computeMergingLogs(task);
         verify(exportResultsService).generateOutputFiles(task);
 
@@ -213,6 +218,7 @@ class MergingServiceTest {
                 pstSpecialService,
                 slackCompensationService,
                 finalCgmService,
+                refProgCalculationService,
                 mergingLogsCalculationService,
                 exportResultsService
         );
@@ -241,6 +247,7 @@ class MergingServiceTest {
         inOrder.verify(pstSpecialService).fixPst(task);
         inOrder.verify(slackCompensationService).compensateFinalCgmSlackImbalance(task);
         inOrder.verify(finalCgmService).computeFinalCgmResult(task);
+        inOrder.verify(refProgCalculationService).computeRefProg(task);
         inOrder.verify(mergingLogsCalculationService).computeMergingLogs(task);
         inOrder.verify(exportResultsService).generateOutputFiles(task);
     }

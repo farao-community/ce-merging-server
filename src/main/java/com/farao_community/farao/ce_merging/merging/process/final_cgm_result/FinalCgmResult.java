@@ -20,7 +20,7 @@ public class FinalCgmResult {
     private final NetPositionsResults netPositionsResults;
 
     @JsonCreator
-    public FinalCgmResult(@JsonProperty("loadflowResults") final LoadFlowOutput loadFlowOutput,
+    public FinalCgmResult(@JsonProperty("loadFlowResults") final LoadFlowOutput loadFlowOutput,
                           @JsonProperty("netPositionsByCountryMap") final NetPositionsResults netPositionsResults) {
         this.loadFlowOutput = loadFlowOutput;
         this.netPositionsResults = netPositionsResults;

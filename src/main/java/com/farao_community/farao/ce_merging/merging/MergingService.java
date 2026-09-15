@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.merging;
 import com.farao_community.farao.ce_merging.global_grid_configurations.GlobalGridConfigurationService;
 import com.farao_community.farao.ce_merging.merging.post_process.export_results.ExportTaskResultsService;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_logs.MergingLogsCalculationService;
+import com.farao_community.farao.ce_merging.merging.post_process.ref_prog.RefProgCalculationService;
 import com.farao_community.farao.ce_merging.merging.process.alegro.AlegroService;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentService;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.BaseCaseImprovementService;
@@ -92,6 +93,7 @@ public class MergingService {
         this.netPositionService = netPositionService;
         this.pstSpecialService = pstSpecialService;
         this.recessivityService = recessivityService;
+        this.refProgCalculationService = refProgCalculationService;
         this.slackCompensationService = slackCompensationService;
         this.targetNetPositionsCalculationService = targetNetPositionsCalculationService;
         this.topologicalMergeService = topologicalMergeService;
@@ -140,6 +142,7 @@ public class MergingService {
     }
 
     private void generateResults(final MergingTask task) {
+        refProgCalculationService.computeRefProg(task);
         mergingLogsCalculationService.computeMergingLogs(task);
         exportResultsService.generateOutputFiles(task);
     }
