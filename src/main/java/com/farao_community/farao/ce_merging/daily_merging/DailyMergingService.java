@@ -1,0 +1,89 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+package com.farao_community.farao.ce_merging.daily_merging;
+
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
+import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
+import com.farao_community.farao.ce_merging.daily_merging.merging_request.MergingRequestService;
+import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.time.OffsetDateTime;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+@Service
+public class DailyMergingService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DailyMergingService.class);
+
+    private final MergingRequestService mergingRequestService;
+
+    public DailyMergingService(final MergingRequestService mergingRequestService) {
+        this.mergingRequestService = mergingRequestService;
+    }
+
+    public void run(final DailyMergingTask dailyMergingTask, final List<MergingTask> mergingTasks) {
+        final RequestInformation requestInformation = mergingRequestService.getMergingRequestInformation(dailyMergingTask);
+        checkThatAllTasksTargetDateAreWithinRequestTimeInterval(mergingTasks, requestInformation);
+        checkTasksHaveDifferentTargetDates(mergingTasks);
+        mergingTasks.sort(Comparator.comparing(task -> task.getInputs().getTargetDate()));
+        final List<MergingTask> successMergingTasks = mergingTasks.stream()
+                .filter(task -> TaskStatus.SUCCESS.equals(task.getStatus()))
+                .toList();
+
+        if (!successMergingTasks.isEmpty()) {
+            // TODO
+        }
+        // TODO
+    }
+
+    private void checkThatAllTasksTargetDateAreWithinRequestTimeInterval(final List<MergingTask> tasks, final RequestInformation requestInformation) {
+        final OffsetDateTime requestStartDateTime = requestInformation.getStartDateTime();
+        final OffsetDateTime requestEndDateTime = requestInformation.getEndDateTime();
+
+        tasks.forEach(task -> {
+            final OffsetDateTime targetDate = task.getInputs().getTargetDate();
+
+            if (!(targetDate.isAfter(requestStartDateTime) && targetDate.isBefore(requestEndDateTime.minusMinutes(1)))) {
+                final String errorMessage = String.format(
+                        "Task's %s target date %s outside merging request time interval %s",
+                        task.getId(),
+                        targetDate,
+                        requestInformation.requestTimeInterval()
+                );
+                LOGGER.error(errorMessage);
+                throw new CeMergingException(errorMessage);
+            }
+        });
+    }
+
+    private void checkTasksHaveDifferentTargetDates(final List<MergingTask> tasks) {
+        final Set<OffsetDateTime> targetDateIntervals = new HashSet<>();
+        for (final MergingTask task : tasks) {
+            final OffsetDateTime targetDate = task.getInputs().getTargetDate();
+            final OffsetDateTime targetDateInterval = targetDate
+                    .withMinute(0)
+                    .withSecond(0)
+                    .withNano(0);
+
+            if (!targetDateIntervals.add(targetDateInterval)) {
+                final String timeInterval = DateTimeUtils.toHourlyInterval(targetDateInterval);
+                final String errorMessage = String.format("More than one task with same target date inside interval %s", timeInterval);
+                LOGGER.error(errorMessage);
+                throw new CeMergingException(errorMessage);
+            }
+        }
+    }
+}

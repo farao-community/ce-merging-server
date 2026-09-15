@@ -9,6 +9,7 @@ package test_utils;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -194,6 +195,12 @@ public final class CeTestUtils {
         TaskTestUtils.setTaskDefaultConfigurations(task);
 
         return task;
+    }
+
+    public static DailyMergingTask dailyTaskWithId(final long id) {
+        final DailyMergingTask dailyMergingTask = new DailyMergingTask();
+        dailyMergingTask.setId(id);
+        return dailyMergingTask;
     }
 
     public static MergingTaskDto taskDtoWithIdAndStatus(final long id,
