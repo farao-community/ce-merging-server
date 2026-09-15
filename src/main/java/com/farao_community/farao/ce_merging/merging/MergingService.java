@@ -50,6 +50,7 @@ public class MergingService {
     private final NetPositionService netPositionService;
     private final PstSpecialService pstSpecialService;
     private final RecessivityService recessivityService;
+    private final RefProgCalculationService refProgCalculationService;
     private final SlackCompensationService slackCompensationService;
     private final TargetNetPositionsCalculationService targetNetPositionsCalculationService;
     private final TopologicalMergeService topologicalMergeService;
@@ -72,6 +73,7 @@ public class MergingService {
             NetPositionService netPositionService,
             PstSpecialService pstSpecialService,
             RecessivityService recessivityService,
+            RefProgCalculationService refProgCalculationService,
             SlackCompensationService slackCompensationService,
             TargetNetPositionsCalculationService targetNetPositionsCalculationService,
             TopologicalMergeService topologicalMergeService,
