@@ -42,6 +42,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.unzipInputFileInTmp;
@@ -437,11 +438,19 @@ public class MergingTaskManagementService {
         return getFinishedTaskById(taskId).getOutputs();
     }
 
-    private MergingTask getTaskById(final Long taskId) {
-        final MergingTask task = repository.findById(taskId)
+    public MergingTask getTaskById(final Long taskId) {
+        final MergingTask task = findTaskById(taskId)
             .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available", taskId)));
         handleDaylightSavingTime(task);
         return task;
+    }
+
+    public boolean checkTaskExist(long taskId) {
+        return findTaskById(taskId).isPresent();
+    }
+
+    private Optional<MergingTask> findTaskById(final long taskId) {
+        return repository.findById(taskId);
     }
 
     private MergingTask getFinishedTaskById(final Long taskId) throws TaskNotRunException {

@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.config;
 
+import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +18,6 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAI
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_OUTPUTS_DIR;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INPUTS_DIR;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OUTPUTS_DIR;
-import static java.io.File.separator;
 
 @Configuration
 public class CeMergingConfiguration {
@@ -48,11 +48,11 @@ public class CeMergingConfiguration {
         return getDirectoryPath(task, INPUTS_DIR);
     }
 
-    public String getDailyInputsDirectoryPath(final MergingTask task) {
+    public String getDailyInputsDirectoryPath(final DailyMergingTask task) {
         return getDailyDirectoryPath(task, DAILY_INPUTS_DIR);
     }
 
-    public String getDailyOutputsDirectoryPath(final MergingTask task) {
+    public String getDailyOutputsDirectoryPath(final DailyMergingTask task) {
         return getDailyDirectoryPath(task, DAILY_OUTPUTS_DIR);
     }
 
@@ -65,7 +65,7 @@ public class CeMergingConfiguration {
     }
 
     public String getDirectoryPath(final MergingTask task, final String directory) {
-        return resolveTaskDirInRoot(task, directory, ceMergingRoot);
+        return resolveTaskDirInRoot(task.getId(), directory, ceMergingRoot);
     }
 
     public String getTaskDirectoryPath(final MergingTask task) {
@@ -74,20 +74,28 @@ public class CeMergingConfiguration {
                 .toString();
     }
 
-    private String getDailyDirectoryPath(final MergingTask task, final String directory) {
-        return resolveTaskDirInRoot(task, directory, dailyMergingRoot);
+    public String getDailyDirectoryPath(final DailyMergingTask task) {
+        return Path.of(dailyMergingRoot)
+                .resolve(task.getId().toString())
+                .toString();
+    }
+
+    private String getDailyDirectoryPath(final DailyMergingTask task, final String directory) {
+        return resolveTaskDirInRoot(task.getId(), directory, dailyMergingRoot);
     }
 
     /**
      *
-     * @param task : each task has it own directory
+     * @param taskId : each taskId has it own directory
      * @param directory : each type of file (in, out, ...) has its subdirectory inside
      * @return /path/to/root/task_id/directory
      */
-    private String resolveTaskDirInRoot(final MergingTask task, final String directory, final String root) {
-        return Path.of(root + separator + task.getId())
-            .resolve(directory)
-            .toString();
-    }
 
+    private String resolveTaskDirInRoot(final Long taskId, final String directory, final String root) {
+
+        return Path.of(root)
+                .resolve(taskId.toString())
+                .resolve(directory)
+                .toString();
+    }
 }

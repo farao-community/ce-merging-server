@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.config;
 
+import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.dailyTaskWithId;
 import static test_utils.CeTestUtils.taskWithIdAndStatus;
 
 @SpringBootTest
@@ -31,6 +33,7 @@ class CeMergingConfigurationTest {
         copy.setCeMergingRoot(configuration.getCeMergingRoot());
         copy.setDailyMergingRoot(configuration.getDailyMergingRoot());
         final MergingTask task = taskWithIdAndStatus(1, TaskStatus.CREATED);
+        final DailyMergingTask dailyMergingTask = dailyTaskWithId(1);
 
         assertEquals(Path.of("/tmp/testFiles"),
                      Path.of(copy.getCeMergingRoot()));
@@ -50,11 +53,11 @@ class CeMergingConfigurationTest {
                      Path.of(copy.getInputsDirectoryPath(task)));
 
         assertEquals(Path.of("/tmp/testFiles/daily/1/daily-outputs"),
-                     Path.of(copy.getDailyOutputsDirectoryPath(task)));
+                     Path.of(copy.getDailyOutputsDirectoryPath(dailyMergingTask)));
 
         copy.setDailyMergingRoot("/a/new/path");
 
         assertEquals(Path.of("/a/new/path/1/daily-inputs"),
-                     Path.of(copy.getDailyInputsDirectoryPath(task)));
+                     Path.of(copy.getDailyInputsDirectoryPath(dailyMergingTask)));
     }
 }
