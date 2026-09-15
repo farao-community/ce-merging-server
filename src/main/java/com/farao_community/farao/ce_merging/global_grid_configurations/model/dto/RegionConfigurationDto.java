@@ -6,9 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractRegionConfiguration;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -28,7 +29,7 @@ import static jakarta.persistence.GenerationType.AUTO;
 
 @Entity
 @Table(name = "regionconfigurationdto")
-public class RegionConfigurationDto extends AbstractRegionConfiguration<TsoInfosDto> {
+public class RegionConfigurationDto {
 
     @Id
     @GeneratedValue(strategy = AUTO)
@@ -114,4 +115,14 @@ public class RegionConfigurationDto extends AbstractRegionConfiguration<TsoInfos
         return areasAllMap;
     }
 
+    @JsonIgnore
+    public Map<String, String> getCountriesByEicCode() {
+        BiMap<String, String> biMapAreas = HashBiMap.create(getAreasAll());
+        return biMapAreas.inverse();
+    }
+
+    @JsonIgnore
+    public String getAreaInEic(final String eic) {
+        return areasIn.get(eic);
+    }
 }

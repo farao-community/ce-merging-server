@@ -6,11 +6,16 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractBecCoefficients;
 import jakarta.persistence.Embeddable;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @Embeddable
-public class BecCoefficientsDto extends AbstractBecCoefficients {
+public class BecCoefficientsDto {
+
+    private String countryCode;
+    private Double coefficient;
 
     public BecCoefficientsDto(final String countryCode, final Double coefficient) {
         this.countryCode = countryCode;
@@ -19,5 +24,36 @@ public class BecCoefficientsDto extends AbstractBecCoefficients {
 
     public BecCoefficientsDto() {
 
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(final String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public Double getCoefficient() {
+        return coefficient;
+    }
+
+    public void setCoefficient(final Double coefficient) {
+        this.coefficient = coefficient;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return EqualsBuilder.reflectionEquals(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }
