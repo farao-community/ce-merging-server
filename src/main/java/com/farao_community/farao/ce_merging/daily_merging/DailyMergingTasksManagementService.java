@@ -190,9 +190,9 @@ public class DailyMergingTasksManagementService {
             if (service.checkTaskExist(taskId)) {
                 MergingTask taskEntity = service.getTaskById(taskId);
                 if (taskEntity.getStatus() == TaskStatus.CREATED) {
-                    LOGGER.warn("Merging task {} has not been run, it will be removed from daily merge", taskId);
+                    LOGGER.warn("Merging task {} has not been run", taskId);
                 } else if (taskEntity.getStatus() == TaskStatus.RUNNING) {
-                    LOGGER.warn("Merging task {} is currently running, it will be removed from daily merge", taskId);
+                    LOGGER.warn("Merging task {} is currently running", taskId);
                 }
                 completedTaskIds.add(taskId);
             } else {
