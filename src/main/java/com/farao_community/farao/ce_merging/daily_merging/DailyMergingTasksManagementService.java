@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 @Service
@@ -82,8 +83,13 @@ public class DailyMergingTasksManagementService {
     public DailyMergingTask runDailyMergingTask(long dailyTaskId) {
         DailyMergingTask dailyTask = getTaskById(dailyTaskId);
         try {
-            setTaskRunning(dailyTask);
+            if (dailyTask.getTaskStatus() == RUNNING) {
+                throw new TaskAlreadyRunningException(String.format("Task %d already running, could not be run again",
+                        dailyTask.getId()));
+            }
+            dailyTask.setTaskStatus(RUNNING);
             LOGGER.info("Running daily merging task: '{}' ", dailyTask.getId());
+            repository.save(dailyTask);
             List<MergingTask> mergingTasks = new ArrayList<>();
             dailyTask.getMergingTaskIds().forEach(taskId -> mergingTasks.add(service.getTaskById(taskId)));
             dailyMergingService.run(dailyTask, mergingTasks);
@@ -96,15 +102,6 @@ public class DailyMergingTasksManagementService {
             repository.save(dailyTask);
             throw e;
         }
-    }
-
-    private synchronized void setTaskRunning(DailyMergingTask task) {
-        if (task.getTaskStatus() == TaskStatus.RUNNING) {
-            throw new TaskAlreadyRunningException(String.format("Task '%d' already running, could not be run again", task.getId()));
-        }
-        task.setTaskStatus(TaskStatus.RUNNING);
-        LOGGER.info("Daily merging task: {} is running.", task.getId());
-        repository.save(task);
     }
 
     public List<DailyMergingTask> getAllTasks() {
@@ -178,7 +175,7 @@ public class DailyMergingTasksManagementService {
         return null;
     }
 
-    public DailyMergingTask getTaskById(final long taskId) {
+    DailyMergingTask getTaskById(final long taskId) {
         return repository.findById(taskId)
                 .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available", taskId)));
     }
@@ -217,8 +214,15 @@ public class DailyMergingTasksManagementService {
         if (originalFilename == null || originalFilename.isBlank()) {
             throw new CeMergingException("Merging request filename is missing");
         }
-        final Path inputPath = taskInputPath.resolve(originalFilename);
+        final Path normalizedTaskInputPath = taskInputPath.toAbsolutePath().normalize();
+        final String filename = Path.of(originalFilename).getFileName().toString();
+        if (filename.isBlank()) {
+            throw new CeMergingException("Invalid merging request filename");
+        }
+        final Path inputPath = normalizedTaskInputPath.resolve(filename).normalize();
+        if (!inputPath.startsWith(normalizedTaskInputPath)) {
+            throw new CeMergingException("Invalid merging request filename");
+        }
         mergingRequest.transferTo(inputPath);
     }
-
 }
