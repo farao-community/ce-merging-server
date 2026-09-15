@@ -186,7 +186,10 @@ public class DailyMergingTasksManagementService {
 
     private List<Long> getCompletedTaskIds(final List<Long> ids) {
         final List<Long> completedTaskIds = new ArrayList<>();
-        for (long taskId : ids) {
+        for (Long taskId : ids) {
+            if (taskId == null) {
+                throw new CeMergingException("Invalid merging task ID");
+            }
             if (service.checkTaskExist(taskId)) {
                 MergingTask taskEntity = service.getTaskById(taskId);
                 if (taskEntity.getStatus() == TaskStatus.CREATED) {
