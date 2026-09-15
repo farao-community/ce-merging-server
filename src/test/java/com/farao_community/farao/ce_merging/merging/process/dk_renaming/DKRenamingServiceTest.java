@@ -35,7 +35,6 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAN
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -82,7 +81,7 @@ class DKRenamingServiceTest {
         when(ceMergingConfiguration.getArtifactsDirectoryPath(task)).thenReturn(tempFile.getParent().toString());
         try (MockedStatic<Network> mocked = mockStatic(Network.class)) {
             final Network network = mock(Network.class);
-            mocked.when(() -> Network.read(anyString(), any())).thenReturn(network);
+            mocked.when(() -> Network.read(anyString())).thenReturn(network);
             service.renameDkCountry(task);
             final ArgumentCaptor<SavedFile> captor = ArgumentCaptor.forClass(SavedFile.class);
             verify(artifacts).putFile(eq(ArtifactType.DK_CONVERTED_FILE), captor.capture());

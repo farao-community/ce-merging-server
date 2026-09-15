@@ -4,11 +4,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.balances_adjustment;
+package com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.AreasManager;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputation;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationArea;
@@ -41,10 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_BASE_NAME;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XIIDM_FORMAT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile;
@@ -93,30 +89,6 @@ public class BalancesAdjustmentProcessor {
 
     }
 
-    private BalanceComputationParameters getOrDefaultAdjustmentParameters(final MergingTask task,
-                                                                          final Supplier<BalanceComputationParameters> balanceComputationParametersSupplier) {
-        final String balanceConfigPath = task.getConfigurations().getBalancesAdjustmentParameters().getPath();
-        final BalanceComputationParameters parameters = Optional.ofNullable(balanceConfigPath)
-            .map(Paths::get)
-            .map(JsonBalanceComputationParameters::read)
-            .orElse(balanceComputationParametersSupplier.get());
-
-        // For proportional scalable, if some scalable are saturated the scaling will be dispatched on the other
-        parameters.getScalingParameters().setPriority(RESPECT_OF_VOLUME_ASKED);
-
-        return parameters;
-    }
-
-    final Map<String, Scalable> getLoadShiftKeysByCountry() throws IOException {
-        final Map<String, Scalable> eicScalable = getZonalDataFromGlsk(task.getArtifactFile(GLSK_QUALITY_CORRECTED_FILE),
-                                                                       network, task.getTargetDate());
-
-        return eicScalable.entrySet()
-            .stream()
-            .collect(toMap(v -> task.getConfigurations().getRegionConfiguration().getCountriesByEicCode().get(v.getKey()),
-                           Map.Entry::getValue));
-    }
-
     public void run() {
         try {
             AreasManager.on(areas, network).applyToGenerators(BalancesAdjustmentProcessor::updateToTrueMinP);
@@ -127,6 +99,30 @@ public class BalancesAdjustmentProcessor {
             LOGGER.error(errorMessage);
             throw new CeMergingException(errorMessage);
         }
+    }
+
+    final Map<String, Scalable> getLoadShiftKeysByCountry() throws IOException {
+        final Map<String, Scalable> eicScalable = getZonalDataFromGlsk(task.getArtifactFile(GLSK_QUALITY_CORRECTED_FILE),
+                network, task.getTargetDate());
+
+        return eicScalable.entrySet()
+                .stream()
+                .collect(toMap(v -> task.getConfigurations().getRegionConfiguration().getCountriesByEicCode().get(v.getKey()),
+                        Map.Entry::getValue));
+    }
+
+    private BalanceComputationParameters getOrDefaultAdjustmentParameters(final MergingTask task,
+                                                                          final Supplier<BalanceComputationParameters> balanceComputationParametersSupplier) {
+        final String balanceConfigPath = task.getConfigurations().getBalancesAdjustmentParameters().getPath();
+        final BalanceComputationParameters parameters = Optional.ofNullable(balanceConfigPath)
+                .map(Paths::get)
+                .map(JsonBalanceComputationParameters::read)
+                .orElse(balanceComputationParametersSupplier.get());
+
+        // For proportional scalable, if some scalable are saturated the scaling will be dispatched on the other
+        parameters.getScalingParameters().setPriority(RESPECT_OF_VOLUME_ASKED);
+
+        return parameters;
     }
 
     private static void updateToTrueMinP(final Generator generator) {
@@ -351,7 +347,7 @@ public class BalancesAdjustmentProcessor {
         }
     }
 
-    void handleComputationSuccess(final Map<String, InitialBounds> initialBounds,
+    private void handleComputationSuccess(final Map<String, InitialBounds> initialBounds,
                                   final String loadflowMode,
                                   final BalanceComputationResult result) {
 
@@ -364,7 +360,7 @@ public class BalancesAdjustmentProcessor {
         }
 
         restoreInitialGeneratorBounds(initialBounds);
-        saveArtifactNetwork(BALANCED_CGM_FILE, network, task, XIIDM_FORMAT, configuration);
+        saveArtifactNetwork(BALANCED_CGM_FILE, network, task, UCTE_FORMAT, configuration);
 
     }
 
