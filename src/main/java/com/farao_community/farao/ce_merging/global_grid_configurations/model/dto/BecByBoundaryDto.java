@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractBecByBoundary;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -14,6 +13,9 @@ import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
@@ -22,7 +24,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
-public class BecByBoundaryDto extends AbstractBecByBoundary<BecCoefficientsDto, BorderDto> {
+public class BecByBoundaryDto {
 
     @Id
     @GeneratedValue(strategy = IDENTITY)
@@ -54,23 +56,34 @@ public class BecByBoundaryDto extends AbstractBecByBoundary<BecCoefficientsDto, 
         this.id = id;
     }
 
-    @Override
     public BorderDto getBorder() {
         return border;
     }
 
-    @Override
     public void setBorder(final BorderDto border) {
         this.border = border;
     }
 
-    @Override
     public List<BecCoefficientsDto> getCoefficientByCountry() {
         return coefficientByCountry;
     }
 
-    @Override
     public void setCoefficientByCountry(final List<BecCoefficientsDto> coefficientByCountry) {
         this.coefficientByCountry = coefficientByCountry;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return EqualsBuilder.reflectionEquals(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

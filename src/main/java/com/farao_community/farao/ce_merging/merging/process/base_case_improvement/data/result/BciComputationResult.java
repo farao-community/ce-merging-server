@@ -17,7 +17,7 @@ public record BciComputationResult(boolean bciActive,
     @JsonCreator
     public BciComputationResult(@JsonProperty("bciActive") final boolean bciActive,
                                 @JsonProperty("bciFeasibilityRangesExtended") final boolean bciFeasibilityRangesExtended,
-                                @JsonProperty("results") final Map<String, BciAreaResults> bciResults) {
+                                @JsonProperty("bciResults") final Map<String, BciAreaResults> bciResults) {
         this.bciActive = bciActive;
         this.bciFeasibilityRangesExtended = bciFeasibilityRangesExtended;
         this.bciResults = bciResults;

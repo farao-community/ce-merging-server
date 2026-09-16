@@ -6,11 +6,17 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.abstractions.AbstractBorder;
 import jakarta.persistence.Embeddable;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 @Embeddable
-public class BorderDto extends AbstractBorder {
+public class BorderDto {
+
+    private String outArea;
+    private String inArea;
+
     public BorderDto(final String outArea, final String inArea) {
         this.outArea = outArea;
         this.inArea = inArea;
@@ -18,5 +24,36 @@ public class BorderDto extends AbstractBorder {
 
     public BorderDto() {
 
+    }
+
+    public String getOutArea() {
+        return outArea;
+    }
+
+    public void setOutArea(final String outArea) {
+        this.outArea = outArea;
+    }
+
+    public String getInArea() {
+        return inArea;
+    }
+
+    public void setInArea(final String inArea) {
+        this.inArea = inArea;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return EqualsBuilder.reflectionEquals(this, o);
+    }
+
+    @Override
+    public int hashCode() {
+        return HashCodeBuilder.reflectionHashCode(this);
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this);
     }
 }

@@ -45,7 +45,7 @@ public class XnodesService {
             xnodesCalculation.checkXnodesConfigConsistency(network, virtualHubList, xnodesConfigList);
             xnodesCalculation.fillXnodesInformation(network, tso, xnodeInformationMap, virtualHubList, xnodesConfigList);
         });
-        saveArtifactFile(XNODES_INFORMATION_FILE, xnodeInformationMap, task, configuration);
+        saveArtifactFile(XNODES_INFORMATION_FILE, new XnodesCheck(xnodeInformationMap), task, configuration);
         tasksRepository.save(task);
     }
 

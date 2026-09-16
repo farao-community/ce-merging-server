@@ -303,13 +303,12 @@ public final class CountryNetPositionHandler {
             LOGGER.warn("In the X-node configuration, {} is affected to area DE without valid subarea", xnode.getName());
             return null;
         }
+        updateIfKosovoXnode(xnode);
 
         final Country area1 = Country.valueOf(xnode.getArea1());
         final String subArea1 = xnode.getSubarea1();
         final Country area2 = Country.valueOf(xnode.getArea2());
         final String subArea2 = xnode.getSubarea2();
-
-        updateIfKosovoXnode(xnode);
 
         if (areSameArea(danglingLineCountry, area1, subArea1)) {
             return getCountryFromCode(subArea2 != null ? subArea2 : xnode.getArea2());

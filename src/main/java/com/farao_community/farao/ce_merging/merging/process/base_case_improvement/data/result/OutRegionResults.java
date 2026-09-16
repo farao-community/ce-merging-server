@@ -13,7 +13,7 @@ import java.util.Map;
 
 public record OutRegionResults(Map<String, Double> globalForecastNetPositions) {
     @JsonCreator
-    public OutRegionResults(@JsonProperty("GlobalForecastNetPositions") final Map<String, Double> globalForecastNetPositions) {
+    public OutRegionResults(@JsonProperty("globalForecastNetPositions") final Map<String, Double> globalForecastNetPositions) {
         this.globalForecastNetPositions = globalForecastNetPositions;
     }
 }
