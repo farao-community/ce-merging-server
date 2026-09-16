@@ -71,7 +71,7 @@ public class DailyMergingTasksManagementService {
             copyMergingRequest(mergingRequest, inputsPath);
             fillTaskInputs(mergingRequest.getOriginalFilename(), dailyMergingTask, dailyMergingTask.getDailyInputs());
             repository.save(dailyMergingTask);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             LOGGER.error("Error during Daily merging task computation", e);
             deleteQuietly(dailyDirectory.toFile());
             repository.delete(dailyMergingTask);
@@ -97,7 +97,7 @@ public class DailyMergingTasksManagementService {
             LOGGER.info("Daily task: '{}' is finished with success", dailyTask.getId());
             repository.save(dailyTask);
             return dailyTask;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             dailyTask.setTaskStatus(TaskStatus.ERROR);
             repository.save(dailyTask);
             throw e;
@@ -193,13 +193,13 @@ public class DailyMergingTasksManagementService {
             if (service.checkTaskExist(taskId)) {
                 MergingTask taskEntity = service.getTaskById(taskId);
                 if (taskEntity.getStatus() == TaskStatus.CREATED) {
-                    LOGGER.warn("Merging task {} has not been run", taskId);
+                    LOGGER.warn("Merging task {} has not been run", taskId); //NOSONAR  : taskId is a Long
                 } else if (taskEntity.getStatus() == TaskStatus.RUNNING) {
-                    LOGGER.warn("Merging task {} is currently running", taskId);
+                    LOGGER.warn("Merging task {} is currently running", taskId); //NOSONAR  : taskId is a Long
                 }
                 completedTaskIds.add(taskId);
             } else {
-                LOGGER.warn("Merging task {} does not exist, it will be removed from daily merge", taskId);
+                LOGGER.warn("Merging task {} does not exist, it will be removed from daily merge", taskId); //NOSONAR  : taskId is a Long
             }
         }
         return completedTaskIds;

@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
@@ -36,7 +37,7 @@ public class DailyMergingService {
 
     public void run(final DailyMergingTask dailyMergingTask, final List<MergingTask> mergingTasks) {
         final RequestInformation requestInformation = mergingRequestService.getMergingRequestInformation(dailyMergingTask);
-        checkThatAllTasksTargetDateAreWithinRequestTimeInterval(mergingTasks, requestInformation);
+        validateTaskTargetDatesWithinRequestInterval(mergingTasks, requestInformation);
         checkTasksHaveDifferentTargetDates(mergingTasks);
         mergingTasks.sort(Comparator.comparing(task -> task.getInputs().getTargetDate()));
         final List<MergingTask> successMergingTasks = mergingTasks.stream()
@@ -49,35 +50,32 @@ public class DailyMergingService {
         // TODO
     }
 
-    private void checkThatAllTasksTargetDateAreWithinRequestTimeInterval(final List<MergingTask> tasks, final RequestInformation requestInformation) {
+    private void validateTaskTargetDatesWithinRequestInterval(final List<MergingTask> tasks, final RequestInformation requestInformation) {
+        tasks.forEach(task -> validateTaskTargetDateWithinRequestInterval(task, requestInformation));
+    }
+
+    private void validateTaskTargetDateWithinRequestInterval(final MergingTask task, final RequestInformation requestInformation) {
+        final OffsetDateTime targetDate = task.getInputs().getTargetDate();
         final OffsetDateTime requestStartDateTime = requestInformation.getStartDateTime();
         final OffsetDateTime requestEndDateTime = requestInformation.getEndDateTime();
 
-        tasks.forEach(task -> {
-            final OffsetDateTime targetDate = task.getInputs().getTargetDate();
-
-            if (!(targetDate.isAfter(requestStartDateTime) && targetDate.isBefore(requestEndDateTime.minusMinutes(1)))) {
-                final String errorMessage = String.format(
-                        "Task's %s target date %s outside merging request time interval %s",
-                        task.getId(),
-                        targetDate,
-                        requestInformation.requestTimeInterval()
-                );
-                LOGGER.error(errorMessage);
-                throw new CeMergingException(errorMessage);
-            }
-        });
+        if (!(targetDate.isAfter(requestStartDateTime) && targetDate.isBefore(requestEndDateTime.minusMinutes(1)))) {
+            final String errorMessage = String.format(
+                    "Task's %s target date %s outside merging request time interval %s",
+                    task.getId(),
+                    targetDate,
+                    requestInformation.requestTimeInterval()
+            );
+            LOGGER.error(errorMessage);
+            throw new CeMergingException(errorMessage);
+        }
     }
 
     private void checkTasksHaveDifferentTargetDates(final List<MergingTask> tasks) {
         final Set<OffsetDateTime> targetDateIntervals = new HashSet<>();
         for (final MergingTask task : tasks) {
             final OffsetDateTime targetDate = task.getInputs().getTargetDate();
-            final OffsetDateTime targetDateInterval = targetDate
-                    .withMinute(0)
-                    .withSecond(0)
-                    .withNano(0);
-
+            final OffsetDateTime targetDateInterval = targetDate.truncatedTo(ChronoUnit.HOURS);
             if (!targetDateIntervals.add(targetDateInterval)) {
                 final String timeInterval = DateTimeUtils.toHourlyInterval(targetDateInterval);
                 final String errorMessage = String.format("More than one task with same target date inside interval %s", timeInterval);
