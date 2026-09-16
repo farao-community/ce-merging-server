@@ -122,7 +122,7 @@ public class MergingController {
     @Operation(tags = TASK_MANAGEMENT_TAG,
             summary = "Delete merging task with given ID.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Merging task deleted successfully."),
+        @ApiResponse(responseCode = NO_CONTENT, description = "Merging task deleted successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with the given ID was not found.")
     })
     public ResponseEntity<Void> deleteTask(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
@@ -134,7 +134,7 @@ public class MergingController {
     @Operation(tags = TASK_MANAGEMENT_TAG,
             summary = "Delete all merging tasks.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Merging tasks deleted successfully.")
+        @ApiResponse(responseCode = NO_CONTENT, description = "Merging tasks deleted successfully.")
     })
     public ResponseEntity<Void> deleteAllTasks() {
         taskManager.deleteAllTasks();

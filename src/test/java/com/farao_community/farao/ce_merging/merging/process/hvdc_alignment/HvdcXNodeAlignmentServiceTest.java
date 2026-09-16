@@ -56,6 +56,7 @@ public class HvdcXNodeAlignmentServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
+        task.setId(3L);
         final SavedFile igmNLFile = createSavedFile(NL_IGM);
         final SavedFile igmITFile = createSavedFile(IT_IGM);
         final SavedFile igmGRFile = createSavedFile(GR_IGM);

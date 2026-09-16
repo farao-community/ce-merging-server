@@ -13,8 +13,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -55,9 +53,13 @@ public final class DateTimeUtils {
     }
 
     public static String toHourlyInterval(final OffsetDateTime targetDateTime) {
-        final Instant startInstant = targetDateTime.withMinute(0).toInstant();
-        final Instant endInstant = startInstant.plus(Duration.ofHours(1));
-        return String.format("%s/%s", OffsetDateTime.parse(startInstant.toString()), OffsetDateTime.parse(endInstant.toString()));
+        final OffsetDateTime startDateTime = targetDateTime.withMinute(0);
+        final OffsetDateTime endDateTime = startDateTime.plusHours(1);
+        return String.format(
+                "%s/%s",
+                startDateTime.toInstant(),
+                endDateTime.toInstant()
+        );
     }
 
     public static XMLGregorianCalendar getNowDate() {
