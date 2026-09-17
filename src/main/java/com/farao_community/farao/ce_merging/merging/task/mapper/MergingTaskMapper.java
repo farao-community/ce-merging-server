@@ -17,7 +17,7 @@ import org.mapstruct.Mapper;
 import java.util.List;
 import java.util.Optional;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {InputsMapper.class, OutputsMapper.class, ConfigurationsMapper.class})
 public interface MergingTaskMapper {
 
     MergingTaskDto mergingTaskToMergingTaskDto(final MergingTask mergingTask);
