@@ -19,15 +19,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Configurations
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {
-        RegionConfigurationMapper.class,
-        VirtualHubMapper.class,
-        BorderDirectionMapper.class,
-        XnodeMapper.class,
-        BecByBoundaryMapper.class,
-        HvdcAlignmentXNodeCoupleMapper.class,
-        ZeroFlowNodeMapper.class
-})
+@Mapper(componentModel = "spring", uses = {RegionConfigurationMapper.class, VirtualHubMapper.class, BorderDirectionMapper.class, XnodeMapper.class, BecByBoundaryMapper.class, HvdcAlignmentXNodeCoupleMapper.class, ZeroFlowNodeMapper.class})
 public interface ConfigurationsMapper {
     @Mapping(source = "dcLoadFlowParameters.location", target = "dcLoadFlowParametersLocation")
     @Mapping(source = "acLoadFlowParameters.location", target = "acLoadFlowParametersLocation")

@@ -16,7 +16,6 @@ import com.farao_community.farao.ce_merging.merging.process.recessivity.Recessiv
 import com.powsybl.loadflow.LoadFlowParameters;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +54,7 @@ public class Configurations implements Serializable {
     private List<XnodeConfig> xnodeList = new ArrayList<>();
     @OneToOne(cascade = ALL)
     private SavedFile recessivityParameters = new SavedFile();
-    @OneToMany(cascade = ALL)
+    @ElementCollection(fetch = LAZY)
     private List<BecByBoundary> becMatrixConfig = new ArrayList<>();
     @OneToOne(cascade = ALL)
     private RegionConfiguration regionConfiguration;
