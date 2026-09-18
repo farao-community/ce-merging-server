@@ -72,7 +72,7 @@ public class ExportTaskResultsService {
             if (outputType == OutputType.IGM_DATA) {
                 fileName = savedFile.getOriginalName();
                 location = outputType.getLocation(mergingTask.getId(), mergingTask.getTargetDate());
-                String[] path = location.split("/");
+                final String[] path = location.split("/");
                 outputDirectory = configuration.getOutputsDirectoryPath(mergingTask) + File.separator + path[path.length - 1];
             } else {
                 fileName = outputType.getFileName(mergingTask.getInputs().getTargetDate());
