@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.dto;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+
 import java.io.Serializable;
 
 public class ConfigurationsDto implements Serializable {
@@ -19,6 +21,16 @@ public class ConfigurationsDto implements Serializable {
      * The BEC keys configuration
      */
     private String becConfig;
+
+    public RegionConfiguration getRegionConfiguration() {
+        return regionConfiguration;
+    }
+
+    public void setRegionConfiguration(final RegionConfiguration regionConfiguration) {
+        this.regionConfiguration = regionConfiguration;
+    }
+
+    private RegionConfiguration regionConfiguration;
 
     public String getBalancesAdjustmentParametersLocation() {
         return balancesAdjustmentParametersLocation;
