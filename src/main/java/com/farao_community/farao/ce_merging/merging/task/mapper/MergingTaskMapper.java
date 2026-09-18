@@ -6,33 +6,16 @@
  */
 package com.farao_community.farao.ce_merging.merging.task.mapper;
 
-import com.farao_community.farao.ce_merging.merging.task.dto.ArtifactsDto;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
-import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import org.mapstruct.Mapper;
 
 import java.util.List;
-import java.util.Optional;
 
-@Mapper(componentModel = "spring", uses = {InputsMapper.class, OutputsMapper.class, ConfigurationsMapper.class})
+@Mapper(componentModel = "spring", uses = {InputsMapper.class, OutputsMapper.class, ConfigurationsMapper.class, ArtifactsMapper.class})
 public interface MergingTaskMapper {
 
     MergingTaskDto mergingTaskToMergingTaskDto(final MergingTask mergingTask);
 
     List<MergingTaskDto> mergingTasksToMergingTasksDto(final Iterable<MergingTask> coreMergingTaskEntity);
-
-    default ArtifactsDto artifactsToArtifactsDto(final Artifacts artifacts) {
-        final ArtifactsDto mapped = new ArtifactsDto();
-
-        for (final ArtifactType type : ArtifactType.values()) {
-            Optional.ofNullable(artifacts.getFile(type))
-                .map(SavedFile::getLocation)
-                .ifPresent(loc -> mapped.putLocation(type, loc));
-        }
-
-        return mapped;
-    }
 }
