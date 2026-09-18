@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<QualityCheckReport DtdVersion="0" DtdRelease="1">
+    <MessageIdentification v="MESSAGE"/>
+    <MessageVersion v="1"/>
+    <MessageType v="A16"/>
+    <ProcessType v="A48"/>
+    <SenderIdentification v="XXXXXXXXXXXXX" codingScheme="A01"/>
+    <SenderRole v="A44"/>
+    <ReceiverIdentification v="YYYYYYYYYYYYY" codingScheme="A01"/>
+    <ReceiverRole v="A36"/>
+    <MessageDateTime v="2020-03-23T07:01:58Z"/>
+    <QualityCheckTimeInterval v="2016-07-29T00:00Z/2016-07-29T01:00Z"/>
+    <Domain v="ID" codingScheme="A01"/>
+    <QualityChecks>
+        <QualityCheck>
+            <CheckType>GLSK</CheckType>
+            <CheckId>1</CheckId>
+            <TSO>TSO</TSO>
+            <Severity>WARNING</Severity>
+            <AssetId>ID </AssetId>
+            <TimeInterval>2016-07-29T00:00Z/2016-07-29T01:00Z</TimeInterval>
+            <Info>Load - GLSK node is not found</Info>
+        </QualityCheck>
+    </QualityChecks>
+</QualityCheckReport>

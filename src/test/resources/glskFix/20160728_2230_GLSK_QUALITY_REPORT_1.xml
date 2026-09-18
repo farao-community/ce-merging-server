@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ Copyright (c) 2020, RTE (http://www.rte-france.com)
+  -->
+
+<QualityCheckReport DtdVersion="0" DtdRelease="1">
+    <MessageIdentification v="MESSAGE"/>
+    <MessageVersion v="1"/>
+    <MessageType v="A16"/>
+    <ProcessType v="A48"/>
+    <SenderIdentification v="XXXXXXXXXXXXXX" codingScheme="A01"/>
+    <SenderRole v="A44"/>
+    <ReceiverIdentification v="YYYYYYYYYYY" codingScheme="A01"/>
+    <ReceiverRole v="A36"/>
+    <MessageDateTime v="2020-03-23T06:43:29Z"/>
+    <QualityCheckTimeInterval v="2016-07-28T22:00Z/2016-07-28T23:00Z"/>
+    <Domain v="XXXXXXXXXXXXX" codingScheme="A01"/>
+    <QualityChecks>
+        <QualityCheck>
+            <CheckType>GLSK</CheckType>
+            <CheckId>1</CheckId>
+            <TSO>TSO</TSO>
+            <Severity>WARNING</Severity>
+            <AssetId>ID </AssetId>
+            <TimeInterval>2016-07-28T22:00Z/2016-07-28T23:00Z</TimeInterval>
+            <Info>node is not found</Info>
+        </QualityCheck>
+        <QualityCheck>
+            <CheckType>GLSK</CheckType>
+            <CheckId>1</CheckId>
+            <TSO>TSO</TSO>
+            <Severity>WARNING</Severity>
+            <AssetId>ID2 </AssetId>
+            <TimeInterval>2016-07-28T22Z/2016-07-28T23:00Z</TimeInterval>
+            <Info> ode is not found</Info>
+        </QualityCheck>
+    </QualityChecks>
+</QualityCheckReport>
