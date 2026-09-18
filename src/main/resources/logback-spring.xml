@@ -9,40 +9,47 @@
             <user>ce</user>
             <password>ce</password>
         </connectionSource>
-<!--        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">-->
-<!--            <providers>-->
-<!--                <timestamp>-->
-<!--                    <timeZone>UTC</timeZone>-->
-<!--                </timestamp>-->
-<!--                <version/>-->
-<!--                <logLevel/>-->
-<!--                <message/>-->
-<!--                <loggerName/>-->
-<!--                <threadName/>-->
-<!--                <context/>-->
-<!--                <pattern>-->
-<!--                    <pattern>-->
-<!--                        {-->
-<!--                        "merging-step": "#asJson{%mdc{merging-step}}",-->
-<!--                        "taskId": "#asJson{%mdc{taskId}}"-->
-<!--                        }-->
-<!--                    </pattern>-->
-<!--                </pattern>-->
-<!--                <mdc>-->
-<!--                    <excludeMdcKeyName>parentId</excludeMdcKeyName>-->
-<!--                    <excludeMdcKeyName>spanExportable</excludeMdcKeyName>-->
-<!--                    <excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>-->
-<!--                    <excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>-->
-<!--                    <excludeMdcKeyName>X-B3-ParentSpanId</excludeMdcKeyName>-->
-<!--                    <excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>-->
-<!--                </mdc>-->
-<!--                <stackTrace/>-->
-<!--            </providers>-->
-<!--        </encoder>-->
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+                <version/>
+                <logLevel/>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <context/>
+                <pattern>
+                    <pattern>
+                        {
+                        "merging-step": "#asJson{%mdc{merging-step}}",
+                        "taskId": "#asJson{%mdc{taskId}}"
+                        }
+                    </pattern>
+                </pattern>
+                <mdc>
+                    <excludeMdcKeyName>parentId</excludeMdcKeyName>
+                    <excludeMdcKeyName>spanExportable</excludeMdcKeyName>
+                    <excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>
+                    <excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>
+                    <excludeMdcKeyName>X-B3-ParentSpanId</excludeMdcKeyName>
+                    <excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>
+                </mdc>
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
     </appender>
 
     <root level="INFO">
         <appender-ref ref="db"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 
     <logger name="org.springframework" level="OFF"/>
