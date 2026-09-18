@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -37,8 +36,8 @@ class MergingTaskMapperTest {
 
         final ArtifactsDto dto = mapper.mergingTaskToMergingTaskDto(task).getArtifacts();
 
-        assertThat(dto.getLocation(CGM_NET_POSITIONS_FILE)).isNotNull();
-        assertThat(dto.getLocation(XNODES_INFORMATION_FILE)).isNull();
+        assertThat(dto.getCgmNetPositionsFileLocation()).isNotNull();
+        assertThat(dto.getGlskQualityReportLocation()).isNull();
     }
 
 }
