@@ -44,7 +44,7 @@ public final class DateTimeUtils {
         return DAY_OF_WEEK_FORMATTER.format(getTargetDateAtParisZone(task));
     }
 
-    private static ZonedDateTime getTargetDateAtParisZone(final MergingTask task) {
+    public static ZonedDateTime getTargetDateAtParisZone(final MergingTask task) {
         return task.getInputs().getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
     }
 
