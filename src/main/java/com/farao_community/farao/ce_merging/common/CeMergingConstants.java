@@ -84,6 +84,8 @@ public final class CeMergingConstants {
     public static final String CODING_SCHEME = "A01";
     public static final String SENDER_ROLE = "A44";
     public static final String RECEIVER_ROLE = "A36";
+    public static final String XML_EXTENSION = "xml";
+    public static final String JSON_EXTENSION = ".json";
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;
