@@ -8,7 +8,6 @@ package com.farao_community.farao.ce_merging.daily_merging.post_process.xnodes_i
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
 import com.farao_community.farao.ce_merging.daily_merging.DailyMergingRepository;
