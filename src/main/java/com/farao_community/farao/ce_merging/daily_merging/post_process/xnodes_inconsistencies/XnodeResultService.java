@@ -8,6 +8,7 @@ package com.farao_community.farao.ce_merging.daily_merging.post_process.xnodes_i
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
 import com.farao_community.farao.ce_merging.daily_merging.DailyMergingRepository;
@@ -26,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JSON_EXTENSION;
@@ -42,6 +44,8 @@ public class XnodeResultService {
     private static final String XNODE_INCONSISTENCIES = "xnodes-inconsistencies_";
     private static final String ZIP_NAME = "xnodes-inconsistencies.zip";
     private static final String TEMP_DIRECTORY_PREFIX = "xnodes-inconsistencies-result";
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmm");
     private final CeMergingConfiguration configuration;
     private final DailyMergingRepository repository;
 
@@ -53,14 +57,14 @@ public class XnodeResultService {
     public void createXnodesInconsistenciesZip(final DailyMergingTask dailyTask, final List<MergingTask> mergingTasks) {
         try {
             final Path resultTempPath = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
-            final boolean clockChange = isClockChange(mergingTasks);
+            final boolean clockChange = isWinterDst(mergingTasks);
             mergingTasks.stream()
                     .filter(task -> task.getStatus().equals(TaskStatus.SUCCESS))
                     .forEach(entity -> {
                         final String newFileName = buildFileName(entity, clockChange);
                         final SavedFile xnodesInconsistenciesFile = entity.getArtifacts().getFile(ArtifactType.XNODES_INCONSISTENCIES);
                         if (xnodesInconsistenciesFile != null && xnodesInconsistenciesFile.getPath() != null) {
-                            copyFileToOtherDirectory(newFileName, xnodesInconsistenciesFile, resultTempPath);
+                            copyFileTo(newFileName, xnodesInconsistenciesFile, resultTempPath);
                         }
                     });
 
@@ -71,7 +75,7 @@ public class XnodeResultService {
                     path -> {
                         try {
                             Files.write(path, ZipUtils.zipDirectory(resultTempPath.toString()));
-                        } catch (IOException e) {
+                        } catch (final IOException e) {
                             throw new CeMergingException("Cannot write xnodes inconsistencies ZIP", e);
                         }
                     }
@@ -80,35 +84,35 @@ public class XnodeResultService {
 
             repository.save(dailyTask);
             LOGGER.info("File '{}' is saved in task '{}' outputs", xnodesZip, dailyTask.getId());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.warn("Error while creating xnodes inconsistencies ZIP of daily merging task '{}'", dailyTask.getId(), e);
         }
     }
 
     private String buildFileName(final MergingTask task, final boolean clockChange) {
-        final String dateAndTime = formatTargetDate(task);
+        final ZonedDateTime targetDate = DateTimeUtils.getTargetDateAtParisZone(task);
         if (clockChange && isTheSecondHour(task)) {
             return XNODE_INCONSISTENCIES
-                    + dateAndTime.substring(0, 9)
+                    + DATE_FORMATTER.format(targetDate)
                     + DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION
-                    + dateAndTime.substring(10)
+                    + TIME_FORMATTER.format(targetDate)
                     + JSON_EXTENSION;
         }
-        return XNODE_INCONSISTENCIES + dateAndTime + JSON_EXTENSION;
+        return XNODE_INCONSISTENCIES + DateTimeUtils.formatTargetDate(task) + JSON_EXTENSION;
     }
 
-    private boolean isClockChange(final List<MergingTask> coreMergingTaskEntityList) {
+    private boolean isWinterDst(final List<MergingTask> coreMergingTaskEntityList) {
         return coreMergingTaskEntityList.stream()
-                .filter(this::isDuplicatedHour)
+                .filter(this::isWinterDstHour)
                 .count() == 2;
     }
 
-    private boolean isDuplicatedHour(final MergingTask task) {
+    private boolean isWinterDstHour(final MergingTask task) {
         final ZonedDateTime targetDateInEuropeZone = task.getInputs().getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
         return targetDateInEuropeZone.getHour() == Integer.parseInt(DAYLIGHT_DUPLICATED_HOUR);
     }
 
-    private void copyFileToOtherDirectory(final String fileName, final SavedFile savedFile, final Path otherDirectoryPath) {
+    private void copyFileTo(final String fileName, final SavedFile savedFile, final Path otherDirectoryPath) {
         final Path filePath = otherDirectoryPath.resolve(fileName);
         try {
             Files.createDirectories(otherDirectoryPath);
