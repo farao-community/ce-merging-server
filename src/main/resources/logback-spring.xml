@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <springProperty scope="context" name="application_name" source="spring.application.name"/>
+    <appender name="db" class="ch.qos.logback.classic.db.DBAppender">
+        <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+            <driverClass>org.h2.Driver</driverClass>
+            <url>jdbc:h2:file:${HOME}/ce-merging/database</url>
+            <user>ce</user>
+            <password>ce</password>
+        </connectionSource>
+<!--        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">-->
+<!--            <providers>-->
+<!--                <timestamp>-->
+<!--                    <timeZone>UTC</timeZone>-->
+<!--                </timestamp>-->
+<!--                <version/>-->
+<!--                <logLevel/>-->
+<!--                <message/>-->
+<!--                <loggerName/>-->
+<!--                <threadName/>-->
+<!--                <context/>-->
+<!--                <pattern>-->
+<!--                    <pattern>-->
+<!--                        {-->
+<!--                        "merging-step": "#asJson{%mdc{merging-step}}",-->
+<!--                        "taskId": "#asJson{%mdc{taskId}}"-->
+<!--                        }-->
+<!--                    </pattern>-->
+<!--                </pattern>-->
+<!--                <mdc>-->
+<!--                    <excludeMdcKeyName>parentId</excludeMdcKeyName>-->
+<!--                    <excludeMdcKeyName>spanExportable</excludeMdcKeyName>-->
+<!--                    <excludeMdcKeyName>X-B3-TraceId</excludeMdcKeyName>-->
+<!--                    <excludeMdcKeyName>X-B3-SpanId</excludeMdcKeyName>-->
+<!--                    <excludeMdcKeyName>X-B3-ParentSpanId</excludeMdcKeyName>-->
+<!--                    <excludeMdcKeyName>X-Span-Export</excludeMdcKeyName>-->
+<!--                </mdc>-->
+<!--                <stackTrace/>-->
+<!--            </providers>-->
+<!--        </encoder>-->
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="db"/>
+    </root>
+
+    <logger name="org.springframework" level="OFF"/>
+    <logger name="org.apache" level="OFF"/>
+    <logger name="com.netflix" level="OFF"/>
+    <logger name="org.hibernate" level="OFF"/>
+    <logger name="io.swagger" level="OFF"/>
+    <logger name="springdoc" level="OFF"/>
+    <logger name="com.zaxxer" level="OFF"/>
+
+    <logger name="com.powsybl.computation" level="OFF"/>
+    <logger name="com.powsybl.commons.config" level="OFF"/>
+    <logger name="com.powsybl.action.util" level="OFF"/>
+
+    <logger name="com.powsybl.iidm.network.impl" level="OFF"/>
+    <logger name="com.powsybl.iidm.export" level="OFF"/>
+    <logger name="com.powsybl.iidm.modification.scalable.LoadScalable" level="OFF"/>
+    <logger name="com.powsybl.iidm.modification.scalable.GeneratorScalable" level="OFF"/>
+    <logger name="com.powsybl.iidm.modification.scalable.DanglingLineScalable" level="OFF"/>
+
+    <logger name="com.powsybl.ucte.network" level="OFF"/>
+    <logger name="com.powsybl.ucte.converter" level="OFF"/>
+    <logger name="com.powsybl.ucte.network.UcteNode" level="OFF"/>
+    <logger name="com.powsybl.ucte.network.UcteLine" level="OFF"/>
+    <logger name="com.powsybl.ucte.network.UcteTransformer" level="OFF"/>
+    <logger name="com.powsybl.ucte.network.UcteLogger" level="OFF"/>
+    <logger name="com.powsybl.ucte.network.UcteValidation" level="OFF"/>
+    <logger name="com.powsybl.ucte.network.UcteRegulation" level="OFF"/>
+
+</configuration>

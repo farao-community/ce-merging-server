@@ -30,9 +30,11 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.api.OpenApiResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,6 +42,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Optional;
@@ -299,8 +302,32 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getExecutionLogs(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        MergingTask mergingTask = checkAndGetTask(taskId);
+        checkTaskRunned(mergingTask);
+        return null; //TODO return executionLogsService.generateLogsForMergingSupervisor(mergingTask);
+    }
+
+    public MergingTask checkAndGetTask(long taskId) {
+        MergingTask task = repository.findById(taskId).orElseThrow(() -> new OpenApiResourceNotFoundException(String.format("Task %d not available", taskId)));
+        clockChangeTreatment(task);
+        return task;
+    }
+
+    private void clockChangeTreatment(MergingTask task) {
+        // necessary treatment for the case of daylight: the changed hour (second 2H:30) will have an offset= +2 but really should be + 1
+        if (task.getInputs().getTargetDate() != null && !task.getInputs().getTargetDate().getOffset().equals(task.getInputs().getRealOffset())) {
+            LocalDateTime offsetDateTime = task.getInputs().getTargetDate().toLocalDateTime();
+            ZoneOffset realZoneOffset = task.getInputs().getRealOffset();
+            task.getInputs().setTargetDate(OffsetDateTime.of(offsetDateTime, realZoneOffset));
+        }
+    }
+
+    private void checkTaskRunned(MergingTask task) {
+        if (task.getStatus() == TaskStatus.CREATED) {
+            throw new TaskNotRunException(String.format("Task %d has not been run", task.getId()));
+        } else if (task.getStatus() == TaskStatus.RUNNING) {
+            throw new TaskNotRunException(String.format("Task %d currently running", task.getId()));
+        }
     }
 
     public SavedFile getOpenLoadFlowLogs(final Long taskId) {
