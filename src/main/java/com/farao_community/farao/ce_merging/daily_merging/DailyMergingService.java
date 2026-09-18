@@ -50,7 +50,7 @@ public class DailyMergingService {
         if (!successMergingTasks.isEmpty()) {
             dailyQualityCheckReportService.computeDailyGlskQualityReport(dailyMergingTask, successMergingTasks, requestInformation.requestTimeInterval());
         }
-       }
+    }
 
     private void validateTaskTargetDatesWithinRequestInterval(final List<MergingTask> tasks, final RequestInformation requestInformation) {
         tasks.forEach(task -> validateTaskTargetDateWithinRequestInterval(task, requestInformation));
