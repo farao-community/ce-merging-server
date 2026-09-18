@@ -56,14 +56,14 @@ public class XnodeResultService {
     public void createXnodesInconsistenciesZip(final DailyMergingTask dailyTask, final List<MergingTask> mergingTasks) {
         try {
             final Path resultTempPath = Files.createTempDirectory(TEMP_DIRECTORY_PREFIX);
-            final boolean clockChange = isWinterDst(mergingTasks);
+            final boolean winterDstDetected = isWinterDst(mergingTasks);
             mergingTasks.stream()
                     .filter(task -> task.getStatus().equals(TaskStatus.SUCCESS))
                     .forEach(entity -> {
-                        final String newFileName = buildFileName(entity, clockChange);
+                        final String fileName = buildFileName(entity, winterDstDetected);
                         final SavedFile xnodesInconsistenciesFile = entity.getArtifacts().getFile(ArtifactType.XNODES_INCONSISTENCIES);
                         if (xnodesInconsistenciesFile != null && xnodesInconsistenciesFile.getPath() != null) {
-                            copyFileTo(newFileName, xnodesInconsistenciesFile, resultTempPath);
+                            copyFileTo(fileName, xnodesInconsistenciesFile, resultTempPath);
                         }
                     });
 
@@ -88,9 +88,9 @@ public class XnodeResultService {
         }
     }
 
-    private String buildFileName(final MergingTask task, final boolean clockChange) {
+    private String buildFileName(final MergingTask task, final boolean winterDstDetected) {
         final ZonedDateTime targetDate = getTargetDateAtParisZone(task);
-        if (clockChange && isTheSecondHour(task)) {
+        if (winterDstDetected && isTheSecondHour(task)) {
             return XNODE_INCONSISTENCIES
                     + DATE_FORMATTER.format(targetDate)
                     + DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION
@@ -100,8 +100,8 @@ public class XnodeResultService {
         return XNODE_INCONSISTENCIES + formatTargetDate(task) + JSON_EXTENSION;
     }
 
-    private boolean isWinterDst(final List<MergingTask> coreMergingTaskEntityList) {
-        return coreMergingTaskEntityList.stream()
+    private boolean isWinterDst(final List<MergingTask> mergingTasks) {
+        return mergingTasks.stream()
                 .filter(this::isWinterDstHour)
                 .count() == 2;
     }
