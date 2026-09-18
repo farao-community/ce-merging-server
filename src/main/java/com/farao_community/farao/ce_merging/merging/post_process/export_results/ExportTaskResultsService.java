@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,15 +68,19 @@ public class ExportTaskResultsService {
         try (InputStream inputStream = new FileInputStream(savedFile.getPath())) {
             final String fileName;
             final String location;
+            final String outputDirectory;
             if (outputType == OutputType.IGM_DATA) {
                 fileName = savedFile.getOriginalName();
                 location = outputType.getLocation(mergingTask.getId(), mergingTask.getTargetDate());
+                final String[] path = location.split("/");
+                outputDirectory = configuration.getOutputsDirectoryPath(mergingTask) + File.separator + path[path.length - 1];
             } else {
                 fileName = outputType.getFileName(mergingTask.getInputs().getTargetDate());
                 location = outputType.getLocation(mergingTask.getId());
+                outputDirectory = configuration.getOutputsDirectoryPath(mergingTask);
             }
             return FileStorageUtils.save(
-                    configuration.getOutputsDirectoryPath(mergingTask),
+                    outputDirectory,
                     fileName,
                     location,
                     path -> saveInOutput(inputStream, path)
