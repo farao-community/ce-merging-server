@@ -90,7 +90,7 @@ public class XnodeResultService {
     }
 
     private String buildFileName(final MergingTask task, final boolean clockChange) {
-        final ZonedDateTime targetDate = DateTimeUtils.getTargetDateAtParisZone(task);
+        final ZonedDateTime targetDate = getTargetDateAtParisZone(task);
         if (clockChange && isTheSecondHour(task)) {
             return XNODE_INCONSISTENCIES
                     + DATE_FORMATTER.format(targetDate)
@@ -98,7 +98,7 @@ public class XnodeResultService {
                     + TIME_FORMATTER.format(targetDate)
                     + JSON_EXTENSION;
         }
-        return XNODE_INCONSISTENCIES + DateTimeUtils.formatTargetDate(task) + JSON_EXTENSION;
+        return XNODE_INCONSISTENCIES + formatTargetDate(task) + JSON_EXTENSION;
     }
 
     private boolean isWinterDst(final List<MergingTask> coreMergingTaskEntityList) {
