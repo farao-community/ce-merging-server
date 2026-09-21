@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 
 public final class OutputUtils {
 
@@ -20,14 +19,12 @@ public final class OutputUtils {
     private static final String OUTPUT_NAME_WITHOUT_MESSAGE_DOCUMENT_TYPE = "22XCORESO------S_10V1001C--00236Y_CORE-FB-%03d_%s-F%03d-%02d.%s";
 
     public static String generateOutputFileName(OffsetDateTime mergingDateTime, int mergingVersion, String messageType, String documentType, int flow, String extension) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String mergingDate = fmt.format(mergingDateTime);
+        final String mergingDate = DateTimeUtils.formatFilenameDate(mergingDateTime);
         return String.format(OUTPUT_NAME, messageType, documentType, flow, mergingDate, flow, mergingVersion, extension);
     }
 
     public static String generateOutputFileName(OffsetDateTime mergingDateTime, int mergingVersion, int flow, String extension) {
-        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyyMMdd");
-        String mergingDate = fmt.format(mergingDateTime);
+        final String mergingDate = DateTimeUtils.formatFilenameDate(mergingDateTime);
         return String.format(OUTPUT_NAME_WITHOUT_MESSAGE_DOCUMENT_TYPE, flow, mergingDate, flow, mergingVersion, extension);
     }
 

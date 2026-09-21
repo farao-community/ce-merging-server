@@ -17,18 +17,19 @@ import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingT
 import com.farao_community.farao.ce_merging.merging.post_process.common.SchemaLocationNamespace;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.QualityCheckReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_EXTENSION;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_REPORT;
 
 @Service
 public class DailyQualityCheckReportService {
@@ -38,6 +39,9 @@ public class DailyQualityCheckReportService {
     private static final String MESSAGE_TYPE = "A16";
     private static final String DOCUMENT_TYPE = "A48";
     private static final int FLOW = 117;
+    private static final int MERGING_DAY_START_INDEX = 18;
+    private static final int MERGING_DAY_END_INDEX = 28;
+    private static final int MERGING_DATE_TIME_END_INDEX = 35;
 
     public DailyQualityCheckReportService(final CeMergingConfiguration configuration, final DailyMergingRepository repository) {
         this.configuration = configuration;
@@ -72,15 +76,15 @@ public class DailyQualityCheckReportService {
         oneDayGlskReport.getMessageVersion().setV(version);
         oneDayGlskReport.getMessageDateTime().setV(DateTimeUtils.getNowDate());
         oneDayGlskReport.getQualityCheckTimeInterval().setV(requestInterval);
-        final String mergingDay = requestInterval.substring(18, 28).replace("-", "");
+        final String mergingDay = requestInterval.substring(MERGING_DAY_START_INDEX, MERGING_DAY_END_INDEX).replace("-", "");
         final String messageIdentification = String.format("%s-F%d-%02d", mergingDay, FLOW, version);
-        IdentificationType identificationType = new IdentificationType();
+        final IdentificationType identificationType = new IdentificationType();
         identificationType.setV(messageIdentification);
         oneDayGlskReport.setMessageIdentification(identificationType);
     }
 
     private void saveDailyGlskReportInOutputs(final QualityCheckReport qualityCheckReport, final DailyMergingTask task) {
-        final OffsetDateTime mergingDate = OffsetDateTime.parse(qualityCheckReport.getQualityCheckTimeInterval().getV().substring(18, 35), DateTimeFormatter.ISO_DATE_TIME);
+        final OffsetDateTime mergingDate = OffsetDateTime.parse(qualityCheckReport.getQualityCheckTimeInterval().getV().substring(MERGING_DAY_START_INDEX, MERGING_DATE_TIME_END_INDEX), DateTimeFormatter.ISO_DATE_TIME);
         final String qualityReportFileName = OutputUtils.generateOutputFileName(mergingDate, task.getVersion(), MESSAGE_TYPE, DOCUMENT_TYPE, FLOW, XML_EXTENSION);
         final String fileLocation = String.format("/daily-merging/tasks/%d/outputs/glsk-quality-report", task.getId());
         final SavedFile dailyQualityReportSavedFile = FileStorageUtils.save(
@@ -101,11 +105,14 @@ public class DailyQualityCheckReportService {
 
     private List<QualityCheckReport> getAllResult(final List<MergingTask> tasksList) {
         return tasksList.stream()
-                .map(task -> task.getArtifacts().getFile(ArtifactType.GLSK_QUALITY_REPORT))
-                .map(savedFile -> JaxbUtils.readFromPath(
-                        QualityCheckReport.class,
-                        savedFile.getPath()
-                ))
+                .map(task -> {
+                    try {
+                        return task.getArtifact(GLSK_QUALITY_REPORT, QualityCheckReport.class);
+                    } catch (final FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .toList();
     }
+
 }

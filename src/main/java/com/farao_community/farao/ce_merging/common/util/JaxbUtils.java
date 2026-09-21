@@ -117,8 +117,8 @@ public final class JaxbUtils {
                 jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
             }
 
-            try (OutputStream outputStream = Files.newOutputStream(filePath);
-                 Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+            try (final OutputStream outputStream = Files.newOutputStream(filePath);
+                 final Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
                 writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
                 jaxbMarshaller.marshal(object, writer);
             }
