@@ -92,7 +92,7 @@ public class CgmResultsServiceTest {
     }
 
     @Test
-    public void createCgmZip() throws IOException {
+    public void shouldcreateCgmZip() throws IOException {
         CgmResultsService cgmResultsService = new CgmResultsService(configuration, tasksRepository, cgmRecognitionService);
         byte[] cgmRecognitionFile = Files.readAllBytes(Paths.get("src", "test", "resources", "cgmResult", "cgmRecognition_mock.xml"));
         Mockito.when(cgmRecognitionService.computeCgmRecognition(requestInformation, tasks, version)).thenReturn(cgmRecognitionFile);
@@ -113,7 +113,7 @@ public class CgmResultsServiceTest {
             if (entryCgm.getName().contains("mock_cgm_2.uct")) {
                 cgmFile2Found = true;
             }
-            if (entryCgm.getName().contains(cgmRecognitionOutputFileName)) {
+            if (entryCgm.getName().contains("cgmRecognition_mock.xml")) {
                 cgmRecognitionFound = true;
             }
         }

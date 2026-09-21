@@ -95,7 +95,7 @@ public class CgmRecognitionServiceTest {
     }
 
     @Test
-    public void computeCgmRecognitionTest() throws JAXBException {
+    public void shouldComputeCgmRecognition() throws JAXBException {
         int version = 5;
         byte[] cgmRecognitionBytes = cgmRecognitionService.computeCgmRecognition(requestInformation, tasks, version);
         EventMessageType cgmRecognition = readCgmRecognition(cgmRecognitionBytes);

@@ -68,7 +68,7 @@ public final class ResponseUtils {
             // set a new header without "standalone=yes"
             final StringWriter writer = new StringWriter();
             writer.write(XML_HEADER);
-            marshaller.marshal(new JAXBElement(new QName("http://www.rte-france.com/gsr", "payload"), EventMessageType.class, responseMessageType), writer);
+            marshaller.marshal(new JAXBElement<>(new QName("http://www.rte-france.com/gsr", "payload"), EventMessageType.class, responseMessageType), writer);
             return writer.toString().getBytes();
         } catch (final JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes", EventMessageType.class.getName());
