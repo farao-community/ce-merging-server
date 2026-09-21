@@ -22,7 +22,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -65,7 +64,7 @@ public class CgmResultsService {
                              RequestInformation requestInformation) {
         try {
             final Path cgmResultTempPath = Files.createTempDirectory("cgm-result");
-            final String cgmZipName = OutputUtils.generateOutputFileName(requestInformation.getMergingDay(), dailyTask.getVersion(), FLOW, ZIP_EXTENSION);
+            final String cgmZipName = OutputUtils.generateOutputFileNameWithHour(requestInformation.getMergingDay(), dailyTask.getVersion(), FLOW, ZIP_EXTENSION);
             final String cgmResultFilePath = String.format("%s/%s", configuration.getDailyOutputsDirectoryPath(dailyTask), cgmZipName);
             final Function<SavedFile, String> fileName = cgm -> cgm.getOriginalName().replace("UC0", String.format("UC%d", dailyTask.getVersion()));
 
@@ -105,7 +104,7 @@ public class CgmResultsService {
     }
 
     private static void writeBytes(byte[] bytes, final String destinationPath) {
-        try (final OutputStream os = new FileOutputStream(new File(destinationPath))) {
+        try (final OutputStream os = new FileOutputStream(destinationPath)) {
             os.write(bytes);
         } catch (final IOException e) {
             throw new ServiceIOException("Error while writing file in directory", e);
