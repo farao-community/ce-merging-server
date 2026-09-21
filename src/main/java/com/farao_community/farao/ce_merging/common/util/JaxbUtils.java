@@ -15,9 +15,9 @@ import jakarta.xml.bind.Unmarshaller;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -104,6 +104,28 @@ public final class JaxbUtils {
             throw errorWhile(e, "writing a %s object to %s",
                              clazz.getSimpleName(),
                              filePath);
+        }
+    }
+
+    public static <T> void writeToPath(final Class<T> clazz, final T object, final Path filePath, final String schemaLocation, final boolean noNamespaceSchemaLocation) {
+        try {
+            final Marshaller jaxbMarshaller = marshaller(clazz);
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+            if (noNamespaceSchemaLocation) {
+                jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
+            } else {
+                jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
+            }
+
+            try (final OutputStream outputStream = Files.newOutputStream(filePath);
+                 final Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+                writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+                jaxbMarshaller.marshal(object, writer);
+            }
+
+        } catch (final Exception e) {
+            throw errorWhile(e, "writing a %s object to %s", clazz.getSimpleName(), filePath
+            );
         }
     }
 

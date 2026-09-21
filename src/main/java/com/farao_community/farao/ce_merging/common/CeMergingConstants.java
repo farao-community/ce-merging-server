@@ -54,6 +54,8 @@ public final class CeMergingConstants {
     public static final String MONITA2_ME_NODE_NAME = "XKOTR220";
     // formatting
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
+    public static final String DATE_FORMAT = "yyyyMMdd";
+
     public static final String CSV_SEPARATOR = ";";
     public static final String ARROW = "->";
     public static final String STRING_FORMAT = "%s";
@@ -85,7 +87,7 @@ public final class CeMergingConstants {
     public static final String SENDER_ROLE = "A44";
     public static final String RECEIVER_ROLE = "A36";
     public static final String XML_EXTENSION = "xml";
-    public static final String JSON_EXTENSION = ".json";
+    public static final String JSON_EXTENSION = "json";
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;
@@ -95,6 +97,7 @@ public final class CeMergingConstants {
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
     public static final ZoneId PARIS_ZONE_ID = ZoneId.of("Europe/Paris");
     public static final DateTimeFormatter FILENAME_DATETIME_FMT = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
+    public static final DateTimeFormatter FILENAME_DATE_FMT = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
     private CeMergingConstants() {
         // constants class

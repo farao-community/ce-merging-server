@@ -20,8 +20,7 @@ import java.time.temporal.Temporal;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DATE_TIME_FORMAT;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
 
 public final class DateTimeUtils {
     private static final DateTimeFormatter TARGET_DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withLocale(Locale.FRANCE);
@@ -42,6 +41,14 @@ public final class DateTimeUtils {
 
     public static String dayOfWeek(final MergingTask task) {
         return DAY_OF_WEEK_FORMATTER.format(getTargetDateAtParisZone(task));
+    }
+
+    public static String formatFilenameDateTime(final OffsetDateTime dateTime) {
+        return FILENAME_DATETIME_FMT.format(dateTime);
+    }
+
+    public static String formatFilenameDate(final OffsetDateTime dateTime) {
+        return FILENAME_DATE_FMT.format(dateTime);
     }
 
     public static ZonedDateTime getTargetDateAtParisZone(final MergingTask task) {
