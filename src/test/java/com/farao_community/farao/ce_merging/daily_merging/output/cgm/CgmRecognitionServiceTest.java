@@ -40,7 +40,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class CgmRecognitionServiceTest {
+class CgmRecognitionServiceTest {
     @Autowired
     private CgmRecognitionService cgmRecognitionService;
     @Autowired
@@ -95,7 +95,7 @@ public class CgmRecognitionServiceTest {
     }
 
     @Test
-    public void shouldComputeCgmRecognition() throws JAXBException {
+    void shouldComputeCgmRecognition() throws JAXBException {
         int version = 5;
         byte[] cgmRecognitionBytes = cgmRecognitionService.computeCgmRecognition(requestInformation, tasks, version);
         EventMessageType cgmRecognition = readCgmRecognition(cgmRecognitionBytes);

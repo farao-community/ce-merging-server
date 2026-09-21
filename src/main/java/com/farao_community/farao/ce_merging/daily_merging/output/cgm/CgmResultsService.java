@@ -63,7 +63,7 @@ public class CgmResultsService {
                              List<MergingTask> coreMergingTaskEntityList,
                              RequestInformation requestInformation) {
         try {
-            final Path cgmResultTempPath = Files.createTempDirectory("cgm-result");
+            final Path cgmResultTempPath = Files.createTempDirectory("cgm-result"); // NOSONAR directories are used safely here
             final String cgmZipName = OutputUtils.generateOutputFileNameWithHour(requestInformation.getMergingDay(), dailyTask.getVersion(), FLOW, ZIP_EXTENSION);
             final String cgmResultFilePath = String.format("%s/%s", configuration.getDailyOutputsDirectoryPath(dailyTask), cgmZipName);
             final Function<SavedFile, String> fileName = cgm -> cgm.getOriginalName().replace("UC0", String.format("UC%d", dailyTask.getVersion()));

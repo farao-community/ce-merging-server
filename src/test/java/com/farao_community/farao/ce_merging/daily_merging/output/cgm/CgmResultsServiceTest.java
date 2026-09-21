@@ -19,7 +19,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -36,9 +35,10 @@ import java.util.zip.ZipFile;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
-public class CgmResultsServiceTest {
+class CgmResultsServiceTest {
 
     @Autowired
     private CeMergingConfiguration configuration;
@@ -93,10 +93,11 @@ public class CgmResultsServiceTest {
     }
 
     @Test
-    public void shouldcreateCgmZip() throws IOException {
+    void shouldCreateCgmZip() throws IOException {
         CgmResultsService cgmResultsService = new CgmResultsService(configuration, tasksRepository, cgmRecognitionService);
         byte[] cgmRecognitionFile = Files.readAllBytes(Paths.get("src", "test", "resources", "cgmResult", "cgmRecognition_mock.xml"));
-        Mockito.when(cgmRecognitionService.computeCgmRecognition(requestInformation, tasks, version)).thenReturn(cgmRecognitionFile);
+        when(cgmRecognitionService.computeCgmRecognition(requestInformation, tasks, version))
+                .thenReturn(cgmRecognitionFile);
         String cgmRecognitionOutputFileName = String.format(CGM_RECOGNITION_OUTPUT_NAME, mergingDay, version);
         cgmResultsService.createCgmZip(dailyMergingTask, tasks, requestInformation);
 
@@ -104,20 +105,24 @@ public class CgmResultsServiceTest {
         boolean cgmRecognitionFound = false;
         boolean cgmFile1Found = false;
         boolean cgmFile2Found = false;
-        ZipFile zipFile = new ZipFile(cgmZip.getPath());
-        Enumeration<? extends ZipEntry> entries = zipFile.entries();
-        while (entries.hasMoreElements()) {
-            ZipEntry entryCgm = entries.nextElement();
-            if (entryCgm.getName().contains("mock_cgm_1.uct")) {
-                cgmFile1Found = true;
-            }
-            if (entryCgm.getName().contains("mock_cgm_2.uct")) {
-                cgmFile2Found = true;
-            }
-            if (entryCgm.getName().contains(cgmRecognitionOutputFileName)) {
-                cgmRecognitionFound = true;
+        Enumeration<? extends ZipEntry> entries;
+        try (ZipFile zipFile = new ZipFile(cgmZip.getPath())) {
+            entries = zipFile.entries();
+
+            while (entries.hasMoreElements()) {
+                ZipEntry entryCgm = entries.nextElement();
+                if (entryCgm.getName().contains("mock_cgm_1.uct")) {
+                    cgmFile1Found = true;
+                }
+                if (entryCgm.getName().contains("mock_cgm_2.uct")) {
+                    cgmFile2Found = true;
+                }
+                if (entryCgm.getName().contains(cgmRecognitionOutputFileName)) {
+                    cgmRecognitionFound = true;
+                }
             }
         }
+
         assertTrue(cgmFile1Found);
         assertTrue(cgmFile2Found);
         assertTrue(cgmRecognitionFound);
