@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MergingLog xsi:schemaLocation="flowbasedmerginglog-01.xsd" xmlns="flowbased"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <DocumentIdentification v="XXXXXXXXXXXXXXXXXXXXXXXX"/>
+    <DocumentVersion v="1"/>
+    <DocumentType v="A18"/>
+    <SenderIdentification codingScheme="AO1" v="XXXXXXXXXXXXXXXX"/>
+    <SenderRole v="A44"/>
+    <ReceiverIdentification codingScheme="A01" v="YYYYYYYYYYYYYYYYYYY"/>
+    <ReceiverRole v="A36"/>
+    <CreationDateTime v="2020-03-03T15:00:01.282+01:00"/>
+    <ReportTimeInterval v="2020-02-18T23:00Z/2020-02-19T23:00Z"/>
+    <Domain codingScheme="A01" v="XXXXXXXXXXXXXX"/>
+    <TimeSeries>
+        <TimeSeriesIdentification v="1"/>
+        <Period>
+            <TimeInterval v="2020-02-18T23:00Z/2020-02-19T23:00Z"/>
+            <Resolution>PTM60</Resolution>
+            <Interval>
+                <Pos v="2"/>
+                <MergingReport>
+                    <BCIactive>true</BCIactive>
+                    <MergeType>AC</MergeType>
+                    <Report id="11111111111" name="AT" typeInfo="CORE">
+                        <BCI>
+                            <BCIapplied>true</BCIapplied>
+                            <CORE_InitialNP_IGM>-3</CORE_InitialNP_IGM>
+                            <InitialMinNP_shift>-4</InitialMinNP_shift>
+                            <InitialMaxNP_shift>-2</InitialMaxNP_shift>
+                            <FinalMinNP_shift>-4</FinalMinNP_shift>
+                            <FinalMaxNP_shift>-2</FinalMaxNP_shift>
+                        </BCI>
+                        <ReferenceProgram>
+                            <Core_NPtarget_initial>-70</Core_NPtarget_initial>
+                            <Core_NPtarget_final>-64</Core_NPtarget_final>
+                            <Global_NPtarget_initial>-9</Global_NPtarget_initial>
+                            <Global_NPtarget_final>3</Global_NPtarget_final>
+                        </ReferenceProgram>
+                        <LoadFlow>
+                            <IGM>
+                                <Generation>6</Generation>
+                                <Load>96</Load>
+                                <GlobalBalance>47</GlobalBalance>
+                            </IGM>
+                            <CGM>
+                                <Generation>7</Generation>
+                                <Load>6</Load>
+                                <GlobalBalance>-5</GlobalBalance>
+                            </CGM>
+                        </LoadFlow>
+                    </Report>
+
+                    <Report id="ID" name="NAME" typeInfo="NON CORE">
+                        <ReferenceProgram>
+                            <Global_NPtarget_initial>-179</Global_NPtarget_initial>
+                            <Global_NPtarget_final>-179</Global_NPtarget_final>
+                        </ReferenceProgram>
+                        <LoadFlow>
+                            <IGM>
+                                <Generation>335</Generation>
+                                <Load>523</Load>
+                                <GlobalBalance>-205</GlobalBalance>
+                            </IGM>
+                            <CGM>
+                                <Generation>345</Generation>
+                                <Load>503</Load>
+                                <GlobalBalance>-179</GlobalBalance>
+                            </CGM>
+                        </LoadFlow>
+                    </Report>
+
+                    <Report id="ID" name="NAME" typeInfo="TSO">
+                        <LoadFlow>
+                            <IGM>
+                                <Generation>5</Generation>
+                                <Load>8</Load>
+                                <GlobalBalance>-12</GlobalBalance>
+                            </IGM>
+                            <CGM>
+                                <Generation>01</Generation>
+                                <Load>58</Load>
+                                <GlobalBalance>-36</GlobalBalance>
+                            </CGM>
+                        </LoadFlow>
+                    </Report>
+                    <SI-IT_Report>
+                        <InArea codingScheme="A01" v="YYYYYYYYYYYY"/>
+                        <OutArea codingScheme="A01" v="XXXXXXXXXXXXX"/>
+                        <AppliedProcedure>2</AppliedProcedure>
+                        <TargetFlow>
+                            <TotalFlow>80.0</TotalFlow>
+                            <FlowDivacaPadriciano>50.0</FlowDivacaPadriciano>
+                            <FlowDivacaRedipuglia>60.0</FlowDivacaRedipuglia>
+                        </TargetFlow>
+                        <BeforeTargetFlowCGM>
+                            <TotalFlow>-59.51984</TotalFlow>
+                            <FlowDivacaPadriciano>-10.85189</FlowDivacaPadriciano>
+                            <FlowDivacaRedipuglia>-49.66794</FlowDivacaRedipuglia>
+                            <TapsPadriciano>1</TapsPadriciano>
+                            <TapsDivaca>2</TapsDivaca>
+                        </BeforeTargetFlowCGM>
+                        <AfterTargetFlowCGM>
+                            <TotalFlow>21.0</TotalFlow>
+                            <FlowDivacaPadriciano>11.0</FlowDivacaPadriciano>
+                            <FlowDivacaRedipuglia>11.0</FlowDivacaRedipuglia>
+                            <TapsPadriciano>1</TapsPadriciano>
+                            <TapsDivaca>2</TapsDivaca>
+                        </AfterTargetFlowCGM>
+                    </SI-IT_Report>
+                </MergingReport>
+            </Interval>
+        </Period>
+    </TimeSeries>
+</MergingLog>
