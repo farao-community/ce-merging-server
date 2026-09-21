@@ -12,6 +12,8 @@ import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingT
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.MergingRequestService;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.daily_merging.post_process.glsk_quality_check.DailyQualityCheckReportService;
+import com.farao_community.farao.ce_merging.daily_merging.post_process.merging_logs.DailyMergingLogsService;
+import com.farao_community.farao.ce_merging.daily_merging.post_process.xnodes_inconsistencies.XnodeResultService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import org.slf4j.Logger;
@@ -32,10 +34,14 @@ public class DailyMergingService {
 
     private final DailyQualityCheckReportService dailyQualityCheckReportService;
     private final MergingRequestService mergingRequestService;
+    private final DailyMergingLogsService dailyMergingLogsService;
+    private final XnodeResultService xnodeResultService;
 
-    public DailyMergingService(final DailyQualityCheckReportService dailyQualityCheckReportService, final MergingRequestService mergingRequestService) {
+    public DailyMergingService(final DailyQualityCheckReportService dailyQualityCheckReportService, final DailyMergingLogsService dailyMergingLogsService, final MergingRequestService mergingRequestService, final XnodeResultService xnodeResultService) {
+        this.dailyMergingLogsService = dailyMergingLogsService;
         this.dailyQualityCheckReportService = dailyQualityCheckReportService;
         this.mergingRequestService = mergingRequestService;
+        this.xnodeResultService = xnodeResultService;
     }
 
     public void run(final DailyMergingTask dailyMergingTask, final List<MergingTask> mergingTasks) {
@@ -48,8 +54,11 @@ public class DailyMergingService {
                 .toList();
 
         if (!successMergingTasks.isEmpty()) {
+            dailyMergingLogsService.computeDailyMergingLogs(dailyMergingTask, successMergingTasks);
             dailyQualityCheckReportService.computeDailyGlskQualityReport(dailyMergingTask, successMergingTasks, requestInformation.requestTimeInterval());
         }
+        xnodeResultService.createXnodesInconsistenciesZip(dailyMergingTask, successMergingTasks); //workaround as xnodes file are not yet available on Merging supervisor
+
     }
 
     private void validateTaskTargetDatesWithinRequestInterval(final List<MergingTask> tasks, final RequestInformation requestInformation) {

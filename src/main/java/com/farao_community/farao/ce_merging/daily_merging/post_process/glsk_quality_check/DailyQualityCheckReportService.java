@@ -28,6 +28,8 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DAY_START_INDEX;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DATE_TIME_END_INDEX;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_EXTENSION;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_REPORT;
 
@@ -39,9 +41,7 @@ public class DailyQualityCheckReportService {
     private static final String MESSAGE_TYPE = "A16";
     private static final String DOCUMENT_TYPE = "A48";
     private static final int FLOW = 117;
-    private static final int MERGING_DAY_START_INDEX = 18;
     private static final int MERGING_DAY_END_INDEX = 28;
-    private static final int MERGING_DATE_TIME_END_INDEX = 35;
 
     public DailyQualityCheckReportService(final CeMergingConfiguration configuration, final DailyMergingRepository repository) {
         this.configuration = configuration;

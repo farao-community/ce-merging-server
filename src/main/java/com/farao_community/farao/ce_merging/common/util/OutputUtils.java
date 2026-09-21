@@ -24,7 +24,7 @@ public final class OutputUtils {
     }
 
     public static String generateOutputFileName(OffsetDateTime mergingDateTime, int mergingVersion, int flow, String extension) {
-        final String mergingDate = DateTimeUtils.formatFilenameDateTime(mergingDateTime);
+        final String mergingDate = DateTimeUtils.formatFilenameDate(mergingDateTime);
         return String.format(OUTPUT_NAME_WITHOUT_MESSAGE_DOCUMENT_TYPE, flow, mergingDate, flow, mergingVersion, extension);
     }
 
