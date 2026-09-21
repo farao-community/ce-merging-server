@@ -6,7 +6,6 @@
  */
 package com.farao_community.farao.ce_merging.daily_merging.output.cgm;
 
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.daily_merging.ResponseUtils;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
@@ -32,6 +31,7 @@ import java.util.List;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATE_FMT;
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toZFormat;
+import static com.farao_community.farao.ce_merging.daily_merging.ResponseUtils.writeResponseInBytes;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 import static java.util.Comparator.comparing;
 
@@ -42,27 +42,21 @@ public class CgmRecognitionService {
     private static final String ERROR_CODE = "1.1";
 
     byte[] computeCgmRecognition(final RequestInformation requestInformation,
-                                 final List<MergingTask> mergingTaskList,
-                                 final int version) {
-        final EventMessageType mergingResponse;
-        try {
-            mergingResponse = buildMergingResponseInformation(requestInformation, mergingTaskList, version);
-            return ResponseUtils.writeResponseInBytes(mergingResponse);
-        } catch (final Exception e) {
-            String errorMessage = "Error occurred when creating cgm recognition file";
-            LOGGER.error(errorMessage);
-            throw new ServiceIOException(errorMessage, e);
-        }
+                                 final List<MergingTask> hourlyTasks,
+                                 final int version) throws JAXBException, ParserConfigurationException {
+        final EventMessageType mergingResponse = buildMergingResponseInformation(requestInformation, hourlyTasks, version);
+        return writeResponseInBytes(mergingResponse);
+
     }
 
     private EventMessageType buildMergingResponseInformation(final RequestInformation requestInformation,
-                                                             final List<MergingTask> tasks,
+                                                             final List<MergingTask> hourlyTasks,
                                                              final int version) throws JAXBException, ParserConfigurationException {
         final EventMessageType response = new EventMessageType();
         final HeaderType responseHeader = fillResponseHeader(requestInformation, version);
         response.setHeader(responseHeader);
 
-        final ResponseItems responseItems = fillResponseItems(requestInformation, tasks);
+        final ResponseItems responseItems = fillResponseItems(requestInformation, hourlyTasks);
         final List<ResponseItem> responseItemList = responseItems.getResponseItem();
 
         requestInformation.findAllIntervals().stream()
@@ -75,9 +69,9 @@ public class CgmRecognitionService {
         return response;
     }
 
-    private ResponseItem fillMissingResponseItemsWithError(String interval) {
-        ResponseItem responseItem = new ResponseItem();
-        ErrorType responseItemError = new ErrorType();
+    private ResponseItem fillMissingResponseItemsWithError(final String interval) {
+        final ResponseItem responseItem = new ResponseItem();
+        final ErrorType responseItemError = new ErrorType();
         responseItemError.setCode(ERROR_CODE);
         responseItemError.setReason(EMPTY);
         responseItem.setTimeInterval(interval);
@@ -101,7 +95,7 @@ public class CgmRecognitionService {
 
     private String generateMessageId(final OffsetDateTime mergingDateTime,
                                      final int mergingVersion) {
-        String mergingDate = FILENAME_DATE_FMT.format(mergingDateTime);
+        final String mergingDate = FILENAME_DATE_FMT.format(mergingDateTime);
         return String.format(MESSAGE_ID, mergingDate, mergingVersion);
     }
 

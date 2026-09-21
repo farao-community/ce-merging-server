@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.w3c.dom.Element;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -95,7 +96,7 @@ class CgmRecognitionServiceTest {
     }
 
     @Test
-    void shouldComputeCgmRecognition() throws JAXBException {
+    void shouldComputeCgmRecognition() throws JAXBException, ParserConfigurationException {
         int version = 5;
         byte[] cgmRecognitionBytes = cgmRecognitionService.computeCgmRecognition(requestInformation, tasks, version);
         EventMessageType cgmRecognition = readCgmRecognition(cgmRecognitionBytes);
