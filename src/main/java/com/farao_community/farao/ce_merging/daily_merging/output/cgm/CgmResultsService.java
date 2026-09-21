@@ -39,9 +39,9 @@ import static com.farao_community.farao.ce_merging.common.util.FileUtils.copyFil
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.DAYLIGHT_DUPLICATED_HOUR;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.generateOutputFileName;
-import static com.farao_community.farao.ce_merging.common.util.OutputUtils.generateOutputFileNameWithHour;
-import static com.farao_community.farao.ce_merging.common.util.OutputUtils.isSuccessful;
+
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirectory;
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 import static java.util.Locale.FRANCE;
 
 @Service
@@ -66,7 +66,7 @@ public class CgmResultsService {
                              final RequestInformation requestInformation) {
         try {
             final Path cgmResultTempPath = Files.createTempDirectory("cgm-result"); // NOSONAR directories are used safely here
-            final String cgmZipName = generateOutputFileNameWithHour(requestInformation.getMergingDay(),
+            final String cgmZipName = generateOutputFileName(requestInformation.getMergingDay(),
                                                                      dailyTask.getVersion(),
                                                                      FLOW,
                                                                      ZIP_EXTENSION);
@@ -75,7 +75,7 @@ public class CgmResultsService {
             final Function<SavedFile, String> fileName = cgm -> cgm.getOriginalName().replace("UC0", String.format("UC%d", dailyTask.getVersion()));
 
             renameCgmInDaylightCase(hourlyTasks);
-            hourlyTasks.stream().filter(isSuccessful())
+            hourlyTasks.stream().filter(task -> task.getStatus() == SUCCESS)
                     .map(MergingTask::getOutputs)
                     .map(Outputs::getCgm)
                     .forEach(cgm -> copyFileTo(fileName.apply(cgm), cgm, cgmResultTempPath));

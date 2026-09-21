@@ -28,8 +28,8 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DAY_START_INDEX;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DATE_TIME_END_INDEX;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DAY_START_INDEX;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_EXTENSION;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_REPORT;
 
@@ -85,7 +85,7 @@ public class DailyQualityCheckReportService {
 
     private void saveDailyGlskReportInOutputs(final QualityCheckReport qualityCheckReport, final DailyMergingTask task) {
         final OffsetDateTime mergingDate = OffsetDateTime.parse(qualityCheckReport.getQualityCheckTimeInterval().getV().substring(MERGING_DAY_START_INDEX, MERGING_DATE_TIME_END_INDEX), DateTimeFormatter.ISO_DATE_TIME);
-        final String qualityReportFileName = OutputUtils.generateOutputFileNameWithHour(mergingDate, task.getVersion(), MESSAGE_TYPE, DOCUMENT_TYPE, FLOW, XML_EXTENSION);
+        final String qualityReportFileName = OutputUtils.generateOutputFileName(mergingDate, task.getVersion(), MESSAGE_TYPE, DOCUMENT_TYPE, FLOW, XML_EXTENSION);
         final String fileLocation = String.format("/daily-merging/tasks/%d/outputs/glsk-quality-report", task.getId());
         final SavedFile dailyQualityReportSavedFile = FileStorageUtils.save(
                 configuration.getDailyOutputsDirectoryPath(task),
