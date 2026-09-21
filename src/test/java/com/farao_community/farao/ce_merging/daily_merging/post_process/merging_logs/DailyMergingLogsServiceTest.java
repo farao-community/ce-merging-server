@@ -82,16 +82,16 @@ class DailyMergingLogsServiceTest {
     }
 
     @Test
-    void shouldReturnTrueWhenPositionExists() {
+    void shouldReturnFalseWhenPositionExists() {
         final List<MergingLog.TimeSeries.Period.Interval> intervals = List.of(intervalWithPosition(1), intervalWithPosition(2));
-        assertTrue(service.positionPresentInMergingLog(1, intervals));
-        assertTrue(service.positionPresentInMergingLog(2, intervals));
+        assertFalse(service.positionNotPresentInMergingLog(1, intervals));
+        assertFalse(service.positionNotPresentInMergingLog(2, intervals));
     }
 
     @Test
-    void shouldReturnFalseWhenPositionDoesNotExist() {
+    void shouldReturnTrueWhenPositionDoesNotExist() {
         final List<MergingLog.TimeSeries.Period.Interval> intervals = List.of(intervalWithPosition(1), intervalWithPosition(2));
-        assertFalse(service.positionPresentInMergingLog(3, intervals));
+        assertTrue(service.positionNotPresentInMergingLog(3, intervals));
     }
 
     @Test

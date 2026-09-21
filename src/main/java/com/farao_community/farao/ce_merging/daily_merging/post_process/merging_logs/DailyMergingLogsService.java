@@ -53,6 +53,32 @@ public class DailyMergingLogsService {
         }
     }
 
+    public MergingLog buildDailyMergingLogs(int version, final List<MergingTask> mergingTasks) {
+        final List<MergingLog> mergingLogsList = getAllMergingLogs(mergingTasks);
+        final MergingLog dailyMergingLogs = mergingLogsList.getFirst();
+        updateHeader(dailyMergingLogs, version);
+        mergingLogsList.stream()
+                .skip(1)
+                .map(MergingLog::getTimeSeries)
+                .map(MergingLog.TimeSeries::getPeriod)
+                .flatMap(period -> period.getInterval().stream())
+                .forEach(interval -> addIntervalToMergingLog(interval, dailyMergingLogs));
+        return dailyMergingLogs;
+    }
+
+    List<MergingLog> getAllMergingLogs(final List<MergingTask> mergingTasks) {
+        return mergingTasks.stream()
+                .map(task -> task.getOutputs().getMergingLogs())
+                .map(file -> JaxbUtils.readFromPath(MergingLog.class, file.getPath()))
+                .toList();
+    }
+
+    boolean positionNotPresentInMergingLog(final Integer position, final List<MergingLog.TimeSeries.Period.Interval> intervals) {
+        return intervals.stream()
+                .map(interval -> Integer.valueOf(interval.getPos().getV()))
+                .noneMatch(position::equals);
+    }
+
     private void saveDailyMergingLogsInOutputs(final DailyMergingTask dailyMergingTask, final MergingLog mergingLog) {
         try {
             final OffsetDateTime mergingDate = OffsetDateTime.parse(mergingLog.getReportTimeInterval().getV().substring(MERGING_DAY_START_INDEX, MERGING_DATE_TIME_END_INDEX), DateTimeFormatter.ISO_DATE_TIME);
@@ -78,24 +104,6 @@ public class DailyMergingLogsService {
         }
     }
 
-    public MergingLog buildDailyMergingLogs(int version, final List<MergingTask> mergingTasks) {
-        final List<MergingLog> mergingLogsList = getAllMergingLogs(mergingTasks);
-        final MergingLog dailyMergingLogs = mergingLogsList.get(0);
-        updateHeader(dailyMergingLogs, version);
-        for (int i = 1; i < mergingLogsList.size(); i++) {
-            final MergingLog mergingLog = mergingLogsList.get(i);
-            mergingLog.getTimeSeries().getPeriod().getInterval().forEach(interval -> addIntervalToMergingLog(interval, dailyMergingLogs));
-        }
-        return dailyMergingLogs;
-    }
-
-    List<MergingLog> getAllMergingLogs(final List<MergingTask> tasksList) {
-        return tasksList.stream()
-                .map(task -> task.getOutputs().getMergingLogs())
-                .map(file -> JaxbUtils.readFromPath(MergingLog.class, file.getPath()))
-                .toList();
-    }
-
     private void updateHeader(final MergingLog mergingLog, final int version) {
         final MergingLog.CreationDateTime creationDateTime = new MergingLog.CreationDateTime();
         creationDateTime.setV(DateTimeUtils.getNowDate());
@@ -117,14 +125,9 @@ public class DailyMergingLogsService {
     private void addIntervalToMergingLog(final MergingLog.TimeSeries.Period.Interval interval, final MergingLog mergingLog) {
         final List<MergingLog.TimeSeries.Period.Interval> intervals = mergingLog.getTimeSeries().getPeriod().getInterval();
         final Integer position = Integer.valueOf(interval.getPos().getV());
-        if (!positionPresentInMergingLog(position, intervals)) {
+        if (positionNotPresentInMergingLog(position, intervals)) {
             intervals.add(interval);
         }
     }
 
-    boolean positionPresentInMergingLog(final Integer position, final List<MergingLog.TimeSeries.Period.Interval> intervals) {
-        return intervals.stream()
-                .map(interval -> Integer.valueOf(interval.getPos().getV()))
-                .anyMatch(position::equals);
-    }
 }
