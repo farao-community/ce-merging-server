@@ -47,7 +47,7 @@ public final class DateTimeUtils {
         return FILENAME_DATETIME_FMT.format(dateTime);
     }
 
-    private static ZonedDateTime getTargetDateAtParisZone(final MergingTask task) {
+    public static ZonedDateTime getTargetDateAtParisZone(final MergingTask task) {
         return task.getInputs().getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
     }
 
