@@ -8,6 +8,10 @@ package com.farao_community.farao.ce_merging.daily_merging.merging_request;
 
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toZFormat;
 
 public record RequestInformation(
         String requestTimeInterval,
@@ -37,4 +41,16 @@ public record RequestInformation(
                 DateTimeFormatter.ISO_DATE_TIME
         );
     }
+
+    public List<String> findAllIntervals() {
+        final List<String> intervalList = new ArrayList<>();
+        final OffsetDateTime start = getStartDateTime();
+        final OffsetDateTime end = getEndDateTime();
+
+        for (long i = 0; !start.plusHours(i).equals(end); i++) {
+            intervalList.add(toZFormat(start.plusHours(i)) + "/" + toZFormat(start.plusHours(i + 1)));
+        }
+        return intervalList;
+    }
+
 }

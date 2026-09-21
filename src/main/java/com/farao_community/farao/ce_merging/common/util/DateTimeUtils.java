@@ -13,6 +13,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,7 +21,11 @@ import java.time.temporal.Temporal;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DATE_TIME_FORMAT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATETIME_FMT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATE_FMT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
 public final class DateTimeUtils {
     private static final DateTimeFormatter TARGET_DATE_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withLocale(Locale.FRANCE);
@@ -76,8 +81,12 @@ public final class DateTimeUtils {
             xmlGregorianCalendar.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
             xmlGregorianCalendar.setTimezone(UTC_TIMEZONE_OFFSET);
             return xmlGregorianCalendar;
-        } catch (DatatypeConfigurationException e) {
+        } catch (final DatatypeConfigurationException e) {
             throw new CeMergingException("Cannot create XMLGregorianCalendar date for fixed glsk document, " + e.getMessage());
         }
+    }
+
+    public static OffsetDateTime toZFormat(final OffsetDateTime targetDate) {
+        return OffsetDateTime.parse(Instant.from(targetDate).toString(), ISO_DATE_TIME);
     }
 }

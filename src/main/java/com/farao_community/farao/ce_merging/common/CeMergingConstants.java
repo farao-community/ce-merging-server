@@ -60,7 +60,9 @@ public final class CeMergingConstants {
     public static final String ARROW = "->";
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
+    public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
     // other strings
+    public static final String EMPTY = "";
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String VIRTUAL_HUB_ALEGRO_BE_CODE = "BE_ALEGrO";
@@ -88,6 +90,7 @@ public final class CeMergingConstants {
     public static final String RECEIVER_ROLE = "A36";
     public static final String XML_EXTENSION = "xml";
     public static final String JSON_EXTENSION = "json";
+    public static final String ZIP_EXTENSION = "zip";
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;

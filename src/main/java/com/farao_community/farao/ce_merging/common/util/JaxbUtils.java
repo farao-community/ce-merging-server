@@ -15,12 +15,18 @@ import jakarta.xml.bind.Unmarshaller;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_HEADER;
 import static com.farao_community.farao.ce_merging.common.exception.ServiceIOException.errorWhile;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static java.lang.Boolean.TRUE;
@@ -119,7 +125,7 @@ public final class JaxbUtils {
 
             try (final OutputStream outputStream = Files.newOutputStream(filePath);
                  final Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
-                writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+                writer.write(XML_HEADER);
                 jaxbMarshaller.marshal(object, writer);
             }
 

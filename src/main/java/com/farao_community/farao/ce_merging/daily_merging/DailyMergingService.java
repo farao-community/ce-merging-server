@@ -11,9 +11,8 @@ import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.MergingRequestService;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
-import com.farao_community.farao.ce_merging.daily_merging.post_process.glsk_quality_check.DailyQualityCheckReportService;
+import com.farao_community.farao.ce_merging.daily_merging.output.glsk_quality_check.DailyQualityCheckReportService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -24,6 +23,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import static com.farao_community.farao.ce_merging.common.util.OutputUtils.isSuccessful;
 
 @Service
 public class DailyMergingService {
@@ -44,7 +45,7 @@ public class DailyMergingService {
         checkTasksHaveDifferentTargetDates(mergingTasks);
         mergingTasks.sort(Comparator.comparing(task -> task.getInputs().getTargetDate()));
         final List<MergingTask> successMergingTasks = mergingTasks.stream()
-                .filter(task -> TaskStatus.SUCCESS.equals(task.getStatus()))
+                .filter(isSuccessful())
                 .toList();
 
         if (!successMergingTasks.isEmpty()) {

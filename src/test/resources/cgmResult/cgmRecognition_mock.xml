@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EventMessage xmlns="response" xmlns:ns2="http://unicorn.com/Response/response-payload">
+    <Header>
+        <Verb>Created</Verb>
+        <Noun>CommonGridModel</Noun>
+        <Revision>2</Revision>
+        <Context>PRODUCTION</Context>
+        <Timestamp>2020-03-27T17:57:03Z</Timestamp>
+        <Source>22V20180312----O</Source>
+        <MessageID>bf0b5592-d1a9-47fd-86fb-c112d634cdf3</MessageID>
+        <CorrelationID>62613970-472b-405a-b8c9-9e1be581f519</CorrelationID>
+    </Header>
+    <Payload>
+        <ns2:ResponseItems timeInterval="2020-02-18T23:00Z/2020-02-19T23:00Z">
+            <ns2:ResponseItem timeInterval="2020-02-19T00:00+01:00/2020-02-19T01:00+01:00">
+                <ns2:Files>
+                    <ns2:File code="CGM" url="fileName://20200219_0030_2D3_UX0.uct"/>
+                </ns2:Files>
+            </ns2:ResponseItem>
+            <ns2:ResponseItem timeInterval="2020-02-19T23:00+01:00/2020-02-20T00:00+01:00">
+                <ns2:Files>
+                    <ns2:File code="CGM" url="fileName://20200219_2330_2D3_UX0.uct"/>
+                </ns2:Files>
+            </ns2:ResponseItem>
+        </ns2:ResponseItems>
+    </Payload>
+</EventMessage>
