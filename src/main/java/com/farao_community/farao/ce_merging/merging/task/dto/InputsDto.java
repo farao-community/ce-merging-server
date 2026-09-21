@@ -31,8 +31,18 @@ public class InputsDto implements Serializable {
     private String generationLoadShiftKeysLocation;
     private String externalConstraintsLocation;
     private String feasibilityRangesLocation;
-    private String mergingRequestLocation;
+    private String dcLinksLocation;
     private String netPositionForecastLocation;
+
+    public String getMergingRequestLocation() {
+        return mergingRequestLocation;
+    }
+
+    public void setMergingRequestLocation(final String mergingRequestLocation) {
+        this.mergingRequestLocation = mergingRequestLocation;
+    }
+
+    private String mergingRequestLocation;
 
     public Integer getAlegroThreshold() {
         return Optional.ofNullable(alegroThreshold).orElse(DEFAULT_ALEGRO_THRESHOLD);
@@ -90,12 +100,12 @@ public class InputsDto implements Serializable {
         this.externalConstraintsLocation = externalConstraintsLocation;
     }
 
-    public String getMergingRequestLocation() {
-        return mergingRequestLocation;
+    public String getDcLinksLocation() {
+        return dcLinksLocation;
     }
 
-    public void setMergingRequestLocation(final String mergingRequestLocation) {
-        this.mergingRequestLocation = mergingRequestLocation;
+    public void setDcLinksLocation(final String dcLinksLocation) {
+        this.dcLinksLocation = dcLinksLocation;
     }
 
     public String getNetPositionForecastLocation() {

@@ -8,15 +8,21 @@ package com.farao_community.farao.ce_merging.merging.task.mapper;
 
 import com.farao_community.farao.ce_merging.merging.task.dto.ArtifactsDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 class MergingTaskMapperTest {
+
+    @Autowired
+    MergingTaskMapper mapper;
 
     @Test
     void shouldMapTaskWithArtifacts() {
@@ -26,11 +32,12 @@ class MergingTaskMapperTest {
         file.setLocation(".");
         artifacts.putFile(CGM_NET_POSITIONS_FILE, file);
         task.setArtifacts(artifacts);
+        task.setInputs(new Inputs());
 
-        final ArtifactsDto dto = new MergingTaskMapperImpl().mergingTaskToMergingTaskDto(task).getArtifacts();
+        final ArtifactsDto dto = mapper.mergingTaskToMergingTaskDto(task).getArtifacts();
 
-        assertThat(dto.getLocation(CGM_NET_POSITIONS_FILE)).isNotNull();
-        assertThat(dto.getLocation(XNODES_INFORMATION_FILE)).isNull();
+        assertThat(dto.getCgmNetPositionsFileLocation()).isNotNull();
+        assertThat(dto.getGlskQualityReportLocation()).isNull();
     }
 
 }
