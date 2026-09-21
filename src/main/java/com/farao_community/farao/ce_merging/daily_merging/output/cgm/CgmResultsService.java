@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -104,7 +105,7 @@ public class CgmResultsService {
     }
 
     private static void writeBytes(byte[] bytes, final String destinationPath) {
-        try (final OutputStream os = new FileOutputStream(destinationPath)) {
+        try (final OutputStream os = new FileOutputStream(new File(destinationPath))) {
             os.write(bytes);
         } catch (final IOException e) {
             throw new ServiceIOException("Error while writing file in directory", e);

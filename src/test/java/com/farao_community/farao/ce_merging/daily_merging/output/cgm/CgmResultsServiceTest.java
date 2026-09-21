@@ -35,7 +35,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 public class CgmResultsServiceTest {
@@ -96,7 +95,7 @@ public class CgmResultsServiceTest {
     public void shouldcreateCgmZip() throws IOException {
         CgmResultsService cgmResultsService = new CgmResultsService(configuration, tasksRepository, cgmRecognitionService);
         byte[] cgmRecognitionFile = Files.readAllBytes(Paths.get("src", "test", "resources", "cgmResult", "cgmRecognition_mock.xml"));
-        Mockito.when(cgmRecognitionService.computeCgmRecognition(any(), any(), any())).thenReturn(cgmRecognitionFile);
+        Mockito.when(cgmRecognitionService.computeCgmRecognition(requestInformation, tasks, version)).thenReturn(cgmRecognitionFile);
         String cgmRecognitionOutputFileName = String.format(CGM_RECOGNITION_OUTPUT_NAME, mergingDay, version);
         cgmResultsService.createCgmZip(dailyMergingTask, tasks, requestInformation);
 
