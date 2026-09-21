@@ -43,8 +43,12 @@ public final class DateTimeUtils {
         return DAY_OF_WEEK_FORMATTER.format(getTargetDateAtParisZone(task));
     }
 
-    public static String formatFilenameDate(final OffsetDateTime dateTime) {
+    public static String formatFilenameDateTime(final OffsetDateTime dateTime) {
         return FILENAME_DATETIME_FMT.format(dateTime);
+    }
+
+    public static String formatFilenameDate(final OffsetDateTime dateTime) {
+        return FILENAME_DATE_FMT.format(dateTime);
     }
 
     public static ZonedDateTime getTargetDateAtParisZone(final MergingTask task) {
