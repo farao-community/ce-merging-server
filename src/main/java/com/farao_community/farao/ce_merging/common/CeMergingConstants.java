@@ -95,6 +95,8 @@ public final class CeMergingConstants {
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;
     public static final double MAX_FICTITIOUS_Q = 99999.;
+    public static final int MERGING_DAY_START_INDEX = 18;
+    public static final int MERGING_DATE_TIME_END_INDEX = 35;
     // Date management
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");

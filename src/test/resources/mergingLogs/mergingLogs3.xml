@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MergingLog xsi:schemaLocation="flowbasedmerginglog-01.xsd" xmlns="flowbased"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <DocumentIdentification v="XXXXXXXXXXXXXXXXXXXXXXX"/>
+    <DocumentVersion v="1"/>
+    <DocumentType v="A18"/>
+    <SenderIdentification codingScheme="AO1" v="XXXXXXXXXXXXXXX"/>
+    <SenderRole v="A44"/>
+    <ReceiverIdentification codingScheme="A01" v="YYYYYYYYYYYYYYY"/>
+    <ReceiverRole v="A36"/>
+    <CreationDateTime v="2020-03-03T15:02:06.661+01:00"/>
+    <ReportTimeInterval v="2020-02-18T23:00Z/2020-02-19T23:00Z"/>
+    <Domain codingScheme="A01" v="YYYYYYYYYYYYYYYY"/>
+    <TimeSeries>
+        <TimeSeriesIdentification v="1"/>
+        <Period>
+            <TimeInterval v="2020-02-18T23:00Z/2020-02-19T23:00Z"/>
+            <Resolution>PTM60</Resolution>
+            <Interval>
+                <Pos v="3"/>
+                <MergingReport>
+                    <BCIactive>true</BCIactive>
+                    <MergeType>AC</MergeType>
+                    <Report id="ID" name="NAME" typeInfo="CORE">
+                        <BCI>
+                            <BCIapplied>true</BCIapplied>
+                            <CORE_InitialNP_IGM>-3</CORE_InitialNP_IGM>
+                            <InitialMinNP_shift>-4</InitialMinNP_shift>
+                            <InitialMaxNP_shift>-2</InitialMaxNP_shift>
+                            <FinalMinNP_shift>-6</FinalMinNP_shift>
+                            <FinalMaxNP_shift>-2</FinalMaxNP_shift>
+                        </BCI>
+                        <ReferenceProgram>
+                            <Core_NPtarget_initial>-3</Core_NPtarget_initial>
+                            <Core_NPtarget_final>-3</Core_NPtarget_final>
+                            <Global_NPtarget_initial>-22</Global_NPtarget_initial>
+                            <Global_NPtarget_final>-20</Global_NPtarget_final>
+                        </ReferenceProgram>
+                        <LoadFlow>
+                            <IGM>
+                                <Generation>18</Generation>
+                                <Load>3</Load>
+                                <GlobalBalance>-5</GlobalBalance>
+                            </IGM>
+                            <CGM>
+                                <Generation>6</Generation>
+                                <Load>9</Load>
+                                <GlobalBalance>-61</GlobalBalance>
+                            </CGM>
+                        </LoadFlow>
+                    </Report>
+
+                   <Report id="ID" name="NAME82" typeInfo="NON CORE">
+                        <ReferenceProgram>
+                            <Global_NPtarget_initial>55</Global_NPtarget_initial>
+                            <Global_NPtarget_final>55</Global_NPtarget_final>
+                        </ReferenceProgram>
+                        <LoadFlow>
+                            <IGM>
+                                <Generation>12</Generation>
+                                <Load>2</Load>
+                                <GlobalBalance>6</GlobalBalance>
+                            </IGM>
+                            <CGM>
+                                <Generation>15</Generation>
+                                <Load>4</Load>
+                                <GlobalBalance>7</GlobalBalance>
+                            </CGM>
+                        </LoadFlow>
+                    </Report>
+                    <Report id="ID_1" name="NAME" typeInfo="TSO">
+                        <LoadFlow>
+                            <IGM>
+                                <Generation>9</Generation>
+                                <Load>1</Load>
+                                <GlobalBalance>8</GlobalBalance>
+                            </IGM>
+                            <CGM>
+                                <Generation>9</Generation>
+                                <Load>1</Load>
+                                <GlobalBalance>8</GlobalBalance>
+                            </CGM>
+                        </LoadFlow>
+                    </Report>
+                    <Report id="ID" name="NAME" typeInfo="TSO">
+                        <LoadFlow>
+                            <IGM>
+                                <Generation>12</Generation>
+                                <Load>22</Load>
+                                <GlobalBalance>-222</GlobalBalance>
+                            </IGM>
+                            <CGM>
+                                <Generation>21</Generation>
+                                <Load>23</Load>
+                                <GlobalBalance>-40</GlobalBalance>
+                            </CGM>
+                        </LoadFlow>
+                    </Report>
+                    <SI-IT_Report>
+
+                    </SI-IT_Report>
+                </MergingReport>
+            </Interval>
+        </Period>
+    </TimeSeries>
+</MergingLog>

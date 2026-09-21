@@ -7,14 +7,10 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.function.Predicate;
 
 public final class OutputUtils {
 
@@ -26,14 +22,9 @@ public final class OutputUtils {
     public static final DateTimeFormatter OUTPUT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     public static final DateTimeFormatter OUTPUT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmm");
 
-    public static String generateOutputFileNameWithHour(OffsetDateTime mergingDateTime, int mergingVersion, String messageType, String documentType, int flow, String extension) {
+    public static String generateOutputFileName(OffsetDateTime mergingDateTime, int mergingVersion, String messageType, String documentType, int flow, String extension) {
         final String mergingDate = DateTimeUtils.formatFilenameDate(mergingDateTime);
         return String.format(OUTPUT_NAME, messageType, documentType, flow, mergingDate, flow, mergingVersion, extension);
-    }
-
-    public static String generateOutputFileNameWithHour(OffsetDateTime mergingDateTime, int mergingVersion, int flow, String extension) {
-        final String mergingDate = DateTimeUtils.formatFilenameDateTime(mergingDateTime);
-        return String.format(OUTPUT_NAME_WITHOUT_MESSAGE_DOCUMENT_TYPE, flow, mergingDate, flow, mergingVersion, extension);
     }
 
     public static String generateOutputFileName(OffsetDateTime mergingDateTime, int mergingVersion, int flow, String extension) {
@@ -60,10 +51,6 @@ public final class OutputUtils {
 
     public static String getDocumentIdentificationDate(String dailyTimeInterval) {
         return dailyTimeInterval.substring(18, 28).replace("-", "");
-    }
-
-    public static Predicate<MergingTask> isSuccessful() {
-        return task -> TaskStatus.SUCCESS.equals(task.getStatus());
     }
 
     private OutputUtils() {
