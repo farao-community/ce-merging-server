@@ -21,7 +21,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,7 +28,11 @@ import java.nio.file.Paths;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_HEADER;
 import static com.farao_community.farao.ce_merging.common.exception.ServiceIOException.errorWhile;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+import static jakarta.xml.bind.Marshaller.JAXB_FRAGMENT;
+import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
+import static jakarta.xml.bind.Marshaller.JAXB_SCHEMA_LOCATION;
 import static java.lang.Boolean.TRUE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.newInputStream;
 
 public final class JaxbUtils {
@@ -70,10 +73,11 @@ public final class JaxbUtils {
         }
     }
 
-    private static <T> T unmarshal(final InputStream inputStream, final Class<T> clazz) throws JAXBException {
+    private static <T> T unmarshal(final InputStream inputStream,
+                                   final Class<T> clazz) throws JAXBException {
         return unmarshaller(clazz)
-            .unmarshal(new StreamSource(inputStream), clazz)
-            .getValue();
+                .unmarshal(new StreamSource(inputStream), clazz)
+                .getValue();
     }
 
     /**
@@ -113,25 +117,24 @@ public final class JaxbUtils {
         }
     }
 
-    public static <T> void writeToPath(final Class<T> clazz, final T object, final Path filePath, final String schemaLocation, final boolean noNamespaceSchemaLocation) {
+    public static <T> void writeToPath(final Class<T> clazz,
+                                       final T object,
+                                       final Path filePath,
+                                       final String schemaLocation,
+                                       final boolean noNamespaceSchema) {
         try {
             final Marshaller jaxbMarshaller = marshaller(clazz);
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            if (noNamespaceSchemaLocation) {
-                jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
-            } else {
-                jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
-            }
+            jaxbMarshaller.setProperty(JAXB_FRAGMENT, TRUE);
+            jaxbMarshaller.setProperty(noNamespaceSchema ? JAXB_NO_NAMESPACE_SCHEMA_LOCATION : JAXB_SCHEMA_LOCATION, schemaLocation);
 
             try (final OutputStream outputStream = Files.newOutputStream(filePath);
-                 final Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
+                 final Writer writer = new OutputStreamWriter(outputStream, UTF_8)) {
                 writer.write(XML_HEADER);
                 jaxbMarshaller.marshal(object, writer);
             }
 
         } catch (final Exception e) {
-            throw errorWhile(e, "writing a %s object to %s", clazz.getSimpleName(), filePath
-            );
+            throw errorWhile(e, "writing a %s object to %s", clazz.getSimpleName(), filePath);
         }
     }
 

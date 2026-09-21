@@ -17,12 +17,14 @@ import com.farao_community.farao.ce_merging.xsd.merging_request.EventMessageType
 import com.farao_community.farao.ce_merging.xsd.merging_request.HeaderType;
 import com.farao_community.farao.ce_merging.xsd.merging_request.PayloadType;
 import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.StringWriter;
@@ -56,7 +58,7 @@ public final class ResponseUtils {
         return responseHeader;
     }
 
-    public static byte[] writeResponseInBytes(EventMessageType responseMessageType) {
+    public static byte[] writeResponseInBytes(final EventMessageType responseMessageType) {
         try {
             final Marshaller marshaller = JAXBContext.newInstance(EventMessageType.class).createMarshaller();
             marshaller.setProperty(JAXB_FORMATTED_OUTPUT, TRUE);
@@ -66,7 +68,7 @@ public final class ResponseUtils {
             // set a new header without "standalone=yes"
             final StringWriter writer = new StringWriter();
             writer.write(XML_HEADER);
-            marshaller.marshal(responseMessageType, writer);
+            marshaller.marshal(new JAXBElement(new QName("http://www.rte-france.com/gsr", "payload"), EventMessageType.class, responseMessageType), writer);
             return writer.toString().getBytes();
         } catch (final JAXBException e) {
             final String errorMessage = String.format("Error occurred when writing content of object of type %s to bytes", EventMessageType.class.getName());

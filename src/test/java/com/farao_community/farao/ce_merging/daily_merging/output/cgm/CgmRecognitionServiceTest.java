@@ -107,7 +107,7 @@ public class CgmRecognitionServiceTest {
         assertEquals("20200106-F100-05", cgmRecognition.getHeader().getMessageID());
 
         assertEquals("62613970-472b-405a-b8c9-9e1be581f519", cgmRecognition.getHeader().getCorrelationID());
-        String timeInterval = cgmRecognition.getPayload().getAny().get(0).getAttribute("timeInterval");
+        String timeInterval = cgmRecognition.getPayload().getAny().getFirst().getAttribute("timeInterval");
         assertEquals("2020-01-05T23:00Z/2020-01-06T23:00Z", timeInterval);
 
         ResponseItems responseItems = readResponseItems(cgmRecognition.getPayload().getAny().get(0));
@@ -119,8 +119,8 @@ public class CgmRecognitionServiceTest {
         assertEquals("2020-01-06T04:00Z/2020-01-06T05:00Z", responseItemList.get(5).getTimeInterval());
 
         assertEquals(1, responseItemList.get(2).getFiles().getFile().size());
-        assertEquals("CGM", responseItemList.get(2).getFiles().getFile().get(0).getCode());
-        assertEquals("fileName://mock_cgm_1.uct", responseItemList.get(2).getFiles().getFile().get(0).getUrl());
+        assertEquals("CGM", responseItemList.get(2).getFiles().getFile().getFirst().getCode());
+        assertEquals("fileName://mock_cgm_1.uct", responseItemList.get(2).getFiles().getFile().getFirst().getUrl());
 
         String expectedErrorReason = String.format("Merging failed for task %d with target date %s", task3.getId(), task3.getInputs().getTargetDate());
         assertEquals(expectedErrorReason, responseItemList.get(5).getError().getReason());
