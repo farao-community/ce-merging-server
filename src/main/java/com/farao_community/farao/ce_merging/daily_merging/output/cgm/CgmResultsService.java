@@ -80,7 +80,7 @@ public class CgmResultsService {
             dailyTask.getDailyOutputs().setCgmZip(cgmZip);
             dailyMergingRepository.save(dailyTask);
             LOGGER.info("File '{}' is saved in task '{}' outputs", cgmZipName, dailyTask.getId());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.error("Error while creating CGM ZIP of daily merging task '{}'", dailyTask.getId());
             throw new ServiceIOException(String.format("Error while creating CGM ZIP of daily merging task '%d'.", dailyTask.getId()), e);
         }

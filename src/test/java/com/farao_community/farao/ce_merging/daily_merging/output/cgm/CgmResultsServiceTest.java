@@ -13,11 +13,13 @@ import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingT
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -33,6 +35,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
 @SpringBootTest
 public class CgmResultsServiceTest {
@@ -43,8 +46,7 @@ public class CgmResultsServiceTest {
     private DailyMergingRepository tasksRepository;
 
     private DailyMergingTask dailyMergingTask;
-    @Autowired
-    private CgmRecognitionService cgmRecognitionService;
+    private final CgmRecognitionService cgmRecognitionService = Mockito.mock(CgmRecognitionService.class);
 
     private List<MergingTask> tasks;
     private static final String CGM_RECOGNITION_OUTPUT_NAME = "22XCORESO------S_10V1001C--00236Y_CORE-FB-100_%s-F100-%02d.xml";
@@ -93,6 +95,8 @@ public class CgmResultsServiceTest {
     @Test
     public void shouldcreateCgmZip() throws IOException {
         CgmResultsService cgmResultsService = new CgmResultsService(configuration, tasksRepository, cgmRecognitionService);
+        byte[] cgmRecognitionFile = Files.readAllBytes(Paths.get("src", "test", "resources", "cgmResult", "cgmRecognition_mock.xml"));
+        Mockito.when(cgmRecognitionService.computeCgmRecognition(any(), any(), any())).thenReturn(cgmRecognitionFile);
         String cgmRecognitionOutputFileName = String.format(CGM_RECOGNITION_OUTPUT_NAME, mergingDay, version);
         cgmResultsService.createCgmZip(dailyMergingTask, tasks, requestInformation);
 
