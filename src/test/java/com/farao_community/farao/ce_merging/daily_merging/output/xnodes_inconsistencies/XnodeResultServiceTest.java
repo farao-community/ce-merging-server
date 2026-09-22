@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.post_process.xnodes_inconsistencies;
+package com.farao_community.farao.ce_merging.daily_merging.output.xnodes_inconsistencies;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.daily_merging.DailyMergingRepository;
@@ -72,15 +72,13 @@ class XnodeResultServiceTest {
 
     @Test
     void shouldReturnFalseWhenTargetDateIsNotSecondHour() {
-        givenTargetDate();
-        assertFalse(service.isTheSecondHour(mergingTask));
+        assertFalse(mergingTask.isAtSecondDstHour());
     }
 
     @Test
     void shouldIgnoreFailedTask() throws IOException {
         final Path outputDirectory = createOutputDirectory();
         givenOutputDirectory(outputDirectory);
-        givenTargetDate();
         when(mergingTask.getStatus()).thenReturn(TaskStatus.ERROR);
         when(dailyTask.getDailyOutputs()).thenReturn(dailyOutputs);
         service.createXnodesInconsistenciesZip(dailyTask, List.of(mergingTask));

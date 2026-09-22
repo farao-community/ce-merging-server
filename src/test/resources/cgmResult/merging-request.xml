@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RequestMessage xsi:noNamespaceSchemaLocation="common-message-specification-01.xsd" xmlns="http://iec.ch/TC57/2011/schema/message" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Header>
+    <Verb>create</Verb>
+    <Noun>CommonGridModel</Noun>
+    <Revision>2</Revision>
+    <Context>PRODUCTION</Context>
+    <Timestamp>2020-03-06T17:00:23Z</Timestamp>
+    <Source>17XTSO-CS------W</Source>
+    <AsyncReplyFlag>true</AsyncReplyFlag>
+    <ReplyAddress>22XCORESO------S</ReplyAddress>
+    <AckRequired>true</AckRequired>
+    <MessageID>62613970-472b-405a-b8c9-9e1be581f519</MessageID>
+    <CorrelationID>62613970-472b-405a-b8c9-9e1be581f519</CorrelationID>
+  </Header>
+  <Payload>
+    <req:RequestItems timeInterval="2020-02-18T23:00Z/2020-02-19T23:00Z" xsi:noNamespaceSchemaLocation="request-payload-01.xsd" xmlns:req="http://unicorn.com/Request/request-payload" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <req:RequestItem timeInterval="2020-02-18T23:00Z/2020-02-19T00:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T00:00Z/2020-02-19T01:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T01:00Z/2020-02-19T02:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T02:00Z/2020-02-19T03:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T03:00Z/2020-02-19T04:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T04:00Z/2020-02-19T05:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T05:00Z/2020-02-19T06:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T06:00Z/2020-02-19T07:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T07:00Z/2020-02-19T08:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T08:00Z/2020-02-19T09:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T09:00Z/2020-02-19T10:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T10:00Z/2020-02-19T11:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T11:00Z/2020-02-19T12:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T12:00Z/2020-02-19T13:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T13:00Z/2020-02-19T14:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T14:00Z/2020-02-19T15:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T15:00Z/2020-02-19T16:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T16:00Z/2020-02-19T17:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T17:00Z/2020-02-19T18:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T18:00Z/2020-02-19T19:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T19:00Z/2020-02-19T20:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T20:00Z/2020-02-19T21:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T21:00Z/2020-02-19T22:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+      <req:RequestItem timeInterval="2020-02-19T22:00Z/2020-02-19T23:00Z">
+        <req:Files>
+          <req:File code="GLSK" url="113://17XTSO-CS------W-20200304-F115v1"/>
+          <req:File code="EC" url="113://17XTSO-CS------W-20200304-F229v1"/>
+        </req:Files>
+      </req:RequestItem>
+    </req:RequestItems>
+  </Payload>
+</RequestMessage>

@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.post_process.glsk_quality_check;
+package com.farao_community.farao.ce_merging.daily_merging.output.glsk_quality_check;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -28,8 +28,8 @@ import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DAY_START_INDEX;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DATE_TIME_END_INDEX;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DAY_START_INDEX;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_EXTENSION;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_REPORT;
 

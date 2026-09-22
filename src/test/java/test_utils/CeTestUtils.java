@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
 import static com.powsybl.loadflow.LoadFlowResult.ComponentResult.Status.CONVERGED;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -193,6 +194,21 @@ public final class CeTestUtils {
         task.setArtifacts(new Artifacts());
         task.setOutputs(new Outputs());
         TaskTestUtils.setTaskDefaultConfigurations(task);
+
+        return task;
+    }
+
+    public static MergingTask mockTaskWithCgmResult(final String targetDate, final String cgmPath) {
+        final String[] path = cgmPath.split("/");
+        SavedFile cgmOutput = new SavedFile(path[path.length - 1], THIS.getResource(cgmPath).getPath(), "mock");
+        final MergingTask task = new MergingTask();
+        final Outputs outputs = new Outputs();
+        outputs.setCgm(cgmOutput);
+        task.setOutputs(outputs);
+        final Inputs inputs = new Inputs();
+        inputs.setTargetDate(OffsetDateTime.parse(targetDate));
+        task.setInputs(inputs);
+        task.setStatus(SUCCESS);
 
         return task;
     }

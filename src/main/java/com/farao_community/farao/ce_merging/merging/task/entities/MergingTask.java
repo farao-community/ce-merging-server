@@ -29,7 +29,9 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATETIME_FMT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_WINTER_OFFSET;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.util.OutputUtils.DAYLIGHT_DUPLICATED_HOUR;
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.AUTO;
 import static java.util.Locale.FRANCE;
@@ -160,12 +162,27 @@ public class MergingTask implements Serializable {
         return inputs.getTargetDate();
     }
 
+    @JsonIgnore
+    public ZonedDateTime getTargetDateInParis() {
+        return inputs.getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
+    }
+
+    @JsonIgnore
+    public boolean isAtDstHour() {
+        return getTargetDateInParis().getHour() == Integer.parseInt(DAYLIGHT_DUPLICATED_HOUR);
+    }
+
+    @JsonIgnore
+    public boolean isAtSecondDstHour() {
+        return isAtDstHour() && inputs.getRealOffset().equals(PARIS_WINTER_OFFSET);
+    }
+
     public boolean hasPreTreatedIgm(final String country) {
         return artifacts.getPreTreatedIgmMap().containsKey(country);
     }
 
     public String getOutputCgmFileName() {
-        final ZonedDateTime targetZdtParis = getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
+        final ZonedDateTime targetZdtParis = getTargetDateInParis();
         final String dateAndTime = FILENAME_DATETIME_FMT.withLocale(FRANCE).format(targetZdtParis);
 
         /* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

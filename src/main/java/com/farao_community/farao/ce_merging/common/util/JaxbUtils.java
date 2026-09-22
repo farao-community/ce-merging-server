@@ -12,18 +12,29 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
+import org.w3c.dom.Node;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_HEADER;
 import static com.farao_community.farao.ce_merging.common.exception.ServiceIOException.errorWhile;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+import static jakarta.xml.bind.Marshaller.JAXB_FRAGMENT;
+import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
+import static jakarta.xml.bind.Marshaller.JAXB_SCHEMA_LOCATION;
 import static java.lang.Boolean.TRUE;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.newInputStream;
 
 public final class JaxbUtils {
@@ -64,10 +75,16 @@ public final class JaxbUtils {
         }
     }
 
-    private static <T> T unmarshal(final InputStream inputStream, final Class<T> clazz) throws JAXBException {
+    public static <T> T readNode(final Node node,
+                                 final Class<T> targetClass) throws JAXBException {
+        return JAXBContext.newInstance(targetClass).createUnmarshaller().unmarshal(node, targetClass).getValue();
+    }
+
+    private static <T> T unmarshal(final InputStream inputStream,
+                                   final Class<T> clazz) throws JAXBException {
         return unmarshaller(clazz)
-            .unmarshal(new StreamSource(inputStream), clazz)
-            .getValue();
+                .unmarshal(new StreamSource(inputStream), clazz)
+                .getValue();
     }
 
     /**
@@ -82,6 +99,24 @@ public final class JaxbUtils {
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
             marshaller(clazz).marshal(object, bos);
+            return bos.toByteArray();
+        } catch (final Exception e) {
+            throw errorWhile(e, "writing a %s object to bytes", clazz.getSimpleName());
+        }
+    }
+
+    public static <T> byte[] writeToBytes(final Class<T> clazz,
+                                          final T object,
+                                          final Map<String, Object> properties,
+                                          final String nameSpaceURI,
+                                          final String rootElement) {
+        try {
+            final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            marshaller(clazz, properties).marshal(withSpecifiedRoot(clazz,
+                                                                    object,
+                                                                    nameSpaceURI,
+                                                                    rootElement),
+                                                  bos);
             return bos.toByteArray();
         } catch (final Exception e) {
             throw errorWhile(e, "writing a %s object to bytes", clazz.getSimpleName());
@@ -107,25 +142,32 @@ public final class JaxbUtils {
         }
     }
 
-    public static <T> void writeToPath(final Class<T> clazz, final T object, final Path filePath, final String schemaLocation, final boolean noNamespaceSchemaLocation) {
+    public static <T> void writeToPath(final Class<T> clazz,
+                                       final T object,
+                                       final Path filePath,
+                                       final String schemaLocation,
+                                       final boolean noNamespaceSchema) {
+        final Map<String, Object> properties = Map.of(JAXB_FRAGMENT, TRUE,
+                                                      noNamespaceSchema ? JAXB_NO_NAMESPACE_SCHEMA_LOCATION : JAXB_SCHEMA_LOCATION,
+                                                      schemaLocation);
+        writeToPath(clazz, object, filePath, properties);
+    }
+
+    public static <T> void writeToPath(final Class<T> clazz,
+                                       final T object,
+                                       final Path filePath,
+                                       final Map<String, Object> properties) {
         try {
-            final Marshaller jaxbMarshaller = marshaller(clazz);
-            jaxbMarshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
-            if (noNamespaceSchemaLocation) {
-                jaxbMarshaller.setProperty(Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION, schemaLocation);
-            } else {
-                jaxbMarshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, schemaLocation);
-            }
+            final Marshaller jaxbMarshaller = marshaller(clazz, properties);
 
             try (final OutputStream outputStream = Files.newOutputStream(filePath);
-                 final Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
-                writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+                 final Writer writer = new OutputStreamWriter(outputStream, UTF_8)) {
+                writer.write(XML_HEADER);
                 jaxbMarshaller.marshal(object, writer);
             }
 
         } catch (final Exception e) {
-            throw errorWhile(e, "writing a %s object to %s", clazz.getSimpleName(), filePath
-            );
+            throw errorWhile(e, "writing a %s object to %s", clazz.getSimpleName(), filePath);
         }
     }
 
@@ -210,6 +252,15 @@ public final class JaxbUtils {
     private static <T> Marshaller marshaller(final Class<T> clazz) throws JAXBException {
         final Marshaller jaxbMarshaller = JAXBContext.newInstance(clazz).createMarshaller();
         jaxbMarshaller.setProperty(JAXB_FORMATTED_OUTPUT, TRUE);
+        return jaxbMarshaller;
+    }
+
+    private static <T> Marshaller marshaller(final Class<T> clazz,
+                                             final Map<String, Object> properties) throws JAXBException {
+        final Marshaller jaxbMarshaller = JAXBContext.newInstance(clazz).createMarshaller();
+        for (final Map.Entry<String, Object> entry : properties.entrySet()) {
+            jaxbMarshaller.setProperty(entry.getKey(), entry.getValue());
+        }
         return jaxbMarshaller;
     }
 

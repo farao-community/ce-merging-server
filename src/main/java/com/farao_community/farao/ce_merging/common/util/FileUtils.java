@@ -21,6 +21,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import static java.nio.file.Files.readAllBytes;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
@@ -96,6 +97,16 @@ public final class FileUtils {
             return Files.readAllBytes(Paths.get(path));
         } catch (final Exception e) {
             throw new CeMergingException("error while reading from %s".formatted(path), e);
+        }
+    }
+
+    public static void copyFileTo(final String fileName, final SavedFile savedFile, final Path otherDirectoryPath) {
+        final Path filePath = otherDirectoryPath.resolve(fileName);
+        try {
+            Files.createDirectories(otherDirectoryPath);
+            Files.copy(Paths.get(savedFile.getPath()), filePath, REPLACE_EXISTING);
+        } catch (final IOException e) {
+            LOGGER.warn("Error while writing {} file in path {}", fileName, filePath, e);
         }
     }
 }

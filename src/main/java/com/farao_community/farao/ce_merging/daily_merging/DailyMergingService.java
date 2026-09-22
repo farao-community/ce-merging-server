@@ -11,11 +11,11 @@ import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.MergingRequestService;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
-import com.farao_community.farao.ce_merging.daily_merging.post_process.glsk_quality_check.DailyQualityCheckReportService;
-import com.farao_community.farao.ce_merging.daily_merging.post_process.merging_logs.DailyMergingLogsService;
-import com.farao_community.farao.ce_merging.daily_merging.post_process.xnodes_inconsistencies.XnodeResultService;
+import com.farao_community.farao.ce_merging.daily_merging.output.cgm.CgmResultsService;
+import com.farao_community.farao.ce_merging.daily_merging.output.glsk_quality_check.DailyQualityCheckReportService;
+import com.farao_community.farao.ce_merging.daily_merging.output.merging_logs.DailyMergingLogsService;
+import com.farao_community.farao.ce_merging.daily_merging.output.xnodes_inconsistencies.XnodeResultService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
+
 @Service
 public class DailyMergingService {
 
@@ -36,36 +38,47 @@ public class DailyMergingService {
     private final MergingRequestService mergingRequestService;
     private final DailyMergingLogsService dailyMergingLogsService;
     private final XnodeResultService xnodeResultService;
+    private final CgmResultsService cgmResultsService;
 
-    public DailyMergingService(final DailyQualityCheckReportService dailyQualityCheckReportService, final DailyMergingLogsService dailyMergingLogsService, final MergingRequestService mergingRequestService, final XnodeResultService xnodeResultService) {
+    public DailyMergingService(final DailyQualityCheckReportService dailyQualityCheckReportService,
+                               final DailyMergingLogsService dailyMergingLogsService,
+                               final MergingRequestService mergingRequestService,
+                               final XnodeResultService xnodeResultService,
+                               final CgmResultsService cgmResultsService) {
         this.dailyMergingLogsService = dailyMergingLogsService;
         this.dailyQualityCheckReportService = dailyQualityCheckReportService;
         this.mergingRequestService = mergingRequestService;
         this.xnodeResultService = xnodeResultService;
+        this.cgmResultsService = cgmResultsService;
     }
 
-    public void run(final DailyMergingTask dailyMergingTask, final List<MergingTask> mergingTasks) {
+    public void run(final DailyMergingTask dailyMergingTask,
+                    final List<MergingTask> hourlyTasks) {
         final RequestInformation requestInformation = mergingRequestService.getMergingRequestInformation(dailyMergingTask);
-        validateTaskTargetDatesWithinRequestInterval(mergingTasks, requestInformation);
-        checkTasksHaveDifferentTargetDates(mergingTasks);
-        mergingTasks.sort(Comparator.comparing(task -> task.getInputs().getTargetDate()));
-        final List<MergingTask> successMergingTasks = mergingTasks.stream()
-                .filter(task -> TaskStatus.SUCCESS.equals(task.getStatus()))
+        validateTaskTargetDatesWithinRequestInterval(hourlyTasks, requestInformation);
+        checkTasksHaveDifferentTargetDates(hourlyTasks);
+        hourlyTasks.sort(Comparator.comparing(task -> task.getInputs().getTargetDate()));
+        final List<MergingTask> successMergingTasks = hourlyTasks.stream()
+                .filter(task -> task.getStatus() == SUCCESS)
                 .toList();
 
         if (!successMergingTasks.isEmpty()) {
             dailyMergingLogsService.computeDailyMergingLogs(dailyMergingTask, successMergingTasks);
             dailyQualityCheckReportService.computeDailyGlskQualityReport(dailyMergingTask, successMergingTasks, requestInformation.requestTimeInterval());
         }
+
+        cgmResultsService.createCgmZip(dailyMergingTask, hourlyTasks, requestInformation);
         xnodeResultService.createXnodesInconsistenciesZip(dailyMergingTask, successMergingTasks); //workaround as xnodes file are not yet available on Merging supervisor
 
     }
 
-    private void validateTaskTargetDatesWithinRequestInterval(final List<MergingTask> tasks, final RequestInformation requestInformation) {
+    private void validateTaskTargetDatesWithinRequestInterval(final List<MergingTask> tasks,
+                                                              final RequestInformation requestInformation) {
         tasks.forEach(task -> validateTaskTargetDateWithinRequestInterval(task, requestInformation));
     }
 
-    private void validateTaskTargetDateWithinRequestInterval(final MergingTask task, final RequestInformation requestInformation) {
+    private void validateTaskTargetDateWithinRequestInterval(final MergingTask task,
+                                                             final RequestInformation requestInformation) {
         final OffsetDateTime targetDate = task.getInputs().getTargetDate();
         final OffsetDateTime requestStartDateTime = requestInformation.getStartDateTime();
         final OffsetDateTime requestEndDateTime = requestInformation.getEndDateTime();
