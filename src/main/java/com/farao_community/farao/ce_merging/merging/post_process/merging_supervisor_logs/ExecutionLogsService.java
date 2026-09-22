@@ -31,13 +31,14 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_STEP;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO_LOWER_CASE;
+
 @Service
 public class ExecutionLogsService {
 
     private static final String MERGING_SUPERVISOR_TIMESTAMP_PATTERN = "dd/MM/yyyy HH:mm:ss";
     private static final String EMPTY = "";
-    private static final String MERGING_STEP = "merging-step";
-    private static final String TSO = "tso";
     private static final String HTTP_WWW_RTE_FRANCE_COM_GSR = "http://www.rte-france.com/gsr";
     private static final String LOGS = "logs";
     private final LoggingEventRepository loggingEventRepository;
@@ -46,27 +47,27 @@ public class ExecutionLogsService {
         this.loggingEventRepository = loggingEventRepository;
     }
 
-    public byte[] generateLogsForMergingSupervisor(MergingTask task) {
-        Set<LoggingEvent> logsByTaskId = loggingEventRepository.findLogsByTaskId(task.getId());
-        List<MergingSupervisorLogsModel> mergingSupervisorLogsRecordsList = adaptLogsForMergingSupervisor(logsByTaskId);
+    public byte[] generateLogsForMergingSupervisor(final MergingTask task) {
+        final Set<LoggingEvent> logsByTaskId = loggingEventRepository.findLogsByTaskId(task.getId());
+        final List<MergingSupervisorLogsModel> mergingSupervisorLogsRecordsList = adaptLogsForMergingSupervisor(logsByTaskId);
 
-        Logs logs = new Logs();
-        List<String> mergingSteps = Arrays.stream(MergingStep.values()).map(Enum::toString).toList();
-        Map<String, List<MergingSupervisorLogsModel>> logsByContext = new TreeMap<>();
+        final Logs logs = new Logs();
+        final List<String> mergingSteps = Arrays.stream(MergingStep.values()).map(Enum::toString).toList();
+        final Map<String, List<MergingSupervisorLogsModel>> logsByContext = new TreeMap<>();
         mergingSteps.forEach(mergingStep -> {
             List<MergingSupervisorLogsModel> listByContext = mergingSupervisorLogsRecordsList.stream().filter(logsModel -> mergingStep.equals(logsModel.getContext())).toList();
             logsByContext.put(mergingStep, listByContext);
         });
 
-        List<Context> contextsList = new ArrayList<>();
+        final List<Context> contextsList = new ArrayList<>();
         logsByContext.forEach((key, value) -> {
             Context context = new Context();
             context.setNom(key);
             List<com.farao_community.farao.ce_merging.xsd.execution_logs.Record> recordsList = new ArrayList<>();
 
             if (key.equals(MergingStep.INITIAL_IMPORT.toString())) {
-                List<Context> tsoSubContextList = new ArrayList<>();
-                Map<String, List<MergingSupervisorLogsModel>> subRecordsMap = value.stream().collect(Collectors.groupingBy(MergingSupervisorLogsModel::getSubContextLevel1, Collectors.toList()));
+                final List<Context> tsoSubContextList = new ArrayList<>();
+                final Map<String, List<MergingSupervisorLogsModel>> subRecordsMap = value.stream().collect(Collectors.groupingBy(MergingSupervisorLogsModel::getSubContextLevel1, Collectors.toList()));
                 subRecordsMap.forEach((tso, supervisorLogsModelList) -> {
                     Context tsoSubContext = new Context();
                     tsoSubContext.setNom(tso);
@@ -103,20 +104,20 @@ public class ExecutionLogsService {
         try {
             final Logs artifact = task.getArtifact(ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS, Logs.class);
             if (artifact != null) {
-                List<Context> openLoadFlowLogs = artifact.getCtxt();
+                final List<Context> openLoadFlowLogs = artifact.getCtxt();
                 openLoadFlowLogs.getFirst().setNom("Open Loadflow on final CGM : " + task.getOutputs().getCgm().getOriginalName());
                 contextsList.stream()
                         .filter(context -> context.getNom().equals(MergingStep.OPEN_LOAD_FLOW_LOGS.toString()))
                         .findFirst()
                         .ifPresent(context -> context.getRecOrCtxt().addAll(openLoadFlowLogs));
-                List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
+                final List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
                 logs.getCtxt().addAll(finalContextList);
                 return JaxbUtils.writeToBytes(Logs.class, logs, HTTP_WWW_RTE_FRANCE_COM_GSR, LOGS);
             } else {
                 throw new CeMergingException("No load flow logs");
             }
         } catch (Exception e) {
-            List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
+            final List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
             logs.getCtxt().addAll(finalContextList);
             return JaxbUtils.writeToBytes(Logs.class, logs, HTTP_WWW_RTE_FRANCE_COM_GSR, LOGS);
         }
@@ -136,7 +137,7 @@ public class ExecutionLogsService {
         MergingSupervisorLogsModel msLogModel = new MergingSupervisorLogsModel(mergingSupervisorTimestamp, log.getLevelString(), log.getFormattedMessage(), mergingSupervisorContext);
         if (mergingSupervisorContext.equals(MergingStep.INITIAL_IMPORT.toString())) {
             String tso = log.getProperties().stream()
-                    .filter(loggingEventProperty -> TSO.equals(loggingEventProperty.getMappedKey()))
+                    .filter(loggingEventProperty -> TSO_LOWER_CASE.equals(loggingEventProperty.getMappedKey()))
                     .map(LoggingEventProperty::getMappedValue)
                     .findFirst()
                     .orElse(EMPTY);

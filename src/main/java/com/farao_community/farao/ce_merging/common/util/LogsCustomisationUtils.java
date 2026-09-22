@@ -8,11 +8,12 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import org.slf4j.MDC;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_STEP;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO_LOWER_CASE;
+
 public final class LogsCustomisationUtils {
 
     private static final String TASK_ID_EXTRA_FIELD = "taskId";
-    private static final String TSO_EXTRA_FIELD = "tso";
-    private static final String MERGING_STEP_EXTRA_FIELD = "merging-step";
 
     private LogsCustomisationUtils() {
     }
@@ -20,15 +21,15 @@ public final class LogsCustomisationUtils {
     public static void setExtraFieldsInLogsMdc(long taskId, String mergingStepValue) {
         // propagate extra fields into SLF4J's MDC in current service
         MDC.put(TASK_ID_EXTRA_FIELD, Long.toString(taskId));
-        MDC.put(MERGING_STEP_EXTRA_FIELD, mergingStepValue);
+        MDC.put(MERGING_STEP, mergingStepValue);
 
     }
 
     public static void setTsoExtraFieldInLogsMdc(String tso) {
-        MDC.put(TSO_EXTRA_FIELD, tso);
+        MDC.put(TSO_LOWER_CASE, tso);
     }
 
     public static void removeTsoFieldFromMdc() {
-        MDC.remove(TSO_EXTRA_FIELD);
+        MDC.remove(TSO_LOWER_CASE);
     }
 }

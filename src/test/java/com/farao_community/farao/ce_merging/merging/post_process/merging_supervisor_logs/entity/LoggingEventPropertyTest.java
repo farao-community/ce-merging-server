@@ -9,15 +9,16 @@ package com.farao_community.farao.ce_merging.merging.post_process.merging_superv
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO_LOWER_CASE;
+
 class LoggingEventPropertyTest {
 
-    private static final String TSO = "tso";
     private static final String RTE = "RTE";
 
     @Test
     void testGettersAndSetters() {
         LoggingEventProperty property = new LoggingEventProperty();
-        property.setMappedKey(TSO);
+        property.setMappedKey(TSO_LOWER_CASE);
         property.setMappedValue(RTE);
         LoggingEvent log = new LoggingEvent();
         log.setTimestmp(1222333444L);
@@ -25,7 +26,7 @@ class LoggingEventPropertyTest {
         property.setLoggingEvent(log);
 
         Assertions.assertThat(property.getLoggingEvent()).isEqualTo(log);
-        Assertions.assertThat(property.getMappedKey()).isEqualTo(TSO);
+        Assertions.assertThat(property.getMappedKey()).isEqualTo(TSO_LOWER_CASE);
         Assertions.assertThat(property.getMappedValue()).isEqualTo(RTE);
 
     }
