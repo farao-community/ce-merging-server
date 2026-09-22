@@ -19,8 +19,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.mockito.ArgumentMatchers.eq;
-
 @SpringBootTest
 class ExecutionLogsServiceTest {
     private static final String LONG_FORMATTED_MESSAGE = "Long formatted message giving full details from log";
@@ -59,11 +57,11 @@ class ExecutionLogsServiceTest {
     }
 
     @Test
-    public void testLogsModelConversion() {
+    void testLogsModelConversion() {
         MergingTask task = new MergingTask();
         task.setId(152L);
         Set<LoggingEvent> logs = Set.of(setupModel());
-        Mockito.when(repository.findLogsByTaskId(eq(EVENT_ID))).thenReturn(logs);
+        Mockito.when(repository.findLogsByTaskId(EVENT_ID)).thenReturn(logs);
         byte[] output = executionLogsService.generateLogsForMergingSupervisor(task);
         Assertions.assertThat(output).isNotEmpty();
     }
