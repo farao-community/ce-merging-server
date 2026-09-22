@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs;
 
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.entity.LoggingEvent;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.entity.LoggingEventProperty;
@@ -101,15 +102,19 @@ public class ExecutionLogsService {
 
         try {
             final Logs artifact = task.getArtifact(ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS, Logs.class);
-            List<Context> openLoadFlowLogs = artifact.getCtxt();
-            openLoadFlowLogs.getFirst().setNom("Open Loadflow on final CGM : " + task.getOutputs().getCgm().getOriginalName());
-            contextsList.stream()
-                    .filter(context -> context.getNom().equals(MergingStep.OPEN_LOAD_FLOW_LOGS.toString()))
-                    .findFirst()
-                    .ifPresent(context -> context.getRecOrCtxt().addAll(openLoadFlowLogs));
-            List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
-            logs.getCtxt().addAll(finalContextList);
-            return JaxbUtils.writeToBytes(Logs.class, logs, HTTP_WWW_RTE_FRANCE_COM_GSR, LOGS);
+            if (artifact != null) {
+                List<Context> openLoadFlowLogs = artifact.getCtxt();
+                openLoadFlowLogs.getFirst().setNom("Open Loadflow on final CGM : " + task.getOutputs().getCgm().getOriginalName());
+                contextsList.stream()
+                        .filter(context -> context.getNom().equals(MergingStep.OPEN_LOAD_FLOW_LOGS.toString()))
+                        .findFirst()
+                        .ifPresent(context -> context.getRecOrCtxt().addAll(openLoadFlowLogs));
+                List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
+                logs.getCtxt().addAll(finalContextList);
+                return JaxbUtils.writeToBytes(Logs.class, logs, HTTP_WWW_RTE_FRANCE_COM_GSR, LOGS);
+            } else {
+                throw new CeMergingException("No load flow logs");
+            }
         } catch (Exception e) {
             List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
             logs.getCtxt().addAll(finalContextList);
