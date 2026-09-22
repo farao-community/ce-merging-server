@@ -30,10 +30,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-/**
- * @author Mohamed Ben Rejeb {@literal <mohamecleard.ben-rejeb at rte-france.com>}
- * @author Oualid Aloui {@literal <oualid.aloui at rte-france.com>}
- */
 @Service
 public class ExecutionLogsService {
 
