@@ -36,6 +36,7 @@ import static com.farao_community.farao.ce_merging.common.util.FileUtils.copyFil
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.generateOutputFileName;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirectory;
+import static com.farao_community.farao.ce_merging.daily_merging.output.cgm.CgmRecognitionBuilder.computeCgmRecognition;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 
 @Service
@@ -46,14 +47,11 @@ public class CgmResultsService {
 
     private final CeMergingConfiguration configuration;
     private final DailyMergingRepository repository;
-    private final CgmRecognitionService cgmRecognitionService;
 
     public CgmResultsService(final CeMergingConfiguration configuration,
-                             final DailyMergingRepository repository,
-                             final CgmRecognitionService cgmRecognitionService) {
+                             final DailyMergingRepository repository) {
         this.configuration = configuration;
         this.repository = repository;
-        this.cgmRecognitionService = cgmRecognitionService;
     }
 
     public void createCgmZip(final DailyMergingTask dailyTask,
@@ -91,7 +89,7 @@ public class CgmResultsService {
                                         final String cgmResultTempPath,
                                         final RequestInformation requestInformation,
                                         final List<MergingTask> hourlyTasks) throws JAXBException, ParserConfigurationException {
-        final byte[] cgmRecognitionFile = cgmRecognitionService.computeCgmRecognition(requestInformation, hourlyTasks, dailyTask.getVersion());
+        final byte[] cgmRecognitionFile = computeCgmRecognition(requestInformation, hourlyTasks, dailyTask.getVersion());
         final String cgmRecognitionOutputFileName = generateOutputFileName(requestInformation.getMergingDay(),
                                                                            dailyTask.getVersion(),
                                                                            CGM_FLOW,

@@ -16,6 +16,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -30,8 +31,8 @@ import java.util.zip.ZipFile;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.mockTaskWithCgmResult;
 
 @SpringBootTest
@@ -43,7 +44,7 @@ class CgmResultsServiceTest {
     private final DailyMergingRepository tasksRepository = mock(DailyMergingRepository.class);
 
     private DailyMergingTask dailyMergingTask;
-    private final CgmRecognitionService cgmRecognitionService = mock(CgmRecognitionService.class);
+    private final CgmRecognitionBuilder cgmRecognitionBuilder = mock(CgmRecognitionBuilder.class);
 
     private List<MergingTask> tasks;
     private static final String CGM_RECOGNITION_OUTPUT_NAME = "22XCORESO------S_10V1001C--00236Y_CORE-FB-100_%s-F100-%02d.xml";
@@ -53,9 +54,9 @@ class CgmResultsServiceTest {
 
     @BeforeEach
     void setUp() throws IOException {
-        MergingTask task1 =  mockTaskWithCgmResult("2020-01-06T22:00Z", "/cgmResult/mock_cgm_1.uct");
+        MergingTask task1 = mockTaskWithCgmResult("2020-01-06T22:00Z", "/cgmResult/mock_cgm_1.uct");
 
-        MergingTask task2 =  mockTaskWithCgmResult("2020-01-06T23:00Z", "/cgmResult/mock_cgm_2.uct");
+        MergingTask task2 = mockTaskWithCgmResult("2020-01-06T23:00Z", "/cgmResult/mock_cgm_2.uct");
 
         tasks = List.of(task1, task2);
 
@@ -75,37 +76,41 @@ class CgmResultsServiceTest {
 
     @Test
     void shouldCreateCgmZip() throws IOException, JAXBException, ParserConfigurationException {
-        final CgmResultsService cgmResultsService = new CgmResultsService(configuration, tasksRepository, cgmRecognitionService);
-        final byte[] cgmRecognitionFile = Files.readAllBytes(Paths.get("src", "test", "resources", "cgmResult", "cgmRecognition_mock.xml"));
-        when(cgmRecognitionService.computeCgmRecognition(requestInformation, tasks, version))
-                .thenReturn(cgmRecognitionFile);
-        final String cgmRecognitionOutputFileName = String.format(CGM_RECOGNITION_OUTPUT_NAME, mergingDay, version);
-        cgmResultsService.createCgmZip(dailyMergingTask, tasks, requestInformation);
 
-        final SavedFile cgmZip = dailyMergingTask.getDailyOutputs().getCgmZip();
-        boolean cgmRecognitionFound = false;
-        boolean cgmFile1Found = false;
-        boolean cgmFile2Found = false;
-        try (final ZipFile zipFile = new ZipFile(cgmZip.getPath())) {
-            final Enumeration<? extends ZipEntry> entries = zipFile.entries();
+        try (final MockedStatic<CgmRecognitionBuilder> cgmRecoMock = mockStatic(CgmRecognitionBuilder.class)) {
+            final byte[] cgmRecognitionFile = Files.readAllBytes(Paths.get("src", "test", "resources", "cgmResult", "cgmRecognition_mock.xml"));
+            cgmRecoMock.when(() -> CgmRecognitionBuilder.computeCgmRecognition(requestInformation, tasks, version))
+                    .thenReturn(cgmRecognitionFile);
+            final CgmResultsService cgmResultsService = new CgmResultsService(configuration, tasksRepository);
+            final String cgmRecognitionOutputFileName = String.format(CGM_RECOGNITION_OUTPUT_NAME, mergingDay, version);
+            cgmResultsService.createCgmZip(dailyMergingTask, tasks, requestInformation);
 
-            while (entries.hasMoreElements()) {
-                final String entryName = entries.nextElement().getName();
-                if (entryName.contains("mock_cgm_1.uct")) {
-                    cgmFile1Found = true;
-                }
-                if (entryName.contains("mock_cgm_2.uct")) {
-                    cgmFile2Found = true;
-                }
-                if (entryName.contains(cgmRecognitionOutputFileName)) {
-                    cgmRecognitionFound = true;
+            final SavedFile cgmZip = dailyMergingTask.getDailyOutputs().getCgmZip();
+            boolean cgmRecognitionFound = false;
+            boolean cgmFile1Found = false;
+            boolean cgmFile2Found = false;
+            try (final ZipFile zipFile = new ZipFile(cgmZip.getPath())) {
+                final Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
+                while (entries.hasMoreElements()) {
+                    final String entryName = entries.nextElement().getName();
+                    if (entryName.contains("mock_cgm_1.uct")) {
+                        cgmFile1Found = true;
+                    }
+                    if (entryName.contains("mock_cgm_2.uct")) {
+                        cgmFile2Found = true;
+                    }
+                    if (entryName.contains(cgmRecognitionOutputFileName)) {
+                        cgmRecognitionFound = true;
+                    }
                 }
             }
+
+            assertTrue(cgmFile1Found);
+            assertTrue(cgmFile2Found);
+            assertTrue(cgmRecognitionFound);
+            verify(tasksRepository).save(dailyMergingTask);
         }
 
-        assertTrue(cgmFile1Found);
-        assertTrue(cgmFile2Found);
-        assertTrue(cgmRecognitionFound);
-        verify(tasksRepository).save(dailyMergingTask);
     }
 }

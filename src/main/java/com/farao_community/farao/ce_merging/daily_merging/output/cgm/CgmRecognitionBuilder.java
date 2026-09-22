@@ -20,7 +20,6 @@ import com.farao_community.farao.ce_merging.xsd.merging_request.EventMessageType
 import com.farao_community.farao.ce_merging.xsd.merging_request.HeaderType;
 import com.farao_community.farao.ce_merging.xsd.merging_request.PayloadType;
 import jakarta.xml.bind.JAXBException;
-import org.springframework.stereotype.Service;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.time.OffsetDateTime;
@@ -40,15 +39,18 @@ import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
 import static java.lang.Boolean.TRUE;
 import static java.util.Comparator.comparing;
 
-@Service
-public class CgmRecognitionService {
+public final class CgmRecognitionBuilder {
     private static final String MESSAGE_ID = "%s-F100-%02d";
     private static final String ERROR_CODE = "1.1";
     private static final Map<String, Object> JAXB_PROPERTIES = Map.of(JAXB_FORMATTED_OUTPUT, TRUE,
                                                                       JAXB_NO_NAMESPACE_SCHEMA_LOCATION, RESPONSE_XSD.getName(),
                                                                       JAXB_FRAGMENT, TRUE);
 
-    public byte[] computeCgmRecognition(final RequestInformation requestInformation,
+    private CgmRecognitionBuilder() {
+        // no constructor
+    }
+
+    public static byte[] computeCgmRecognition(final RequestInformation requestInformation,
                                         final List<MergingTask> hourlyTasks,
                                         final int version) throws JAXBException, ParserConfigurationException {
         final EventMessageType mergingResponse = buildMergingResponseInformation(requestInformation, hourlyTasks, version);
@@ -56,7 +58,7 @@ public class CgmRecognitionService {
 
     }
 
-    private EventMessageType buildMergingResponseInformation(final RequestInformation requestInformation,
+    private static EventMessageType buildMergingResponseInformation(final RequestInformation requestInformation,
                                                              final List<MergingTask> hourlyTasks,
                                                              final int version) throws JAXBException, ParserConfigurationException {
         final EventMessageType response = new EventMessageType();
@@ -76,7 +78,7 @@ public class CgmRecognitionService {
         return response;
     }
 
-    private ResponseItem fillMissingResponseItemsWithError(final String interval) {
+    private static ResponseItem fillMissingResponseItemsWithError(final String interval) {
         final ResponseItem responseItem = new ResponseItem();
         final ErrorType responseItemError = new ErrorType();
         responseItemError.setCode(ERROR_CODE);
@@ -86,7 +88,7 @@ public class CgmRecognitionService {
         return responseItem;
     }
 
-    private HeaderType fillResponseHeader(final RequestInformation requestInformation,
+    private static HeaderType fillResponseHeader(final RequestInformation requestInformation,
                                           final int version) {
         final HeaderType responseHeader = new HeaderType();
         responseHeader.setVerb("created");
@@ -100,25 +102,25 @@ public class CgmRecognitionService {
         return responseHeader;
     }
 
-    private String generateMessageId(final OffsetDateTime mergingDateTime,
+    private static String generateMessageId(final OffsetDateTime mergingDateTime,
                                      final int mergingVersion) {
         final String mergingDate = FILENAME_DATE_FMT.format(mergingDateTime);
         return String.format(MESSAGE_ID, mergingDate, mergingVersion);
     }
 
-    private ResponseItems fillResponseItems(final RequestInformation mergingRequest,
+    private static ResponseItems fillResponseItems(final RequestInformation mergingRequest,
                                             final List<MergingTask> tasks) {
         final ResponseItems responseItems = new ResponseItems();
         responseItems.setTimeInterval(mergingRequest.requestTimeInterval());
 
         tasks.stream()
-                .map(this::fillResponseItem)
+                .map(CgmRecognitionBuilder::fillResponseItem)
                 .forEach(responseItems.getResponseItem()::add);
 
         return responseItems;
     }
 
-    private ResponseItem fillResponseItem(final MergingTask task) {
+    private static ResponseItem fillResponseItem(final MergingTask task) {
         final ResponseItem responseItem = new ResponseItem();
         final String itemTimeInterval = getTaskTimeInterval(task);
         if (task.getStatus() == SUCCESS) {
@@ -140,7 +142,7 @@ public class CgmRecognitionService {
         return responseItem;
     }
 
-    private String getTaskTimeInterval(final MergingTask task) {
+    private static String getTaskTimeInterval(final MergingTask task) {
         final OffsetDateTime startDate =
                 task.getInputs().getTargetDate().truncatedTo(ChronoUnit.HOURS);
 

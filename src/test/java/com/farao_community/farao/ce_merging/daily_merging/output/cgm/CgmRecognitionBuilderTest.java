@@ -7,7 +7,6 @@
 
 package com.farao_community.farao.ce_merging.daily_merging.output.cgm;
 
-import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
@@ -18,7 +17,6 @@ import com.farao_community.farao.ce_merging.xsd.merging_request.EventMessageType
 import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -26,17 +24,13 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.util.JaxbUtils.readNode;
+import static com.farao_community.farao.ce_merging.daily_merging.output.cgm.CgmRecognitionBuilder.computeCgmRecognition;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.mockTaskWithCgmResult;
 
 @SpringBootTest
-class CgmRecognitionServiceTest {
-    @Autowired
-    private CgmRecognitionService cgmRecognitionService;
-    @Autowired
-    private CeMergingConfiguration configuration;
-
+class CgmRecognitionBuilderTest {
     private List<MergingTask> tasks;
     private RequestInformation requestInformation;
     private MergingTask task3;
@@ -65,7 +59,7 @@ class CgmRecognitionServiceTest {
     @Test
     void shouldComputeCgmRecognition() throws JAXBException, ParserConfigurationException {
         final int version = 5;
-        final byte[] cgmRecognitionBytes = cgmRecognitionService.computeCgmRecognition(requestInformation, tasks, version);
+        final byte[] cgmRecognitionBytes = computeCgmRecognition(requestInformation, tasks, version);
         final EventMessageType cgmRecognition = JaxbUtils.readFromBytes(EventMessageType.class, cgmRecognitionBytes);
 
         assertEquals("PRODUCTION", cgmRecognition.getHeader().getContext());
