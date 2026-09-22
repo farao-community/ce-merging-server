@@ -37,8 +37,6 @@ import java.util.stream.Collectors;
 @Service
 public class ExecutionLogsService {
 
-    private static final String LOGS_INDEX_NAME = "logstash-*";
-    private static final String SEARCHING_CRITERIA = "traceId";
     private static final String MERGING_SUPERVISOR_TIMESTAMP_PATTERN = "dd/MM/yyyy HH:mm:ss";
     private static final String EMPTY = "";
     private static final String MERGING_STEP = "merging-step";
@@ -59,7 +57,7 @@ public class ExecutionLogsService {
         List<String> mergingSteps = Arrays.stream(MergingStep.values()).map(Enum::toString).toList();
         Map<String, List<MergingSupervisorLogsModel>> logsByContext = new TreeMap<>();
         mergingSteps.forEach(mergingStep -> {
-            List<MergingSupervisorLogsModel> listByContext = mergingSupervisorLogsRecordsList.stream().filter(record -> mergingStep.equals(record.getContext())).collect(Collectors.toList());
+            List<MergingSupervisorLogsModel> listByContext = mergingSupervisorLogsRecordsList.stream().filter(logsModel -> mergingStep.equals(logsModel.getContext())).toList();
             logsByContext.put(mergingStep, listByContext);
         });
 
@@ -77,11 +75,11 @@ public class ExecutionLogsService {
                     tsoSubContext.setNom(tso);
                     List<com.farao_community.farao.ce_merging.xsd.execution_logs.Record> subRecordsList = new ArrayList<>();
                     supervisorLogsModelList.forEach(hit -> {
-                        com.farao_community.farao.ce_merging.xsd.execution_logs.Record record = new com.farao_community.farao.ce_merging.xsd.execution_logs.Record();
-                        record.setDt(hit.getTimestamp());
-                        record.setLevel(hit.getLevel());
-                        record.setValue(hit.getMessage());
-                        subRecordsList.add(record);
+                        com.farao_community.farao.ce_merging.xsd.execution_logs.Record rec = new com.farao_community.farao.ce_merging.xsd.execution_logs.Record();
+                        rec.setDt(hit.getTimestamp());
+                        rec.setLevel(hit.getLevel());
+                        rec.setValue(hit.getMessage());
+                        subRecordsList.add(rec);
                     });
                     tsoSubContext.getRecOrCtxt().addAll(subRecordsList);
                     tsoSubContextList.add(tsoSubContext);
@@ -91,11 +89,11 @@ public class ExecutionLogsService {
             } else {
 
                 value.forEach(hit -> {
-                    com.farao_community.farao.ce_merging.xsd.execution_logs.Record record = new com.farao_community.farao.ce_merging.xsd.execution_logs.Record();
-                    record.setDt(hit.getTimestamp());
-                    record.setLevel(hit.getLevel());
-                    record.setValue(hit.getMessage());
-                    recordsList.add(record);
+                    com.farao_community.farao.ce_merging.xsd.execution_logs.Record rec = new com.farao_community.farao.ce_merging.xsd.execution_logs.Record();
+                    rec.setDt(hit.getTimestamp());
+                    rec.setLevel(hit.getLevel());
+                    rec.setValue(hit.getMessage());
+                    recordsList.add(rec);
                 });
 
                 context.getRecOrCtxt().addAll(recordsList);
@@ -106,7 +104,8 @@ public class ExecutionLogsService {
         contextsList.sort(Comparator.comparing(Context::getNom, Comparator.comparingInt(nom -> MergingStep.valueOf(nom).getOrder())));
 
         try {
-            List<Context> openLoadFlowLogs = task.getArtifact(ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS, Logs.class).getCtxt();
+            final Logs artifact = task.getArtifact(ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS, Logs.class);
+            List<Context> openLoadFlowLogs = artifact.getCtxt();
             openLoadFlowLogs.getFirst().setNom("Open Loadflow on final CGM : " + task.getOutputs().getCgm().getOriginalName());
             contextsList.stream()
                     .filter(context -> context.getNom().equals(MergingStep.OPEN_LOAD_FLOW_LOGS.toString()))
