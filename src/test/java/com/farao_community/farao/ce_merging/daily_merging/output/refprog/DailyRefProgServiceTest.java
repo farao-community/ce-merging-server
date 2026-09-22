@@ -24,7 +24,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -33,7 +32,7 @@ import static test_utils.CeTestUtils.mockTaskWithRefProgResult;
 import static test_utils.assertions.TimeSeriesAssert.assertThat;
 
 @SpringBootTest
-public class DailyRefProgServiceTest {
+class DailyRefProgServiceTest {
     private MergingTask task1;
     private MergingTask task2;
     private MergingTask task3;
@@ -59,7 +58,7 @@ public class DailyRefProgServiceTest {
     }
 
     @Test
-    public void shouldBuildDailyRefProg() {
+    void shouldBuildDailyRefProg() {
         final List<MergingTask> tasksList = Arrays.asList(task1, task2);
         final PublicationDocument publicationDocument = builder.buildDailyRefProg(1, tasksList, 24);
         assertEquals(1, publicationDocument.getDtdVersion().intValue());
@@ -92,15 +91,18 @@ public class DailyRefProgServiceTest {
     }
 
     @Test
-    public void shouldExportBorderWhenBorderPresentForTaskButNotForAnother() {
+    void shouldExportBorderWhenBorderPresentForTaskButNotForAnother() {
         final List<MergingTask> tasksList = Arrays.asList(task3, task4);
         final PublicationDocument publicationDocument = builder.buildDailyRefProg(1, tasksList, 24);
-        final List<String> timeSeriesIdentificationList = publicationDocument.getPublicationTimeSeries().stream().map(publication -> publication.getTimeSeriesIdentification().getV()).collect(Collectors.toList());
+        final List<String> timeSeriesIdentificationList = publicationDocument.getPublicationTimeSeries()
+                .stream()
+                .map(publication -> publication.getTimeSeriesIdentification().getV())
+                .toList();
         assertTrue(timeSeriesIdentificationList.contains("RS-ME"));
     }
 
     @Test
-    public void shouldThrowExceptionWhenTasksHaveDifferentInterval() {
+    void shouldThrowExceptionWhenTasksHaveDifferentInterval() {
         final List<MergingTask> tasksList = Arrays.asList(task4, task5);
         final List<PublicationDocument> refProgResultsList = builder.getAllHourlyRefProgs(tasksList);
         assertThrows(CeMergingException.class, () -> {
@@ -109,14 +111,14 @@ public class DailyRefProgServiceTest {
     }
 
     @Test
-    public void shouldNotThrowExceptionWhenTasksHaveSameInterval() {
+    void shouldNotThrowExceptionWhenTasksHaveSameInterval() {
         final List<MergingTask> tasksList = Arrays.asList(task1, task2, task3, task4);
         final List<PublicationDocument> refProgResultsList = builder.getAllHourlyRefProgs(tasksList);
         builder.checkUniqueRefProgInterval(refProgResultsList);
     }
 
     @Test
-    public void shouldSaveDailyRefProg() throws IOException {
+    void shouldSaveDailyRefProg() throws IOException {
         DailyMergingTask dailyTask = new DailyMergingTask();
         final int version = 4;
         dailyTask.setVersion(version);
