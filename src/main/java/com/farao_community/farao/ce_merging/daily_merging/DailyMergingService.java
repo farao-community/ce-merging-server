@@ -13,8 +13,8 @@ import com.farao_community.farao.ce_merging.daily_merging.merging_request.Mergin
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.daily_merging.output.cgm.CgmResultsService;
 import com.farao_community.farao.ce_merging.daily_merging.output.glsk_quality_check.DailyQualityCheckReportService;
+import com.farao_community.farao.ce_merging.daily_merging.output.merging_logs.DailyMergingLogsService;
 import com.farao_community.farao.ce_merging.daily_merging.output.xnodes_inconsistencies.XnodeResultService;
-import com.farao_community.farao.ce_merging.daily_merging.post_process.merging_logs.DailyMergingLogsService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
