@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.daily_merging.merging_request;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public record RequestInformation(
         );
     }
 
-    public List<String> findAllIntervals() {
+    public List<String> buildAllHourlyIntervals() {
         final List<String> intervalList = new ArrayList<>();
         final OffsetDateTime start = getStartDateTime();
         final OffsetDateTime end = getEndDateTime();
@@ -51,6 +52,10 @@ public record RequestInformation(
             intervalList.add(toZFormat(start.plusHours(i)) + "/" + toZFormat(start.plusHours(i + 1)));
         }
         return intervalList;
+    }
+
+    public int numberOfPositions() {
+        return (int) Duration.between(getStartDateTime(), getEndDateTime()).toHours();
     }
 
 }

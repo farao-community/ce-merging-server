@@ -161,7 +161,7 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>src/main/resources/xsd/daily_merging/response-payload_02.xsd</source>
+                                <source>src/main/resources/xsd/daily_merging/response/response-payload_02.xsd</source>
                             </sources>
                             <packageName>com.farao_community.farao.ce_merging.xsd.daily.response.payload</packageName>
                             <outputDirectory>${project.build.directory}/generated-sources/jaxb/daily_response</outputDirectory>

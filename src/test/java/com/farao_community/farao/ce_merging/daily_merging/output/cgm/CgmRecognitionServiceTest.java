@@ -12,8 +12,6 @@ import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.xsd.daily.response.payload.ResponseItem;
 import com.farao_community.farao.ce_merging.xsd.daily.response.payload.ResponseItems;
 import com.farao_community.farao.ce_merging.xsd.merging_request.EventMessageType;
@@ -24,14 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.util.JaxbUtils.readNode;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.mockTaskWithCgmResult;
 
 @SpringBootTest
 class CgmRecognitionServiceTest {
@@ -45,26 +42,9 @@ class CgmRecognitionServiceTest {
     private MergingTask task3;
 
     @BeforeEach
-    void setUp() throws IOException {
-        final SavedFile cgm1 = new SavedFile("mock_cgm_1.uct", getClass().getResource("/cgmResult/mock_cgm_1.uct").getPath(), "mock");
-        final MergingTask task1 = new MergingTask();
-        final Outputs outputs1 = new Outputs();
-        outputs1.setCgm(cgm1);
-        task1.setOutputs(outputs1);
-        final Inputs inputs1 = new Inputs();
-        inputs1.setTargetDate(OffsetDateTime.parse("2020-01-06T01:30Z"));
-        task1.setInputs(inputs1);
-        task1.setStatus(SUCCESS);
-
-        final SavedFile cgm2 = new SavedFile("mock_cgm_2.uct", getClass().getResource("/cgmResult/mock_cgm_2.uct").getPath(), "mock");
-        final MergingTask task2 = new MergingTask();
-        final Outputs outputs2 = new Outputs();
-        outputs2.setCgm(cgm2);
-        task2.setOutputs(outputs2);
-        final Inputs inputs2 = new Inputs();
-        inputs2.setTargetDate(OffsetDateTime.parse("2020-01-06T02:30Z"));
-        task2.setInputs(inputs2);
-        task2.setStatus(SUCCESS);
+    void setUp() {
+        final MergingTask task1 = mockTaskWithCgmResult("2020-01-06T01:30Z", "/cgmResult/mock_cgm_1.uct");
+        final MergingTask task2 = mockTaskWithCgmResult("2020-01-06T02:30Z", "/cgmResult/mock_cgm_2.uct");
 
         task3 = new MergingTask();
         final Inputs inputs3 = new Inputs();

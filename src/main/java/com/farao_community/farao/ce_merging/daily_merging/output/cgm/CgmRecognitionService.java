@@ -66,7 +66,7 @@ public class CgmRecognitionService {
         final ResponseItems responseItems = fillResponseItems(requestInformation, hourlyTasks);
         final List<ResponseItem> responseItemList = responseItems.getResponseItem();
 
-        requestInformation.findAllIntervals().stream()
+        requestInformation.buildAllHourlyIntervals().stream()
                 .filter(interval -> responseItemList.stream().map(ResponseItem::getTimeInterval).noneMatch(interval::equals))
                 .forEach(interval -> responseItemList.add(fillMissingResponseItemsWithError(interval)));
 
