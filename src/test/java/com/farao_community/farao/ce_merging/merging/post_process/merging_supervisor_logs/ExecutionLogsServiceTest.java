@@ -21,10 +21,6 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.eq;
 
-/**
- * @author Mohamed Ben Rejeb {@literal <mohamed.ben-rejeb at rte-france.com>}
- * @author Oualid Aloui {@literal <oualid.aloui at rte-france.com>}
- */
 @SpringBootTest
 class ExecutionLogsServiceTest {
     private static final String LONG_FORMATTED_MESSAGE = "Long formatted message giving full details from log";
