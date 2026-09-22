@@ -135,6 +135,7 @@ class AlegroServiceTest {
         // ALDE target flow = 200 MW, ALBE target flow = -200 MW
         //EC limit = [-100 MW, +100 MW]
         final MergingTask task = new MergingTask();
+        task.setId(1L);
         task.setArtifact(BCI_OUTPUT_FILE, copyResource("bciOutputs.json"));
         task.setArtifact(TGM_FILE_AFTER_RECESSIVITY, copyResource("network_alegro.uct"));
         task.setArtifact(ALEGRO_NET_POSITIONS, copyResource("alegroNetPositions.json"));

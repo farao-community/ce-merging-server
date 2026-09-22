@@ -23,6 +23,8 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.services.
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.RegionConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.VirtualHubsConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.XNodeConfigurationService;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectionRecord;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
@@ -92,6 +94,7 @@ public class GlobalGridConfigurationService {
 
     public void setConfigurations(final MergingTask task) {
         try {
+            LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.CONFIGURATIONS.toString());
             setRegionEicConfiguration(task);
             setVirtualHubsConfiguration(task);
             setHvdcXNodeAlignmentConfiguration(task);

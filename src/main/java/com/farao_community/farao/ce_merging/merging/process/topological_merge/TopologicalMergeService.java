@@ -9,6 +9,8 @@ package com.farao_community.farao.ce_merging.merging.process.topological_merge;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -46,6 +48,7 @@ public class TopologicalMergeService {
     }
 
     public void mergeInitialIgms(final MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.TOPOLOGICAL_MERGE.toString());
         try {
             final Network mergedNetwork = getTopologicalMergeNetwork(task);
             FileStorageUtils.saveArtifactNetwork(

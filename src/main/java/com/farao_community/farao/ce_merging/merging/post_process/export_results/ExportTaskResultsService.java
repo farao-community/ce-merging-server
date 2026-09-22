@@ -10,6 +10,8 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
@@ -43,6 +45,7 @@ public class ExportTaskResultsService {
     }
 
     public void generateOutputFiles(final MergingTask mergingTask) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(mergingTask.getId(), MergingStep.RESULTS_EXPORT.toString());
         try {
             mergingTask.getOutputs().setRealGlsk(copyFileToOutputDirectory(mergingTask, mergingTask.getArtifacts().getFile(ArtifactType.GLSK_QUALITY_REPORT), OutputType.GLSK_QUALITY_REPORT));
             copyIgmQualityReportInOutputDirectory(mergingTask);

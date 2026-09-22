@@ -8,6 +8,8 @@ package com.farao_community.farao.ce_merging.merging.process.slack_compensation;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.commons.report.ReportNodeNoOp;
@@ -66,6 +68,7 @@ public class SlackCompensationService {
     }
 
     public void compensateFinalCgmSlackImbalance(final MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.SLACK_COMPENSATION.toString());
         final Network compensatedNetwork = compensateNetwork(task);
         addSlackNode(compensatedNetwork, task);
 

@@ -9,6 +9,8 @@ package com.farao_community.farao.ce_merging.merging.process.forecast_netpositio
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
@@ -29,6 +31,7 @@ public class ForecastNetPositionService {
     }
 
     public void importForecastNetPosition(MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.FORECAST_NET_POSITION_IMPORT.toString());
         try {
             ReferenceProgram referenceProgram = ForecastNetPositionImporter.importFromFile(task.getInputs().getNetPositionForecast().getPath(), task.getInputs().getTargetDate());
             FileStorageUtils.saveArtifactFile(ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE, referenceProgram, task, configuration);

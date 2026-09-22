@@ -10,12 +10,16 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodesCalculation;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodesCheck;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.xsd.execution_logs.Logs;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
@@ -32,6 +36,7 @@ import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_BASE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFileWithWriter;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getLoadFlowMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithLogs;
 import static com.farao_community.farao.ce_merging.merging.process.final_cgm_result.OpenLoadFlowReportToXmlConverter.fromOlfReportToXmlLogs;
@@ -58,6 +63,8 @@ public class FinalCgmService {
     }
 
     public void computeFinalCgmResult(final MergingTask task) {
+
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.FINAL_RESULTS_CALCULATION.toString());
         try {
             final Configurations taskConfiguration = task.getConfigurations();
             final LoadFlowParameters loadFlowParameters = taskConfiguration.getLoadFlowParameters();
@@ -76,8 +83,10 @@ public class FinalCgmService {
             final LoadFlowOutput loadflowOutput = LoadFlowOutput.from(cgm.getOriginalName(),
                                                                       getLoadFlowMode(loadFlowParameters),
                                                                       result);
+            saveArtifactFileWithWriter(LOAD_FLOW_ON_FINAL_CGM_LOGS, task, configuration, path -> {
+                JaxbUtils.writeToPath(Logs.class, fromOlfReportToXmlLogs(rootReportNode), "http://www.rte-france.com/gsr", "logs", path);
+            });
 
-            saveArtifactFile(LOAD_FLOW_ON_FINAL_CGM_LOGS, fromOlfReportToXmlLogs(rootReportNode), task, configuration);
             network.getCountries().forEach(country -> {
                 final NetPositions netPositions = CountryNetPositionHandler.computeCountryNetPositions(
                         country,

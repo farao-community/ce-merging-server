@@ -7,6 +7,8 @@
 package com.farao_community.farao.ce_merging.merging.process.base_case_improvement;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.BciProcessor;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.springframework.stereotype.Service;
@@ -16,11 +18,12 @@ public class BaseCaseImprovementService {
 
     private final CeMergingConfiguration configuration;
 
-    public BaseCaseImprovementService(CeMergingConfiguration configuration) {
+    public BaseCaseImprovementService(final CeMergingConfiguration configuration) {
         this.configuration = configuration;
     }
 
     public void computeTargetNetPositions(MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.BASE_CASE_IMPROVEMENT.toString());
         BciProcessor processor = new BciProcessor(task, configuration);
         processor.run();
     }

@@ -7,6 +7,8 @@
 package com.farao_community.farao.ce_merging.merging.process.xnode;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -24,10 +26,11 @@ public class InitialImportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(InitialImportService.class);
 
     public Map<String, Network> importInitialIgms(final MergingTask taskEntity) {
-
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(taskEntity.getId(), MergingStep.INITIAL_IMPORT.toString());
         final Map<String, Network> networkByTsoMap = new HashMap<>();
 
         taskEntity.getInputs().getIgms().forEach(igmData -> importIgm(networkByTsoMap, igmData));
+        LogsCustomisationUtils.removeTsoFieldFromMdc();
         return networkByTsoMap;
     }
 
@@ -35,6 +38,7 @@ public class InitialImportService {
         final SavedFile igmFile = igmData.getIgmFile();
         try (FileInputStream inputStream = new FileInputStream(igmFile.getPath())) {
             LOGGER.info("Importing network file: {}", igmFile.getOriginalName());
+            LogsCustomisationUtils.setTsoExtraFieldInLogsMdc(igmData.getCountry());
             final Network network = Network.read(igmFile.getOriginalName(), inputStream);
             networkByTsoMap.put(igmData.getCountry(), network);
 

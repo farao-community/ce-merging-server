@@ -21,6 +21,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.services.
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.VirtualHubsConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.XNodeConfigurationService;
 import com.farao_community.farao.ce_merging.merging.MergingService;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.ExecutionLogsService;
 import com.farao_community.farao.ce_merging.merging.request_metadata.RequestMetadataManager;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
@@ -73,6 +74,7 @@ public class MergingTaskManagementService {
     private final BECKeyConfigurationService becKeyConfigurationService;
     private final RegionConfigurationService regionConfigurationService;
     private final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService;
+    private final ExecutionLogsService executionLogsService;
 
     public MergingTaskManagementService(final CeMergingConfiguration configuration,
                                         final MergingService mergingService,
@@ -82,7 +84,8 @@ public class MergingTaskManagementService {
                                         final XNodeConfigurationService xNodeConfigurationService,
                                         final BECKeyConfigurationService becKeyConfigurationService,
                                         final RegionConfigurationService regionConfigurationService,
-                                        final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService) {
+                                        final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService,
+                                        final ExecutionLogsService executionLogsService) {
         this.configuration = configuration;
         this.mergingService = mergingService;
         this.repository = repository;
@@ -92,6 +95,7 @@ public class MergingTaskManagementService {
         this.becKeyConfigurationService = becKeyConfigurationService;
         this.regionConfigurationService = regionConfigurationService;
         this.hvdcAlignmentConfigurationService = hvdcAlignmentConfigurationService;
+        this.executionLogsService = executionLogsService;
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -304,7 +308,7 @@ public class MergingTaskManagementService {
     public byte[] getExecutionLogs(final Long taskId) {
         MergingTask mergingTask = checkAndGetTask(taskId);
         checkTaskRunned(mergingTask);
-        return null; //TODO return executionLogsService.generateLogsForMergingSupervisor(mergingTask);
+        return executionLogsService.generateLogsForMergingSupervisor(mergingTask);
     }
 
     public MergingTask checkAndGetTask(long taskId) {

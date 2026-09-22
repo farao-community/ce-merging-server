@@ -11,7 +11,6 @@ import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodesCalculation;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.xsd.execution_logs.Logs;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -26,7 +25,6 @@ import java.util.Collections;
 
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
 import static com.powsybl.loadflow.LoadFlowResult.ComponentResult.Status.CONVERGED;
@@ -81,14 +79,10 @@ class FinalCgmServiceTest {
 
             verify(loadFlowRunner).run(eq(network), any(LoadFlowRunParameters.class));
 
-            final ArgumentCaptor<Logs> logsCaptor = ArgumentCaptor.forClass(Logs.class);
             final ArgumentCaptor<FinalCgmResult> cgmResultCaptor = ArgumentCaptor.forClass(FinalCgmResult.class);
-            fsMock.verify(() -> saveArtifactFile(eq(LOAD_FLOW_ON_FINAL_CGM_LOGS), logsCaptor.capture(),
-                                                 eq(task), eq(configuration)));
             fsMock.verify(() -> saveArtifactFile(eq(CGM_NET_POSITIONS_FILE), cgmResultCaptor.capture(),
                                                  eq(task), eq(configuration)));
 
-            assertThat(logsCaptor.getValue()).isNotNull();
             assertThat(cgmResultCaptor.getValue().getLoadFlowResults().getCgmFileName()).isEqualTo("cgm.xiidm");
             assertThat(cgmResultCaptor.getValue().getLoadFlowResults().isLoadflowStatus()).isTrue();
         }
