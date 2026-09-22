@@ -27,27 +27,22 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DATE_TIME_FORMAT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_EXTENSION;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ZIP_EXTENSION;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.copyFileTo;
-import static com.farao_community.farao.ce_merging.common.util.OutputUtils.DAYLIGHT_DUPLICATED_HOUR;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.generateOutputFileName;
-
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirectory;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
-import static java.util.Locale.FRANCE;
 
 @Service
 public class CgmResultsService {
     private static final Logger LOGGER = LoggerFactory.getLogger(CgmResultsService.class);
-    private static final int FLOW = 100;
+    private static final int CGM_FLOW = 100;
+    private static final int FILENAME_END_OF_DATETIME_INDEX = 9;
 
     private final CeMergingConfiguration configuration;
     private final DailyMergingRepository repository;
@@ -68,7 +63,7 @@ public class CgmResultsService {
             final Path cgmResultTempPath = Files.createTempDirectory("cgm-result"); // NOSONAR directories are used safely here
             final String cgmZipName = generateOutputFileName(requestInformation.getMergingDay(),
                                                                      dailyTask.getVersion(),
-                                                                     FLOW,
+                                                                     CGM_FLOW,
                                                                      ZIP_EXTENSION);
             final String taskOutPath = configuration.getDailyOutputsDirectoryPath(dailyTask);
             final String cgmResultFilePath = getZipDestination(taskOutPath, cgmZipName);
@@ -99,7 +94,7 @@ public class CgmResultsService {
         final byte[] cgmRecognitionFile = cgmRecognitionService.computeCgmRecognition(requestInformation, hourlyTasks, dailyTask.getVersion());
         final String cgmRecognitionOutputFileName = generateOutputFileName(requestInformation.getMergingDay(),
                                                                            dailyTask.getVersion(),
-                                                                           FLOW,
+                                                                           CGM_FLOW,
                                                                            XML_EXTENSION);
         writeBytes(cgmRecognitionFile, getZipDestination(cgmResultTempPath, cgmRecognitionOutputFileName));
         LOGGER.info("File '{}' is saved in task '{}' outputs", cgmRecognitionOutputFileName, dailyTask.getId());
@@ -121,35 +116,24 @@ public class CgmResultsService {
 
     private void renameCgmInDaylightCase(final List<MergingTask> hourlyTasks) {
         final List<MergingTask> tasksAtTwoOClock = hourlyTasks.stream()
-                .filter(isAtDstHour())
+                .filter(MergingTask::isAtDstHour)
                 .toList();
 
         if (tasksAtTwoOClock.size() == 2) {
             final SavedFile secondCgm = tasksAtTwoOClock.stream()
-                    .filter(isAtSecondDstHour())
+                    .filter(MergingTask::isAtSecondDstHour)
                     .findFirst()
                     .map(MergingTask::getOutputs)
                     .map(Outputs::getCgm)
                     .orElseThrow(() -> new CeMergingException("Unexpected duplicated tasks at 2 o'clock without an offset shift"));
 
-            final String fileNameUpdated = secondCgm.getOriginalName().substring(0, 9)
+            final String fileNameUpdated = secondCgm.getOriginalName().substring(0, FILENAME_END_OF_DATETIME_INDEX)
                                            + DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION
-                                           + secondCgm.getOriginalName().substring(10);
+                                           + secondCgm.getOriginalName().substring(FILENAME_END_OF_DATETIME_INDEX + 1);
 
             secondCgm.setOriginalName(fileNameUpdated);
 
         }
     }
 
-    private Predicate<MergingTask> isAtDstHour() {
-        return task -> DateTimeFormatter.ofPattern(DATE_TIME_FORMAT).withLocale(FRANCE)
-                .format(task.getTargetDateInParis())
-                .startsWith(DAYLIGHT_DUPLICATED_HOUR, 9);
-    }
-
-    private Predicate<MergingTask> isAtSecondDstHour() {
-        return task -> task.getTargetDate()
-                               .minusHours(Integer.parseInt(task.getTargetDate().getOffset().toString().substring(0, 3)))
-                               .getHour() == 1;
-    }
 }

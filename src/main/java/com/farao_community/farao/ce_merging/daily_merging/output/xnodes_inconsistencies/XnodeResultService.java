@@ -27,12 +27,8 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JSON_EXTENSION;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_WINTER_OFFSET;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.formatTargetDate;
-import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.getTargetDateAtParisZone;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.copyFileTo;
-import static com.farao_community.farao.ce_merging.common.util.OutputUtils.DAYLIGHT_DUPLICATED_HOUR;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.OUTPUT_DATE_FORMATTER;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.OUTPUT_TIME_FORMATTER;
@@ -93,8 +89,8 @@ public class XnodeResultService {
 
     private String buildFileName(final MergingTask task,
                                  final boolean winterDstDetected) {
-        final ZonedDateTime targetDate = getTargetDateAtParisZone(task);
-        if (winterDstDetected && isTheSecondHour(task)) {
+        final ZonedDateTime targetDate = task.getTargetDateInParis();
+        if (winterDstDetected && task.isAtSecondDstHour()) {
             return XNODE_INCONSISTENCIES
                    + OUTPUT_DATE_FORMATTER.format(targetDate)
                    + DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION
@@ -106,18 +102,8 @@ public class XnodeResultService {
 
     private boolean isWinterDst(final List<MergingTask> mergingTasks) {
         return mergingTasks.stream()
-                       .filter(this::isWinterDstHour)
+                       .filter(MergingTask::isAtDstHour)
                        .count() == 2;
     }
 
-    private boolean isWinterDstHour(final MergingTask task) {
-        final ZonedDateTime targetDateInEuropeZone = task.getInputs().getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
-        return targetDateInEuropeZone.getHour() == Integer.parseInt(DAYLIGHT_DUPLICATED_HOUR);
-    }
-
-    public boolean isTheSecondHour(final MergingTask task) {
-        final ZonedDateTime targetDateInEuropeZone = getTargetDateAtParisZone(task);
-        return targetDateInEuropeZone.getHour() == Integer.parseInt(DAYLIGHT_DUPLICATED_HOUR)
-               && task.getInputs().getRealOffset().equals(PARIS_WINTER_OFFSET);
-    }
 }

@@ -13,10 +13,8 @@ import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingT
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,15 +26,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
+import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -61,24 +60,24 @@ class CgmResultsServiceTest {
         SavedFile cgm1 = new SavedFile("mock_cgm_1.uct", getClass().getResource("/cgmResult/mock_cgm_1.uct").getPath(), "mock");
         MergingTask task1 = new MergingTask();
         Inputs inputs1 = new Inputs();
-        inputs1.setTargetDate(OffsetDateTime.parse("2020-01-06T22:00Z", DateTimeFormatter.ISO_DATE_TIME));
+        inputs1.setTargetDate(OffsetDateTime.parse("2020-01-06T22:00Z", ISO_DATE_TIME));
         Outputs outputs1 = new Outputs();
         outputs1.setCgm(cgm1);
         task1.setInputs(inputs1);
         task1.setOutputs(outputs1);
-        task1.setStatus(TaskStatus.SUCCESS);
+        task1.setStatus(SUCCESS);
 
         SavedFile cgm2 = new SavedFile("mock_cgm_2.uct", getClass().getResource("/cgmResult/mock_cgm_2.uct").getPath(), "mock");
         MergingTask task2 = new MergingTask();
         Inputs inputs2 = new Inputs();
-        inputs2.setTargetDate(OffsetDateTime.parse("2020-01-06T23:00Z", DateTimeFormatter.ISO_DATE_TIME));
+        inputs2.setTargetDate(OffsetDateTime.parse("2020-01-06T23:00Z", ISO_DATE_TIME));
         Outputs outputs2 = new Outputs();
         outputs2.setCgm(cgm2);
         task2.setInputs(inputs2);
         task2.setOutputs(outputs2);
-        task2.setStatus(TaskStatus.SUCCESS);
+        task2.setStatus(SUCCESS);
 
-        tasks = Arrays.asList(task1, task2);
+        tasks = List.of(task1, task2);
 
         dailyMergingTask = new DailyMergingTask();
         dailyMergingTask.setId(1L);
@@ -96,30 +95,29 @@ class CgmResultsServiceTest {
 
     @Test
     void shouldCreateCgmZip() throws IOException, JAXBException, ParserConfigurationException {
-        CgmResultsService cgmResultsService = new CgmResultsService(configuration, tasksRepository, cgmRecognitionService);
-        byte[] cgmRecognitionFile = Files.readAllBytes(Paths.get("src", "test", "resources", "cgmResult", "cgmRecognition_mock.xml"));
+        final CgmResultsService cgmResultsService = new CgmResultsService(configuration, tasksRepository, cgmRecognitionService);
+        final byte[] cgmRecognitionFile = Files.readAllBytes(Paths.get("src", "test", "resources", "cgmResult", "cgmRecognition_mock.xml"));
         when(cgmRecognitionService.computeCgmRecognition(requestInformation, tasks, version))
                 .thenReturn(cgmRecognitionFile);
-        String cgmRecognitionOutputFileName = String.format(CGM_RECOGNITION_OUTPUT_NAME, mergingDay, version);
+        final String cgmRecognitionOutputFileName = String.format(CGM_RECOGNITION_OUTPUT_NAME, mergingDay, version);
         cgmResultsService.createCgmZip(dailyMergingTask, tasks, requestInformation);
 
-        SavedFile cgmZip = dailyMergingTask.getDailyOutputs().getCgmZip();
+        final SavedFile cgmZip = dailyMergingTask.getDailyOutputs().getCgmZip();
         boolean cgmRecognitionFound = false;
         boolean cgmFile1Found = false;
         boolean cgmFile2Found = false;
-        Enumeration<? extends ZipEntry> entries;
-        try (ZipFile zipFile = new ZipFile(cgmZip.getPath())) {
-            entries = zipFile.entries();
+        try (final ZipFile zipFile = new ZipFile(cgmZip.getPath())) {
+            final Enumeration<? extends ZipEntry> entries = zipFile.entries();
 
             while (entries.hasMoreElements()) {
-                ZipEntry entryCgm = entries.nextElement();
-                if (entryCgm.getName().contains("mock_cgm_1.uct")) {
+                final String entryName = entries.nextElement().getName();
+                if (entryName.contains("mock_cgm_1.uct")) {
                     cgmFile1Found = true;
                 }
-                if (entryCgm.getName().contains("mock_cgm_2.uct")) {
+                if (entryName.contains("mock_cgm_2.uct")) {
                     cgmFile2Found = true;
                 }
-                if (entryCgm.getName().contains(cgmRecognitionOutputFileName)) {
+                if (entryName.contains(cgmRecognitionOutputFileName)) {
                     cgmRecognitionFound = true;
                 }
             }
@@ -128,5 +126,6 @@ class CgmResultsServiceTest {
         assertTrue(cgmFile1Found);
         assertTrue(cgmFile2Found);
         assertTrue(cgmRecognitionFound);
+        verify(tasksRepository).save(dailyMergingTask);
     }
 }

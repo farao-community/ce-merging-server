@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.daily_merging.output.cgm;
 
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.daily_merging.ResponseUtils;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
@@ -19,33 +20,39 @@ import com.farao_community.farao.ce_merging.xsd.merging_request.EventMessageType
 import com.farao_community.farao.ce_merging.xsd.merging_request.HeaderType;
 import com.farao_community.farao.ce_merging.xsd.merging_request.PayloadType;
 import jakarta.xml.bind.JAXBException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Map;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATE_FMT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RTE_GSR_URL;
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toZFormat;
-import static com.farao_community.farao.ce_merging.daily_merging.ResponseUtils.writeResponseInBytes;
+import static com.farao_community.farao.ce_merging.merging.post_process.common.SchemaLocationNamespace.RESPONSE_XSD;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
+import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+import static jakarta.xml.bind.Marshaller.JAXB_FRAGMENT;
+import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
+import static java.lang.Boolean.TRUE;
 import static java.util.Comparator.comparing;
 
 @Service
 public class CgmRecognitionService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CgmRecognitionService.class);
     private static final String MESSAGE_ID = "%s-F100-%02d";
     private static final String ERROR_CODE = "1.1";
+    private static final Map<String, Object> JAXB_PROPERTIES = Map.of(JAXB_FORMATTED_OUTPUT, TRUE,
+                                                                      JAXB_NO_NAMESPACE_SCHEMA_LOCATION, RESPONSE_XSD.getName(),
+                                                                      JAXB_FRAGMENT, TRUE);
 
-    byte[] computeCgmRecognition(final RequestInformation requestInformation,
-                                 final List<MergingTask> hourlyTasks,
-                                 final int version) throws JAXBException, ParserConfigurationException {
+    public byte[] computeCgmRecognition(final RequestInformation requestInformation,
+                                        final List<MergingTask> hourlyTasks,
+                                        final int version) throws JAXBException, ParserConfigurationException {
         final EventMessageType mergingResponse = buildMergingResponseInformation(requestInformation, hourlyTasks, version);
-        return writeResponseInBytes(mergingResponse);
+        return JaxbUtils.writeToBytes(EventMessageType.class, mergingResponse, JAXB_PROPERTIES, RTE_GSR_URL, "payload");
 
     }
 
@@ -113,8 +120,7 @@ public class CgmRecognitionService {
 
     private ResponseItem fillResponseItem(final MergingTask task) {
         final ResponseItem responseItem = new ResponseItem();
-        final OffsetDateTime startDate = task.getInputs().getTargetDate().truncatedTo(ChronoUnit.HOURS);
-        final String itemTimeInterval = toZFormat(startDate) + "/" + toZFormat(startDate.plusHours(1));
+        final String itemTimeInterval = getTaskTimeInterval(task);
         if (task.getStatus() == SUCCESS) {
             responseItem.setTimeInterval(itemTimeInterval);
             final File cgmFile = new File();
@@ -132,6 +138,13 @@ public class CgmRecognitionService {
             responseItem.setError(responseItemError);
         }
         return responseItem;
+    }
+
+    private String getTaskTimeInterval(final MergingTask task) {
+        final OffsetDateTime startDate =
+                task.getInputs().getTargetDate().truncatedTo(ChronoUnit.HOURS);
+
+        return toZFormat(startDate) + "/" + toZFormat(startDate.plusHours(1));
     }
 
 }

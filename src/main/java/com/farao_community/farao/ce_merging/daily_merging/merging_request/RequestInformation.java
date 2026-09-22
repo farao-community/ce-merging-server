@@ -47,7 +47,7 @@ public record RequestInformation(
         final OffsetDateTime start = getStartDateTime();
         final OffsetDateTime end = getEndDateTime();
 
-        for (long i = 0; !start.plusHours(i).equals(end); i++) {
+        for (long i = 0; start.plusHours(i).isBefore(end); i++) {
             intervalList.add(toZFormat(start.plusHours(i)) + "/" + toZFormat(start.plusHours(i + 1)));
         }
         return intervalList;

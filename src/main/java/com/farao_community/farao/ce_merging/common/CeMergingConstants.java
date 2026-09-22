@@ -91,6 +91,7 @@ public final class CeMergingConstants {
     public static final String XML_EXTENSION = "xml";
     public static final String JSON_EXTENSION = "json";
     public static final String ZIP_EXTENSION = "zip";
+    public static final String RTE_GSR_URL = "http://www.rte-france.com/gsr";
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;

@@ -72,15 +72,13 @@ class XnodeResultServiceTest {
 
     @Test
     void shouldReturnFalseWhenTargetDateIsNotSecondHour() {
-        givenTargetDate();
-        assertFalse(service.isTheSecondHour(mergingTask));
+        assertFalse(mergingTask.isAtSecondDstHour());
     }
 
     @Test
     void shouldIgnoreFailedTask() throws IOException {
         final Path outputDirectory = createOutputDirectory();
         givenOutputDirectory(outputDirectory);
-        givenTargetDate();
         when(mergingTask.getStatus()).thenReturn(TaskStatus.ERROR);
         when(dailyTask.getDailyOutputs()).thenReturn(dailyOutputs);
         service.createXnodesInconsistenciesZip(dailyTask, List.of(mergingTask));
