@@ -1,0 +1,1002 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PublicationDocument xmlns="refprog" DtdRelease="0" DtdVersion="1">
+    <DocumentIdentification v="RP-CORESO-20190618-17"/>
+    <DocumentVersion v="5"/>
+    <DocumentType v="A45"/>
+    <SenderIdentification codingScheme="A01" v="22XCORESO------S"/>
+    <SenderRole v="A44"/>
+    <ReceiverIdentification codingScheme="A01" v="17XTSO-CS------W"/>
+    <ReceiverRole v="A36"/>
+    <CreationDateTime v="2020-02-26T13:57:44.598+01:00"/>
+    <PublicationTimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="RS-ME"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCS-CG-TSO---S"/>
+        <OutArea codingScheme="A01" v="10YCS-SERBIATSOV"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2949"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="GR-MK"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YMK-MEPSO----8"/>
+        <OutArea codingScheme="A01" v="10YCB-GREECE---2"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="1404"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="BA-HR"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YHR-HEP------M"/>
+        <OutArea codingScheme="A01" v="10YBA-JPCC-----D"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-107"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="AT-SI"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YSI-ELES-----O"/>
+        <OutArea codingScheme="A01" v="10YAT-APG------L"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="3756"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="FR-IT"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YIT-GRTN-----B"/>
+        <OutArea codingScheme="A01" v="10YFR-RTE------C"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="503"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="UA-HU"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YHU-MAVIR----U"/>
+        <OutArea codingScheme="A01" v="10Y1001C--00003F"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2648"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="HU-RO"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YRO-TEL------P"/>
+        <OutArea codingScheme="A01" v="10YHU-MAVIR----U"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-1829"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DE-NL"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YNL----------L"/>
+        <OutArea codingScheme="A01" v="10YCB-GERMANY--8"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="322"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="CH-FR"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YFR-RTE------C"/>
+        <OutArea codingScheme="A01" v="10YCB-SWITZERL-D"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="3146"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="IT-AT"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YAT-APG------L"/>
+        <OutArea codingScheme="A01" v="10YIT-GRTN-----B"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="969"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="GR-TR"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-TURKEY---V"/>
+        <OutArea codingScheme="A01" v="10YCB-GREECE---2"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-534"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="RS-RO"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YRO-TEL------P"/>
+        <OutArea codingScheme="A01" v="10YCS-SERBIATSOV"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="3900"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="ES-PT"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YPT-REN------W"/>
+        <OutArea codingScheme="A01" v="10YES-REE------0"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2265"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="CH-AT"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YAT-APG------L"/>
+        <OutArea codingScheme="A01" v="10YCB-SWITZERL-D"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="3609"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="CH-DE"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-GERMANY--8"/>
+        <OutArea codingScheme="A01" v="10YCB-SWITZERL-D"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="417"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="MK-BG"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-BULGARIA-F"/>
+        <OutArea codingScheme="A01" v="10YMK-MEPSO----8"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="2187"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DE-DK"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YDK-1--------W"/>
+        <OutArea codingScheme="A01" v="10YCB-GERMANY--8"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="1979"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="UA-SK"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YSK-SEPS-----K"/>
+        <OutArea codingScheme="A01" v="10Y1001C--00003F"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="1651"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="AT-CZ"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCZ-CEPS-----N"/>
+        <OutArea codingScheme="A01" v="10YAT-APG------L"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2353"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="CH-IT"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YIT-GRTN-----B"/>
+        <OutArea codingScheme="A01" v="10YCB-SWITZERL-D"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="1840"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DE-FR"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YFR-RTE------C"/>
+        <OutArea codingScheme="A01" v="10YCB-GERMANY--8"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-1447"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="IT-SI"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YSI-ELES-----O"/>
+        <OutArea codingScheme="A01" v="10YIT-GRTN-----B"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-732"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="AT-DE"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-GERMANY--8"/>
+        <OutArea codingScheme="A01" v="10YAT-APG------L"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="1502"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="RS-BA"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YBA-JPCC-----D"/>
+        <OutArea codingScheme="A01" v="10YCS-SERBIATSOV"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="1323"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="GR-AL"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-ALBANIA--1"/>
+        <OutArea codingScheme="A01" v="10YCB-GREECE---2"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-941"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="BG-TR"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-TURKEY---V"/>
+        <OutArea codingScheme="A01" v="10YCB-BULGARIA-F"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-412"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="HU-SK"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YSK-SEPS-----K"/>
+        <OutArea codingScheme="A01" v="10YHU-MAVIR----U"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="3369"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="ME-AL"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-ALBANIA--1"/>
+        <OutArea codingScheme="A01" v="10YCS-CG-TSO---S"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="239"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="GR-BG"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-BULGARIA-F"/>
+        <OutArea codingScheme="A01" v="10YCB-GREECE---2"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-302"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="BE-NL"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YNL----------L"/>
+        <OutArea codingScheme="A01" v="10YBE----------2"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-3009"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="RS-BG"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-BULGARIA-F"/>
+        <OutArea codingScheme="A01" v="10YCS-SERBIATSOV"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-1970"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DE-PL"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YPL-AREA-----S"/>
+        <OutArea codingScheme="A01" v="10YCB-GERMANY--8"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2160"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="FR-ES"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YES-REE------0"/>
+        <OutArea codingScheme="A01" v="10YFR-RTE------C"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-3476"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="BE-FR"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YFR-RTE------C"/>
+        <OutArea codingScheme="A01" v="10YBE----------2"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-1231"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="UA-RO"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YRO-TEL------P"/>
+        <OutArea codingScheme="A01" v="10Y1001C--00003F"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-3828"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="RS-HR"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YHR-HEP------M"/>
+        <OutArea codingScheme="A01" v="10YCS-SERBIATSOV"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="819"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="RO-BG"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-BULGARIA-F"/>
+        <OutArea codingScheme="A01" v="10YRO-TEL------P"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="537"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="RS-HU"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YHU-MAVIR----U"/>
+        <OutArea codingScheme="A01" v="10YCS-SERBIATSOV"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2115"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="RS-MK"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YMK-MEPSO----8"/>
+        <OutArea codingScheme="A01" v="10YCS-SERBIATSOV"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="820"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="RS-AL"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCB-ALBANIA--1"/>
+        <OutArea codingScheme="A01" v="10YCS-SERBIATSOV"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2196"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DE-CZ"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCZ-CEPS-----N"/>
+        <OutArea codingScheme="A01" v="10YCB-GERMANY--8"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-3942"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="ME-BA"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YBA-JPCC-----D"/>
+        <OutArea codingScheme="A01" v="10YCS-CG-TSO---S"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-3419"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="CZ-SK"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YSK-SEPS-----K"/>
+        <OutArea codingScheme="A01" v="10YCZ-CEPS-----N"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="1798"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="AT-HU"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YHU-MAVIR----U"/>
+        <OutArea codingScheme="A01" v="10YAT-APG------L"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="1169"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="PL-SK"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YSK-SEPS-----K"/>
+        <OutArea codingScheme="A01" v="10YPL-AREA-----S"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-3518"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="HR-HU"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YHU-MAVIR----U"/>
+        <OutArea codingScheme="A01" v="10YHR-HEP------M"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2125"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="CZ-PL"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YPL-AREA-----S"/>
+        <OutArea codingScheme="A01" v="10YCZ-CEPS-----N"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-3448"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="HR-SI"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YSI-ELES-----O"/>
+        <OutArea codingScheme="A01" v="10YHR-HEP------M"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="3417"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="BE-UK_NemoLink"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="22Y20191008----W"/>
+        <OutArea codingScheme="A01" v="10YBE----------2"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-3743"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DK-NO_Skaggerak1"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17YXXXXXXAAAAAAN"/>
+        <OutArea codingScheme="A01" v="10YDK-1--------W"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="3042"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DK-NO_Skaggerak2"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17YXXXXXXAAAAAAO"/>
+        <OutArea codingScheme="A01" v="10YDK-1--------W"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-1294"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DK-SE_Kontiskan2"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17YXXXXXXAAAAAAL"/>
+        <OutArea codingScheme="A01" v="10YDK-1--------W"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-3420"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="IT-IT_MONITA1"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17YXXXXXXAAAAAAT"/>
+        <OutArea codingScheme="A01" v="10YIT-GRTN-----B"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="211"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="NL-NO_NorNed"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YDOM-1001A039M"/>
+        <OutArea codingScheme="A01" v="10YNL----------L"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2051"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DE-DK2_Kontek"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17YXXXXXXAAAAAAC"/>
+        <OutArea codingScheme="A01" v="10YCB-GERMANY--8"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-1719"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="GR-IT_HVDC"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17YXXXXXXAAAAAAU"/>
+        <OutArea codingScheme="A01" v="10YCB-GREECE---2"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="1480"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DK-XFG_HK11--Internal-DK-Line-TO-BE-VALIDATED"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="XFG_HK11--Internal-DK-Line-TO-BE-VALIDATED"/>
+        <OutArea codingScheme="A01" v="10YDK-1--------W"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-24"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DK-SE_Kontiskan1"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17YXXXXXXAAAAAAK"/>
+        <OutArea codingScheme="A01" v="10YDK-1--------W"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2245"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="FR-UK_IFA2000_link2"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17Y000000930810R"/>
+        <OutArea codingScheme="A01" v="10YFR-RTE------C"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="417"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="PL-LT_LitPol1"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17YXXXXXXAAAAAAH"/>
+        <OutArea codingScheme="A01" v="10YPL-AREA-----S"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-2917"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="FR-UK_IFA2000_link1"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17Y000000930808E"/>
+        <OutArea codingScheme="A01" v="10YFR-RTE------C"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="1925"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="IT-GR_HVDC"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YDOM-1010A0108"/>
+        <OutArea codingScheme="A01" v="10YIT-GRTN-----B"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="3663"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="NL-UK_BritNed"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="49Y000000000001Q"/>
+        <OutArea codingScheme="A01" v="10YNL----------L"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="3228"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="PL-SE_SwePol"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17YXXXXXXAAAAAAG"/>
+        <OutArea codingScheme="A01" v="10YPL-AREA-----S"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="677"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DK-XTJ_K31K--TO-BE-VALIDATED"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="XTJ_K31K--TO-BE-VALIDATED"/>
+        <OutArea codingScheme="A01" v="10YDK-1--------W"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="720"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="DK-XTJ_K41K--TO-BE-VALIDATED"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="XTJ_K41K--TO-BE-VALIDATED"/>
+        <OutArea codingScheme="A01" v="10YDK-1--------W"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="1"/>
+                <Qty v="-128"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+</PublicationDocument>
