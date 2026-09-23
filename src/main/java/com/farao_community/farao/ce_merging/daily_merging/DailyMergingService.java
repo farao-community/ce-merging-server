@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.daily_merging;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
+import com.farao_community.farao.ce_merging.daily_merging.merging_report.MergingReportService;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.MergingRequestService;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.daily_merging.output.cgm.CgmResultsService;
@@ -39,17 +40,20 @@ public class DailyMergingService {
     private final DailyMergingLogsService dailyMergingLogsService;
     private final XnodeResultService xnodeResultService;
     private final CgmResultsService cgmResultsService;
+    private final MergingReportService mergingReportService;
 
     public DailyMergingService(final DailyQualityCheckReportService dailyQualityCheckReportService,
                                final DailyMergingLogsService dailyMergingLogsService,
                                final MergingRequestService mergingRequestService,
                                final XnodeResultService xnodeResultService,
-                               final CgmResultsService cgmResultsService) {
+                               final CgmResultsService cgmResultsService,
+                               final MergingReportService mergingReportService) {
         this.dailyMergingLogsService = dailyMergingLogsService;
         this.dailyQualityCheckReportService = dailyQualityCheckReportService;
         this.mergingRequestService = mergingRequestService;
         this.xnodeResultService = xnodeResultService;
         this.cgmResultsService = cgmResultsService;
+        this.mergingReportService = mergingReportService;
     }
 
     public void run(final DailyMergingTask dailyMergingTask,
@@ -69,7 +73,7 @@ public class DailyMergingService {
 
         cgmResultsService.createCgmZip(dailyMergingTask, hourlyTasks, requestInformation);
         xnodeResultService.createXnodesInconsistenciesZip(dailyMergingTask, successMergingTasks); //workaround as xnodes file are not yet available on Merging supervisor
-
+        mergingReportService.computeMergingReport(dailyMergingTask, hourlyTasks, requestInformation);
     }
 
     private void validateTaskTargetDatesWithinRequestInterval(final List<MergingTask> tasks,
