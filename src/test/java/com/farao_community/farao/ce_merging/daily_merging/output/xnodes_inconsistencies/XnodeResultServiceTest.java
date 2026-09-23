@@ -26,8 +26,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -108,9 +108,8 @@ class XnodeResultServiceTest {
     }
 
     private void givenTargetDate() {
-        when(mergingTask.getInputs()).thenReturn(inputs);
-        when(inputs.getTargetDate()).thenReturn(
-                OffsetDateTime.of(
+        when(mergingTask.getTargetDateInParis()).thenReturn(
+                ZonedDateTime.of(
                         2026,
                         9,
                         17,

@@ -22,7 +22,6 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DATE_TIME_FORMAT;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATETIME_FMT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATE_FMT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
@@ -41,23 +40,15 @@ public final class DateTimeUtils {
     }
 
     public static String formatTargetDate(final MergingTask task) {
-        return TARGET_DATE_FORMATTER.format(getTargetDateAtParisZone(task));
+        return TARGET_DATE_FORMATTER.format(task.getTargetDateInParis());
     }
 
     public static String dayOfWeek(final MergingTask task) {
-        return DAY_OF_WEEK_FORMATTER.format(getTargetDateAtParisZone(task));
-    }
-
-    public static String formatFilenameDateTime(final OffsetDateTime dateTime) {
-        return FILENAME_DATETIME_FMT.format(dateTime);
+        return DAY_OF_WEEK_FORMATTER.format(task.getTargetDateInParis());
     }
 
     public static String formatFilenameDate(final OffsetDateTime dateTime) {
         return FILENAME_DATE_FMT.format(dateTime);
-    }
-
-    public static ZonedDateTime getTargetDateAtParisZone(final MergingTask task) {
-        return task.getInputs().getTargetDate().atZoneSameInstant(PARIS_ZONE_ID);
     }
 
     static ZonedDateTime nowAtParisZone() {
