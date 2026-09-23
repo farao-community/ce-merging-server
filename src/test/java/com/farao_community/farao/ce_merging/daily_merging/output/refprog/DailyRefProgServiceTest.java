@@ -66,7 +66,7 @@ class DailyRefProgServiceTest {
 
         final List<PublicationDocument.PublicationTimeSeries> docTimeSeries = publicationDocument.getPublicationTimeSeries();
 
-        assertEquals(68, docTimeSeries.size());
+        assertEquals(3, docTimeSeries.size());
 
         assertThat(docTimeSeries.getFirst())
                 .isIdentifiedBy("RS-ME")
@@ -82,8 +82,8 @@ class DailyRefProgServiceTest {
                 .hasPoint(22, -3088)
                 .hasPoint(24, -3355);
 
-        assertThat(docTimeSeries.get(65))
-                .isIdentifiedBy("NL-DK1_Cobra")
+        assertThat(docTimeSeries.getLast())
+                .isIdentifiedBy("AB-CD")
                 .links("10YNL----------L", "17YXXXXXXAAAAAAB")
                 .isFullDay()
                 .hasPoint(22, -2978)
