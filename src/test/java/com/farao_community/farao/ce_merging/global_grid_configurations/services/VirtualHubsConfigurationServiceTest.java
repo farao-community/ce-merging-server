@@ -10,9 +10,11 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfi
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.VirtualHubsConfigurationRecord;
 import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Limit;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -30,9 +32,8 @@ class VirtualHubsConfigurationServiceTest {
 
         final VirtualHubsConfigurationRecord mock = mock(VirtualHubsConfigurationRecord.class);
 
-        when(repository.findFirstByValidFromLessThanEqualAndValidToGreaterThanOrderByPublishedOnDesc(
-            any(LocalDateTime.class), any(LocalDateTime.class))
-        ).thenReturn(mock);
+        when(repository.findLatestValidOfType(any(), any(LocalDateTime.class), any(Limit.class)))
+                .thenReturn(List.of(mock));
 
         service.getConfiguration(BEGINNING_OF_2000);
 
