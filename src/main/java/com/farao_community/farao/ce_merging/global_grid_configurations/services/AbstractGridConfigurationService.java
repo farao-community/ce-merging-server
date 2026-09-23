@@ -14,7 +14,6 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.rec
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.Limit;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -46,7 +45,7 @@ public abstract class AbstractGridConfigurationService<R extends AbstractGridCon
                                                         final OffsetDateTime validTo) throws IOException;
 
     protected R findLatestPublishedValid(final LocalDateTime validityDate) {
-        return getRepository().findLatestValidOfType(getRecordClass(), validityDate, Limit.of(1))
+        return getRepository().findLatestValidOfType(getRecordClass(), validityDate)
                            .stream().findFirst().orElse(null);
     }
 

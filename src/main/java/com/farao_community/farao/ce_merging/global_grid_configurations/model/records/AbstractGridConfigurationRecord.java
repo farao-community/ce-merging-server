@@ -1,5 +1,6 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
+import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
@@ -8,6 +9,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Inheritance
+@DiscriminatorColumn(length = 64)
 public abstract class AbstractGridConfigurationRecord {
     @Id
     protected String id;
