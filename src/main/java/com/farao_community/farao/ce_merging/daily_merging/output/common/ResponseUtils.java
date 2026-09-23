@@ -5,13 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.daily_merging;
+package com.farao_community.farao.ce_merging.daily_merging.output.common;
 
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
-import com.farao_community.farao.ce_merging.merging.post_process.common.SchemaLocationNamespace;
-import com.farao_community.farao.ce_merging.xsd.daily.response.payload.ResponseItem;
-import com.farao_community.farao.ce_merging.xsd.daily.response.payload.ResponseItems;
+import com.farao_community.farao.ce_merging.xsd.merging_response.ResponseItem;
+import com.farao_community.farao.ce_merging.xsd.merging_response.ResponseItems;
 import com.farao_community.farao.ce_merging.xsd.merging_request.HeaderType;
 import com.farao_community.farao.ce_merging.xsd.merging_request.PayloadType;
 import jakarta.xml.bind.JAXBContext;
