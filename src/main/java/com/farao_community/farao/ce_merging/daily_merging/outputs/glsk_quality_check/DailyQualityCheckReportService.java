@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.output.glsk_quality_check;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.glsk_quality_check;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -14,7 +14,7 @@ import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.OutputUtils;
 import com.farao_community.farao.ce_merging.daily_merging.DailyMergingRepository;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
-import com.farao_community.farao.ce_merging.daily_merging.output.common.SchemaLocationNamespace;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.common.SchemaLocationNamespace;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;

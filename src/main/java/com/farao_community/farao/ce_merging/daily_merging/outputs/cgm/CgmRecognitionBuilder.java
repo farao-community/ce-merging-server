@@ -4,11 +4,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.output.cgm;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.cgm;
 
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
-import com.farao_community.farao.ce_merging.daily_merging.output.common.ResponseUtils;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.common.ResponseUtils;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.xsd.merging_response.ErrorType;

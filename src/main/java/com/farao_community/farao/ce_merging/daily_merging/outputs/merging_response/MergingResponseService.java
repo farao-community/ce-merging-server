@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.output.merging_response;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.merging_response;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -40,8 +40,8 @@ import java.util.List;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JAXB_PROPERTIES;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_EXTENSION;
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toZFormat;
-import static com.farao_community.farao.ce_merging.daily_merging.output.common.ResponseUtils.fillResponseHeader;
-import static com.farao_community.farao.ce_merging.daily_merging.output.common.ResponseUtils.getResponseElement;
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.ResponseUtils.fillResponseHeader;
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.ResponseUtils.getResponseElement;
 
 @Service
 public class MergingResponseService {

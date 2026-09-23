@@ -11,8 +11,10 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.daily_merging.output.common.SchemaLocationNamespace.RESPONSE_XSD;
-import static jakarta.xml.bind.Marshaller.*;
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.SchemaLocationNamespace.RESPONSE_XSD;
+import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+import static jakarta.xml.bind.Marshaller.JAXB_FRAGMENT;
+import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
 import static java.lang.Boolean.TRUE;
 
 public final class CeMergingConstants {

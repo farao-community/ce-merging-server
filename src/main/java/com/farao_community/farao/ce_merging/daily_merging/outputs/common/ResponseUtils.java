@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.daily_merging.output.common;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.common;
 
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
