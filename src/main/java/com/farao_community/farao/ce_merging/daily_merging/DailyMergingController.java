@@ -14,22 +14,34 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.API_VERSION;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BAD_REQUEST;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_DAILY_MERGING_URL;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CREATED;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_INPUTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_OUTPUTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_TASK_MANAGEMENT_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JSON_API_MIME_TYPE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NOT_FOUND;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NO_CONTENT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OK;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ORIGIN_ANY;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.toAttachmentFileResponse;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
@@ -154,7 +166,7 @@ public class DailyMergingController {
         @ApiResponse(responseCode = OK, description = "Result package returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily task with given ID not found in the server or daily result reports not found")
     })
-    public ResponseEntity<byte[]> getDailyResultPackage(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+    public ResponseEntity<byte[]> getDailyResultPackage(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) throws IOException {
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyResultPackage(taskId), "results-package.zip");
     }
 

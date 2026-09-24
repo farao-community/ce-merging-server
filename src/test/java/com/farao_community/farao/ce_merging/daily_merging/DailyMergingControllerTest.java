@@ -149,7 +149,7 @@ class DailyMergingControllerTest {
     }
 
     @Test
-    void shouldGetDailyResultPackage() {
+    void shouldGetDailyResultPackage() throws IOException {
         final byte[] content = "zip content".getBytes();
         when(dailyTasksManagementService.getDailyResultPackage(TASK_ID)).thenReturn(content);
         final ResponseEntity<byte[]> response = controller.getDailyResultPackage(TASK_ID);

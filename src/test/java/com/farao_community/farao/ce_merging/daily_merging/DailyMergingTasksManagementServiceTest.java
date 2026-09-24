@@ -122,7 +122,7 @@ class DailyMergingTasksManagementServiceTest {
     void shouldDeleteAllTasks() {
         final DailyMergingTask task1 = dailyTask(TASK_ID_1);
         final DailyMergingTask task2 = dailyTask(TASK_ID_2);
-        when(repository.findAll()).thenReturn(List.of(task1, task2));
+        when(repository.findAllIds()).thenReturn(List.of(TASK_ID_1, TASK_ID_2));
         givenTaskFound(task1);
         givenTaskFound(task2);
         when(configuration.getDailyDirectoryPath(task1)).thenReturn(tempDir.resolve("task-1").toString());
