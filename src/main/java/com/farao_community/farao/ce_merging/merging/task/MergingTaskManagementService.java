@@ -31,7 +31,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -306,14 +305,6 @@ public class MergingTaskManagementService {
     public byte[] getExecutionLogs(final Long taskId) {
         final MergingTask mergingTask = getFinishedTaskById(taskId);
         return executionLogsService.generateLogsForMergingSupervisor(mergingTask);
-    }
-
-    private void checkTaskRunned(MergingTask task) {
-        if (task.getStatus() == TaskStatus.CREATED) {
-            throw new TaskNotRunException(String.format("Task %d has not been run", task.getId()));
-        } else if (task.getStatus() == TaskStatus.RUNNING) {
-            throw new TaskNotRunException(String.format("Task %d currently running", task.getId()));
-        }
     }
 
     public SavedFile getOpenLoadFlowLogs(final Long taskId) {
