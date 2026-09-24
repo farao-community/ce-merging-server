@@ -4,23 +4,23 @@
 [![MPL-2.0 License](https://img.shields.io/badge/license-MPL_2.0-blue.svg)](https://www.mozilla.org/en-US/MPL/2.0/)
 
 ## Functional Overview
-The purpose of this application is the creation of aggregated files for the [CE zone]([https://www.entsoe.eu/bites/ccr-ce/about/](https://www.entsoe.eu/bites/ccr-ce/about/)).
+The purpose of this application is the creation of aggregated files for the [CE zone](https://www.entsoe.eu/bites/ccr-ce/about/).
 
 ### Process
 
 The nominal merging case is (either automated, or with Swagger for testing/developping purposes) :
 - create an hourly task with all the expected inputs
-  - it will produce a response containing a task id
-- run this task, providing the task id
+  - it will produce a response containing a task ID
+- run this task, providing the task ID
 - repeat for the 24 hours (±1 on DST days)
 - create a daily merging task, providing : 
   - a merging request file, containing target calculation date & other informations,
-  - all the previous task ids.
-- Run it
+  - all the previous task IDs.
+- Run it with the provided daily task ID.
 
-Each of these steps correspond to a REST endpoint ; there are several other providing a given task's specific inputs, outputs, or intermediate files (called Artifacts).
+Each of these steps correspond to a REST endpoint ; there are several other providing a given task's specific inputs, outputs, or intermediate files (called **Artifacts**).
 
-For more detail, see the Controller classes.
+For more detail, see the **Controller** classes.
 
 ### Inputs
 It works with these inputs :
