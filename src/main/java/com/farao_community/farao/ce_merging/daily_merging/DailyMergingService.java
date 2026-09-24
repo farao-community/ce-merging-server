@@ -11,10 +11,11 @@ import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.MergingRequestService;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
-import com.farao_community.farao.ce_merging.daily_merging.output.cgm.CgmResultsService;
-import com.farao_community.farao.ce_merging.daily_merging.output.glsk_quality_check.DailyQualityCheckReportService;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_logs.DailyMergingLogsService;
-import com.farao_community.farao.ce_merging.daily_merging.output.xnodes_inconsistencies.XnodeResultService;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.cgm.CgmResultsService;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.glsk_quality_check.DailyQualityCheckReportService;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_logs.DailyMergingLogsService;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_response.MergingResponseService;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.xnodes_inconsistencies.XnodeResultService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ public class DailyMergingService {
 
     private final DailyQualityCheckReportService dailyQualityCheckReportService;
     private final MergingRequestService mergingRequestService;
+    private final MergingResponseService mergingResponseService;
     private final DailyMergingLogsService dailyMergingLogsService;
     private final XnodeResultService xnodeResultService;
     private final CgmResultsService cgmResultsService;
@@ -43,11 +45,13 @@ public class DailyMergingService {
     public DailyMergingService(final DailyQualityCheckReportService dailyQualityCheckReportService,
                                final DailyMergingLogsService dailyMergingLogsService,
                                final MergingRequestService mergingRequestService,
+                               final MergingResponseService mergingResponseService,
                                final XnodeResultService xnodeResultService,
                                final CgmResultsService cgmResultsService) {
         this.dailyMergingLogsService = dailyMergingLogsService;
         this.dailyQualityCheckReportService = dailyQualityCheckReportService;
         this.mergingRequestService = mergingRequestService;
+        this.mergingResponseService = mergingResponseService;
         this.xnodeResultService = xnodeResultService;
         this.cgmResultsService = cgmResultsService;
     }
@@ -66,7 +70,7 @@ public class DailyMergingService {
             dailyMergingLogsService.computeDailyMergingLogs(dailyMergingTask, successMergingTasks);
             dailyQualityCheckReportService.computeDailyGlskQualityReport(dailyMergingTask, successMergingTasks, requestInformation.requestTimeInterval());
         }
-
+        mergingResponseService.computeMergingResponse(dailyMergingTask, successMergingTasks, requestInformation);
         cgmResultsService.createCgmZip(dailyMergingTask, hourlyTasks, requestInformation);
         xnodeResultService.createXnodesInconsistenciesZip(dailyMergingTask, successMergingTasks); //workaround as xnodes file are not yet available on Merging supervisor
 

@@ -9,8 +9,19 @@ package com.farao_community.farao.ce_merging.common;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
+
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.SchemaLocationNamespace.RESPONSE_XSD;
+import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+import static jakarta.xml.bind.Marshaller.JAXB_FRAGMENT;
+import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
+import static java.lang.Boolean.TRUE;
 
 public final class CeMergingConstants {
+
+    private CeMergingConstants() {
+        // constants class
+    }
 
     // app configuration
     public static final String TAG_VERSION = "1.0.0";
@@ -105,7 +116,12 @@ public final class CeMergingConstants {
     public static final DateTimeFormatter FILENAME_DATETIME_FMT = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
     public static final DateTimeFormatter FILENAME_DATE_FMT = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
-    private CeMergingConstants() {
-        // constants class
-    }
+    //JAXB
+    public static final Map<String, Object> JAXB_PROPERTIES = Map.of(
+            JAXB_FORMATTED_OUTPUT, TRUE,
+            JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
+            RESPONSE_XSD.getName(),
+            JAXB_FRAGMENT, TRUE
+    );
+
 }

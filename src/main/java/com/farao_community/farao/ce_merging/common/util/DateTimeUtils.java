@@ -52,7 +52,7 @@ public final class DateTimeUtils {
         return FILENAME_DATETIME_FMT.format(dateTime);
     }
 
-    public static String formatFilenameDate(final OffsetDateTime dateTime) {
+    public static String formatDate(final OffsetDateTime dateTime) {
         return FILENAME_DATE_FMT.format(dateTime);
     }
 
