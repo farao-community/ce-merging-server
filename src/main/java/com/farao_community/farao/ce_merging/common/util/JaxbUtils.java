@@ -148,8 +148,8 @@ public final class JaxbUtils {
                                        final String schemaLocation,
                                        final boolean noNamespaceSchema) {
         final Map<String, Object> properties = Map.of(JAXB_FRAGMENT, TRUE,
-                                                      noNamespaceSchema ? JAXB_NO_NAMESPACE_SCHEMA_LOCATION : JAXB_SCHEMA_LOCATION,
-                                                      schemaLocation);
+                                                      noNamespaceSchema ? JAXB_NO_NAMESPACE_SCHEMA_LOCATION : JAXB_SCHEMA_LOCATION, schemaLocation,
+                                                      JAXB_FORMATTED_OUTPUT, TRUE);
         writeToPath(clazz, object, filePath, properties);
     }
 
