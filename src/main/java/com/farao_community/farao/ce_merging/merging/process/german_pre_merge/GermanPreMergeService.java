@@ -48,7 +48,7 @@ public class GermanPreMergeService {
     }
 
     public void preMergeGermanCountries(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.GERMAN_PREMERGE.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.GERMAN_PREMERGE);
         try {
             final Network germanNetwork = mergeGermanRegions(task);
             LOGGER.info("German network files merged with success");

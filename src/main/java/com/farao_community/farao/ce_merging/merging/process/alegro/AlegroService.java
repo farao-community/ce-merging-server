@@ -47,7 +47,7 @@ public class AlegroService {
     }
 
     public void checkAlegroXnodesQuality(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.ALEGRO.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.ALEGRO);
         final String topologicalMergeFilePath = task.getArtifactPath(ArtifactType.TGM_FILE_AFTER_RECESSIVITY);
         final Network network = Network.read(topologicalMergeFilePath);
         final List<DanglingLine> alegroDanglingLinesList = getAlegroDanglingLines(network);
@@ -69,7 +69,7 @@ public class AlegroService {
     }
 
     public void updateAlegroP0(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.ALEGRO.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.ALEGRO);
         final AlegroData alegroData = JsonUtils.read(AlegroData.class, task.getArtifactPath(ArtifactType.ALEGRO_NET_POSITIONS));
         if (alegroData.alegroInOutage()) {
             return;

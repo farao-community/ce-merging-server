@@ -45,7 +45,7 @@ public class ExportTaskResultsService {
     }
 
     public void generateOutputFiles(final MergingTask mergingTask) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(mergingTask.getId(), MergingStep.RESULTS_EXPORT.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(mergingTask, MergingStep.RESULTS_EXPORT);
         try {
             mergingTask.getOutputs().setRealGlsk(copyFileToOutputDirectory(mergingTask, mergingTask.getArtifacts().getFile(ArtifactType.GLSK_QUALITY_REPORT), OutputType.GLSK_QUALITY_REPORT));
             copyIgmQualityReportInOutputDirectory(mergingTask);

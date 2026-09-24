@@ -60,7 +60,7 @@ public class NetPositionService {
     }
 
     public void computeInitialNetPositions(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.INITIAL_NET_POSION_CALCULATION.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.INITIAL_NET_POSION_CALCULATION);
         try {
             final Artifacts artifacts = task.getArtifacts();
             final Map<String, NetPositions> fromPreTreatedInputs = task.getInputs()

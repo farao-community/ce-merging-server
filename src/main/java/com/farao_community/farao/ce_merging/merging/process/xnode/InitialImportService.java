@@ -26,7 +26,7 @@ public class InitialImportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(InitialImportService.class);
 
     public Map<String, Network> importInitialIgms(final MergingTask taskEntity) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(taskEntity.getId(), MergingStep.INITIAL_IMPORT.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(taskEntity, MergingStep.INITIAL_IMPORT);
         final Map<String, Network> networkByTsoMap = new HashMap<>();
 
         taskEntity.getInputs().getIgms().forEach(igmData -> importIgm(networkByTsoMap, igmData));

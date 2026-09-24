@@ -48,7 +48,7 @@ public class TopologicalMergeService {
     }
 
     public void mergeInitialIgms(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.TOPOLOGICAL_MERGE.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.TOPOLOGICAL_MERGE);
         try {
             final Network mergedNetwork = getTopologicalMergeNetwork(task);
             FileStorageUtils.saveArtifactNetwork(

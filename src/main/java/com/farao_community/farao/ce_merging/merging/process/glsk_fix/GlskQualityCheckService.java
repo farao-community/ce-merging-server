@@ -77,7 +77,7 @@ public class GlskQualityCheckService {
     }
 
     public void runQualityCheck(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.GLSK_QUALITY_CHECK.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.GLSK_QUALITY_CHECK);
         final Inputs inputs = task.getInputs();
         final OffsetDateTime processTargetDate = inputs.getTargetDate();
         final SavedFile mergedFile = task.getArtifacts().getFile(ArtifactType.TGM_FILE_AFTER_RECESSIVITY);

@@ -35,7 +35,7 @@ public class BalancesAdjustmentService {
     }
 
     public void shiftCgm(final MergingTask task) throws IOException {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.BALANCES_ADJUSTMENT.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.BALANCES_ADJUSTMENT);
         new BalancesAdjustmentProcessor(
                 task,
                 configuration,

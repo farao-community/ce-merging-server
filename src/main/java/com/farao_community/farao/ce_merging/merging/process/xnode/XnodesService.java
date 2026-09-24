@@ -39,7 +39,7 @@ public class XnodesService {
     }
 
     public void checkIgmsStatus(MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.XNODES_IGM_CHECK.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.XNODES_IGM_CHECK);
         final Configurations configurations = task.getConfigurations();
         final Map<String, XnodeInformation> xnodeInformationMap = new TreeMap<>();
         final List<VirtualHubRecord> virtualHubList = configurations.getVirtualHubList();

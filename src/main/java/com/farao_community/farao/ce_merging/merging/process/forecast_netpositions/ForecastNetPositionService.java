@@ -31,7 +31,7 @@ public class ForecastNetPositionService {
     }
 
     public void importForecastNetPosition(MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.FORECAST_NET_POSITION_IMPORT.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.FORECAST_NET_POSITION_IMPORT);
         try {
             ReferenceProgram referenceProgram = ForecastNetPositionImporter.importFromFile(task.getInputs().getNetPositionForecast().getPath(), task.getInputs().getTargetDate());
             FileStorageUtils.saveArtifactFile(ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE, referenceProgram, task, configuration);

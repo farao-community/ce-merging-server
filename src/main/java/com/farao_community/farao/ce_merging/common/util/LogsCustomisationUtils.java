@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.common.util;
 
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.slf4j.MDC;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_STEP;
@@ -18,7 +20,11 @@ public final class LogsCustomisationUtils {
     private LogsCustomisationUtils() {
     }
 
-    public static void setExtraFieldsInLogsMdc(long taskId, String mergingStepValue) {
+    public static void setExtraFieldsInLogsMdc(MergingTask task, MergingStep mergingStep) {
+        setExtraFieldsInLogsMdc(task.getId(), mergingStep.toString());
+    }
+
+    private static void setExtraFieldsInLogsMdc(long taskId, String mergingStepValue) {
         // propagate extra fields into SLF4J's MDC in current service
         MDC.put(TASK_ID_EXTRA_FIELD, Long.toString(taskId));
         MDC.put(MERGING_STEP, mergingStepValue);

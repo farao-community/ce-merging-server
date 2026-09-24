@@ -64,7 +64,7 @@ public class FinalCgmService {
 
     public void computeFinalCgmResult(final MergingTask task) {
 
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.FINAL_RESULTS_CALCULATION.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.FINAL_RESULTS_CALCULATION);
         try {
             final Configurations taskConfiguration = task.getConfigurations();
             final LoadFlowParameters loadFlowParameters = taskConfiguration.getLoadFlowParameters();

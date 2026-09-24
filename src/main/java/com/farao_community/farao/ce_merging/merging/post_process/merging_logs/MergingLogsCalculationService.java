@@ -63,7 +63,7 @@ public class MergingLogsCalculationService {
     }
 
     public void computeMergingLogs(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.MERGING_REPORTS.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.MERGING_REPORTS);
         try {
             final MergingLog mergingLog = buildMergingLog(task);
             saveMergingLogsFileInOutputs(mergingLog, task);

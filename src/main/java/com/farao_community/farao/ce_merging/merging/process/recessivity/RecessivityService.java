@@ -74,7 +74,7 @@ public class RecessivityService {
     }
 
     public void applyRecessivity(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.RECESSIVITY_APPLICATION.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.RECESSIVITY_APPLICATION);
         try {
             final List<String> recessiveCountries = task.getConfigurations().getOrDefaultRecessiveCountries();
             LOGGER.info("Recessive countries are {}", recessiveCountries);

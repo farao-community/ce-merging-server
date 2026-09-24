@@ -50,7 +50,7 @@ public class TargetNetPositionsCalculationService {
     }
 
     public void computeTargetNetPositions(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.TARGET_NET_POSION_CALCULATION.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.TARGET_NET_POSION_CALCULATION);
         try {
             final Map<String, Double> virtualHubsGaps = VirtualHubsShifting.applyVirtualHubFlows(task, configuration);
             final Map<String, Double> targetNetPositionsWithoutHvdc = getTargetNetPositionsFromBciOutput(task);

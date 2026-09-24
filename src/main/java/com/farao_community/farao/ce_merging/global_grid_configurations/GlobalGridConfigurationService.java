@@ -94,7 +94,7 @@ public class GlobalGridConfigurationService {
 
     public void setConfigurations(final MergingTask task) {
         try {
-            LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.CONFIGURATIONS.toString());
+            LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.CONFIGURATIONS);
             setRegionEicConfiguration(task);
             setVirtualHubsConfiguration(task);
             setHvdcXNodeAlignmentConfiguration(task);

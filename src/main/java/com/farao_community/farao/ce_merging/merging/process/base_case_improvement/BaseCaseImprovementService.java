@@ -23,7 +23,7 @@ public class BaseCaseImprovementService {
     }
 
     public void computeTargetNetPositions(MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.BASE_CASE_IMPROVEMENT.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.BASE_CASE_IMPROVEMENT);
         BciProcessor processor = new BciProcessor(task, configuration);
         processor.run();
     }

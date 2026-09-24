@@ -72,7 +72,7 @@ public class PstSpecialService {
     }
 
     public void fixPst(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.PST_SPECIAL_PROCEDURE.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.PST_SPECIAL_PROCEDURE);
         try {
             doFixPst(task);
         } catch (final Exception e) {

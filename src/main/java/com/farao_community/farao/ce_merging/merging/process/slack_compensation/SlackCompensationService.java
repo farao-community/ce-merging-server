@@ -68,7 +68,7 @@ public class SlackCompensationService {
     }
 
     public void compensateFinalCgmSlackImbalance(final MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.SLACK_COMPENSATION.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.SLACK_COMPENSATION);
         final Network compensatedNetwork = compensateNetwork(task);
         addSlackNode(compensatedNetwork, task);
 

@@ -43,7 +43,7 @@ public class DKRenamingService {
     }
 
     public void renameDkCountry(MergingTask task) {
-        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task.getId(), MergingStep.DK_RENAMING.toString());
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.DK_RENAMING);
         SavedFile d1File = task.getInputs().getIgm(DANISH_TSO).getIgmFile();
         try (InputStream inputStream = new FileInputStream(d1File.getPath())) {
             String dkHvdcXnodes = Optional.ofNullable(task.getConfigurations().getDkHvdcXnodes())

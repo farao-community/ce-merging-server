@@ -57,7 +57,7 @@ public class RefProgCalculationService {
 
     public void computeRefProg(final MergingTask mergingTask) {
         try {
-            LogsCustomisationUtils.setExtraFieldsInLogsMdc(mergingTask.getId(), MergingStep.REF_PROG.toString());
+            LogsCustomisationUtils.setExtraFieldsInLogsMdc(mergingTask, MergingStep.REF_PROG);
             final Map<Border, Double> virtualHubsExchanges = new HashMap<>();
             final Map<Border, Double> acExchanges = new HashMap<>();
             final ReferenceProgram referenceProgram = JsonUtils.read(ReferenceProgram.class, mergingTask.getArtifacts().getFile(ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE).getPath());

@@ -31,15 +31,15 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_STEP;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RTE_GSR_URL;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO_LOWER_CASE;
 
 @Service
 public class ExecutionLogsService {
 
     private static final String MERGING_SUPERVISOR_TIMESTAMP_PATTERN = "dd/MM/yyyy HH:mm:ss";
-    private static final String EMPTY = "";
-    private static final String HTTP_WWW_RTE_FRANCE_COM_GSR = "http://www.rte-france.com/gsr";
     private static final String LOGS = "logs";
     private final LoggingEventRepository loggingEventRepository;
 
@@ -103,23 +103,23 @@ public class ExecutionLogsService {
 
         try {
             final Logs artifact = task.getArtifact(ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS, Logs.class);
-            if (artifact != null) {
-                final List<Context> openLoadFlowLogs = artifact.getCtxt();
-                openLoadFlowLogs.getFirst().setNom("Open Loadflow on final CGM : " + task.getOutputs().getCgm().getOriginalName());
-                contextsList.stream()
-                        .filter(context -> context.getNom().equals(MergingStep.OPEN_LOAD_FLOW_LOGS.toString()))
-                        .findFirst()
-                        .ifPresent(context -> context.getRecOrCtxt().addAll(openLoadFlowLogs));
-                final List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
-                logs.getCtxt().addAll(finalContextList);
-                return JaxbUtils.writeToBytes(Logs.class, logs, HTTP_WWW_RTE_FRANCE_COM_GSR, LOGS);
-            } else {
+            if (artifact == null) {
                 throw new CeMergingException("No load flow logs");
             }
+            final List<Context> openLoadFlowLogs = artifact.getCtxt();
+            openLoadFlowLogs.getFirst().setNom("Open Loadflow on final CGM : " + task.getOutputs().getCgm().getOriginalName());
+            contextsList.stream()
+                    .filter(context -> context.getNom().equals(MergingStep.OPEN_LOAD_FLOW_LOGS.toString()))
+                    .findFirst()
+                    .ifPresent(context -> context.getRecOrCtxt().addAll(openLoadFlowLogs));
+            final List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
+            logs.getCtxt().addAll(finalContextList);
+            return JaxbUtils.writeToBytes(Logs.class, logs, RTE_GSR_URL, LOGS);
+
         } catch (Exception e) {
             final List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
             logs.getCtxt().addAll(finalContextList);
-            return JaxbUtils.writeToBytes(Logs.class, logs, HTTP_WWW_RTE_FRANCE_COM_GSR, LOGS);
+            return JaxbUtils.writeToBytes(Logs.class, logs, RTE_GSR_URL, LOGS);
         }
     }
 
