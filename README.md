@@ -24,7 +24,7 @@ For more detail, see the **Controller** classes.
 
 ### Inputs
 It works with these inputs :
-- individual [UCTE](https://eepublicdownloads.entsoe.eu/clean-documents/pre2015/publications/ce/otherreports/UCTE-format.pdf) network files by country (called **IGM - Integrated Grid Model**),
+- individual [UCTE](https://eepublicdownloads.entsoe.eu/clean-documents/pre2015/publications/ce/otherreports/UCTE-format.pdf) network files by country (called **IGM - Individual Grid Model**),
 - **quality checks** files for those : contains information such as, for example, warnings about a given node having attributes outside of expected boundaries,
 - **Net Position Forecast (NPF)** file : contains the TSO's daily predictions for power generation / consumption 
 - the merged **Generation Load Shift Key file (GLSK)** : describes how a shift in power should be distributed among all the grid's nodes
@@ -34,6 +34,8 @@ It works with these inputs :
   - balances adjustment
   - AC loadflow
   - DC loadflow
+
+One can provide additional files if a change in configuration is needed : [more info here](/doc/globalGridConfigurations.md)
 
 ### Outputs
 For every hour of a given day, there is an hourly process launched, then these are subsequently merged into daily results.
