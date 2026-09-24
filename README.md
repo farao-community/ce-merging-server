@@ -6,7 +6,7 @@
 ## Functional Overview
 The purpose of this application is the creation of aggregated files for the [CE zone](https://www.entsoe.eu/bites/ccr-ce/about/).
 
-### Process
+### Nominal process
 
 The nominal merging case is (either automated, or with Swagger for testing/developping purposes) :
 - create an hourly task with all the expected inputs
@@ -20,7 +20,7 @@ The nominal merging case is (either automated, or with Swagger for testing/devel
 
 Each of these steps correspond to a REST endpoint ; there are several other providing a given task's specific inputs, outputs, or intermediate files (called **Artifacts**).
 
-For more detail, see the **Controller** classes.
+For more detail on the endpoints, see the **Controller** classes.
 
 ### Inputs
 It works with these inputs :
@@ -36,6 +36,16 @@ It works with these inputs :
   - DC loadflow
 
 One can provide additional files if a change in configuration is needed : [more info here](/doc/globalGridConfigurations.md)
+### Merging steps
+#### Hourly
+- [Inputs preparation](/doc/hourly_task/inputPreparation.md)
+- Flow computations
+- Output Generation
+
+#### Daily
+- Check that all provided task IDs correspond to finished tasks, with coherent dates regarding the daily task
+- Get the hourly outputs and merge them into aggregated files, as described below
+- Create some other files like the xlsx summary described below
 
 ### Outputs
 For every hour of a given day, there is an hourly process launched, then these are subsequently merged into daily results.
