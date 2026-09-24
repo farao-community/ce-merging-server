@@ -20,8 +20,10 @@ import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toZFormat;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
 import static java.lang.Boolean.TRUE;
@@ -55,6 +57,11 @@ public final class ResponseUtils {
         PayloadType responsePayload = new PayloadType();
         responsePayload.getAny().add(doc.getDocumentElement());
         return responsePayload;
+    }
+
+    public static String createHourlyTimeInterval(final OffsetDateTime targetDate) {
+        final OffsetDateTime startDate = targetDate.minusMinutes(targetDate.getMinute());
+        return toZFormat(startDate) + "/" + toZFormat(startDate.plusHours(1));
     }
 
 }

@@ -39,7 +39,7 @@ import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JAXB_PROPERTIES;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_EXTENSION;
-import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toZFormat;
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.ResponseUtils.createHourlyTimeInterval;
 import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.ResponseUtils.fillResponseHeader;
 import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.ResponseUtils.getResponseElement;
 
@@ -96,10 +96,14 @@ public class MergingResponseService {
         final String identificationDate = DateTimeUtils.formatDate(requestInformation.getEndDateTime());
         final List<ResponseItem> responseItemList = responseItems.getResponseItem();
         requestInformation.buildAllHourlyIntervals().stream()
-                .filter(interval -> responseItemList.stream()
-                        .map(ResponseItem::getTimeInterval)
-                        .noneMatch(interval::equals))
+                .filter(interval -> isMissingResponseItem(responseItemList, interval))
                 .forEach(interval -> responseItemList.add(createMissingResponseItem(interval, version, identificationDate)));
+    }
+
+    private boolean isMissingResponseItem(final List<ResponseItem> responseItemList, final String interval) {
+        return responseItemList.stream()
+                .map(ResponseItem::getTimeInterval)
+                .noneMatch(interval::equals);
     }
 
     private ResponseItem createMissingResponseItem(final String interval, final int version, final String identificationDate) {
@@ -113,7 +117,7 @@ public class MergingResponseService {
 
     private ResponseItem createResponseItem(final MergingTask task, final int version) {
         final ResponseItem responseItem = new ResponseItem();
-        final String identificationDate = DateTimeUtils.formatDate(task.getInputs().getTargetDate());
+        final String identificationDate = DateTimeUtils.formatDate(task.getTargetDate());
         responseItem.setTimeInterval(createHourlyTimeInterval(task.getInputs().getTargetDate()));
         final File refProgFile = createDocumentFile(REF_PROG, identificationDate, version);
         final Files files = new Files();
@@ -174,11 +178,7 @@ public class MergingResponseService {
         return String.format("%s%s-%s-%02d", DOCUMENT_IDENTIFICATION_PREFIX, identificationDate, documentType, version);
     }
 
-    private String createHourlyTimeInterval(final OffsetDateTime targetDate) {
-        final OffsetDateTime startDate = targetDate.minusMinutes(targetDate.getMinute());
-        return toZFormat(startDate) + "/" + toZFormat(startDate.plusHours(1));
-    }
-
     private record DocumentInfo(String code, String documentType) {
     }
+
 }

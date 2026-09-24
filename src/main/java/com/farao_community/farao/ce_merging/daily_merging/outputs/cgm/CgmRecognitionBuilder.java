@@ -23,14 +23,13 @@ import jakarta.xml.bind.JAXBException;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATE_FMT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JAXB_PROPERTIES;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RTE_GSR_URL;
-import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toZFormat;
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.ResponseUtils.createHourlyTimeInterval;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 import static java.util.Comparator.comparing;
 
@@ -114,7 +113,7 @@ public final class CgmRecognitionBuilder {
 
     private static ResponseItem fillResponseItem(final MergingTask task) {
         final ResponseItem responseItem = new ResponseItem();
-        final String itemTimeInterval = getTaskTimeInterval(task);
+        final String itemTimeInterval = createHourlyTimeInterval(task.getTargetDate());
         if (task.getStatus() == SUCCESS) {
             responseItem.setTimeInterval(itemTimeInterval);
             final File cgmFile = new File();
@@ -132,13 +131,6 @@ public final class CgmRecognitionBuilder {
             responseItem.setError(responseItemError);
         }
         return responseItem;
-    }
-
-    private static String getTaskTimeInterval(final MergingTask task) {
-        final OffsetDateTime startDate =
-                task.getInputs().getTargetDate().truncatedTo(ChronoUnit.HOURS);
-
-        return toZFormat(startDate) + "/" + toZFormat(startDate.plusHours(1));
     }
 
 }
