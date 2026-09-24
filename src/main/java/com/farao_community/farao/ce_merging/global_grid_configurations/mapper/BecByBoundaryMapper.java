@@ -9,10 +9,15 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.mapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {BorderMapper.class, BecCoefficientsMapper.class})
 public interface BecByBoundaryMapper {
     List<BecByBoundary> mapToBecByBoundaryList(List<BecByBoundaryDto> becByBoundaryDtoList);
+
+    // The DTO id belongs to the global configuration table: the task gets its own rows
+    @Mapping(target = "id", ignore = true)
+    BecByBoundary mapToBecByBoundary(BecByBoundaryDto becByBoundaryDto);
 }
