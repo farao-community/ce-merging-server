@@ -171,58 +171,16 @@ public final class JaxbUtils {
         }
     }
 
-    /**
-     * Solution to marshal an object without @XmlRootElement annotation
-     *
-     * @param clazz        the Class object representing T
-     * @param <T>          the class of the object
-     * @param object       object to read
-     * @param nameSpaceURI given so that JAXB is able to marshal
-     * @param rootElement  given so that JAXB is able to marshal
-     * @return a byte array of the file content
-     */
-    public static <T> byte[] writeToBytes(final Class<T> clazz,
-                                          final T object,
-                                          final String nameSpaceURI,
-                                          final String rootElement) {
+    public static <T> void writeToPath(final JAXBElement<T> element, final Path filePath, final Map<String, Object> properties) {
         try {
-            final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            marshaller(clazz).marshal(withSpecifiedRoot(clazz,
-                                                        object,
-                                                        nameSpaceURI,
-                                                        rootElement),
-                                      outputStream);
-            return outputStream.toByteArray();
+            final Marshaller jaxbMarshaller = marshaller(element.getDeclaredType(), properties);
+            try (final OutputStream outputStream = Files.newOutputStream(filePath);
+                 final Writer writer = new OutputStreamWriter(outputStream, UTF_8)) {
+                writer.write(XML_HEADER);
+                jaxbMarshaller.marshal(element, writer);
+            }
         } catch (final Exception e) {
-            throw errorWhile(e, "writing a %s object to bytes", clazz.getSimpleName());
-        }
-    }
-
-    /**
-     * Solution to marshal an object without @XmlRootElement annotation
-     *
-     * @param filePath     the path to write to
-     * @param clazz        the Class object representing T
-     * @param <T>          the class of the object
-     * @param object       object to write
-     * @param nameSpaceURI given so that JAXB is able to marshal
-     * @param rootElement  given so that JAXB is able to marshal
-     */
-    public static <T> void writeToPath(final Class<T> clazz,
-                                       final T object,
-                                       final String nameSpaceURI,
-                                       final String rootElement,
-                                       final Path filePath) {
-        try {
-            marshaller(clazz).marshal(withSpecifiedRoot(clazz,
-                                                        object,
-                                                        nameSpaceURI,
-                                                        rootElement),
-                                      filePath.toFile());
-        } catch (final Exception e) {
-            throw errorWhile(e, "writing a %s object to %s",
-                             clazz.getSimpleName(),
-                             filePath);
+            throw errorWhile(e, "writing JAXB element to %s", filePath);
         }
     }
 

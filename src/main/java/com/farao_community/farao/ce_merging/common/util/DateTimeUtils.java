@@ -47,7 +47,7 @@ public final class DateTimeUtils {
         return DAY_OF_WEEK_FORMATTER.format(task.getTargetDateInParis());
     }
 
-    public static String formatFilenameDate(final OffsetDateTime dateTime) {
+    public static String formatDate(final OffsetDateTime dateTime) {
         return FILENAME_DATE_FMT.format(dateTime);
     }
 
