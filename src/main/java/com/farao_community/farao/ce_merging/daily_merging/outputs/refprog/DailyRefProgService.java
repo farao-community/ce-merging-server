@@ -36,7 +36,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MER
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DAY_START_INDEX;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_EXTENSION;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.generateOutputFileName;
-import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.SchemaLocationNamespace.RESPONSE_XSD;
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.SchemaLocationNamespace.REFPROG_XSD;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static jakarta.xml.bind.Marshaller.JAXB_FRAGMENT;
 import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
@@ -53,7 +53,7 @@ public class DailyRefProgService {
     private static final int REFPROG_FLOW = 101;
 
     private static final Map<String, Object> JAXB_PROPERTIES = Map.of(JAXB_FORMATTED_OUTPUT, TRUE,
-                                                                      JAXB_NO_NAMESPACE_SCHEMA_LOCATION, RESPONSE_XSD.getName(),
+                                                                      JAXB_NO_NAMESPACE_SCHEMA_LOCATION, REFPROG_XSD.getName(),
                                                                       JAXB_FRAGMENT, TRUE);
 
     public DailyRefProgService(final CeMergingConfiguration configuration,
@@ -122,7 +122,7 @@ public class DailyRefProgService {
                 .collect(toSet());
 
         for (int position = 1; position < numberOfPosition + 1; position++) {
-            if (existingPositions.add(position)) {
+            if (!existingPositions.contains(position)) {
                 addZeroAtPosition(dailyRefProg, position);
             }
         }

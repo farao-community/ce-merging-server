@@ -53,7 +53,7 @@ public class DailyMergingService {
                                final MergingResponseService mergingResponseService,
                                final XnodeResultService xnodeResultService,
                                final CgmResultsService cgmResultsService,
-                               final DailyRefProgService dailyRefProgService) {
+                               final DailyRefProgService dailyRefProgService,
                                final MergingReportService mergingReportService) {
         this.dailyMergingLogsService = dailyMergingLogsService;
         this.dailyQualityCheckReportService = dailyQualityCheckReportService;
