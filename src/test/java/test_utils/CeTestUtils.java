@@ -45,6 +45,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
 import static com.powsybl.loadflow.LoadFlowResult.ComponentResult.Status.CONVERGED;
@@ -72,14 +74,16 @@ public final class CeTestUtils {
     public static final ServiceIOException S_IO_EXCEPTION = new ServiceIOException("Test");
     private static final Class<CeTestUtils> THIS = CeTestUtils.class;
     private static final String DEFAULT_FILE = "blank.file";
+    private static final String PATH_SEPARATOR = "/";
+    private static final String MOCK = "mock";
 
     private CeTestUtils() {
         // utility class
     }
 
     public static Path pathOf(final String fileName) {
-        return Paths.get(Optional.ofNullable(THIS.getResource("/" + fileName))
-                                 .orElse(THIS.getResource("/" + DEFAULT_FILE))
+        return Paths.get(Optional.ofNullable(THIS.getResource(PATH_SEPARATOR + fileName))
+                                 .orElse(THIS.getResource(PATH_SEPARATOR + DEFAULT_FILE))
                                  .getPath());
     }
 
@@ -90,9 +94,9 @@ public final class CeTestUtils {
         igm.setIgmFilePath(stringPathOf(path));
         final SavedFile file = new SavedFile();
         file.setPath(stringPathOf(path));
-        final boolean hasFolder = path.lastIndexOf("/") > 0;
-        file.setOriginalName(hasFolder ? path.split("/")[1] : path.replace("/", ""));
-        file.setLocation(hasFolder ? path.split("/")[0] : ".");
+        final boolean hasFolder = path.lastIndexOf(PATH_SEPARATOR) > 0;
+        file.setOriginalName(hasFolder ? path.split(PATH_SEPARATOR)[1] : path.replace(PATH_SEPARATOR, EMPTY));
+        file.setLocation(hasFolder ? path.split(PATH_SEPARATOR)[0] : ".");
         igm.setIgmFile(file);
 
         return igm;
@@ -138,8 +142,17 @@ public final class CeTestUtils {
     public static MergingTask createMockTask(final long id,
                                              final Inputs inputs,
                                              final Artifacts artifacts) {
-        final MergingTask task = taskWithIdAndStatus(id, TaskStatus.CREATED);
-        inputs.setTargetDate(BEGINNING_OF_2000);
+        return createMockTask(id, inputs, artifacts, CREATED);
+    }
+
+    public static MergingTask createMockTask(final long id,
+                                             final Inputs inputs,
+                                             final Artifacts artifacts,
+                                             final TaskStatus status) {
+        final MergingTask task = taskWithIdAndStatus(id, status);
+        if (inputs.getTargetDate() == null) {
+            inputs.setTargetDate(BEGINNING_OF_2000);
+        }
         task.setInputs(inputs);
         task.setArtifacts(artifacts);
         task.setOutputs(new Outputs());
@@ -150,7 +163,7 @@ public final class CeTestUtils {
     public static Artifacts singletonArtifact(final ArtifactType type,
                                               final String name) {
         final Artifacts artifacts = new Artifacts();
-        artifacts.putFile(type, new SavedFile(name, name, "mock"));
+        artifacts.putFile(type, new SavedFile(name, name, MOCK));
         return artifacts;
     }
 
@@ -175,11 +188,29 @@ public final class CeTestUtils {
     public static Inputs singletonIgmInputs(final String country,
                                             final String igmPath) {
         final Inputs inputs = new Inputs();
-        final IgmData igmEs = new IgmData();
-        igmEs.setCountry(country);
-        igmEs.setIgmFilePath(igmPath);
-        inputs.setIgms(singletonList(igmEs));
+        final IgmData igmData = new IgmData();
+        igmData.setCountry(country);
+        igmData.setIgmFilePath(igmPath);
+        inputs.setIgms(singletonList(igmData));
         return inputs;
+    }
+
+    public static Inputs withTargetDateAndIgms(final String targetDate,
+                                               final Map<String, String> igmPathByCountry) {
+        final Inputs inputs = new Inputs();
+        inputs.setTargetDate(OffsetDateTime.parse(targetDate));
+
+        inputs.setIgms(igmPathByCountry.entrySet().stream()
+                               .map(CeTestUtils::fromMapEntry)
+                               .toList());
+        return inputs;
+    }
+
+    private static IgmData fromMapEntry(final Map.Entry<String, String> entry) {
+        final IgmData igmData = new IgmData();
+        igmData.setCountry(entry.getKey());
+        igmData.setIgmFilePath(entry.getValue());
+        return igmData;
     }
 
     public static MergingTask taskWithIdAndStatus(final long id,
@@ -200,7 +231,7 @@ public final class CeTestUtils {
 
     public static MergingTask mockTaskWithCgmResult(final String targetDate, final String cgmPath) {
         final String[] path = cgmPath.split("/");
-        SavedFile cgmOutput = new SavedFile(path[path.length - 1], THIS.getResource(cgmPath).getPath(), "mock");
+        SavedFile cgmOutput = new SavedFile(path[path.length - 1], THIS.getResource(cgmPath).getPath(), MOCK);
         final MergingTask task = new MergingTask();
         final Outputs outputs = new Outputs();
         outputs.setCgm(cgmOutput);

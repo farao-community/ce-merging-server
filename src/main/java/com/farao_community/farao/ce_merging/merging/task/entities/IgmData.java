@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.task.entities;
 
 import com.farao_community.farao.ce_merging.merging.task.enums.IgmType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToOne;
 
@@ -86,5 +87,10 @@ public class IgmData implements Serializable {
 
     public void setCountry(final String country) {
         this.country = country;
+    }
+
+    @JsonIgnore
+    public String getIgmName() {
+        return igmFile.getOriginalName().toUpperCase();
     }
 }

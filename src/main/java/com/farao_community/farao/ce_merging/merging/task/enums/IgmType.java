@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.task.enums;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import static java.util.Arrays.stream;
 
@@ -20,6 +21,11 @@ public enum IgmType {
     LONG_TERM_REFERENCE("LR");
 
     private final String typeCode;
+
+    @JsonIgnore
+    public String getTypeCode() {
+        return typeCode;
+    }
 
     IgmType(final String typeCode) {
         this.typeCode = typeCode;

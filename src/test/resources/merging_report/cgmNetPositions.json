@@ -1,0 +1,59 @@
+{
+  "loadFlowResults" : {
+    "cgmFileName" : "20200923_0430_2D3_UX0.uct",
+    "loadflowStatus" : true,
+    "iterationNumber" : 9,
+    "componentNumber" : 1,
+    "slackNode" : "XXXXXX",
+    "slackCompensation" : 4.8,
+    "slackNodeGap" : 5.9
+  },
+  "netPositionsResults" : {
+    "netPositionsByCountryMap" : {
+      "BE" : {
+        "globalNetPosition" : {
+          "withVirtualHubs" : -100.0,
+          "withoutVirtualHubs" : -200.0
+        },
+        "inRegionNetPosition" : {
+          "withVirtualHubs" : 123.456,
+          "withoutVirtualHubs" : -567.89
+        },
+        "outBciNetPosition" : -50.0,
+        "virtualHubsExchanges" : {
+          "XX" : 1.0,
+          "XY" : 2.0
+        },
+        "globalDetailedExchanges" : {
+          "FR" : 123.456
+        },
+        "generationAndLoadQuantity" : {
+          "generation" : 66846464.00,
+          "load" : 4687683565.11
+        }
+      },
+      "FR" : {
+        "globalNetPosition" : {
+          "withVirtualHubs" : 464131654.01,
+          "withoutVirtualHubs" : 864644.02
+        },
+        "inRegionNetPosition" : {
+          "withVirtualHubs" : 123.0,
+          "withoutVirtualHubs" : 123.0
+        },
+        "outBciNetPosition" : -5.55555,
+        "virtualHubsExchanges" : {
+          "XA" : -500.0,
+          "XZ" : -200.0
+        },
+        "globalDetailedExchanges" : {
+          "BE" : -123.456
+        },
+        "generationAndLoadQuantity" : {
+          "generation" : 56464.54,
+          "load" : 47076.7041905
+        }
+      }
+    }
+  }
+}
