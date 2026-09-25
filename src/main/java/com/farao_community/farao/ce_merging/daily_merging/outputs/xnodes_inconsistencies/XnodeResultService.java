@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.output.xnodes_inconsistencies;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.xnodes_inconsistencies;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -26,8 +26,7 @@ import java.nio.file.Path;
 import java.time.ZonedDateTime;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JSON_EXTENSION;
-import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.formatTargetDate;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.copyFileTo;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.OUTPUT_DATE_FORMATTER;
@@ -38,7 +37,7 @@ public class XnodeResultService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(XnodeResultService.class);
 
-    private static final String XNODE_INCONSISTENCIES = "xnodes-inconsistencies_";
+    private static final String XNODE_INCONSISTENCIES = "xnodes-inconsistencies_%s%s_%s.json";
     private static final String ZIP_NAME = "xnodes-inconsistencies.zip";
     private static final String TEMP_DIRECTORY_PREFIX = "xnodes-inconsistencies-result";
 
@@ -90,14 +89,10 @@ public class XnodeResultService {
     private String buildFileName(final MergingTask task,
                                  final boolean winterDstDetected) {
         final ZonedDateTime targetDate = task.getTargetDateInParis();
-        if (winterDstDetected && task.isAtSecondDstHour()) {
-            return XNODE_INCONSISTENCIES
-                   + OUTPUT_DATE_FORMATTER.format(targetDate)
-                   + DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION
-                   + OUTPUT_TIME_FORMATTER.format(targetDate)
-                   + JSON_EXTENSION;
-        }
-        return XNODE_INCONSISTENCIES + formatTargetDate(task) + JSON_EXTENSION;
+        final String dstIndexOrEmpty = winterDstDetected && task.isAtSecondDstHour() ? DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION : EMPTY;
+        final String date = OUTPUT_DATE_FORMATTER.format(targetDate);
+        final String time = OUTPUT_TIME_FORMATTER.format(targetDate);
+        return XNODE_INCONSISTENCIES.formatted(date, dstIndexOrEmpty, time);
     }
 
     private boolean isWinterDst(final List<MergingTask> mergingTasks) {

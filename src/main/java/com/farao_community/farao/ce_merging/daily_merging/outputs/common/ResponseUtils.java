@@ -5,13 +5,12 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.daily_merging;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.common;
 
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
-import com.farao_community.farao.ce_merging.merging.post_process.common.SchemaLocationNamespace;
-import com.farao_community.farao.ce_merging.xsd.daily.response.payload.ResponseItem;
-import com.farao_community.farao.ce_merging.xsd.daily.response.payload.ResponseItems;
+import com.farao_community.farao.ce_merging.xsd.merging_response.ResponseItem;
+import com.farao_community.farao.ce_merging.xsd.merging_response.ResponseItems;
 import com.farao_community.farao.ce_merging.xsd.merging_request.HeaderType;
 import com.farao_community.farao.ce_merging.xsd.merging_request.PayloadType;
 import jakarta.xml.bind.JAXBContext;
@@ -21,8 +20,10 @@ import org.w3c.dom.Document;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
+import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toZFormat;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
 import static java.lang.Boolean.TRUE;
@@ -56,6 +57,11 @@ public final class ResponseUtils {
         PayloadType responsePayload = new PayloadType();
         responsePayload.getAny().add(doc.getDocumentElement());
         return responsePayload;
+    }
+
+    public static String createHourlyTimeInterval(final OffsetDateTime targetDate) {
+        final OffsetDateTime startDate = targetDate.minusMinutes(targetDate.getMinute());
+        return toZFormat(startDate) + "/" + toZFormat(startDate.plusHours(1));
     }
 
 }

@@ -29,25 +29,16 @@ import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInOutage;
-import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.getPstBranch;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.getTargetFlow;
-import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.halveRegulationValue;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.hasTargetFlow;
-import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.inconsistentTargetFlows;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.regulatePst;
-import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.setPstRegulating;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.DIVACA;
-import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.LIENZ;
-import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.NAUDERS1;
-import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.NAUDERS2;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.PADRICIANO;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.forAllSpecialPst;
-import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.forAustrianPsts;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.toPstMap;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.PST_OUTPUT_FILE;
-import static com.powsybl.iidm.network.Country.AT;
 import static com.powsybl.iidm.network.Country.SI;
 import static com.powsybl.iidm.network.util.Networks.applySolvedTapPositionAndSolvedSectionCount;
 
@@ -99,14 +90,6 @@ public class PstSpecialService {
                                      cgm.getTwoWindingsTransformer(pstIds.get(PADRICIANO)),
                                      pstOutput);
 
-        // handle AT Special PSTs
-        final Network austria = task.getIgm(AT);
-        applyLienzProcess(cgm.getTwoWindingsTransformer(pstIds.get(LIENZ)), pstOutput, austria);
-        applyNaudersProcess(cgm.getTwoWindingsTransformer(pstIds.get(NAUDERS1)),
-                            cgm.getTwoWindingsTransformer(pstIds.get(NAUDERS2)),
-                            pstOutput,
-                            austria);
-
         // save results
         fillPstOutputsFromCgm(cgm, pstIds, pstOutput, loadFlowParameters);
         saveArtifactFile(PST_OUTPUT_FILE, pstOutput, task, configuration);
@@ -123,7 +106,7 @@ public class PstSpecialService {
             divacaTargetFlowProcess(divaca, padriciano, pstOutput);
         } else {
             pstOutput.setAndLogProcedure(DIVACA, 1);
-            pstOutput.setTotalTargetFlowDivaca(0);
+            pstOutput.setTotalTargetFlow(0);
             pstOutput.setTargetFlowDivacaPadriciano(0);
             pstOutput.setTargetFlowDivacaRedipuglia(0);
             if (!isInOutage(padriciano)) {
@@ -141,7 +124,7 @@ public class PstSpecialService {
         //      - target flow follows UCTE generator convention
         final double totalDivacaFlow = -getTargetFlow(divaca);
         pstOutput.setAndLogProcedure(DIVACA, 2);
-        pstOutput.setTotalTargetFlowDivaca(totalDivacaFlow);
+        pstOutput.setTotalTargetFlow(totalDivacaFlow);
 
         final double divacaToPadriciano;
         final double divacaToRedipulgia;
@@ -168,85 +151,18 @@ public class PstSpecialService {
         pstOutput.setTargetFlowDivacaRedipuglia(divacaToRedipulgia);
     }
 
-    private void applyLienzProcess(final TwoWindingsTransformer lienz,
-                                   final PstOutput pstOutput,
-                                   final Network austrianGrid) {
-
-        Integer procedure = null;
-        if (isInOutage(lienz)) { // outage in CGM
-            procedure = 6;
-        } else if (!hasTargetFlow(lienz)) {
-            procedure = 4;
-        } else {
-            if (isInOutage(getPstBranch(LIENZ, austrianGrid))) { // outage in IGM
-                LOGGER.warn("Lienz's tie line is inactive");
-                setPstRegulating(lienz, false);
-            } else {
-                setPstRegulating(lienz, true);
-                pstOutput.setTargetFlowLipst(-getTargetFlow(lienz));
-                procedure = 5;
-            }
-        }
-
-        Optional.ofNullable(procedure).ifPresent(nb -> pstOutput.setAndLogProcedure(LIENZ, nb));
-    }
-
-    private void applyNaudersProcess(final TwoWindingsTransformer nrpst21,
-                                     final TwoWindingsTransformer nrpst22,
-                                     final PstOutput pstOutput,
-                                     final Network austrianGrid) {
-        final boolean pst21OutInCgm = isInOutage(nrpst21);
-        final boolean pst22OutInCgm = isInOutage(nrpst22);
-
-        if (pst21OutInCgm && pst22OutInCgm) {
-            pstOutput.setAndLogProcedure(NAUDERS1, 10);
-        } else if (!hasTargetFlow(nrpst21) || !hasTargetFlow(nrpst22)) {
-            pstOutput.setAndLogProcedure(NAUDERS1, 7);
-        } else if (!pst21OutInCgm && !pst22OutInCgm) {
-            // if out in IGM
-            if (isInOutage(getPstBranch(NAUDERS1, austrianGrid)) || isInOutage(getPstBranch(NAUDERS2, austrianGrid))) {
-                LOGGER.warn("At least one of Nauders's tie lines is inactive");
-                setPstRegulating(nrpst21, false);
-                setPstRegulating(nrpst22, false);
-            }
-            if (inconsistentTargetFlows(nrpst21, nrpst22)) {
-                LOGGER.warn("Nauders PST: inconsistent target flows");
-                setPstRegulating(nrpst21, false);
-                setPstRegulating(nrpst22, false);
-            } else {
-                halveRegulationValue(nrpst21);
-                halveRegulationValue(nrpst22);
-                pstOutput.setAndLogProcedure(NAUDERS1, 8);
-                pstOutput.setTargetFlowNrpst21(-getTargetFlow(nrpst21));
-                pstOutput.setTargetFlowNrpst22(-getTargetFlow(nrpst22));
-            }
-        } else if (!pst21OutInCgm) {
-            setPstRegulating(nrpst21, true);
-            pstOutput.setAndLogProcedure(NAUDERS1, 9);
-            pstOutput.setTargetFlowNrpst21(-getTargetFlow(nrpst21));
-        } else {
-            setPstRegulating(nrpst22, true);
-            pstOutput.setAndLogProcedure(NAUDERS2, 9);
-            pstOutput.setTargetFlowNrpst22(-getTargetFlow(nrpst22));
-        }
-    }
-
     private void fillPstOutputsFromIgms(final MergingTask task,
                                         final Map<SpecialPst, String> pstIds,
                                         final PstOutput pstOutput,
                                         final LoadFlowParameters loadFlowParameters) {
         final Network slovenianGrid = task.getIgm(SI);
-        final Network austrianGrid = task.getIgm(AT);
 
         runLoadFlowWithBalanceTypeCorrection(slovenianGrid, loadFlowRunnerSupplier, loadFlowParameters);
-        runLoadFlowWithBalanceTypeCorrection(austrianGrid, loadFlowRunnerSupplier, loadFlowParameters);
         applySolvedTapPositionAndSolvedSectionCount(slovenianGrid);
-        applySolvedTapPositionAndSolvedSectionCount(austrianGrid);
 
         pstOutput.getFlowDivacaPadriciano().setIgmFlowFromDanglingLine(DIVACA_PADRICIANO_DANGLING_LINE, slovenianGrid);
         pstOutput.getFlowDivacaRedipuglia().setIgmFlowFromDanglingLine(DIVACA_REDIPULGIA_DANGLING_LINE, slovenianGrid);
 
-        forAustrianPsts(pst -> pstOutput.getFlow(pst).setIgmFlowFromBranch(getPstBranch(pst, austrianGrid)));
         forAllSpecialPst(pst -> pstOutput.setTapIgmFromId(pst, pstIds.get(pst), task.getIgm(pst.getCountry())));
     }
 
@@ -260,7 +176,6 @@ public class PstSpecialService {
         pstOutput.getFlowDivacaPadriciano().setCgmFlowFromTieLine(DIVACA_PADRICIANO_LINE, cgm);
         pstOutput.getFlowDivacaRedipuglia().setCgmFlowFromTieLine(DIVACA_REDIPULGIA_LINE, cgm);
 
-        forAustrianPsts(pst -> pstOutput.getFlow(pst).setCgmFlowFromBranch(getPstBranch(pst, cgm)));
         forAllSpecialPst(pst -> pstOutput.setTapCgmFromId(pst, pstIds.get(pst), cgm));
     }
 

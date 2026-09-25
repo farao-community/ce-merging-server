@@ -5,14 +5,14 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.daily_merging.output.cgm;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.cgm;
 
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.xsd.daily.response.payload.ResponseItem;
-import com.farao_community.farao.ce_merging.xsd.daily.response.payload.ResponseItems;
+import com.farao_community.farao.ce_merging.xsd.merging_response.ResponseItem;
+import com.farao_community.farao.ce_merging.xsd.merging_response.ResponseItems;
 import com.farao_community.farao.ce_merging.xsd.merging_request.EventMessageType;
 import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.util.JaxbUtils.readNode;
-import static com.farao_community.farao.ce_merging.daily_merging.output.cgm.CgmRecognitionBuilder.computeCgmRecognition;
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.cgm.CgmRecognitionBuilder.computeCgmRecognition;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.mockTaskWithCgmResult;

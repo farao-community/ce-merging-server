@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.output.xnodes_inconsistencies;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.xnodes_inconsistencies;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.daily_merging.DailyMergingRepository;
@@ -26,8 +26,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -108,9 +108,8 @@ class XnodeResultServiceTest {
     }
 
     private void givenTargetDate() {
-        when(mergingTask.getInputs()).thenReturn(inputs);
-        when(inputs.getTargetDate()).thenReturn(
-                OffsetDateTime.of(
+        when(mergingTask.getTargetDateInParis()).thenReturn(
+                ZonedDateTime.of(
                         2026,
                         9,
                         17,

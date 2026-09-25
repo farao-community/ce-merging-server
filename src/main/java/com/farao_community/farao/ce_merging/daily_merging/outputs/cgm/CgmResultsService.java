@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.daily_merging.output.cgm;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.cgm;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -36,7 +36,7 @@ import static com.farao_community.farao.ce_merging.common.util.FileUtils.copyFil
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.DAYLIGHT_DUPLICATED_HOUR_NAME_CONVENTION;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.generateOutputFileName;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirectory;
-import static com.farao_community.farao.ce_merging.daily_merging.output.cgm.CgmRecognitionBuilder.computeCgmRecognition;
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.cgm.CgmRecognitionBuilder.computeCgmRecognition;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 
 @Service
