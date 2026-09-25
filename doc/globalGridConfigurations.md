@@ -26,7 +26,7 @@ Also contains border information, but more specifically about involved TSOs/regi
 
 ### Recessivity configuration
 
-Since two TSO can provide different statuses for a same X-Node, there is a notion of recessive & reference countries :
+Since two TSO can provide different statuses for the same X-Node, there is a notion of recessive & reference countries :
 In case of conflict, we use the value provided by the reference country. 
 
 Which country is reference & which is recessive is specified in the recessivity configuration file.

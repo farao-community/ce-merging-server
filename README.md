@@ -39,7 +39,7 @@ One can provide additional files if a change in configuration is needed : [more 
 ### Merging steps
 #### Hourly
 - [Inputs preparation](/doc/hourly_task/inputPreparation.md)
-- Flow computations
+- [Calculations](/doc/hourly_task/calculations.md)
 - Output Generation
 
 #### Daily
