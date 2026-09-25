@@ -10,8 +10,12 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskAlreadyRunningException;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotFoundException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotRunException;
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.common.util.ZipUtils;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyInputs;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
+import com.farao_community.farao.ce_merging.daily_merging.entities.DailyOutputs;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskManagementService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -30,7 +34,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.StreamSupport;
 
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
+import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 @Service
@@ -56,50 +63,57 @@ public class DailyMergingTasksManagementService {
                         TASKS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
-    public DailyMergingTask createDailyTask(final List<Long> ids, final MultipartFile mergingRequest, final int mergingVersion) {
-        final DailyMergingTask dailyMergingTask = new DailyMergingTask();
-        dailyMergingTask.setVersion(mergingVersion);
+    public DailyMergingTask createDailyTask(final List<Long> ids,
+                                            final MultipartFile mergingRequest,
+                                            final int mergingVersion) {
+        final DailyMergingTask task = new DailyMergingTask();
+        task.setVersion(mergingVersion);
         final List<Long> completedTaskIds = getCompletedTaskIds(ids);
-        dailyMergingTask.setMergingTaskIds(completedTaskIds);
-        repository.save(dailyMergingTask);
-        final Path dailyDirectory = Path.of(configuration.getDailyDirectoryPath(dailyMergingTask));
-        final Path inputsPath = Path.of(configuration.getDailyInputsDirectoryPath(dailyMergingTask));
-        final Path outputsPath = Path.of(configuration.getDailyOutputsDirectoryPath(dailyMergingTask));
+        task.setMergingTaskIds(completedTaskIds);
+        repository.save(task);
+
+        final Path dailyDirectory = Path.of(configuration.getDailyDirectoryPath(task));
+        final Path inputsPath = Path.of(configuration.getDailyInputsDirectoryPath(task));
+        final Path outputsPath = Path.of(configuration.getDailyOutputsDirectoryPath(task));
+
         try {
             Files.createDirectories(inputsPath);
             Files.createDirectories(outputsPath);
             copyMergingRequest(mergingRequest, inputsPath);
-            fillTaskInputs(mergingRequest.getOriginalFilename(), dailyMergingTask, dailyMergingTask.getDailyInputs());
-            repository.save(dailyMergingTask);
+            fillTaskInputs(mergingRequest.getOriginalFilename(), task, task.getDailyInputs());
+            repository.save(task);
         } catch (final Exception e) {
             LOGGER.error("Error during Daily merging task computation", e);
             deleteQuietly(dailyDirectory.toFile());
-            repository.delete(dailyMergingTask);
+            repository.delete(task);
             throw new CeMergingException("Error during Daily merging task creation", e);
         }
-        return dailyMergingTask;
+        return task;
     }
 
-    public DailyMergingTask runDailyMergingTask(long dailyTaskId) {
-        DailyMergingTask dailyTask = getTaskById(dailyTaskId);
+    public DailyMergingTask runDailyMergingTask(final long dailyTaskId) {
+        final DailyMergingTask task = getTaskById(dailyTaskId);
         try {
-            if (dailyTask.getTaskStatus() == RUNNING) {
+            if (task.getTaskStatus() == RUNNING) {
                 throw new TaskAlreadyRunningException(String.format("Task %d already running, could not be run again",
-                        dailyTask.getId()));
+                                                                    task.getId()));
             }
-            dailyTask.setTaskStatus(RUNNING);
-            LOGGER.info("Running daily merging task: '{}' ", dailyTask.getId());
-            repository.save(dailyTask);
-            List<MergingTask> mergingTasks = new ArrayList<>();
-            dailyTask.getMergingTaskIds().forEach(taskId -> mergingTasks.add(service.getTaskById(taskId)));
-            dailyMergingService.run(dailyTask, mergingTasks);
-            dailyTask.setTaskStatus(TaskStatus.SUCCESS);
-            LOGGER.info("Daily task: '{}' is finished with success", dailyTask.getId());
-            repository.save(dailyTask);
-            return dailyTask;
+            task.setTaskStatus(RUNNING);
+            LOGGER.info("Running daily merging task: '{}' ", task.getId());
+            repository.save(task);
+            final List<MergingTask> hourlyTasks = task.getMergingTaskIds()
+                    .stream()
+                    .map(service::getTaskById)
+                    .toList();
+
+            dailyMergingService.run(task, hourlyTasks);
+            task.setTaskStatus(SUCCESS);
+            LOGGER.info("Daily task: '{}' is finished with success", task.getId());
+            repository.save(task);
+            return task;
         } catch (final Exception e) {
-            dailyTask.setTaskStatus(TaskStatus.ERROR);
-            repository.save(dailyTask);
+            task.setTaskStatus(ERROR);
+            repository.save(task);
             throw e;
         }
     }
@@ -114,7 +128,7 @@ public class DailyMergingTasksManagementService {
     }
 
     public void deleteAllTasks() {
-        repository.findAll().forEach(task -> deleteTask(task.getId()));
+        repository.findAllIds().forEach(this::deleteTask);
     }
 
     public void deleteTask(final long taskId) {
@@ -122,7 +136,7 @@ public class DailyMergingTasksManagementService {
             final DailyMergingTask task = getTaskById(taskId);
             FileSystemUtils.deleteRecursively(Paths.get(configuration.getDailyDirectoryPath(task)));
             repository.deleteById(taskId);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new CeMergingException("Error during daily merging task delete", e);
         }
     }
@@ -132,8 +146,7 @@ public class DailyMergingTasksManagementService {
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     public SavedFile getMergingRequest(final long taskId) {
-        DailyMergingTask task = getTaskById(taskId);
-        return task.getDailyInputs().getMergingRequest();
+        return getTaskById(taskId).getDailyInputs().getMergingRequest();
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -141,38 +154,45 @@ public class DailyMergingTasksManagementService {
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     public SavedFile getDailyRefProgOutput(final long taskId) {
-        //TODO
-        return null;
+        return getOutputs(taskId).getRefProg();
     }
 
     public SavedFile getDailyMergingResponse(final long taskId) {
-        //TODO
-        return null;
+        return getOutputs(taskId).getMergingResponse();
     }
 
     public SavedFile getDailyMergingLogs(final long taskId) {
-        //TODO
-        return null;
+        return getOutputs(taskId).getMergingLogs();
     }
 
     public SavedFile getDailyCgmZip(final long taskId) {
-        //TODO
-        return null;
+        return getOutputs(taskId).getCgmZip();
     }
 
     public SavedFile getDailyGlskReport(final long taskId) {
-        //TODO
-        return null;
+        return getOutputs(taskId).getGlskQualityReport();
     }
 
-    public byte[] getDailyResultPackage(final long taskId) {
-        //TODO
-        return null;
+    public byte[] getDailyResultPackage(final long taskId) throws IOException {
+        final DailyMergingTask task = getTaskById(taskId);
+        checkTaskRunned(task);
+        final String fileName = "response_daily_task_" + taskId + ".json";
+        final String outputDirectory = configuration.getDailyOutputsDirectoryPath(task);
+        JsonUtils.writeInPath(DailyMergingTask.class, task, Paths.get(outputDirectory + "/" + fileName));
+        return ZipUtils.zipDirectory(outputDirectory);
+
     }
 
     public SavedFile getMergingReport(final long taskId) {
-        //TODO
-        return null;
+        return getOutputs(taskId).getMergingReport();
+    }
+
+    /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
+            INTERNAL (PRIVATE & PACKAGE-PRIVATE)
+     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+
+    private DailyOutputs getOutputs(final long taskId) {
+        return getTaskById(taskId).getDailyOutputs();
     }
 
     DailyMergingTask getTaskById(final long taskId) {
@@ -180,21 +200,25 @@ public class DailyMergingTasksManagementService {
                 .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available", taskId)));
     }
 
-    /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
-                   INTERNAL (PRIVATE)
-     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
+    void checkTaskRunned(final DailyMergingTask task) {
+        if (task.getTaskStatus() == CREATED) {
+            throw new TaskNotRunException(String.format("Task %d has not been run", task.getId()));
+        } else if (task.getTaskStatus() == RUNNING) {
+            throw new TaskAlreadyRunningException(String.format("Task %d currently running", task.getId()));
+        }
+    }
 
-    private List<Long> getCompletedTaskIds(final List<Long> ids) {
+    private List<Long> getCompletedTaskIds(final List<Long> hourlyTasksIds) {
         final List<Long> completedTaskIds = new ArrayList<>();
-        for (Long taskId : ids) {
+        for (final Long taskId : hourlyTasksIds) {
             if (taskId == null) {
                 throw new CeMergingException("Invalid merging task ID");
             }
             if (service.checkTaskExist(taskId)) {
-                MergingTask taskEntity = service.getTaskById(taskId);
-                if (taskEntity.getStatus() == TaskStatus.CREATED) {
+                final MergingTask task = service.getTaskById(taskId);
+                if (task.getStatus() == CREATED) {
                     LOGGER.warn("Merging task {} has not been run", taskId); //NOSONAR  : taskId is a Long
-                } else if (taskEntity.getStatus() == TaskStatus.RUNNING) {
+                } else if (task.getStatus() == TaskStatus.RUNNING) {
                     LOGGER.warn("Merging task {} is currently running", taskId); //NOSONAR  : taskId is a Long
                 }
                 completedTaskIds.add(taskId);
@@ -205,14 +229,17 @@ public class DailyMergingTasksManagementService {
         return completedTaskIds;
     }
 
-    private void fillTaskInputs(final String originalFilename, final DailyMergingTask task, final DailyInputs dailyInputs) {
+    private void fillTaskInputs(final String originalFilename,
+                                final DailyMergingTask task,
+                                final DailyInputs dailyInputs) {
         final Path inputFilePath = Path.of(configuration.getDailyInputsDirectoryPath(task), originalFilename);
         dailyInputs.setMergingRequestFilePath(inputFilePath.toString());
         dailyInputs.getMergingRequest().setLocation("/tasks/" + task.getId() + "/inputs/merging-request");
         task.setDailyInputs(dailyInputs);
     }
 
-    private void copyMergingRequest(final MultipartFile mergingRequest, final Path taskInputPath) throws IOException {
+    private void copyMergingRequest(final MultipartFile mergingRequest,
+                                    final Path taskInputPath) throws IOException {
         final String originalFilename = mergingRequest.getOriginalFilename();
         if (originalFilename == null || originalFilename.isBlank()) {
             throw new CeMergingException("Merging request filename is missing");
