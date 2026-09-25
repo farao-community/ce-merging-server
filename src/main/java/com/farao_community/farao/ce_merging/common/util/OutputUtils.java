@@ -24,12 +24,12 @@ public final class OutputUtils {
     public static final DateTimeFormatter OUTPUT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmm");
 
     public static String generateOutputFileName(OffsetDateTime mergingDateTime, int mergingVersion, String messageType, String documentType, int flow, String extension) {
-        final String mergingDate = DateTimeUtils.formatFilenameDate(mergingDateTime);
+        final String mergingDate = DateTimeUtils.formatDate(mergingDateTime);
         return String.format(OUTPUT_NAME, messageType, documentType, flow, mergingDate, flow, mergingVersion, extension);
     }
 
     public static String generateOutputFileName(OffsetDateTime mergingDateTime, int mergingVersion, int flow, String extension) {
-        final String mergingDate = DateTimeUtils.formatFilenameDate(mergingDateTime);
+        final String mergingDate = DateTimeUtils.formatDate(mergingDateTime);
         return String.format(OUTPUT_NAME_WITHOUT_MESSAGE_DOCUMENT_TYPE, flow, mergingDate, flow, mergingVersion, extension);
     }
 

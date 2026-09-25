@@ -78,8 +78,8 @@ class PstSpecialServiceTest {
         pstSpecialService.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
-        assertEquals(1, result.getProcessNumberDivaca());
-        assertEquals(0., result.getTotalTargetFlowDivaca());
+        assertEquals(1, result.getProcessNumber());
+        assertEquals(0., result.getTotalTargetFlow());
         assertEquals(0., result.getTargetFlowDivacaPadriciano());
         assertEquals(0., result.getTargetFlowDivacaRedipuglia());
         assertEquals(0., result.getTap(DIVACA).getTapIGM());
@@ -98,8 +98,8 @@ class PstSpecialServiceTest {
         pstSpecialService.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
-        assertEquals(1, result.getProcessNumberDivaca());
-        assertEquals(0., result.getTotalTargetFlowDivaca());
+        assertEquals(1, result.getProcessNumber());
+        assertEquals(0., result.getTotalTargetFlow());
         assertEquals(0., result.getTargetFlowDivacaPadriciano());
         assertEquals(0., result.getTargetFlowDivacaRedipuglia());
         assertEquals(0.0, result.getTap(DIVACA).getTapIGM());
@@ -118,8 +118,8 @@ class PstSpecialServiceTest {
         pstSpecialService.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
-        assertEquals(1, result.getProcessNumberDivaca());
-        assertEquals(0., result.getTotalTargetFlowDivaca());
+        assertEquals(1, result.getProcessNumber());
+        assertEquals(0., result.getTotalTargetFlow());
         assertEquals(0., result.getTargetFlowDivacaPadriciano());
         assertEquals(0., result.getTargetFlowDivacaRedipuglia());
         assertEquals(0.0, result.getTap(DIVACA).getTapIGM());
@@ -138,8 +138,8 @@ class PstSpecialServiceTest {
         pstSpecialService.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
-        assertEquals(1, result.getProcessNumberDivaca());
-        assertEquals(0., result.getTotalTargetFlowDivaca());
+        assertEquals(1, result.getProcessNumber());
+        assertEquals(0., result.getTotalTargetFlow());
         assertEquals(0., result.getTargetFlowDivacaPadriciano());
         assertEquals(0., result.getTargetFlowDivacaRedipuglia());
         assertTrue(isNaN(result.getTap(DIVACA).getTapIGM()));
@@ -158,8 +158,8 @@ class PstSpecialServiceTest {
         pstSpecialService.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
-        assertEquals(2, result.getProcessNumberDivaca());
-        assertEquals(12.6, result.getTotalTargetFlowDivaca());
+        assertEquals(2, result.getProcessNumber());
+        assertEquals(12.6, result.getTotalTargetFlow());
         assertEquals(150., result.getTargetFlowDivacaPadriciano());
         assertEquals(-137.4, result.getTargetFlowDivacaRedipuglia());
         assertEquals(0, result.getTap(DIVACA).getTapIGM());
@@ -178,8 +178,8 @@ class PstSpecialServiceTest {
         pstSpecialService.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
-        assertEquals(2, result.getProcessNumberDivaca());
-        assertEquals(3.389, result.getTotalTargetFlowDivaca());
+        assertEquals(2, result.getProcessNumber());
+        assertEquals(3.389, result.getTotalTargetFlow());
         assertEquals(0., result.getTargetFlowDivacaPadriciano());
         assertEquals(3.389, result.getTargetFlowDivacaRedipuglia());
         assertEquals(0., result.getTap(DIVACA).getTapIGM());
@@ -199,8 +199,8 @@ class PstSpecialServiceTest {
         pstSpecialService.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
-        assertEquals(2, result.getProcessNumberDivaca());
-        assertEquals(2.865, result.getTotalTargetFlowDivaca());
+        assertEquals(2, result.getProcessNumber());
+        assertEquals(2.865, result.getTotalTargetFlow());
         assertEquals(150., result.getTargetFlowDivacaPadriciano());
         assertEquals(0., result.getTargetFlowDivacaRedipuglia());
         assertEquals(0.0, result.getTap(DIVACA).getTapIGM());
@@ -220,7 +220,7 @@ class PstSpecialServiceTest {
         pstSpecialService.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
-        assertEquals(3, result.getProcessNumberDivaca());
+        assertEquals(3, result.getProcessNumber());
         assertEquals(0.0, result.getTap(DIVACA).getTapIGM());
         assertEquals(0.0, result.getTap(DIVACA).getTapCGM());
         assertEquals(0., result.getTap(PADRICIANO).getTapIGM());

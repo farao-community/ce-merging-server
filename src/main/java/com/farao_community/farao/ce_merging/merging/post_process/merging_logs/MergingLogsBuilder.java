@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.post_process.merging_logs;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.TsoInfos;
 import com.farao_community.farao.ce_merging.common.util.OutputUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.TsoInfos;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst;
 import com.farao_community.farao.ce_merging.merging.process.pst_special_process.output.Flow;
@@ -21,7 +21,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CORE_REGION_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RECEIVER_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RESOLUTION;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SENDER_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.getNowDate;
 
 public class MergingLogsBuilder {
@@ -271,7 +278,7 @@ public class MergingLogsBuilder {
         inArea.setCodingScheme(IDENTIFICATION);
         inArea.setV(areasAll.get(ITALY_CODE));
         siitReport.setInArea(inArea);
-        siitReport.setAppliedProcedure((Integer.valueOf(pstOutputs.getProcessNumberDivaca())).byteValue());
+        siitReport.setAppliedProcedure((Integer.valueOf(pstOutputs.getProcessNumber())).byteValue());
         siitReport.setTargetFlow(getTargetFlow(pstOutputs));
         siitReport.setBeforeTargetFlowCGM(getBeforeTargetFlowCGM(pstOutputs));
         siitReport.setAfterTargetFlowCGM(getAfterTargetFlowCGM(pstOutputs));
@@ -280,7 +287,7 @@ public class MergingLogsBuilder {
 
     private MergingLog.TimeSeries.Period.Interval.MergingReport.SIITReport.TargetFlow getTargetFlow(final PstOutput pstOutputs) {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.SIITReport.TargetFlow targetFlow = new MergingLog.TimeSeries.Period.Interval.MergingReport.SIITReport.TargetFlow();
-        targetFlow.setTotalFlow((float) pstOutputs.getTotalTargetFlowDivaca());
+        targetFlow.setTotalFlow((float) pstOutputs.getTotalTargetFlow());
         targetFlow.setFlowDivacaPadriciano((float) pstOutputs.getTargetFlowDivacaPadriciano());
         targetFlow.setFlowDivacaRedipuglia((float) pstOutputs.getTargetFlowDivacaRedipuglia());
         return targetFlow;

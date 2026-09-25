@@ -14,7 +14,7 @@ import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.OutputUtils;
 import com.farao_community.farao.ce_merging.daily_merging.DailyMergingRepository;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
-import com.farao_community.farao.ce_merging.merging.post_process.common.SchemaLocationNamespace;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.common.SchemaLocationNamespace;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.xsd.merging_logs.MergingLog;
