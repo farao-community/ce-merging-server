@@ -97,9 +97,6 @@ public final class CeMergingConstants {
     public static final String TSO = "TSO";
     public static final String TSO_LOWER_CASE = "tso";
     public static final String RESOLUTION = "PT60M";
-    public static final String CODING_SCHEME = "A01";
-    public static final String SENDER_ROLE = "A44";
-    public static final String RECEIVER_ROLE = "A36";
     public static final String XML_EXTENSION = "xml";
     public static final String JSON_EXTENSION = "json";
     public static final String ZIP_EXTENSION = "zip";

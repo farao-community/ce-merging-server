@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ Copyright (c) 2026, RTE (http://www.rte-france.com)
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  -->
+
+<PublicationDocument xmlns="refprog" DtdRelease="0" DtdVersion="1">
+    <DocumentIdentification v="RP-CORESO-20200106-05"/>
+    <DocumentVersion v="5"/>
+    <DocumentType v="A45"/>
+    <SenderIdentification codingScheme="A01" v="22XCORESO------S"/>
+    <SenderRole v="A44"/>
+    <ReceiverIdentification codingScheme="A01" v="17XTSO-CS------W"/>
+    <ReceiverRole v="A36"/>
+    <CreationDateTime v="2020-02-18T09:13:16.921+01:00"/>
+    <PublicationTimeInterval v="2020-01-05T23:00Z/2020-01-06T23:00Z"/>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="RS-ME"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YCS-CG-TSO---S"/>
+        <OutArea codingScheme="A01" v="10YCS-SERBIATSOV"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2020-01-05T23:00Z/2020-01-06T23:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="24"/>
+                <Qty v="-900"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="GR-MK"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="10YMK-MEPSO----8"/>
+        <OutArea codingScheme="A01" v="10YCB-GREECE---2"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2020-01-05T23:00Z/2020-01-06T23:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="24"/>
+                <Qty v="-3355"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+    <PublicationTimeSeries>
+        <TimeSeriesIdentification v="AB-CD"/>
+        <BusinessType v="A66"/>
+        <InArea codingScheme="A01" v="17YXXXXXXAAAAAAB"/>
+        <OutArea codingScheme="A01" v="10YNL----------L"/>
+        <MeasureUnitQuantity v="MAW"/>
+        <Period>
+            <TimeInterval v="2020-01-05T23:00Z/2020-01-06T23:00Z"/>
+            <Resolution v="PT60M"/>
+            <Interval>
+                <Pos v="24"/>
+                <Qty v="2594"/>
+            </Interval>
+        </Period>
+    </PublicationTimeSeries>
+</PublicationDocument>

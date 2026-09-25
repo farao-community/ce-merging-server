@@ -11,11 +11,13 @@ import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.MergingRequestService;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
+
 import com.farao_community.farao.ce_merging.daily_merging.outputs.cgm.CgmResultsService;
 import com.farao_community.farao.ce_merging.daily_merging.outputs.glsk_quality_check.DailyQualityCheckReportService;
 import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_logs.DailyMergingLogsService;
 import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.MergingReportService;
 import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_response.MergingResponseService;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.refprog.DailyRefProgService;
 import com.farao_community.farao.ce_merging.daily_merging.outputs.xnodes_inconsistencies.XnodeResultService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.slf4j.Logger;
@@ -42,6 +44,7 @@ public class DailyMergingService {
     private final DailyMergingLogsService dailyMergingLogsService;
     private final XnodeResultService xnodeResultService;
     private final CgmResultsService cgmResultsService;
+    private final DailyRefProgService dailyRefProgService;
     private final MergingReportService mergingReportService;
 
     public DailyMergingService(final DailyQualityCheckReportService dailyQualityCheckReportService,
@@ -50,6 +53,7 @@ public class DailyMergingService {
                                final MergingResponseService mergingResponseService,
                                final XnodeResultService xnodeResultService,
                                final CgmResultsService cgmResultsService,
+                               final DailyRefProgService dailyRefProgService,
                                final MergingReportService mergingReportService) {
         this.dailyMergingLogsService = dailyMergingLogsService;
         this.dailyQualityCheckReportService = dailyQualityCheckReportService;
@@ -57,6 +61,7 @@ public class DailyMergingService {
         this.mergingResponseService = mergingResponseService;
         this.xnodeResultService = xnodeResultService;
         this.cgmResultsService = cgmResultsService;
+        this.dailyRefProgService = dailyRefProgService;
         this.mergingReportService = mergingReportService;
     }
 
@@ -71,6 +76,7 @@ public class DailyMergingService {
                 .toList();
 
         if (!successMergingTasks.isEmpty()) {
+            dailyRefProgService.computeDailyRefProg(dailyMergingTask, successMergingTasks, requestInformation);
             dailyMergingLogsService.computeDailyMergingLogs(dailyMergingTask, successMergingTasks);
             dailyQualityCheckReportService.computeDailyGlskQualityReport(dailyMergingTask, successMergingTasks, requestInformation.requestTimeInterval());
         }

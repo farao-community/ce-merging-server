@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.DocumentTypeList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,9 +24,14 @@ public final class OutputUtils {
     public static final DateTimeFormatter OUTPUT_DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
     public static final DateTimeFormatter OUTPUT_TIME_FORMATTER = DateTimeFormatter.ofPattern("HHmm");
 
-    public static String generateOutputFileName(OffsetDateTime mergingDateTime, int mergingVersion, String messageType, String documentType, int flow, String extension) {
+    public static String generateOutputFileName(final OffsetDateTime mergingDateTime,
+                                                final int mergingVersion,
+                                                final String messageType,
+                                                final DocumentTypeList documentType,
+                                                final int flow,
+                                                final String extension) {
         final String mergingDate = DateTimeUtils.formatDate(mergingDateTime);
-        return String.format(OUTPUT_NAME, messageType, documentType, flow, mergingDate, flow, mergingVersion, extension);
+        return String.format(OUTPUT_NAME, messageType, documentType.value(), flow, mergingDate, flow, mergingVersion, extension);
     }
 
     public static String generateOutputFileName(OffsetDateTime mergingDateTime, int mergingVersion, int flow, String extension) {

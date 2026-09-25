@@ -231,10 +231,25 @@ public final class CeTestUtils {
 
     public static MergingTask mockTaskWithCgmResult(final String targetDate, final String cgmPath) {
         final String[] path = cgmPath.split("/");
-        SavedFile cgmOutput = new SavedFile(path[path.length - 1], THIS.getResource(cgmPath).getPath(), MOCK);
+        final SavedFile cgmOutput = new SavedFile(path[path.length - 1], THIS.getResource(cgmPath).getPath(), "mock");
         final MergingTask task = new MergingTask();
         final Outputs outputs = new Outputs();
         outputs.setCgm(cgmOutput);
+        task.setOutputs(outputs);
+        final Inputs inputs = new Inputs();
+        inputs.setTargetDate(OffsetDateTime.parse(targetDate));
+        task.setInputs(inputs);
+        task.setStatus(SUCCESS);
+
+        return task;
+    }
+
+    public static MergingTask mockTaskWithRefProgResult(final String targetDate, final String refProgPath) {
+        final String[] path = refProgPath.split("/");
+        final SavedFile refProg = new SavedFile(path[path.length - 1], THIS.getResource(refProgPath).getPath(), "mock");
+        final MergingTask task = new MergingTask();
+        final Outputs outputs = new Outputs();
+        outputs.setRefProg(refProg);
         task.setOutputs(outputs);
         final Inputs inputs = new Inputs();
         inputs.setTargetDate(OffsetDateTime.parse(targetDate));
