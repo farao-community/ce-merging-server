@@ -4,12 +4,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.output.merging_report;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report;
 
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.ColumnsHeader;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.FilesSheet;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.MergeSheet;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.XNodeInconsistenciesSheet;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.ColumnsHeader;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.FilesSheet;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.MergeSheet;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.XNodeInconsistenciesSheet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -51,8 +52,8 @@ public final class ExcelWriter {
                                                                final List<T> data) {
 
         final File file = new File(filePath);
-        try (final OutputStream outputStream = new FileOutputStream(file);
-             final XSSFWorkbook workbook = createWorkbook(file)) {
+        try (final XSSFWorkbook workbook = createWorkbook(file);
+             final OutputStream outputStream = new FileOutputStream(file)) {
 
             final Sheet sheet = workbook.createSheet(sheetName);
 
@@ -75,6 +76,8 @@ public final class ExcelWriter {
 
         } catch (final Exception e) {
             LOGGER.error("Cannot write merging report file '{}' ", e.getMessage());
+            throw new CeMergingException("Cannot write merging report file '" + filePath + "'", e);
+
         }
     }
 
@@ -87,8 +90,9 @@ public final class ExcelWriter {
                                            final List<String> columnNames) {
         int count = 0;
         final Row row = sheet.createRow(count++);
+        int columnCount = 0;
         for (final String columnName : columnNames) {
-            final Cell cell = row.createCell(count);
+            final Cell cell = row.createCell(columnCount++);
             cell.setCellValue(columnName);
         }
         return count;

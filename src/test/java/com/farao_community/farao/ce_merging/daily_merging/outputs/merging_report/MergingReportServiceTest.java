@@ -5,17 +5,15 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.daily_merging.merging_report;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report;
 
 import com.farao_community.farao.ce_merging.daily_merging.DailyMergingRepository;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyInputs;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.MergingReportBuilder;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.MergingReportService;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.FilesSheet;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.MergeSheet;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.XNodeInconsistenciesSheet;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.FilesSheet;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.MergeSheet;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.XNodeInconsistenciesSheet;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;

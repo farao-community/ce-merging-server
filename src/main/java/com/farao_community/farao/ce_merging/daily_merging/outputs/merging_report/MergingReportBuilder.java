@@ -4,13 +4,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.output.merging_report;
+package com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.FilesSheet;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.MergeSheet;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.XNodeInconsistenciesSheet;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.FilesSheet;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.MergeSheet;
+import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.XNodeInconsistenciesSheet;
 import com.farao_community.farao.ce_merging.merging.process.final_cgm_result.FinalCgmResult;
 import com.farao_community.farao.ce_merging.merging.process.final_cgm_result.LoadFlowOutput;
 import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodesInconsistencies;
@@ -30,7 +30,7 @@ import java.util.TreeMap;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.OUTPUT_DATE_FORMATTER;
-import static com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.XNodeInconsistenciesSheet.fromXnodeIncorrect;
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report.sheets.XNodeInconsistenciesSheet.fromXnodeIncorrect;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INCONSISTENCIES;
 import static com.farao_community.farao.ce_merging.merging.task.enums.IgmType.D2CF;
