@@ -4,13 +4,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.merging_report;
+package com.farao_community.farao.ce_merging.daily_merging.output.merging_report;
 
-import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import com.farao_community.farao.ce_merging.daily_merging.merging_report.sheets.FilesSheet;
-import com.farao_community.farao.ce_merging.daily_merging.merging_report.sheets.MergeSheet;
-import com.farao_community.farao.ce_merging.daily_merging.merging_report.sheets.XNodeInconsistenciesSheet;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
+import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.FilesSheet;
+import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.MergeSheet;
+import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.XNodeInconsistenciesSheet;
 import com.farao_community.farao.ce_merging.merging.process.final_cgm_result.FinalCgmResult;
 import com.farao_community.farao.ce_merging.merging.process.final_cgm_result.LoadFlowOutput;
 import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodesInconsistencies;
@@ -21,19 +21,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.threeten.extra.Interval;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.OUTPUT_DATE_FORMATTER;
-import static com.farao_community.farao.ce_merging.daily_merging.merging_report.sheets.XNodeInconsistenciesSheet.fromXnodeIncorrect;
+import static com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.XNodeInconsistenciesSheet.fromXnodeIncorrect;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INCONSISTENCIES;
 import static com.farao_community.farao.ce_merging.merging.task.enums.IgmType.D2CF;
+import static com.farao_community.farao.ce_merging.merging.task.enums.IgmType.DACF;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static com.powsybl.iidm.network.Country.CH;
 import static com.powsybl.iidm.network.Country.IT;
@@ -41,9 +42,6 @@ import static com.powsybl.iidm.network.Country.IT;
 public class MergingReportBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MergingReportBuilder.class);
-    private static final String DEFAULT_OUT_CORE_IGM_KIND = "DACF";
-    private static final String DEFAULT_IN_CORE_IGM_KIND = "D2CF";
-    private static final int HOUR_IN_SECONDS = 3600;
 
     private final String businessDay;
     private final String interval;
@@ -60,15 +58,15 @@ public class MergingReportBuilder {
         ExcelWriter.export(filePath, getMergeSheets(), getXNodeInconsistenciesSheets(), getFilesSheets());
     }
 
-    List<MergeSheet> getMergeSheets() {
+    public List<MergeSheet> getMergeSheets() {
         return hourlyTasks.stream().map(this::getMergeSheet).toList();
     }
 
-    List<XNodeInconsistenciesSheet> getXNodeInconsistenciesSheets() {
+    public List<XNodeInconsistenciesSheet> getXNodeInconsistenciesSheets() {
         return hourlyTasks.stream().map(this::getXNodeInconsistenciesSheet).flatMap(List::stream).toList();
     }
 
-    List<FilesSheet> getFilesSheets() {
+    public List<FilesSheet> getFilesSheets() {
         return hourlyTasks.stream().map(this::getFilesSheet).toList();
     }
 
@@ -118,12 +116,11 @@ public class MergingReportBuilder {
     private String getIgmKind(final MergingTask task,
                               final Country country) {
 
-        final Optional<String> igmInCore = task.getInputs().getIgms().stream()
+        final boolean hasCountryInCore = task.getInputs().getIgms().stream()
                 .map(IgmData::getIgmName)
-                .filter(name -> name.contains(country.toString()) && name.contains(D2CF.getTypeCode()))
-                .findFirst();
+                .anyMatch(name -> name.contains(country.toString()) && name.contains(D2CF.getTypeCode()));
 
-        return igmInCore.isPresent() ? DEFAULT_IN_CORE_IGM_KIND : DEFAULT_OUT_CORE_IGM_KIND;
+        return hasCountryInCore ? D2CF.name() : DACF.name();
     }
 
     private Map<Integer, Interval> getIntervalsByPosition() {
@@ -133,8 +130,8 @@ public class MergingReportBuilder {
         final Map<Integer, Interval> positionsMap = new TreeMap<>();
         int position = 1;
         while (startDate.isBefore(endDate)) {
-            positionsMap.put(position, Interval.of(startDate, startDate.plusSeconds(HOUR_IN_SECONDS)));
-            startDate = startDate.plusSeconds(HOUR_IN_SECONDS);
+            positionsMap.put(position, Interval.of(startDate, startDate.plus(Duration.ofHours(1))));
+            startDate = startDate.plus(Duration.ofHours(1));
             position++;
         }
         return positionsMap;
@@ -145,7 +142,7 @@ public class MergingReportBuilder {
         return getIntervalsByPosition().entrySet().stream()
                 .filter(entry -> entry.getValue().contains(instant)) // not a collection type contains
                 .findFirst()
-                .orElseThrow(() -> new ServiceIOException(String.format("Instant %s not found in interval %s", instant, interval)))
+                .orElseThrow(() -> new CeMergingException(String.format("Instant %s not found in interval %s", instant, interval)))
                 .getKey()
                 .toString();
     }

@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.daily_merging.merging_report;
+package com.farao_community.farao.ce_merging.daily_merging.output.merging_report;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.daily_merging.DailyMergingRepository;
@@ -54,9 +54,5 @@ public class MergingReportService {
         dailyTask.getDailyOutputs().setMergingReport(mergingReportSavedFile);
         repository.save(dailyTask);
         LOGGER.info("File '{}' is saved in task '{}' outputs", reportFileName, dailyTask.getId());
-    }
-
-    public SavedFile getMergingReport(final long taskId) {
-        return repository.findById(taskId).orElseThrow().getDailyOutputs().getMergingReport();
     }
 }

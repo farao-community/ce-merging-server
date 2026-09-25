@@ -4,12 +4,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.daily_merging.merging_report;
+package com.farao_community.farao.ce_merging.daily_merging.output.merging_report;
 
-import com.farao_community.farao.ce_merging.daily_merging.merging_report.sheets.ColumnsHeader;
-import com.farao_community.farao.ce_merging.daily_merging.merging_report.sheets.FilesSheet;
-import com.farao_community.farao.ce_merging.daily_merging.merging_report.sheets.MergeSheet;
-import com.farao_community.farao.ce_merging.daily_merging.merging_report.sheets.XNodeInconsistenciesSheet;
+import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.ColumnsHeader;
+import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.FilesSheet;
+import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.MergeSheet;
+import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.sheets.XNodeInconsistenciesSheet;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -18,7 +18,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -51,17 +50,10 @@ public final class ExcelWriter {
                                                                final String sheetName,
                                                                final List<T> data) {
 
-        // out of try block so that they can be closed if necessary
-        OutputStream outputStream = null;
-        XSSFWorkbook workbook = null;
+        final File file = new File(filePath);
+        try (final OutputStream outputStream = new FileOutputStream(file);
+             final XSSFWorkbook workbook = createWorkbook(file)) {
 
-        try {
-            final File file = new File(filePath);
-            if (file.exists()) {
-                workbook = (XSSFWorkbook) WorkbookFactory.create(new FileInputStream(file));
-            } else {
-                workbook = new XSSFWorkbook();
-            }
             final Sheet sheet = workbook.createSheet(sheetName);
 
             final T first = data.getFirst();
@@ -78,27 +70,17 @@ public final class ExcelWriter {
                 writeCellValues(fieldNames, row, clazz, rowValues);
             }
 
-            outputStream = new FileOutputStream(file);
             workbook.write(outputStream);
             outputStream.flush();
 
         } catch (final Exception e) {
             LOGGER.error("Cannot write merging report file '{}' ", e.getMessage());
-        } finally {
-            tryToClose(outputStream, filePath);
-            tryToClose(workbook, filePath);
         }
     }
 
-    private static void tryToClose(final Closeable closeable,
-                                   final String filePath) {
-        try {
-            if (closeable != null) {
-                closeable.close();
-            }
-        } catch (final IOException e) {
-            LOGGER.error("Cannot close some resource file '{}' : '{}' ", filePath, e.getMessage());
-        }
+    private static XSSFWorkbook createWorkbook(final File file) throws IOException {
+        return file.exists() ? (XSSFWorkbook) WorkbookFactory.create(new FileInputStream(file))
+                : new XSSFWorkbook();
     }
 
     private static int setSheetColumnNames(final Sheet sheet,
