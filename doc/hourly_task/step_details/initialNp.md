@@ -18,7 +18,7 @@ During the initial calculation of the net positions, for X-Nodes with area=DE, t
 
 Here's how the X-Nodes are counted depending on their presence in config files :
 
-| X-node is present in  …              | X-node & VH config                                                      | VH Config                         | X-Node config                                                 | neither*           | 
+| X-Node is present in  …              | X-Node & VH config                                                      | VH Config                         | X-Node config                                                 | neither*           | 
 |--------------------------------------|-------------------------------------------------------------------------|-----------------------------------|---------------------------------------------------------------|--------------------|
 | examples                             | Alegro, GR-IT, Cobra and HVDC cables going outside the synchronous area | XCEPR120 (created during process) | X-nodes modeled as AC links (including FR-ES and FR-IT HVDCs) | XHR_HR12, XMO_HO11 |
 | load counted in Global NP with VH    | ✅                                                                      | ✅                                | ✅                                                            | ✅                 | 
@@ -30,8 +30,8 @@ Here's how the X-Nodes are counted depending on their presence in config files :
 ### Monita post-treatment
 
 For the MONITA HVDC, post-treatment is necessary:
-Its nodes are all present in the Italian IGM, but we need to have the XKOTR120 and XKOTR220 nodes to Montenegro, to
-apply the BCI step correctly on Montenegro.
+Its nodes are all present in the Italian IGM, but we need to have the XKOTR120 and XKOTR220 nodes in Montenegro's IGM to
+be able toapply the BCI step correctly.
 
 Indeed, as we can see in the reference program file provided in outputs, we have :
 
