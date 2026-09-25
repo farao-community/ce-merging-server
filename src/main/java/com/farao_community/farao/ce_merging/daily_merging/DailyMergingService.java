@@ -11,16 +11,13 @@ import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.MergingRequestService;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
+import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.MergingReportService;
 import com.farao_community.farao.ce_merging.daily_merging.outputs.cgm.CgmResultsService;
 import com.farao_community.farao.ce_merging.daily_merging.outputs.glsk_quality_check.DailyQualityCheckReportService;
 import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_logs.DailyMergingLogsService;
 import com.farao_community.farao.ce_merging.daily_merging.outputs.merging_response.MergingResponseService;
 import com.farao_community.farao.ce_merging.daily_merging.outputs.xnodes_inconsistencies.XnodeResultService;
-import com.farao_community.farao.ce_merging.daily_merging.output.cgm.CgmResultsService;
-import com.farao_community.farao.ce_merging.daily_merging.output.glsk_quality_check.DailyQualityCheckReportService;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_logs.DailyMergingLogsService;
-import com.farao_community.farao.ce_merging.daily_merging.output.merging_report.MergingReportService;
-import com.farao_community.farao.ce_merging.daily_merging.output.xnodes_inconsistencies.XnodeResultService;
+
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
