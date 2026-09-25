@@ -41,7 +41,7 @@ import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getSenderIdentification;
 
 public final class FinalRefProgBuilder {
-    
+
     private FinalRefProgBuilder() {
     }
 

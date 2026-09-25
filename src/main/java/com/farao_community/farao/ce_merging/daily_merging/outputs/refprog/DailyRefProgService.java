@@ -29,6 +29,7 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DATE_TIME_END_INDEX;
@@ -112,16 +113,16 @@ public class DailyRefProgService {
                 .flatMap(List::stream)
                 .forEach(timeSeries -> addHourlyTimeSeriesToDailyRefProg(timeSeries, dailyRefProg));
 
-        final List<Integer> existingPositions = dailyRefProg.getPublicationTimeSeries()
+        final Set<Integer> existingPositions = dailyRefProg.getPublicationTimeSeries()
                 .getFirst()
                 .getPeriod()
                 .getInterval()
                 .stream()
                 .map(DailyRefProgService::getIntervalPosition)
-                .toList();
+                .collect(toSet());
 
         for (int position = 1; position < numberOfPosition + 1; position++) {
-            if (!existingPositions.contains(position)) {
+            if (existingPositions.add(position)) {
                 addZeroAtPosition(dailyRefProg, position);
             }
         }
@@ -152,7 +153,7 @@ public class DailyRefProgService {
                 .forEach(intervalList -> intervalList.add(interval));
     }
 
-    void checkUniqueRefProgInterval(final List<PublicationDocument> refProgResultsList) {
+    private void checkUniqueRefProgInterval(final List<PublicationDocument> refProgResultsList) {
         final int numberOfDistinctIntervals = refProgResultsList.stream()
                 .map(refProgResult -> refProgResult.getPublicationTimeInterval().getV())
                 .collect(toSet())
@@ -226,7 +227,7 @@ public class DailyRefProgService {
         refProgResult.setDocumentIdentification(documentIdentification);
     }
 
-    List<PublicationDocument> getAllHourlyRefProgs(final List<MergingTask> hourlyTasks) {
+    private List<PublicationDocument> getAllHourlyRefProgs(final List<MergingTask> hourlyTasks) {
         return hourlyTasks.stream()
                 .map(MergingTask::getOutputs)
                 .map(Outputs::getRefProg)

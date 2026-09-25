@@ -90,7 +90,7 @@ public final class ForecastNetPositionImporter {
         final OffsetDateTime startDateTime = parseDateTime(period.getTimeInterval().getStart());
         final OffsetDateTime endDateTime = parseDateTime(period.getTimeInterval().getEnd());
         final List<Point> points = period.getPoint();
-        return switch (CurveTypeList.valueOf(curveType)) {
+        return switch (CurveTypeList.fromValue(curveType)) {
             case A_01 -> getFlowFromConstantResolutionCurve(dateTime, startDateTime, resolutionInSeconds, points);
             case A_03 -> getFlowFromVariableResolutionCurve(dateTime, startDateTime, endDateTime, resolutionInSeconds, points);
             default -> {

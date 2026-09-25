@@ -59,7 +59,7 @@ class DailyRefProgServiceTest {
 
     @Test
     void shouldBuildDailyRefProg() {
-        final List<MergingTask> tasksList = Arrays.asList(task1, task2);
+        final List<MergingTask> tasksList = List.of(task1, task2);
         final PublicationDocument publicationDocument = builder.buildDailyRefProg(1, tasksList, 24);
         assertEquals(1, publicationDocument.getDtdVersion().intValue());
         assertEquals(0, publicationDocument.getDtdRelease().intValue());
@@ -104,17 +104,13 @@ class DailyRefProgServiceTest {
     @Test
     void shouldThrowExceptionWhenTasksHaveDifferentInterval() {
         final List<MergingTask> tasksList = Arrays.asList(task4, task5);
-        final List<PublicationDocument> refProgResultsList = builder.getAllHourlyRefProgs(tasksList);
-        assertThrows(CeMergingException.class, () -> {
-            builder.checkUniqueRefProgInterval(refProgResultsList);
-        });
+        assertThrows(CeMergingException.class, () -> builder.buildDailyRefProg(1, tasksList, 24));
     }
 
     @Test
     void shouldNotThrowExceptionWhenTasksHaveSameInterval() {
         final List<MergingTask> tasksList = Arrays.asList(task1, task2, task3, task4);
-        final List<PublicationDocument> refProgResultsList = builder.getAllHourlyRefProgs(tasksList);
-        builder.checkUniqueRefProgInterval(refProgResultsList);
+        builder.buildDailyRefProg(1, tasksList, 24);
     }
 
     @Test
