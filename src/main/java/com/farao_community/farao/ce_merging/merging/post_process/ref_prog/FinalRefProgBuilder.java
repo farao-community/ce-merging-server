@@ -7,17 +7,22 @@
 package com.farao_community.farao.ce_merging.merging.post_process.ref_prog;
 
 import com.farao_community.farao.ce_merging.common.CeMergingConstants;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.CountryCodeUtils;
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.common.util.OutputUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
 import com.farao_community.farao.ce_merging.merging.post_process.common.CurrentType;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
+import com.farao_community.farao.ce_merging.xsd.forecast_netpositions.StandardDocumentTypeList;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.BusinessTypeList;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.RoleTypeList;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.UnitSymbol;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.farao_community.farao.ce_merging.common.util.CountryCodeUtils;
-import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -29,9 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CODING_SCHEME;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RECEIVER_ROLE;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SENDER_ROLE;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getDocumentIdentification;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getDocumentVersion;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getPublicationTimeInterval;
@@ -39,16 +41,12 @@ import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getSenderIdentification;
 
 public final class FinalRefProgBuilder {
-
-    private static final String MAW = "MAW";
-    private static final String BUSINESS_TYPE = "A66";
-
+    
     private FinalRefProgBuilder() {
     }
 
-    private static final String DOCUMENT_TYPE = "A45";
-
-    public static PublicationDocument buildFinalRefProgResult(final RefProgResult refProgResult, final MergingTask taskEntity) {
+    public static PublicationDocument buildFinalRefProgResult(final RefProgResult refProgResult,
+                                                              final MergingTask taskEntity) {
         final String dailyTimeInterval = refProgResult.dailyTimeInterval();
         final OffsetDateTime periodStart = OffsetDateTime.parse(dailyTimeInterval.substring(0, 17), DateTimeFormatter.ISO_DATE_TIME);
         final OffsetDateTime periodEnd = OffsetDateTime.parse(dailyTimeInterval.substring(18, 35), DateTimeFormatter.ISO_DATE_TIME);
@@ -62,19 +60,19 @@ public final class FinalRefProgBuilder {
         publicationDocument.setDocumentIdentification(getDocumentIdentification(documentIdentification));
         publicationDocument.setDocumentVersion(getDocumentVersion());
         final PublicationDocument.DocumentType documentType = new PublicationDocument.DocumentType();
-        documentType.setV(DOCUMENT_TYPE);
+        documentType.setV(StandardDocumentTypeList.A_45.value());
         publicationDocument.setDocumentType(documentType);
 
         publicationDocument.setSenderIdentification(getSenderIdentification());
 
         final PublicationDocument.SenderRole senderRole = new PublicationDocument.SenderRole();
-        senderRole.setV(SENDER_ROLE);
+        senderRole.setV(RoleTypeList.A_44.value());
         publicationDocument.setSenderRole(senderRole);
 
         publicationDocument.setReceiverIdentification(getReceiverIdentification());
 
         final PublicationDocument.ReceiverRole receiverRole = new PublicationDocument.ReceiverRole();
-        receiverRole.setV(RECEIVER_ROLE);
+        receiverRole.setV(RoleTypeList.A_36.value());
         publicationDocument.setReceiverRole(receiverRole);
 
         final PublicationDocument.CreationDateTime creationDateTime = new PublicationDocument.CreationDateTime();
@@ -84,22 +82,22 @@ public final class FinalRefProgBuilder {
         publicationDocument.setPublicationTimeInterval(getPublicationTimeInterval(dailyTimeInterval));
 
         final PublicationDocument.Domain domain = new PublicationDocument.Domain();
-        domain.setCodingScheme(CODING_SCHEME);
+        domain.setCodingScheme(CodingSchemeType.A_01.value());
         domain.setV(CeMergingConstants.CORE_REGION_ID);
         publicationDocument.setDomain(domain);
 
         final List<PublicationDocument.PublicationTimeSeries> publicationTimeSeries = computeAllTimeSeries(refProgResult,
-                                                                                                     taskEntity,
-                                                                                                     dailyTimeInterval,
-                                                                                                     position);
+                                                                                                           taskEntity,
+                                                                                                           dailyTimeInterval,
+                                                                                                           position);
         publicationDocument.getPublicationTimeSeries().addAll(publicationTimeSeries);
         return publicationDocument;
     }
 
     private static List<PublicationDocument.PublicationTimeSeries> computeAllTimeSeries(final RefProgResult refProgResult,
-                                                                                 final MergingTask mergingTask,
-                                                                                 final String dailyTimeInterval,
-                                                                                 final int position) {
+                                                                                        final MergingTask mergingTask,
+                                                                                        final String dailyTimeInterval,
+                                                                                        final int position) {
         final List<PublicationDocument.PublicationTimeSeries> pubTimeSeriesList = new ArrayList<>();
         final BiMap<String, String> allAreasBiMap = HashBiMap.create(mergingTask.getConfigurations().getRegionConfiguration().getAreasAll());
         final List<VirtualHubRecord> virtualHubList = mergingTask.getConfigurations().getVirtualHubList();
@@ -112,12 +110,12 @@ public final class FinalRefProgBuilder {
     }
 
     private static PublicationDocument.PublicationTimeSeries computePublicationTimeSeries(final Map.Entry<Border, Double> entry,
-                                                                                   final BiMap<String, String> allAreasBiMap,
-                                                                                   final Map<String, String> countryMaEicCodeMap,
-                                                                                   final Map<String, String> countryEicCodeMap,
-                                                                                   final CurrentType currentType,
-                                                                                   final String dailyTimeInterval,
-                                                                                   final int position) {
+                                                                                          final BiMap<String, String> allAreasBiMap,
+                                                                                          final Map<String, String> countryMaEicCodeMap,
+                                                                                          final Map<String, String> countryEicCodeMap,
+                                                                                          final CurrentType currentType,
+                                                                                          final String dailyTimeInterval,
+                                                                                          final int position) {
         final PublicationDocument.PublicationTimeSeries publTimeSeries = new PublicationDocument.PublicationTimeSeries();
         final List<PublicationDocument.PublicationTimeSeries.Period.Interval> intervalList = new ArrayList<>();
         final PublicationDocument.PublicationTimeSeries.Period.Interval interval = new PublicationDocument.PublicationTimeSeries.Period.Interval();
@@ -150,34 +148,35 @@ public final class FinalRefProgBuilder {
             publTimeSeries.setTimeSeriesIdentification(timeSeriesIdentif);
         }
         final PublicationDocument.PublicationTimeSeries.BusinessType businessType = new PublicationDocument.PublicationTimeSeries.BusinessType();
-        businessType.setV(BUSINESS_TYPE);
+        businessType.setV(BusinessTypeList.A_66.value());
         publTimeSeries.setBusinessType(businessType);
 
         final PublicationDocument.PublicationTimeSeries.MeasureUnitQuantity measureUnitQuant = new PublicationDocument.PublicationTimeSeries.MeasureUnitQuantity();
-        measureUnitQuant.setV(MAW);
+        measureUnitQuant.setV(UnitSymbol.MAW.value());
         publTimeSeries.setMeasureUnitQuantity(measureUnitQuant);
 
         final PublicationDocument.PublicationTimeSeries.InArea inArea = new PublicationDocument.PublicationTimeSeries.InArea();
         inArea.setV(entry.getKey().getInArea());
-        inArea.setCodingScheme(CODING_SCHEME);
+        inArea.setCodingScheme(CodingSchemeType.A_01.value());
         publTimeSeries.setInArea(inArea);
 
         final PublicationDocument.PublicationTimeSeries.OutArea outArea = new PublicationDocument.PublicationTimeSeries.OutArea();
         outArea.setV(entry.getKey().getOutArea());
-        outArea.setCodingScheme(CODING_SCHEME);
+        outArea.setCodingScheme(CodingSchemeType.A_01.value());
         publTimeSeries.setOutArea(outArea);
         return publTimeSeries;
     }
 
-    private static String getAcTimeSeriesIdentification(final Map.Entry<Border, Double> entry, final BiMap<String, String> allAreasBiMap) {
+    private static String getAcTimeSeriesIdentification(final Map.Entry<Border, Double> entry,
+                                                        final BiMap<String, String> allAreasBiMap) {
         final String countryTo = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(entry.getKey().getInArea()));
         final String countryFrom = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(entry.getKey().getOutArea()));
         return countryFrom + "-" + countryTo;
     }
 
     private static String getDcTimeSeriesIdentification(final Map.Entry<Border, Double> entry,
-                                                 final Map<String, String> countryMaEicCodeMap,
-                                                 final Map<String, String> countryEicCodeMap) {
+                                                        final Map<String, String> countryMaEicCodeMap,
+                                                        final Map<String, String> countryEicCodeMap) {
 
         final String eicCodeFrom = entry.getKey().getOutArea();
         final String eicCodeTo = entry.getKey().getInArea();

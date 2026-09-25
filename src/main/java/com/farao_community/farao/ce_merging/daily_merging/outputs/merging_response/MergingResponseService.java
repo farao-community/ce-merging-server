@@ -18,6 +18,8 @@ import com.farao_community.farao.ce_merging.daily_merging.merging_request.Reques
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.DocumentTypeList;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.MessageTypeList;
 import com.farao_community.farao.ce_merging.xsd.merging_request.EventMessageType;
 import com.farao_community.farao.ce_merging.xsd.merging_request.ObjectFactory;
 import com.farao_community.farao.ce_merging.xsd.merging_response.File;
@@ -46,8 +48,6 @@ import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.
 @Service
 public class MergingResponseService {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergingResponseService.class);
-    private static final String MESSAGE_TYPE = "A18";
-    private static final String DOCUMENT_TYPE = "A01";
     private static final int FLOW = 121;
     private static final DocumentInfo REF_PROG = new DocumentInfo("REFPROG", "F101");
     private static final DocumentInfo CGM = new DocumentInfo("CGM", "F100");
@@ -136,7 +136,12 @@ public class MergingResponseService {
     }
 
     private void saveMergingResponseInDailyOutputs(final DailyMergingTask dailyMergingTask, final OffsetDateTime mergingDay, final int version, EventMessageType response) {
-        final String fileName = OutputUtils.generateOutputFileName(mergingDay, version, MESSAGE_TYPE, DOCUMENT_TYPE, FLOW, XML_EXTENSION);
+        final String fileName = OutputUtils.generateOutputFileName(mergingDay,
+                                                                   version,
+                                                                   MessageTypeList.A_18.value(),
+                                                                   DocumentTypeList.A_01,
+                                                                   FLOW,
+                                                                   XML_EXTENSION);
         final String location = String.format("/daily-merging/tasks/%d/outputs/merging-response", dailyMergingTask.getId());
         final SavedFile savedFile = FileStorageUtils.save(
                 configuration.getDailyOutputsDirectoryPath(dailyMergingTask),

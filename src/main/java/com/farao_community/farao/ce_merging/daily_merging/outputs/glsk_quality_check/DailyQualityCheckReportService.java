@@ -17,7 +17,9 @@ import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingT
 import com.farao_community.farao.ce_merging.daily_merging.outputs.common.SchemaLocationNamespace;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.DocumentTypeList;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.MessageTypeList;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.QualityCheckReport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +40,6 @@ public class DailyQualityCheckReportService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DailyQualityCheckReportService.class);
     private final CeMergingConfiguration configuration;
     private final DailyMergingRepository repository;
-    private static final String MESSAGE_TYPE = "A16";
-    private static final String DOCUMENT_TYPE = "A48";
     private static final int FLOW = 117;
     private static final int MERGING_DAY_END_INDEX = 28;
 
@@ -85,7 +85,12 @@ public class DailyQualityCheckReportService {
 
     private void saveDailyGlskReportInOutputs(final QualityCheckReport qualityCheckReport, final DailyMergingTask task) {
         final OffsetDateTime mergingDate = OffsetDateTime.parse(qualityCheckReport.getQualityCheckTimeInterval().getV().substring(MERGING_DAY_START_INDEX, MERGING_DATE_TIME_END_INDEX), DateTimeFormatter.ISO_DATE_TIME);
-        final String qualityReportFileName = OutputUtils.generateOutputFileName(mergingDate, task.getVersion(), MESSAGE_TYPE, DOCUMENT_TYPE, FLOW, XML_EXTENSION);
+        final String qualityReportFileName = OutputUtils.generateOutputFileName(mergingDate,
+                                                                                task.getVersion(),
+                                                                                MessageTypeList.A_16.value(),
+                                                                                DocumentTypeList.A_48,
+                                                                                FLOW,
+                                                                                XML_EXTENSION);
         final String fileLocation = String.format("/daily-merging/tasks/%d/outputs/glsk-quality-report", task.getId());
         final SavedFile dailyQualityReportSavedFile = FileStorageUtils.save(
                 configuration.getDailyOutputsDirectoryPath(task),

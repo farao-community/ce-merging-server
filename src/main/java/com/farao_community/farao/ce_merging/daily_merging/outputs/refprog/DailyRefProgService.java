@@ -17,6 +17,7 @@ import com.farao_community.farao.ce_merging.daily_merging.merging_request.Reques
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.DocumentTypeList;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +30,12 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DATE_TIME_END_INDEX;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_DAY_START_INDEX;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XML_EXTENSION;
 import static com.farao_community.farao.ce_merging.common.util.OutputUtils.generateOutputFileName;
-import static com.farao_community.farao.ce_merging.merging.post_process.common.SchemaLocationNamespace.RESPONSE_XSD;
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.SchemaLocationNamespace.RESPONSE_XSD;
 import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
 import static jakarta.xml.bind.Marshaller.JAXB_FRAGMENT;
 import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
@@ -47,8 +49,6 @@ public class DailyRefProgService {
     private static final Logger LOGGER = LoggerFactory.getLogger(DailyRefProgService.class);
     private final CeMergingConfiguration configuration;
     private final DailyMergingRepository repository;
-    private static final String MESSAGE_TYPE = "";
-    private static final String DOCUMENT_TYPE = "A45";
     private static final int REFPROG_FLOW = 101;
 
     private static final Map<String, Object> JAXB_PROPERTIES = Map.of(JAXB_FORMATTED_OUTPUT, TRUE,
@@ -84,8 +84,8 @@ public class DailyRefProgService {
         );
         final String fileName = generateOutputFileName(mergingDay,
                                                        dailyTask.getVersion(),
-                                                       MESSAGE_TYPE,
-                                                       DOCUMENT_TYPE,
+                                                       EMPTY,
+                                                       DocumentTypeList.A_45,
                                                        REFPROG_FLOW,
                                                        XML_EXTENSION);
         final Path refProgOutPath = Paths.get(configuration.getDailyOutputsDirectoryPath(dailyTask), fileName);

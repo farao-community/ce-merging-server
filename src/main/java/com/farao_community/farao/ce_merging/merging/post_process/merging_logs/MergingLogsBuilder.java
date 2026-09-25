@@ -13,6 +13,10 @@ import com.farao_community.farao.ce_merging.merging.process.pst_special_process.
 import com.farao_community.farao.ce_merging.merging.process.pst_special_process.output.Flow;
 import com.farao_community.farao.ce_merging.merging.process.pst_special_process.output.PstOutput;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.DocumentTypeList;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.ProcessTypeList;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.RoleTypeList;
 import com.farao_community.farao.ce_merging.xsd.merging_logs.MergingLog;
 import com.powsybl.iidm.network.Country;
 
@@ -34,12 +38,6 @@ import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.get
 public class MergingLogsBuilder {
     private static final String CORE_REPORT_TYPE_INFO = "CORE";
     private static final String OUT_CORE_REPORT_TYPE_INFO = "nonCORE";
-    private static final String IDENTIFICATION = "A01";
-    private static final String RECEIVER_ROLE = "A36";
-    private static final String SENDER_ROLE = "A44";
-    private static final String DOCUMENT_TYPE = "A18";
-    private static final String ITALY_CODE = "IT";
-    private static final String SLOVENIA_CODE = "SI";
 
     MergingLog buildMergingLog(final MergingTask task, final List<ReportInformationInRegion> reportInformationInRegionList, final ReferenceProgram referenceProgram, final PstOutput pstOutputs, final List<ReportInformationOutRegion> reportInformationsOutRegionList, final List<ReportCommonsInformation> tsoInformationsList, final List<AlegroReportInformation> alegroReportInformationsList) {
         final MergingLog mergingLog = new MergingLog();
@@ -85,24 +83,24 @@ public class MergingLogsBuilder {
         documentVersion.setV((byte) 1);
         mergingLog.setDocumentVersion(documentVersion);
         final MergingLog.DocumentType documentType = new MergingLog.DocumentType();
-        documentType.setV(DOCUMENT_TYPE);
+        documentType.setV(DocumentTypeList.A_18.value());
         mergingLog.setDocumentType(documentType);
         final MergingLog.ProcessType processType = new MergingLog.ProcessType();
-        processType.setV(IDENTIFICATION);
+        processType.setV(ProcessTypeList.A_01.value());
         mergingLog.setProcessType(processType);
         final MergingLog.SenderIdentification senderIdentification = new MergingLog.SenderIdentification();
-        senderIdentification.setCodingScheme(IDENTIFICATION);
+        senderIdentification.setCodingScheme(CodingSchemeType.A_01.value());
         senderIdentification.setV(SENDER_ID);
         mergingLog.setSenderIdentification(senderIdentification);
         final MergingLog.SenderRole senderRole = new MergingLog.SenderRole();
-        senderRole.setV(SENDER_ROLE);
+        senderRole.setV(RoleTypeList.A_44.value());
         mergingLog.setSenderRole(senderRole);
         final MergingLog.ReceiverIdentification receiverIdentification = new MergingLog.ReceiverIdentification();
-        receiverIdentification.setCodingScheme(IDENTIFICATION);
+        receiverIdentification.setCodingScheme(CodingSchemeType.A_01.value());
         receiverIdentification.setV(RECEIVER_ID);
         mergingLog.setReceiverIdentification(receiverIdentification);
         final MergingLog.ReceiverRole receiverRole = new MergingLog.ReceiverRole();
-        receiverRole.setV(RECEIVER_ROLE);
+        receiverRole.setV(RoleTypeList.A_36.value());
         mergingLog.setReceiverRole(receiverRole);
         final MergingLog.CreationDateTime creationDateTime = new MergingLog.CreationDateTime();
         creationDateTime.setV(getNowDate());
@@ -111,16 +109,16 @@ public class MergingLogsBuilder {
         reportTimeInterval.setV(referenceProgram.getDailyTimeInterval());
         mergingLog.setReportTimeInterval(reportTimeInterval);
         final MergingLog.Domain domain = new MergingLog.Domain();
-        domain.setCodingScheme(IDENTIFICATION);
+        domain.setCodingScheme(CodingSchemeType.A_01.value());
         domain.setV(CORE_REGION_ID);
         mergingLog.setDomain(domain);
     }
 
     private MergingLog.TimeSeries.Period.Interval.MergingReport computeMergingReport(final MergingTask task, final List<ReportInformationInRegion> reportInformationInRegionList, final PstOutput pstOutputs, final List<ReportInformationOutRegion> reportInformationsOutRegionList, final List<ReportCommonsInformation> tsoInformationsList, final List<AlegroReportInformation> alegroReportInformationList) {
         final MergingLog.TimeSeries.Period.Interval.MergingReport mergingReport = new MergingLog.TimeSeries.Period.Interval.MergingReport();
-        mergingReport.setMergeType(reportInformationInRegionList.get(0).mergeLoadflowType());
-        mergingReport.setBCIactive(reportInformationInRegionList.get(0).bciActive());
-        mergingReport.setBCIFeasibilityRangesExtended(reportInformationInRegionList.get(0).bciFeasibilityRangesExtended());
+        mergingReport.setMergeType(reportInformationInRegionList.getFirst().mergeLoadflowType());
+        mergingReport.setBCIactive(reportInformationInRegionList.getFirst().bciActive());
+        mergingReport.setBCIFeasibilityRangesExtended(reportInformationInRegionList.getFirst().bciFeasibilityRangesExtended());
         reportInformationInRegionList.forEach(reportInformationInRegion ->
                 mergingReport.getReport().add(computeCoreReport(task, reportInformationInRegion)));
         reportInformationsOutRegionList.forEach(reportInformationsOutRegion ->
@@ -271,12 +269,12 @@ public class MergingLogsBuilder {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.SIITReport siitReport = new MergingLog.TimeSeries.Period.Interval.MergingReport.SIITReport();
         final MergingLog.TimeSeries.Period.Interval.MergingReport.SIITReport.OutArea outArea = new MergingLog.TimeSeries.Period.Interval.MergingReport.SIITReport.OutArea();
         final Map<String, String> areasAll = task.getConfigurations().getRegionConfiguration().getAreasAll();
-        outArea.setCodingScheme(IDENTIFICATION);
-        outArea.setV(areasAll.get(SLOVENIA_CODE));
+        outArea.setCodingScheme(CodingSchemeType.A_01.value());
+        outArea.setV(areasAll.get(Country.SI.name()));
         siitReport.setOutArea(outArea);
         final MergingLog.TimeSeries.Period.Interval.MergingReport.SIITReport.InArea inArea = new MergingLog.TimeSeries.Period.Interval.MergingReport.SIITReport.InArea();
-        inArea.setCodingScheme(IDENTIFICATION);
-        inArea.setV(areasAll.get(ITALY_CODE));
+        inArea.setCodingScheme(CodingSchemeType.A_01.value());
+        inArea.setV(areasAll.get(Country.IT.name()));
         siitReport.setInArea(inArea);
         siitReport.setAppliedProcedure((Integer.valueOf(pstOutputs.getProcessNumber())).byteValue());
         siitReport.setTargetFlow(getTargetFlow(pstOutputs));
