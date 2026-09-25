@@ -82,7 +82,7 @@ public final class ExcelWriter {
     }
 
     private static XSSFWorkbook createWorkbook(final File file) throws IOException {
-        return file.exists() ? (XSSFWorkbook) WorkbookFactory.create(new FileInputStream(file))
+        return file.exists() && file.length() != 0 ? (XSSFWorkbook) WorkbookFactory.create(new FileInputStream(file))
                 : new XSSFWorkbook();
     }
 

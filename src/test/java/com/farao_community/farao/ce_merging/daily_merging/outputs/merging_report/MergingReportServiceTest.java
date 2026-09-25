@@ -7,6 +7,7 @@
 
 package com.farao_community.farao.ce_merging.daily_merging.outputs.merging_report;
 
+import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.daily_merging.DailyMergingRepository;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyInputs;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
@@ -22,6 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +52,9 @@ class MergingReportServiceTest {
 
     @Autowired
     private DailyMergingRepository repository;
+
+    @Autowired
+    private CeMergingConfiguration configuration;
 
     @Autowired
     MergingReportService mergingReportService;
@@ -86,8 +93,10 @@ class MergingReportServiceTest {
     }
 
     @Test
-    public void shouldProduceMergingReport() {
+    public void shouldProduceMergingReport() throws IOException {
         dailyTask = repository.save(dailyTask);
+        Files.createDirectories(Paths.get(configuration.getDailyInputsDirectoryPath(dailyTask)));
+        Files.createDirectories(Paths.get(configuration.getDailyOutputsDirectoryPath(dailyTask)));
         mergingReportService.computeMergingReport(dailyTask, tasksList, requestInformation);
         assertNotNull(dailyTask.getDailyOutputs().getMergingReport());
     }
