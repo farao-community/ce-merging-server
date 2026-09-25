@@ -9,6 +9,8 @@ package com.farao_community.farao.ce_merging.merging.process.german_pre_merge;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
 import com.powsybl.iidm.network.Network;
@@ -46,6 +48,7 @@ public class GermanPreMergeService {
     }
 
     public void preMergeGermanCountries(final MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.GERMAN_PREMERGE);
         try {
             final Network germanNetwork = mergeGermanRegions(task);
             LOGGER.info("German network files merged with success");

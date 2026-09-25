@@ -17,6 +17,8 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecCoefficients;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceExchangeData;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.process.final_cgm_result.FinalCgmResult;
@@ -55,6 +57,7 @@ public class RefProgCalculationService {
 
     public void computeRefProg(final MergingTask mergingTask) {
         try {
+            LogsCustomisationUtils.setExtraFieldsInLogsMdc(mergingTask, MergingStep.REF_PROG);
             final Map<Border, Double> virtualHubsExchanges = new HashMap<>();
             final Map<Border, Double> acExchanges = new HashMap<>();
             final ReferenceProgram referenceProgram = JsonUtils.read(ReferenceProgram.class, mergingTask.getArtifacts().getFile(ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE).getPath());

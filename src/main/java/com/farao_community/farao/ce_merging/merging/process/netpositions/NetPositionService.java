@@ -11,6 +11,8 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.monita.MonitaService;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
@@ -58,6 +60,7 @@ public class NetPositionService {
     }
 
     public void computeInitialNetPositions(final MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.INITIAL_NET_POSION_CALCULATION);
         try {
             final Artifacts artifacts = task.getArtifacts();
             final Map<String, NetPositions> fromPreTreatedInputs = task.getInputs()

@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.merging.task;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.util.FileUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.ExecutionLogsService;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -90,6 +91,7 @@ class MergingTaskManagementServiceTest {
     private final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService = mock(HvdcAlignmentConfigurationService.class);
     private final VirtualHubsConfigurationService virtualHubsConfigurationService = mock(VirtualHubsConfigurationService.class);
     private final XNodeConfigurationService xNodeConfigurationService = mock(XNodeConfigurationService.class);
+    private final ExecutionLogsService executionLogsService = mock(ExecutionLogsService.class);
 
     MergingTaskManagementService service;
 
@@ -104,7 +106,8 @@ class MergingTaskManagementServiceTest {
                                                    xNodeConfigurationService,
                                                    becKeyConfigurationService,
                                                    regionConfigurationService,
-                                                   hvdcAlignmentConfigurationService);
+                                                   hvdcAlignmentConfigurationService,
+                                                   executionLogsService);
     }
 
     @Test

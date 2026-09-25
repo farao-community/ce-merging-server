@@ -64,6 +64,7 @@ class XnodesServiceTest {
     @Test
     void shouldCheckIgmsStatus() {
         final MergingTask task = new MergingTask();
+        task.setId(2L);
         final Configurations configurations = new Configurations();
         task.setConfigurations(configurations);
 

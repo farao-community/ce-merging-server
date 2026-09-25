@@ -11,6 +11,8 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -75,6 +77,7 @@ public class GlskQualityCheckService {
     }
 
     public void runQualityCheck(final MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.GLSK_QUALITY_CHECK);
         final Inputs inputs = task.getInputs();
         final OffsetDateTime processTargetDate = inputs.getTargetDate();
         final SavedFile mergedFile = task.getArtifacts().getFile(ArtifactType.TGM_FILE_AFTER_RECESSIVITY);

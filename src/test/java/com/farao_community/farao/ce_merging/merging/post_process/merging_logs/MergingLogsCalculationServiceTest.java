@@ -2,6 +2,7 @@
 package com.farao_community.farao.ce_merging.merging.post_process.merging_logs;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import test_utils.TaskTestUtils;
 
 import java.io.IOException;
@@ -49,6 +51,9 @@ class MergingLogsCalculationServiceTest {
 
     @Mock
     private TsoInformationsService tsoInformationsService;
+
+    @Autowired
+    LogsCustomisationUtils logsCustomisationUtils;
 
     @Mock
     private MergingTaskRepository repository;
