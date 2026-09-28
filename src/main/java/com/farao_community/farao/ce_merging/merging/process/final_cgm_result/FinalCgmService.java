@@ -10,7 +10,6 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
-import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler;
@@ -35,14 +34,20 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_BASE_NAME;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RTE_GSR_URL;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFileWithWriter;
+import static com.farao_community.farao.ce_merging.common.util.JaxbUtils.writeToPath;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getLoadFlowMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithLogs;
 import static com.farao_community.farao.ce_merging.merging.process.final_cgm_result.OpenLoadFlowReportToXmlConverter.fromOlfReportToXmlLogs;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
+import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+import static jakarta.xml.bind.Marshaller.JAXB_FRAGMENT;
+import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
+import static java.lang.Boolean.TRUE;
 import static java.util.function.Predicate.not;
 
 @Service
@@ -83,9 +88,16 @@ public class FinalCgmService {
             final LoadFlowOutput loadflowOutput = LoadFlowOutput.from(cgm.getOriginalName(),
                                                                       getLoadFlowMode(loadFlowParameters),
                                                                       result);
-            saveArtifactFileWithWriter(LOAD_FLOW_ON_FINAL_CGM_LOGS, task, configuration, path -> {
-                JaxbUtils.writeToPath(Logs.class, fromOlfReportToXmlLogs(rootReportNode), path, "http://www.rte-france.com/gsr", true);
-            });
+            saveArtifactFileWithWriter(LOAD_FLOW_ON_FINAL_CGM_LOGS, task, configuration, path ->
+                    writeToPath(Logs.class,
+                                fromOlfReportToXmlLogs(rootReportNode),
+                                path,
+                                Map.of(JAXB_FRAGMENT, TRUE,
+                                       JAXB_NO_NAMESPACE_SCHEMA_LOCATION, RTE_GSR_URL,
+                                       JAXB_FORMATTED_OUTPUT, TRUE),
+                                RTE_GSR_URL,
+                                "logs")
+            );
 
             network.getCountries().forEach(country -> {
                 final NetPositions netPositions = CountryNetPositionHandler.computeCountryNetPositions(

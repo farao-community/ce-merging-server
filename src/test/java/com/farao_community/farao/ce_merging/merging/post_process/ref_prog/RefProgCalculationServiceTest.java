@@ -14,6 +14,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecCoefficients;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
+import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
@@ -62,6 +63,9 @@ class RefProgCalculationServiceTest {
 
     @Autowired
     RefProgCalculationService refProgCalculationService;
+
+    @Autowired
+    MergingTaskRepository repository;
 
     MergingTask task = new MergingTask();
 
@@ -328,7 +332,7 @@ class RefProgCalculationServiceTest {
 
     private void initCoreMergingTaskEntity() throws Exception {
         TaskTestUtils.setTaskDefaultConfigurations(task);
-        task.setId(1L);
+        repository.save(task);
         initArtifacts();
         initInputs();
         initBecByBoundary();

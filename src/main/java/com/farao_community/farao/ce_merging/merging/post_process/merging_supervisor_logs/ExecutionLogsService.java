@@ -35,6 +35,8 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMP
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_STEP;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RTE_GSR_URL;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO_LOWER_CASE;
+import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+import static java.lang.Boolean.TRUE;
 
 @Service
 public class ExecutionLogsService {
@@ -114,12 +116,12 @@ public class ExecutionLogsService {
                     .ifPresent(context -> context.getRecOrCtxt().addAll(openLoadFlowLogs));
             final List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
             logs.getCtxt().addAll(finalContextList);
-            return JaxbUtils.writeToBytes(Logs.class, logs, Map.of(), RTE_GSR_URL, LOGS);
+            return JaxbUtils.writeToBytes(Logs.class, logs, Map.of(JAXB_FORMATTED_OUTPUT, TRUE), RTE_GSR_URL, LOGS);
 
         } catch (Exception e) {
             final List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
             logs.getCtxt().addAll(finalContextList);
-            return JaxbUtils.writeToBytes(Logs.class, logs, Map.of(), RTE_GSR_URL, LOGS);
+            return JaxbUtils.writeToBytes(Logs.class, logs, Map.of(JAXB_FORMATTED_OUTPUT, TRUE), RTE_GSR_URL, LOGS);
         }
     }
 
