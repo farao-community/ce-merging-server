@@ -11,7 +11,7 @@ For each IGM, it starts by running a loadflow (in AC with fallback DC) and then 
 
 During the initial calculation of the net positions, for X-Nodes with area=DE, to determine the country on the other side, we look at subarea : 
 
-- subarea = "D1" → DK
+- subarea == "D1" → DK
 - subarea ∈ { D2, D4, D6, D7, D8 } → DE
 
 - subarea ∉ { D1, D2, D4, D6, D7, D8 } →  Warning because the area is DE without a valid subarea
@@ -35,9 +35,9 @@ be able toapply the BCI step correctly.
 
 Indeed, as we can see in the reference program file provided in outputs, we have :
 
-NP_IT = (IT-FR + IT-AT + IT-SI + IT-CH) + (XAR_GA1I + XCEPR220 + XCEPR120)
+$NP(IT) = NP(IT→FR) + NP(IT→AT) + NP(IT→SI) + NP(IT→CH) + (XAR\_GA1I + XCEPR220 + XCEPR120)$
 
-NP_ME = (ME-RS + ME-AL + ME-XK + ME-BA) + (XKOTR120 + XKOTR220)
+$NP(ME) = NP(ME→RS) + NP(ME→AL) + NP(ME→XK) + NP(ME→BA) + (XKOTR120 + XKOTR220)$
 
 And here's how the balance adjustment targets are calculated :
 

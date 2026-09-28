@@ -5,9 +5,9 @@ As of writing, one paragraph below <=> one service called in the **MergingServic
 
 ### X-Node IGM status
 For every X-Node found in IGMs, we check if there are inconsistencies :
-- Is there a X-Node appearing only in one IGM ?
-- Is there a difference in statuses between two IGMs ?
-- Is there an X-Node undefined in the X-Node configuration file ?
+- Is there an X-Node appearing only in one IGM?
+- Is there a difference in statuses between two IGMs?
+- Is there an X-Node undefined in the X-Node configuration file?
 
 If so, these informations are saved in an X-Node inconsistencies file.
 ### NPF import
@@ -20,9 +20,9 @@ We then check date validity against the time series periods, and we compute the 
 If it is not **A01** or **A03**, we throw an exception because it is not an acceptable input,
 if it's one of these, it defines how we model the intervals of time :
 
-**A01 :** end of interval = start of interval + resolution
+**A01 :** $end(interval_i) = start(interval_i) + resolution$
 
-**A03 :** end of interval = start of next interval
+**A03 :** $end(interval_i) = start(interval_{i+1})$
 ### German pre-merge
 Since there are several German TSOs, we receive 5 different IGMs, with the "country" codes being D2, D4, D6, D7 and D8.
 
@@ -30,23 +30,23 @@ In this step, we merge these into a single German UCTE file, with the country co
 The XNodes merged during the process are then converted into German standard nodes, since these are not representing a border node anymore.
 Then we run a first load flow on this merged German network.
 
-Finally, we calculate the german internal mismatch by summing all internal net positions, and distribute this mismatch on boundary lines proportionally :
+Finally, we calculate the german internal mismatch by summing all internal net positions and distributing this mismatch on boundary lines proportionally :
 
-updated flow = initial flow + mismatch * | initial flow / sumExternalNP |
+$Flow_{updated} = Flow_{initial} + mismatch \times | \frac{Flow_{initial}}{\sum NP_{external}}|$
 
 
 
 ### Denmark renaming
 The IGM files that we receive from Danish TSO have nodes defined in the **##ZD1** zone and have names starting with D1.
 
-In order to not clash with german country code, any node which name starts with D1 will be moved in the **##ZDK** zone and renamed to start with K1.
+To not clash with german country code, any node whose name starts with D1 will be moved in the **##ZDK** zone and renamed to start with K1.
 
-An explicit list of specific nodes (HVDC ones) that does not start with D1, but are Danish nodes,
+An explicit list of specific nodes (HVDC ones) that do not start with D1 but are Danish nodes
 will be moved in **##ZDK** zone and renamed to start with X. 
 
-Any element (line, transformer...) that reference these nodes are also renamed.
+Any element (line, transformer...) that references these nodes is also renamed.
 ### HVDC alignment
-For each couple defined in the HVDC alignment configuration, we check if one of the nodes was not found in virtual hub configuration. 
+For each couple defined in the HVDC alignment configuration, we check if one of the nodes was not found in the virtual hub configuration. 
 If the two nodes have been recovered correctly, we find the corresponding countries using the _RelatedMa_ field, and then the corresponding IGMs.
 
 If we cannot find any one of these, we emit an error. Then, if we are unable to retrieve the boundary line associated with the reference or recessive node in the network, we will emit a warning.
@@ -54,12 +54,12 @@ If we cannot find any one of these, we emit an error. Then, if we are unable to 
 
 If the two dangling lines have been recovered correctly, we apply the HVDC alignment :
 
-- Boundary line and generator Powers corresponding to the recessive X-Node are set to the opposite value of that of the reference node
-- We also align the outage status of the recessive with the reference one
+- Boundary line and generator Powers corresponding to the recessive X-Node are set to the opposite value of the reference one,
+- We also align the outage status of the recessive with the reference.
 
 We then save the modified IGMs in the artifacts with the same name.
 ### MONITA renaming
-The nodes describing the MONITA (**MON**tenegro - **ITA**ly) HVDC don't start with an X. In order to include them correctly in the following calculations, they have to, so we rename these :
+The nodes describing the MONITA (**MON**tenegro - **ITA**ly) HVDC don't start with an X. To include them correctly in the following calculations, they have to, so we rename these :
 - ICEPR → XCEPR
 - IKOTR → XKOTR.
 
