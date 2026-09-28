@@ -35,9 +35,7 @@ import java.util.List;
 import java.util.stream.StreamSupport;
 
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
-import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 import static org.apache.commons.io.FileUtils.deleteQuietly;
 
 @Service
