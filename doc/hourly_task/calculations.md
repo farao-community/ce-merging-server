@@ -55,7 +55,9 @@ We then create a new GLSK, filtering blocks like this:
 If multiple blocks were used with a share value different of 100% (e.g. one GSK and one LSK), the share is never modified, except if one of the associated block is empty after previous filtering. In that case, the other associated blocks share value is rescaled proportionally to their initial value to have a 100% share sum.
 
 ### Base case improvement
-TODO
+This step is a first calculation on net positions, to bring the ones outside the feasibility ranges to acceptable values. It is detailed [here](/doc/hourly_task/step_details/bci.md).
+
+The result of this step is the _bciOutputs.json_ file.
 ### Alegro P0 Update
 TODO
 ### Target net positions computation
