@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model.re
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,7 +18,12 @@ import java.util.List;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
-public class XNodeConfigurationRecord extends AbstractGridConfigurationRecord {
+public class XNodeConfigurationRecord {
+    @Id
+    protected String id;
+    protected LocalDateTime validFrom;
+    protected LocalDateTime validTo;
+    protected LocalDateTime publishedOn;
     @ElementCollection(fetch = LAZY)
     private List<XnodeConfigDto> xNodeList = new ArrayList<>();
 
@@ -26,7 +32,10 @@ public class XNodeConfigurationRecord extends AbstractGridConfigurationRecord {
                                     final LocalDateTime validTo,
                                     final LocalDateTime publishedOn,
                                     final List<XnodeConfigDto> xNodeList) {
-        super(id, validFrom, validTo, publishedOn);
+        this.id = id;
+        this.validFrom = validFrom;
+        this.validTo = validTo;
+        this.publishedOn = publishedOn;
         this.xNodeList = xNodeList;
     }
 
@@ -40,5 +49,37 @@ public class XNodeConfigurationRecord extends AbstractGridConfigurationRecord {
 
     public void setXNodeList(final List<XnodeConfigDto> xNodeList) {
         this.xNodeList = xNodeList;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getValidFrom() {
+        return validFrom;
+    }
+
+    public void setValidFrom(final LocalDateTime validFrom) {
+        this.validFrom = validFrom;
+    }
+
+    public LocalDateTime getValidTo() {
+        return validTo;
+    }
+
+    public void setValidTo(final LocalDateTime validTo) {
+        this.validTo = validTo;
+    }
+
+    public LocalDateTime getPublishedOn() {
+        return publishedOn;
+    }
+
+    public void setPublishedOn(final LocalDateTime publishedOn) {
+        this.publishedOn = publishedOn;
     }
 }
