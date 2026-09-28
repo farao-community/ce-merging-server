@@ -123,6 +123,25 @@ public final class JaxbUtils {
         }
     }
 
+    public static <T> byte[] writeToPath(final Class<T> clazz,
+                                         final T object,
+                                         final Path path,
+                                         final Map<String, Object> properties,
+                                         final String nameSpaceURI,
+                                         final String rootElement) {
+        try {
+            final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            marshaller(clazz, properties).marshal(withSpecifiedRoot(clazz,
+                                                                    object,
+                                                                    nameSpaceURI,
+                                                                    rootElement),
+                                                  path.toFile());
+            return bos.toByteArray();
+        } catch (final Exception e) {
+            throw errorWhile(e, "writing a %s object to bytes", clazz.getSimpleName());
+        }
+    }
+
     /**
      *
      * @param clazz    the Class object representing T
@@ -171,7 +190,9 @@ public final class JaxbUtils {
         }
     }
 
-    public static <T> void writeToPath(final JAXBElement<T> element, final Path filePath, final Map<String, Object> properties) {
+    public static <T> void writeToPath(final JAXBElement<T> element,
+                                       final Path filePath,
+                                       final Map<String, Object> properties) {
         try {
             final Marshaller jaxbMarshaller = marshaller(element.getDeclaredType(), properties);
             try (final OutputStream outputStream = Files.newOutputStream(filePath);
