@@ -2,12 +2,10 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model.re
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Inheritance
 public abstract class AbstractGridConfigurationRecord {
     @Id
     protected String id;

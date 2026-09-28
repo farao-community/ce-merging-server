@@ -15,6 +15,11 @@ import com.farao_community.farao.ce_merging.common.exception.task.TaskNotRunExce
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
 import com.farao_community.farao.ce_merging.common.util.FileUtils;
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonXNodeConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.HvdcAlignmentConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.RegionConfigurationService;
@@ -32,6 +37,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
+import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -105,9 +111,9 @@ public class MergingTaskManagementService {
 
     public JsonApiDocument<MergingTaskDto> getTaskJsonDoc(final Long taskId) {
         return JsonApiDocument.fromData(
-            mapper.mergingTaskToMergingTaskDto(
-                getTaskById(taskId)
-            )
+                mapper.mergingTaskToMergingTaskDto(
+                        getTaskById(taskId)
+                )
         );
     }
 
@@ -177,11 +183,13 @@ public class MergingTaskManagementService {
         return zipDirectory(configuration.getInputsDirectoryPath(getTaskById(taskId)));
     }
 
-    public SavedFile getIgm(final Long taskId, final String areaId) {
+    public SavedFile getIgm(final Long taskId,
+                            final String areaId) {
         return getIgmData(taskId, areaId).getIgmFile();
     }
 
-    public SavedFile getIgmQualityReport(final Long taskId, final String areaId) {
+    public SavedFile getIgmQualityReport(final Long taskId,
+                                         final String areaId) {
         return getIgmData(taskId, areaId).getIgmQualityReportFile();
     }
 
@@ -319,7 +327,7 @@ public class MergingTaskManagementService {
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     public byte[] getBECKeyConfiguration(final OffsetDateTime dateTime) throws IOException {
-        return becKeyConfigurationService.getConfigAsJsonBytes(dateTime);
+        return JsonUtils.writeToBytes(JsonBecConfiguration.class, becKeyConfigurationService.getConfiguration(dateTime));
     }
 
     public void publishBECKeyConfiguration(final MultipartFile configurationFile,
@@ -329,7 +337,7 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getRegionConfiguration(final OffsetDateTime dateTime) throws IOException {
-        return regionConfigurationService.getConfigAsJsonBytes(dateTime);
+        return JsonUtils.writeToBytes(JsonRegionConfiguration.class, regionConfigurationService.getConfiguration(dateTime));
     }
 
     public void publishRegionConfiguration(final MultipartFile configurationFile,
@@ -339,7 +347,7 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getHvdcXNodeAlignmentConfiguration(final OffsetDateTime dateTime) throws IOException {
-        return hvdcAlignmentConfigurationService.getConfigAsJsonBytes(dateTime);
+        return JsonUtils.writeToBytes(JsonHvdcAlignmentConfiguration.class, hvdcAlignmentConfigurationService.getConfiguration(dateTime));
     }
 
     public void publishHvdcXNodeAlignmentConfiguration(final MultipartFile configurationFile,
@@ -349,7 +357,7 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getVirtualHubsConfiguration(final OffsetDateTime dateTime) throws IOException {
-        return virtualHubsConfigurationService.getConfigAsJsonBytes(dateTime);
+        return JsonUtils.writeToBytes(VirtualHubsConfiguration.class, virtualHubsConfigurationService.getConfiguration(dateTime));
     }
 
     public void publishVirtualHubsConfiguration(final MultipartFile configurationFile,
@@ -359,7 +367,7 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getXNodesConfiguration(final OffsetDateTime dateTime) throws IOException {
-        return xNodeConfigurationService.getConfigAsJsonBytes(dateTime);
+        return JsonUtils.writeToBytes(JsonXNodeConfiguration.class, xNodeConfigurationService.getConfiguration(dateTime));
     }
 
     public void publishXNodesConfiguration(final MultipartFile configurationFile,
@@ -444,7 +452,7 @@ public class MergingTaskManagementService {
 
     public MergingTask getTaskById(final Long taskId) {
         final MergingTask task = findTaskById(taskId)
-            .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available", taskId)));
+                .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available", taskId)));
         handleDaylightSavingTime(task);
         return task;
     }
@@ -487,15 +495,18 @@ public class MergingTaskManagementService {
 
     }
 
-    private SavedFile getInputFile(final Long taskId, final Function<Inputs, SavedFile> accessor) {
+    private SavedFile getInputFile(final Long taskId,
+                                   final Function<Inputs, SavedFile> accessor) {
         return accessor.apply(getTaskById(taskId).getInputs());
     }
 
-    private SavedFile getConfigurationFile(final Long taskId, final Function<Configurations, SavedFile> accessor) {
+    private SavedFile getConfigurationFile(final Long taskId,
+                                           final Function<Configurations, SavedFile> accessor) {
         return accessor.apply(getTaskById(taskId).getConfigurations());
     }
 
-    private IgmData getIgmData(final Long taskId, final String areaId) {
+    private IgmData getIgmData(final Long taskId,
+                               final String areaId) {
         final MergingTask task = getTaskById(taskId);
         return task.getInputs().getIgm(areaId);
     }
