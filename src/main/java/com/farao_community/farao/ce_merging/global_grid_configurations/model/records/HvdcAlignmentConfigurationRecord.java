@@ -10,6 +10,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,7 +19,13 @@ import java.util.List;
 import static jakarta.persistence.FetchType.LAZY;
 
 @Entity
-public class HvdcAlignmentConfigurationRecord extends AbstractGridConfigurationRecord {
+public class HvdcAlignmentConfigurationRecord {
+
+    @Id
+    protected String id;
+    protected LocalDateTime validFrom;
+    protected LocalDateTime validTo;
+    protected LocalDateTime publishedOn;
     @ElementCollection(fetch = LAZY)
     private List<VirtualHubsAlignmentCoupleDto> hvdcXNodeAlignmentCouplesDto = new ArrayList<>();
 
@@ -38,7 +45,10 @@ public class HvdcAlignmentConfigurationRecord extends AbstractGridConfigurationR
                                             final List<ZeroFlowNodeDto> zeroFlowNodeDtos,
                                             final List<String> dkHvdcXnodes,
                                             final String defaultSlackNode) {
-        super(id, validFrom, validTo, publishedOn);
+        this.id = id;
+        this.validFrom = validFrom;
+        this.validTo = validTo;
+        this.publishedOn = publishedOn;
         this.hvdcXNodeAlignmentCouplesDto = hvdcXNodeAlignmentCouplesDto;
         this.zeroFlowNodeDtos = zeroFlowNodeDtos;
         this.dkHvdcXnodes = dkHvdcXnodes;
@@ -78,5 +88,37 @@ public class HvdcAlignmentConfigurationRecord extends AbstractGridConfigurationR
 
     public void setDkHvdcXnodes(final List<String> dkHvdcXnodes) {
         this.dkHvdcXnodes = new ArrayList<>(dkHvdcXnodes);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(final String id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getValidFrom() {
+        return validFrom;
+    }
+
+    public void setValidFrom(final LocalDateTime validFrom) {
+        this.validFrom = validFrom;
+    }
+
+    public LocalDateTime getValidTo() {
+        return validTo;
+    }
+
+    public void setValidTo(final LocalDateTime validTo) {
+        this.validTo = validTo;
+    }
+
+    public LocalDateTime getPublishedOn() {
+        return publishedOn;
+    }
+
+    public void setPublishedOn(final LocalDateTime publishedOn) {
+        this.publishedOn = publishedOn;
     }
 }
