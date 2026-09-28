@@ -13,8 +13,10 @@ Given :
 
 The new target CE net positions calculation depends on the sum of NeededShift for inactive zones :
 - if it is negative,
+
 ![bci formula for negative needed shift](bci_negative_shift.png)
 - if it is positive :
+
 ![bci formula for positive needed shift](bci_positive_shift.png)
 
 For the inactive bidding zones, the net positions will be shifted to the max/min of the feasibility range using the real merged GLSK.
