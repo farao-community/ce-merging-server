@@ -84,7 +84,7 @@ public class FinalCgmService {
                                                                       getLoadFlowMode(loadFlowParameters),
                                                                       result);
             saveArtifactFileWithWriter(LOAD_FLOW_ON_FINAL_CGM_LOGS, task, configuration, path -> {
-                JaxbUtils.writeToPath(Logs.class, fromOlfReportToXmlLogs(rootReportNode), "http://www.rte-france.com/gsr", "logs", path);
+                JaxbUtils.writeToPath(Logs.class, fromOlfReportToXmlLogs(rootReportNode), path, "http://www.rte-france.com/gsr", true);
             });
 
             network.getCountries().forEach(country -> {
