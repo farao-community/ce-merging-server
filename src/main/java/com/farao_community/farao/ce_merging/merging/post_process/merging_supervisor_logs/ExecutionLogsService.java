@@ -114,12 +114,12 @@ public class ExecutionLogsService {
                     .ifPresent(context -> context.getRecOrCtxt().addAll(openLoadFlowLogs));
             final List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
             logs.getCtxt().addAll(finalContextList);
-            return JaxbUtils.writeToBytes(Logs.class, logs, RTE_GSR_URL, LOGS);
+            return JaxbUtils.writeToBytes(Logs.class, logs, Map.of(), RTE_GSR_URL, LOGS);
 
         } catch (Exception e) {
             final List<Context> finalContextList = contextsList.stream().filter(context -> !context.getRecOrCtxt().isEmpty()).toList();
             logs.getCtxt().addAll(finalContextList);
-            return JaxbUtils.writeToBytes(Logs.class, logs, RTE_GSR_URL, LOGS);
+            return JaxbUtils.writeToBytes(Logs.class, logs, Map.of(), RTE_GSR_URL, LOGS);
         }
     }
 
