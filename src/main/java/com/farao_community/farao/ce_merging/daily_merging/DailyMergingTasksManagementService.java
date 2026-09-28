@@ -91,8 +91,8 @@ public class DailyMergingTasksManagementService {
         return task;
     }
 
-    public DailyMergingTask runDailyMergingTask(final long dailyTaskId) {
-        final DailyMergingTask task = getTaskById(dailyTaskId);
+    public DailyMergingTask runDailyMergingTask(long dailyTaskId) {
+        DailyMergingTask task = getTaskById(dailyTaskId);
         try {
             if (task.getTaskStatus() == RUNNING) {
                 throw new TaskAlreadyRunningException(String.format("Task %d already running, could not be run again",
@@ -101,18 +101,19 @@ public class DailyMergingTasksManagementService {
             task.setTaskStatus(RUNNING);
             LOGGER.info("Running daily merging task: '{}' ", task.getId());
             repository.save(task);
-            final List<MergingTask> hourlyTasks = task.getMergingTaskIds()
-                    .stream()
-                    .map(service::getTaskById)
-                    .toList();
+            final List<MergingTask> mergingTasks = new ArrayList<>(
+                    task.getMergingTaskIds().stream()
+                            .map(service::getTaskById)
+                            .toList()
+            );
+            dailyMergingService.run(task, mergingTasks);
 
-            dailyMergingService.run(task, hourlyTasks);
-            task.setTaskStatus(SUCCESS);
+            task.setTaskStatus(TaskStatus.SUCCESS);
             LOGGER.info("Daily task: '{}' is finished with success", task.getId());
             repository.save(task);
             return task;
         } catch (final Exception e) {
-            task.setTaskStatus(ERROR);
+            task.setTaskStatus(TaskStatus.ERROR);
             repository.save(task);
             throw e;
         }
