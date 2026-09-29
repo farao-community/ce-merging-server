@@ -110,8 +110,8 @@ public class BciExportBuilder {
                 .getGermanyZone()
                 .entrySet()
                 .stream()
-                .collect(toMap(Map.Entry::getKey,
-                               e -> e.getValue().getName()));
+                .collect(toMap(e -> e.getValue().getName(),
+                               Map.Entry::getKey));
     }
 
     private HubBCI convertReport(final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report) {
