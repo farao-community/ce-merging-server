@@ -24,7 +24,7 @@ public class MergingLogsConverter {
     public byte[] convert(final MergingTask task) {
         try {
             final MergingLog mergingLogs = JaxbUtils.readFromPath(MergingLog.class, task.getOutputs().getMergingLogs().getPath());
-            final ExportBCI exportBci = bciLogsBuilder.buildBciLogs(task, mergingLogs);
+            final ExportBCI exportBci = BciLogsBuilder.buildBciLogs(task, mergingLogs);
             return JaxbUtils.writeToBytes(ExportBCI.class, exportBci);
 
         } catch (final Exception e) {
