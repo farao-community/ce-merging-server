@@ -95,7 +95,7 @@ public final class CeMergingConstants {
     public static final String CORE_REGION_ID = "10Y1001C--00059P";
     public static final String UCTE_IMPORT_CREATE_AREAS_KEY = "ucte.import.create-areas";
     public static final String TSO = "TSO";
-    public static final String CE = "CE";
+    public static final String CORE = "CORE";
     public static final String TSO_LOWER_CASE = "tso";
     public static final String RESOLUTION = "PT60M";
     public static final String XML_EXTENSION = "xml";

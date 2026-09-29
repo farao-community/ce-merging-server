@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CORE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
@@ -218,7 +218,7 @@ class BciExportBuilderTest {
 
     private MergingLog.TimeSeries.Period.Interval.MergingReport.Report createCeReport(final String id, final String name) {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report = new MergingLog.TimeSeries.Period.Interval.MergingReport.Report();
-        report.setTypeInfo(CE);
+        report.setTypeInfo(CORE);
         report.setId(id);
         report.setName(name);
 
@@ -242,7 +242,7 @@ class BciExportBuilderTest {
 
     private MergingLog.TimeSeries.Period.Interval.MergingReport.Report createAlegroReport(final String id) {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report = new MergingLog.TimeSeries.Period.Interval.MergingReport.Report();
-        report.setTypeInfo(CE);
+        report.setTypeInfo(CORE);
         report.setId(id);
         report.setName(id);
 

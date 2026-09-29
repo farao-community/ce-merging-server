@@ -36,7 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CORE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
@@ -45,9 +45,9 @@ import static java.util.stream.Collectors.toMap;
 
 public class BciExportBuilder {
 
-    private static final List<String> TYPE_INFOS = Arrays.asList(CE, TSO);
-    private MergingTask task;
-    private MergingLog mergingLog;
+    private static final List<String> TYPE_INFOS = Arrays.asList(CORE, TSO);
+    private final MergingTask task;
+    private final MergingLog mergingLog;
 
     public BciExportBuilder(final MergingTask task,
                             final MergingLog mergingLog) {
@@ -88,7 +88,7 @@ public class BciExportBuilder {
 
     private String getCountryCode(final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report) {
         return switch (report.getTypeInfo()) {
-            case CE -> getAreasAllMapInversed().get(report.getId());
+            case CORE -> getAreasAllMapInversed().get(report.getId());
             case TSO -> getTsoCodes().get(report.getName());
             default -> EMPTY;
         };
@@ -118,7 +118,7 @@ public class BciExportBuilder {
         final HubBCI hubBCI = new HubBCI();
         hubBCI.setVal(getCountryCode(report));
         buildBaseCaseExport(report, hubBCI);
-        final boolean isCe = report.getTypeInfo().equals(CE);
+        final boolean isCe = report.getTypeInfo().equals(CORE);
         final boolean isAlegro = report.getId().equals(VIRTUAL_HUB_ALEGRO_BE_EIC) || report.getId().equals(VIRTUAL_HUB_ALEGRO_DE_EIC);
         if (isCe && !isAlegro) {
             buildReference(report, hubBCI);
