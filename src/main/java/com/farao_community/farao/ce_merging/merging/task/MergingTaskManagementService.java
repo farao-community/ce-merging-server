@@ -26,6 +26,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.services.
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.VirtualHubsConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.XNodeConfigurationService;
 import com.farao_community.farao.ce_merging.merging.MergingService;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor.MergingLogsConverter;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.ExecutionLogsService;
 import com.farao_community.farao.ce_merging.merging.request_metadata.RequestMetadataManager;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
@@ -36,6 +37,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
 import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
 import org.slf4j.Logger;
@@ -72,6 +74,7 @@ public class MergingTaskManagementService {
     private final MergingService mergingService;
     private final MergingTaskRepository repository;
     private final MergingTaskMapper mapper;
+    private final MergingLogsConverter mergingLogsConverter;
     private final VirtualHubsConfigurationService virtualHubsConfigurationService;
     private final XNodeConfigurationService xNodeConfigurationService;
     private final BECKeyConfigurationService becKeyConfigurationService;
@@ -83,6 +86,7 @@ public class MergingTaskManagementService {
                                         final MergingService mergingService,
                                         final MergingTaskRepository repository,
                                         final MergingTaskMapper mapper,
+                                        final MergingLogsConverter mergingLogsConverter,
                                         final VirtualHubsConfigurationService virtualHubsConfigurationService,
                                         final XNodeConfigurationService xNodeConfigurationService,
                                         final BECKeyConfigurationService becKeyConfigurationService,
@@ -93,6 +97,7 @@ public class MergingTaskManagementService {
         this.mergingService = mergingService;
         this.repository = repository;
         this.mapper = mapper;
+        this.mergingLogsConverter = mergingLogsConverter;
         this.virtualHubsConfigurationService = virtualHubsConfigurationService;
         this.xNodeConfigurationService = xNodeConfigurationService;
         this.becKeyConfigurationService = becKeyConfigurationService;
@@ -405,8 +410,13 @@ public class MergingTaskManagementService {
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     public byte[] exportMergingLogs(long taskId) {
-        //TODO
-        return null;
+        MergingTask task = getFinishedTaskById(taskId);
+        if (task.getStatus() == TaskStatus.SUCCESS) {
+            return mergingLogsConverter.convert(task);
+        } else {
+            LOGGER.error("Merging logs file for task: {} not available.", taskId);
+            throw new CeMergingException(String.format("Merging logs file for task %d not available", taskId));
+        }
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
