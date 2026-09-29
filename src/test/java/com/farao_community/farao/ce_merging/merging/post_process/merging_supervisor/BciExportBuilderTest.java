@@ -45,7 +45,7 @@ class BciExportBuilderTest {
 
     @BeforeEach
     void setUp() {
-        bciExportBuilder = new BciExportBuilder();
+
         mergingTask = new MergingTask();
         mergingTask.getInputs().setTargetDate(TARGET_DATE);
 
@@ -73,7 +73,8 @@ class BciExportBuilderTest {
         timeSeries.setPeriod(period);
         mergingLog.setTimeSeries(timeSeries);
 
-        final ExportBCI exportBCI = bciExportBuilder.buildBciExport(mergingTask, mergingLog);
+        bciExportBuilder = new BciExportBuilder(mergingTask, mergingLog);
+        final ExportBCI exportBCI = bciExportBuilder.buildBciExport();
 
         assertNotNull(exportBCI);
         assertNotNull(exportBCI.getBCIDateTime());
@@ -89,7 +90,8 @@ class BciExportBuilderTest {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.Report ceReport = createCeReport(AREA_FR_EIC, "FR");
         mergingLog.getTimeSeries().getPeriod().getInterval().getFirst().getMergingReport().getReport().add(ceReport);
 
-        final ExportBCI exportBCI = bciExportBuilder.buildBciExport(mergingTask, mergingLog);
+        bciExportBuilder = new BciExportBuilder(mergingTask, mergingLog);
+        final ExportBCI exportBCI = bciExportBuilder.buildBciExport();
 
         assertNotNull(exportBCI);
         assertEquals(TARGET_DATE.toString(), exportBCI.getBCIDateTime().getVal());
@@ -134,7 +136,8 @@ class BciExportBuilderTest {
         mergingLog.getTimeSeries().getPeriod().getInterval().getFirst().getMergingReport().getReport().add(alegroReportBe);
         mergingLog.getTimeSeries().getPeriod().getInterval().getFirst().getMergingReport().getReport().add(alegroReportDe);
 
-        final ExportBCI exportBCI = bciExportBuilder.buildBciExport(mergingTask, mergingLog);
+        bciExportBuilder = new BciExportBuilder(mergingTask, mergingLog);
+        final ExportBCI exportBCI = bciExportBuilder.buildBciExport();
 
         assertNotNull(exportBCI);
         assertNotNull(exportBCI.getBCIActive());
@@ -169,8 +172,8 @@ class BciExportBuilderTest {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.Report tsoReport = createTsoReport("DE_TNG", "aGermanTso");
         mergingLog.getTimeSeries().getPeriod().getInterval().getFirst().getMergingReport().getReport().add(tsoReport);
 
-        final ExportBCI exportBCI = bciExportBuilder.buildBciExport(mergingTask, mergingLog);
-
+        bciExportBuilder = new BciExportBuilder(mergingTask, mergingLog);
+        final ExportBCI exportBCI = bciExportBuilder.buildBciExport();
         assertNotNull(exportBCI);
         final List<HubBCI> hubBCIList = exportBCI.getPays().getHubBCI();
         assertEquals(1, hubBCIList.size());
@@ -192,7 +195,8 @@ class BciExportBuilderTest {
         otherReport.setName("OTHER_NAME");
         mergingLog.getTimeSeries().getPeriod().getInterval().getFirst().getMergingReport().getReport().add(otherReport);
 
-        final ExportBCI exportBCI = bciExportBuilder.buildBciExport(mergingTask, mergingLog);
+        bciExportBuilder = new BciExportBuilder(mergingTask, mergingLog);
+        final ExportBCI exportBCI = bciExportBuilder.buildBciExport();
 
         assertNotNull(exportBCI);
         assertTrue(exportBCI.getPays().getHubBCI().isEmpty());

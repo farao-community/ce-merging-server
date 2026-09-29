@@ -10,23 +10,22 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.xsd.merging_logs.MergingLog;
+import com.farao_community.farao.ce_merging.xsd.merging_supervisor.bci_nf.ExportBCI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
-@Service
-public class MergingLogsConverter {
+public final class MergingLogsConverter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MergingLogsConverter.class);
 
-    public MergingLogsConverter() {
+    private MergingLogsConverter() {
+        //utility
     }
 
-    public byte[] convert(final MergingTask task) {
+    public static byte[] convert(final MergingTask task) {
         try {
             final MergingLog mergingLogs = JaxbUtils.readFromPath(MergingLog.class, task.getOutputs().getMergingLogs().getPath());
-            final ExportBCI exportBci = BciLogsBuilder.buildBciLogs(task, mergingLogs);
+            final ExportBCI exportBci = new BciExportBuilder(task, mergingLogs).buildBciExport();
             return JaxbUtils.writeToBytes(ExportBCI.class, exportBci);
-
         } catch (final Exception e) {
             LOGGER.error("Cannot convert merging logs file for task '{}'", task.getId(), e);
             throw new CeMergingException(String.format("Cannot convert merging logs file for task %s ", task.getId()), e);

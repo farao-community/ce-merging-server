@@ -32,7 +32,6 @@ import com.farao_community.farao.ce_merging.xsd.merging_supervisor.bci_nf.Vertic
 import com.farao_community.farao.ce_merging.xsd.merging_supervisor.bci_nf.VerticalLoadIGM;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -47,18 +46,30 @@ import static java.util.stream.Collectors.toMap;
 public class BciExportBuilder {
 
     private static final List<String> TYPE_INFOS = Arrays.asList(CE, TSO);
+    private MergingTask task;
+    private MergingLog mergingLog;
 
-    ExportBCI buildBciExport(final MergingTask task,
-                             final MergingLog mergingLog) {
+    public BciExportBuilder(final MergingTask task,
+                            final MergingLog mergingLog) {
+        this.task = task;
+        this.mergingLog = mergingLog;
+    }
+
+    public ExportBCI buildBciExport() {
         final ExportBCI result = new ExportBCI();
         final Pays pays = new Pays();
-        final List<MergingLog.TimeSeries.Period.Interval> mergeIntervals = mergingLog.getTimeSeries().getPeriod().getInterval();
+        final List<MergingLog.TimeSeries.Period.Interval> mergeIntervals = mergingLog
+                .getTimeSeries()
+                .getPeriod()
+                .getInterval();
         if (!mergeIntervals.isEmpty()) {
-            final MergingLog.TimeSeries.Period.Interval.MergingReport mergingReport = mergeIntervals.getFirst().getMergingReport();
+            final MergingLog.TimeSeries.Period.Interval.MergingReport mergingReport = mergeIntervals
+                    .getFirst()
+                    .getMergingReport();
             final BCIActive bciActive = new BCIActive();
             bciActive.setVal(mergingReport.isBCIactive());
             result.setBCIActive(bciActive);
-            pays.getHubBCI().addAll(buildBciHubs(task, mergingReport));
+            pays.getHubBCI().addAll(buildBciHubs(mergingReport));
         }
         final BCIDateTime bciDateTime = new BCIDateTime();
         bciDateTime.setVal(task.getInputs().getTargetDate().toString());
@@ -68,25 +79,22 @@ public class BciExportBuilder {
         return result;
     }
 
-    private List<HubBCI> buildBciHubs(final MergingTask task,
-                                      final MergingLog.TimeSeries.Period.Interval.MergingReport mergingReport) {
-        List<HubBCI> hubBcis = new ArrayList<>();
-        mergingReport.getReport().stream()
+    private List<HubBCI> buildBciHubs(final MergingLog.TimeSeries.Period.Interval.MergingReport mergingReport) {
+        return mergingReport.getReport().stream()
                 .filter(report -> TYPE_INFOS.contains(report.getTypeInfo()))
-                .forEach(report -> hubBcis.add(convertReport(task, report)));
-        return hubBcis;
+                .map(this::convertReport)
+                .toList();
     }
 
-    private String getCountryCode(final MergingTask task,
-                                  final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report) {
+    private String getCountryCode(final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report) {
         return switch (report.getTypeInfo()) {
-            case CE -> getAreasAllMapInversed(task).get(report.getId());
-            case TSO -> getTsoCodes(task).get(report.getName());
+            case CE -> getAreasAllMapInversed().get(report.getId());
+            case TSO -> getTsoCodes().get(report.getName());
             default -> EMPTY;
         };
     }
 
-    private Map<String, String> getAreasAllMapInversed(final MergingTask task) {
+    private Map<String, String> getAreasAllMapInversed() {
         return task.getConfigurations()
                 .getRegionConfiguration()
                 .getAreasAll()
@@ -96,7 +104,7 @@ public class BciExportBuilder {
                                Map.Entry::getKey));
     }
 
-    private Map<String, String> getTsoCodes(final MergingTask task) {
+    private Map<String, String> getTsoCodes() {
         return task.getConfigurations()
                 .getRegionConfiguration()
                 .getGermanyZone()
@@ -106,10 +114,9 @@ public class BciExportBuilder {
                                e -> e.getValue().getName()));
     }
 
-    private HubBCI convertReport(final MergingTask task,
-                                 final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report) {
+    private HubBCI convertReport(final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report) {
         final HubBCI hubBCI = new HubBCI();
-        hubBCI.setVal(getCountryCode(task, report));
+        hubBCI.setVal(getCountryCode(report));
         buildBaseCaseExport(report, hubBCI);
         final boolean isCe = report.getTypeInfo().equals(CE);
         final boolean isAlegro = report.getId().equals(VIRTUAL_HUB_ALEGRO_BE_EIC) || report.getId().equals(VIRTUAL_HUB_ALEGRO_DE_EIC);
