@@ -30,9 +30,9 @@ In this step, we merge these into a single German UCTE file, with the country co
 The XNodes merged during the process are then converted into German standard nodes, since these are not representing a border node anymore.
 Then we run a first load flow on this merged German network.
 
-Finally, we calculate the german internal mismatch by summing all internal net positions and distributing this mismatch on boundary lines proportionally :
+Finally, we calculate the german internal mismatch $M$ by summing all internal net positions and distributing this mismatch on boundary lines proportionally :
 
-$Flow_{updated} = Flow_{initial} + mismatch \times | \frac{Flow_{initial}}{\sum NP_{external}}|$
+$FLOW_{UPDATED} = FLOW_{INITIAL} + (M \times | \frac{FLOW_{INITIAL}}{\sum NP_{EXTERNAL}}|)$
 
 
 

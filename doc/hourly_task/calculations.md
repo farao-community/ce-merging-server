@@ -15,7 +15,7 @@ Some of the acronyms used here :
 The initial calculation of the net positions is done on all the IGMs:
 either the artifacts created in the previous steps, or the input IGMs as-is if it's not concerned by these.
 
-The computation is detailed [here](/doc/hourly_task/step_details/initialNp.md) ; its result is saved in a JSON file named _igmsNetPositions.json_.
+The computation is detailed [here](/doc/hourly_task/step_details/initialNp.md); its result is saved in a JSON file named _igmsNetPositions.json_.
 
 ### Topological merge
 
@@ -43,8 +43,8 @@ This step is decomposed into two parts: GLSK quality report generation and actua
 
 The generated quality report is an XML file that can contain warnings if:
 - An explicitly named node cannot be found in the CGM
-- An explicitly named node is found but no correct associated resource (Generator or Load) can be found in the CGM
-- An explicitly named resource can be found but is not connected to the main synchronous component of the CGM
+- An explicitly named node is found, but no correct associated resource (Generator or Load) can be found in the CGM
+- An explicitly named resource is found, but is not connected to the main synchronous component of the CGM
 
 ##### Actual GLSK generation
 We then create a new GLSK, filtering blocks like this:
@@ -58,18 +58,74 @@ If multiple blocks were used with a share value different of 100% (e.g. one GSK 
 This step is a first calculation on net positions, to bring the ones outside the feasibility ranges to acceptable values. It is detailed [here](/doc/hourly_task/step_details/bci.md).
 
 The result of this step is the _bciOutputs.json_ file.
-### Alegro P0 Update
-TODO
+
 ### Target net positions computation
-TODO
+The aim of this step is the computation of the target net positions, i.e., the net positions to which we'll shift the CGM in the next step, as follows:
+
+$NP_{TARGET} = NP_{BCI} + outBciFlows$
+
+with :
+- $NP_{BCI}$: The net position of the BCI output without the HVDCs,
+- $outBciFlows$: HVDC Flows $+$ Flows out to areas not configured in the region configuration file.
+
+There are a few special cases:
+##### Alegro countries
+To compensate for the fact that Alegro initial flows are already taken into account in the BCI target NP,
+we add to the previous formula the gap between target and initial flow for AL_BE for Belgium (respectively AL_DE for germany) :
+
+##### German virtual hubs
+Some German virtual hubs have codes not beginning with X (**D2HWKR1D**, **D8BWW_25**...). 
+To keep coherence between the target net position and the net position computed with loadflow, we subtract the flow of these virtual hubs from the target NP.
+
+In the end, given:
+- the Alegro mismatch $M_{AL}(country) =$ Alegro target flow – Alegro initial flow, 
+- $FLOW_{VH\_NO\_X}$ the sum of flows over german VH not starting with X,
+
+we have:
+
+$NP_{TARGET}(BE) = NP_{BCI}(BE) + outBciFlows + M_{AL}(BE)$
+
+$NP_{TARGET}(DE) = NP_{BCI}(DE) + outBciFlows + M_{AL}(DE) - FLOW_{VH\_NO\_X}$
+
 ### Balances Adjustment
-TODO
+Balances adjustment consists in shifting the CGM to the global target net positions.
+
+To execute this step, we have to convert the current CGM to XIIDM format, then back to UCTE for the output.
+
+##### Balances area definition
+Balances adjustment algorithm is based on the definition of balance areas. Each area is defined by three important elements:
+
+- Area definition: the way to compute its net position on a network instance (e.g. area based on a country).
+- Target net position: the expected value, at the end of the algorithm, of the area net position as calculated using the previous description.
+- GLSK: the way in which a modification in injection changes the net position of the area.
+
+For this particular process, an area is created for each UCTE country. 
+
+##### Balancing algorithm
+
+The net position of the country is calculated as the sum of:
+- Active loads of XNodes connected to a substation in the country
+- Leaving flows of lines connected :
+  - in the country on one side
+  - outside the country on the other side
+
+The leaving flow is calculated as the mean of origin and extremity flows calculated by a loadflow.
+
+With this definition of net position, the target value for each area is the global net position with HVDC for each country.
+
+If a country does not provide GLSK (as it is the case for countries outside the CE region), 
+a country LSK is created, dispatching the flows proportionally on all loads. 
+The balances adjustment ignores the Pmin/Pmax limitation of generators.
+
+The algorithm is iterative: at each iteration, each area's net position mismatch is redispatched via the area's GLSK. 
+
+It continues until the sum of the square mismatches is lower than a certain threshold, or until it reaches the maximum number of iterations. This threshold and the max number of iterations are both configurable in the app.
 ### Special PST treatment
 Some phase shift transformers require special treatments: [Divača / Padriciano](/doc/hourly_task/step_details/divacaPadriciano.md) and [some austrian PSTs](/doc/hourly_task/step_details/austrianPsts.md).
 ### Slack compensation
 Before exporting the CGM, this step changes the setpoints of generators and loads to take into account the slack imbalance distributed by the loadflow.
 
-With the current loadflow parameters, the distribution is done proportionally with generators setpoint. 
+With the current loadflow parameters, the distribution is done proportionally with generators setpoints. 
 
 We then export the CGM as an UCT file.
 ### CGM net positions calculation
