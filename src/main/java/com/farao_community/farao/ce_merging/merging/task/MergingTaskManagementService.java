@@ -294,8 +294,7 @@ public class MergingTaskManagementService {
     }
 
     public SavedFile getTgmNetPositions(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(TGM_NET_POSITIONS_FILE);
     }
 
     public SavedFile getAlegroNetPositions(final Long taskId) {

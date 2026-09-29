@@ -31,6 +31,7 @@ public enum ArtifactType {
     BALANCES_ADJUSTMENT_TARGET_FILE("balancesAdjustmentTarget.json", "balances-adjustment-target"),
     CGM_NET_POSITIONS_FILE("cgmNetPositions.json", "cgm-net-positions"),
     TGM_FILE_AFTER_RECESSIVITY("%s_2D%d_UX0_RECESSIVITY_APPLIED.uct", "tgm-recessivity"),
+    TGM_NET_POSITIONS_FILE("tgmNetPositions.json", "tgm-net-positions"),
     PST_OUTPUT_FILE("pstOutput.json", "pst-result"),
     LOAD_FLOW_ON_FINAL_CGM_LOGS("Loadflow_final_cgm_logs.xml", "open-loadflow-logs"),
     ALEGRO_NET_POSITIONS("alegroNetPositions.json", "igms-net-positions"),
