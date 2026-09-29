@@ -6,19 +6,21 @@
 ## Functional Overview
 The purpose of this application is the creation of aggregated files for the [CE zone](https://www.entsoe.eu/bites/ccr-ce/about/).
 
+Here's a list of acronyms used across this documentation: [acronyms](/doc/acronyms.md)
+
 ### Nominal process
 
-The nominal merging case is (either automated, or with Swagger for testing/developping purposes) :
+The nominal merging case is (either called directly or with Swagger for testing/developping purposes) :
 - create an hourly task with all the expected inputs
   - it will produce a response containing a task ID
 - run this task, providing the task ID
-- repeat for the 24 hours (±1 on DST days)
+- repeat for the 24 hours (±1 on daylight saving time (DST) days)
 - create a daily merging task, providing : 
-  - a merging request file, containing target calculation date & other informations,
-  - all the previous task IDs.
+  - a merging request file, containing target calculation date and other information,
+  - all the previously mentioned task IDs.
 - Run it with the provided daily task ID.
 
-Each of these steps correspond to a REST endpoint ; there are several other providing a given task's specific inputs, outputs, or intermediate files (called **Artifacts**).
+Each of these steps corresponds to a REST endpoint; there are several other endpoints providing a given task's specific inputs, outputs, or intermediate files (called **Artifacts**).
 
 For more detail on the endpoints, see the **Controller** classes.
 

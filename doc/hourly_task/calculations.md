@@ -3,13 +3,6 @@
 This page describes the computation steps following the [inputs preparation](/doc/hourly_task/inputPreparation.md), in
 the same order as what is done in the application.
 
-Some of the acronyms used here :
-
-- NP: Net Positions
-- VH: Virtual Hubs
-- BCI: Base Case Improvement
-- IGM/CGM: Individual/Common Grid Model
-
 ### Initial net positions computation
 
 The initial calculation of the net positions is done on all the IGMs:
@@ -95,7 +88,7 @@ To execute this step, we have to convert the current CGM to XIIDM format, then b
 ##### Balances area definition
 Balances adjustment algorithm is based on the definition of balance areas. Each area is defined by three important elements:
 
-- Area definition: the way to compute its net position on a network instance (e.g. area based on a country).
+- Area definition: the way to compute its net position on a network instance (e.g., area based on a country).
 - Target net position: the expected value, at the end of the algorithm, of the area net position as calculated using the previous description.
 - GLSK: the way in which a modification in injection changes the net position of the area.
 
