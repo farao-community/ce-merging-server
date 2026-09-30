@@ -1,0 +1,682 @@
+{
+  "netPositionsByCountryMap" : {
+    "AL" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 657.1961998615859,
+        "withoutVirtualHubs" : 657.1961998615859
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "GR" : 223.446799961684,
+        "ME" : 216.87469989988097,
+        "XK" : 216.874700000021
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 1235.5548999999999,
+        "load" : 551.5896299999999
+      }
+    },
+    "AT" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -2526.922699999784,
+        "withoutVirtualHubs" : -2526.922699999784
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : -2415.6776999996505,
+        "withoutVirtualHubs" : -2415.6776999996505
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "CH" : -361.5620000000114,
+        "CZ" : -1632.4700000000007,
+        "DE" : -2280.655699999514,
+        "HU" : 655.7431999998628,
+        "IT" : 250.3169999998783,
+        "SI" : 841.704800000002
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 4352.234059437064,
+        "load" : 6766.0197
+      }
+    },
+    "BA" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -68.44378627601999,
+        "withoutVirtualHubs" : -68.44378627601999
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "HR" : -132.02706635241964,
+        "ME" : 96.49928003174205,
+        "RS" : -32.91599995534244
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 1223.6936072606106,
+        "load" : 1274.166756
+      }
+    },
+    "BE" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -3406.3486975752726,
+        "withoutVirtualHubs" : -3040.3486978834394
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : -3319.348697582653,
+        "withoutVirtualHubs" : -3040.3486978834394
+      },
+      "outBciNetPosition" : -365.9999996918332,
+      "virtualHubsExchanges" : {
+        "XBE_GB1B" : -86.99999999261946,
+        "XLI_OB1B" : -278.99999969921373
+      },
+      "globalDetailedExchanges" : {
+        "DE" : -278.99999969921373,
+        "FR" : 887.5412994006227,
+        "GB" : -86.99999999261946,
+        "NL" : -3927.8899972840622
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 3669.868629387074,
+        "load" : 6988.66317
+      }
+    },
+    "BG" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -1390.1999978789177,
+        "withoutVirtualHubs" : -1390.1999978789177
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "GR" : -1013.9999985239035,
+        "MK" : -297.79999936528213,
+        "RO" : 269.9999999426532,
+        "RS" : 41.99999995632449,
+        "TR" : -390.3999998887102
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 4269.064943977204,
+        "load" : 5520.7
+      }
+    },
+    "CH" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -3199.972000087873,
+        "withoutVirtualHubs" : -3199.972000087873
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "AT" : -390.01499999975135,
+        "DE" : -1126.5009999247902,
+        "FR" : -2861.31999991134,
+        "IT" : 1177.863999748009
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 2772.2304519261043,
+        "load" : 6022.17
+      }
+    },
+    "CZ" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 979.9679999945519,
+        "withoutVirtualHubs" : 979.9679999945519
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 979.9679999945519,
+        "withoutVirtualHubs" : 979.9679999945519
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "AT" : 1236.019999999991,
+        "DE" : -1065.4500000054304,
+        "PL" : -1372.6019999998884,
+        "SK" : 2181.999999999879
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 8638.717462541248,
+        "load" : 7404.57
+      }
+    },
+    "DE" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 3719.1520781650866,
+        "withoutVirtualHubs" : 3972.8423515511904
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 1914.2595805945305,
+        "withoutVirtualHubs" : 1580.119853926306
+      },
+      "outBciNetPosition" : -253.69027338610402,
+      "virtualHubsExchanges" : {
+        "D2HWKR1D" : 0.0,
+        "D8BWW_25" : -73.86027333139985,
+        "XBW_BJ1D" : -587.8299999696458,
+        "XLI_OB1A" : 407.99999999962415,
+        "XWI_ET11" : -4.234127715108116E-8,
+        "XWI_ET12" : -4.234127715108116E-8
+      },
+      "globalDetailedExchanges" : {
+        "AT" : 1692.1588398973843,
+        "BE" : 407.99999999962415,
+        "CH" : 2073.5118976940844,
+        "CZ" : 1202.5779990573394,
+        "DK" : -268.61940003884683,
+        "FR" : -2039.339992519057,
+        "NL" : -2006.9469920859392,
+        "NO" : -8.468255430216232E-8,
+        "PL" : 2731.6699995765794
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 23492.26495349551,
+        "load" : 17348.81871
+      }
+    },
+    "DK" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 2566.3000018107655,
+        "withoutVirtualHubs" : 1396.799999999976
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 1169.5000018107899,
+      "virtualHubsExchanges" : {
+        "XBI_R11K" : 501.49999573213677,
+        "XBI_R21K" : 501.49999573213677,
+        "XED_EE1D" : -546.9999890231517,
+        "XFG_HK11" : -167.0999999988084,
+        "XTJ_K13K" : 0.1999999999968574,
+        "XTJ_K23K" : 0.1999999999968574,
+        "XTJ_K31K" : 100.39999974195752,
+        "XTJ_K41K" : 145.79999962404736,
+        "XVH_L11K" : 316.1000000012264,
+        "XVH_L21K" : 317.90000000125127
+      },
+      "globalDetailedExchanges" : {
+        "DE" : 1396.799999999976,
+        "NL" : -546.9999890231517,
+        "NO" : 246.5999993659986,
+        "SE" : 466.9000000036693
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 3505.9017512193645,
+        "load" : 886.0
+      }
+    },
+    "ES" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 4064.699979868782,
+        "withoutVirtualHubs" : 3460.899979873554
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 603.7999999952283,
+      "virtualHubsExchanges" : {
+        "XTA_FA11" : 321.69999999810074,
+        "XTA_FA12" : 282.0999999971275
+      },
+      "globalDetailedExchanges" : {
+        "FR" : 2717.9999804610793,
+        "MA" : 603.7999999952283,
+        "PT" : 742.8999994124745
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 17825.6,
+        "load" : 13244.7
+      }
+    },
+    "FR" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 8248.877499663331,
+        "withoutVirtualHubs" : 5632.643499733051
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 2993.581499885459,
+        "withoutVirtualHubs" : 2993.581499885459
+      },
+      "outBciNetPosition" : 2616.233999930282,
+      "virtualHubsExchanges" : {
+        "XMA_SE11" : 594.6170000000251,
+        "XMA_SE13" : 594.6170000000251,
+        "XMA_SE15" : 684.0999999999035,
+        "XTO_CH11" : 742.8999999303285
+      },
+      "globalDetailedExchanges" : {
+        "BE" : 1576.1634999886558,
+        "CH" : 3217.356999844656,
+        "DE" : 1417.4179998968034,
+        "ES" : -2771.479999996429,
+        "GB" : 2616.233999930282,
+        "IT" : 2193.184999999364
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 53963.7555006359,
+        "load" : 44253.47981
+      }
+    },
+    "GR" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 974.4987887092952,
+        "withoutVirtualHubs" : 643.4987893014146
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 330.9999994078805,
+      "virtualHubsExchanges" : {
+        "XAR_GA1G" : 330.9999994078805
+      },
+      "globalDetailedExchanges" : {
+        "AL" : -26.662999801612372,
+        "BG" : 120.99979671520927,
+        "IT" : 330.9999994078805,
+        "MK" : 443.5259958023657,
+        "TR" : 105.63599658545218
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 5892.511855484645,
+        "load" : 4843.22445
+      }
+    },
+    "HR" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -674.099934698576,
+        "withoutVirtualHubs" : -674.099934698576
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : -525.6999322178503,
+        "withoutVirtualHubs" : -525.6999322178503
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "BA" : -163.59999983720166,
+        "HU" : -462.9999537476189,
+        "RS" : 15.19999735647605,
+        "SI" : -62.69997847023145
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 588.0,
+        "load" : 1248.2
+      }
+    },
+    "HU" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -1597.3100001260384,
+        "withoutVirtualHubs" : -1597.3100001260384
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : -1387.6200003495358,
+        "withoutVirtualHubs" : -1387.6200003495358
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "AT" : -958.5999999982803,
+        "HR" : 340.8599999977684,
+        "RO" : 518.2999995856304,
+        "RS" : -221.49999977702709,
+        "SI" : -7.399999999939802,
+        "SK" : -1280.7799999347144,
+        "UA" : 11.810000000524024
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 4050.9866490481018,
+        "load" : 5571.6
+      }
+    },
+    "IT" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -4511.400000000117,
+        "withoutVirtualHubs" : -3823.900000000176
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : -687.49999999994,
+      "virtualHubsExchanges" : {
+        "XAR_GA1I" : -330.99999999998096,
+        "XCEPR220" : -356.499999999959
+      },
+      "globalDetailedExchanges" : {
+        "AT" : -131.29999999999964,
+        "CH" : -961.5999999999713,
+        "FR" : -2102.000000000208,
+        "GR" : -330.99999999998096,
+        "ME" : 0.0,
+        "SI" : -628.9999999999975
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 11240.395631220552,
+        "load" : 15550.0
+      }
+    },
+    "MD" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -104.35295878828326,
+        "withoutVirtualHubs" : -104.35295878828326
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "RO" : -134.34999754367445,
+        "UA" : 29.997038755391173
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 411.33889999999997,
+        "load" : 505.7131
+      }
+    },
+    "ME" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 523.584407474721,
+        "withoutVirtualHubs" : 161.5844074747211
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 362.0,
+      "virtualHubsExchanges" : {
+        "XKOTR120" : 0.0,
+        "XKOTR220" : 362.0
+      },
+      "globalDetailedExchanges" : {
+        "AL" : 14.893899814221289,
+        "BA" : -411.0139931667786,
+        "IT" : 349.99999202967854,
+        "RS" : 104.01450999999942,
+        "XK" : 103.68999879760048
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 515.9853648800743,
+        "load" : 341.701977
+      }
+    },
+    "MK" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -459.99920526744154,
+        "withoutVirtualHubs" : -459.99920526744154
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "BG" : 119.99853195073479,
+        "GR" : -494.99873044947,
+        "RS" : -13.999466462665719,
+        "XK" : -70.9995403060406
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 568.86,
+        "load" : 1010.78842
+      }
+    },
+    "NL" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 1600.994997693789,
+        "withoutVirtualHubs" : 2035.9949976182904
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 2035.9949976182904,
+        "withoutVirtualHubs" : 2035.9949976182904
+      },
+      "outBciNetPosition" : -434.9999999245017,
+      "virtualHubsExchanges" : {
+        "XED_EE1N" : 546.9999999029077,
+        "XEE_FE1N" : -2.0363195574191195E-9,
+        "XGR_MA1N" : -981.999999825373
+      },
+      "globalDetailedExchanges" : {
+        "BE" : 2490.9899979089164,
+        "DE" : -454.9950002906261,
+        "DK" : 546.9999999029077,
+        "GB" : -981.999999825373,
+        "NO" : -2.0363195574191195E-9
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 13873.85696905467,
+        "load" : 12061.44403
+      }
+    },
+    "PL" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -22.820000010185005,
+        "withoutVirtualHubs" : 738.9799999841432
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 378.9799999860792,
+        "withoutVirtualHubs" : 378.9799999860792
+      },
+      "outBciNetPosition" : -761.7999999943282,
+      "virtualHubsExchanges" : {
+        "XEL_AL11" : -96.0999999971641,
+        "XEL_AL12" : -96.0999999971641,
+        "XSL_SW11" : -569.6,
+        "XZA_DO21" : 0.0
+      },
+      "globalDetailedExchanges" : {
+        "CZ" : 1477.589999999385,
+        "DE" : -2289.3899999995865,
+        "LT" : -192.1999999943282,
+        "SE" : -569.6,
+        "SK" : 1190.7799999862807,
+        "UA" : 359.9999999980642
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 18077.290212026932,
+        "load" : 17778.28
+      }
+    },
+    "PT" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -697.8000000671028,
+        "withoutVirtualHubs" : -697.8000000671028
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "ES" : -697.8000000671028
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 1970.2964498346848,
+        "load" : 2581.2
+      }
+    },
+    "RO" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -727.2947621116075,
+        "withoutVirtualHubs" : -727.2947621116075
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : -1050.9999936318518,
+        "withoutVirtualHubs" : -1050.9999936318518
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "BG" : -593.4999992147011,
+        "HU" : -1050.9999936318518,
+        "MD" : 1174.0399999043811,
+        "RS" : -277.43026898581354,
+        "UA" : 20.595499816377544
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 5598.545659225642,
+        "load" : 6174.669676
+      }
+    },
+    "RS" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -189.99349996632998,
+        "withoutVirtualHubs" : -189.99349996632998
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "BA" : -0.8781999967856677,
+        "BG" : -81.79889999494507,
+        "HR" : 238.7023000000587,
+        "HU" : 196.80599999997216,
+        "ME" : -107.8119999997567,
+        "MK" : -153.0799999972858,
+        "RO" : -108.78000000001813,
+        "XK" : -173.15269997756948
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 4731.577821097435,
+        "load" : 4819.013549
+      }
+    },
+    "SI" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -531.099999945935,
+        "withoutVirtualHubs" : -531.099999945935
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : -470.89999994594194,
+        "withoutVirtualHubs" : -470.89999994594194
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "AT" : -136.89999997274802,
+        "HR" : -273.7999999817095,
+        "HU" : -60.199999991484376,
+        "IT" : -60.19999999999318
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 911.6479772404821,
+        "load" : 1435.0
+      }
+    },
+    "SK" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 179.00001608879472,
+        "withoutVirtualHubs" : 179.00001608879472
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : -607.9999754126078,
+        "withoutVirtualHubs" : -607.9999754126078
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "CZ" : -1621.9999872331734,
+        "HU" : 2281.9999986419325,
+        "PL" : -1267.9999868213672,
+        "UA" : 786.9999915014025
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 2464.551959777006,
+        "load" : 2223.0
+      }
+    },
+    "TR" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : 144.7999999968506,
+        "withoutVirtualHubs" : 144.7999999968506
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "BG" : -131.00000000000068,
+        "GR" : 275.7999999968513
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 33159.7,
+        "load" : 32208.3
+      }
+    },
+    "UA" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -934.1124523749411,
+        "withoutVirtualHubs" : -934.1124523749411
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "HU" : -242.7265827811588,
+        "MD" : -173.65789039803275,
+        "PL" : -432.33997855293126,
+        "RO" : 749.7020062111129,
+        "SK" : -835.0900068539313
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 10118.844373955571,
+        "load" : 10554.74533
+      }
+    },
+    "XK" : {
+      "globalNetPosition" : {
+        "withVirtualHubs" : -233.79912153953296,
+        "withoutVirtualHubs" : -233.79912153953296
+      },
+      "inRegionNetPosition" : {
+        "withVirtualHubs" : 0.0,
+        "withoutVirtualHubs" : 0.0
+      },
+      "outBciNetPosition" : 0.0,
+      "virtualHubsExchanges" : { },
+      "globalDetailedExchanges" : {
+        "AL" : -493.2284300157155,
+        "ME" : -232.78656173017345,
+        "MK" : 159.66731150735592,
+        "RS" : 332.5485586990001
+      },
+      "generationAndLoadQuantity" : {
+        "generation" : 801.669,
+        "load" : 1019.075
+      }
+    }
+  }
+}
