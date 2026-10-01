@@ -10,6 +10,8 @@ package com.farao_community.farao.ce_merging.common.util;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,5 +31,14 @@ public class DateTimeUtilsTest {
         final MergingTask task = mock(MergingTask.class);
         when(task.getTargetDateInParis()).thenReturn(ZonedDateTime.parse("2026-07-08T12:00:00Z"));
         assertEquals("3", DateTimeUtils.dayOfWeek(task));
+    }
+
+    @Test
+    void toUtcLocalDateTimeTest() {
+        final OffsetDateTime offsetParisTime = OffsetDateTime.parse("2026-07-08T12:00:00+02:00");
+        final OffsetDateTime offsetUtc = OffsetDateTime.parse("2026-07-08T10:00:00Z");
+        final LocalDateTime localUtc = LocalDateTime.parse("2026-07-08T10:00:00");
+        assertEquals(localUtc, DateTimeUtils.toUtcLocalDateTime(offsetParisTime));
+        assertEquals(localUtc, DateTimeUtils.toUtcLocalDateTime(offsetUtc));
     }
 }
