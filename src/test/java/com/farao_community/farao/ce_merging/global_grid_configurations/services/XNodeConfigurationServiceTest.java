@@ -30,8 +30,8 @@ class XNodeConfigurationServiceTest {
         final OffsetDateTime validTo = OffsetDateTime.parse("2026-10-02T12:00:00+02:00");
         final LocalDateTime validFromLocal = LocalDateTime.parse("2026-10-01T10:00:00");
         final LocalDateTime validToLocal = LocalDateTime.parse("2026-10-02T10:00:00");
-        final XNodeConfigurationRecord record = service.getConfigurationRecordFromFile(file, validFrom, validTo);
-        Assertions.assertThat(record.getValidFrom()).isEqualTo(validFromLocal);
-        Assertions.assertThat(record.getValidTo()).isEqualTo(validToLocal);
+        final XNodeConfigurationRecord xnodeConfig = service.getConfigurationRecordFromFile(file, validFrom, validTo);
+        Assertions.assertThat(xnodeConfig.getValidFrom()).isEqualTo(validFromLocal);
+        Assertions.assertThat(xnodeConfig.getValidTo()).isEqualTo(validToLocal);
     }
 }
