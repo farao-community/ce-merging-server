@@ -52,8 +52,7 @@ class TargetNetPositionsCalculationServiceTest {
 
         targetNetPositionsCalculationService.computeTargetNetPositions(taskEntity);
 
-        final SavedFile balancesAdjustmentTargetFile = taskEntity.getArtifacts().getFile(ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE);
-        final BalancesAdjustmentTarget balancesAdjustmentTarget = JsonUtils.read(BalancesAdjustmentTarget.class, balancesAdjustmentTargetFile.getPath());
+        final BalancesAdjustmentTarget balancesAdjustmentTarget = taskEntity.getArtifact(ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE, BalancesAdjustmentTarget.class);
         final BalancesAdjustmentTarget balancesAdjustmentTargetExpected = JsonUtils.read(BalancesAdjustmentTarget.class, RESOURCES_PATH + BALANCE_ADJUSTMENT_TARGET_FILENAME);
 
         assertEquals(balancesAdjustmentTargetExpected, balancesAdjustmentTarget);
