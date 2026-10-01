@@ -494,7 +494,7 @@ public class MergingTaskManagementService {
         return switch (task.getStatus()) {
             case CREATED -> throw new TaskNotRunException(String.format("Task %d has not been run", taskId));
             case RUNNING -> throw new TaskNotRunException(String.format("Task %d currently running", taskId));
-            //case null -> throw new TaskNotValidException(String.format("Task %d has no status", taskId));
+            case null -> throw new TaskNotValidException(String.format("Task %d has no status", taskId));
             case SUCCESS, ERROR -> task;
         };
     }
