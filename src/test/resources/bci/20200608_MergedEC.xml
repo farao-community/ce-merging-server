@@ -1,4 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
+<!--
+  ~ Copyright (c) 2026, RTE (http://www.rte-france.com)
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  -->
+
 <FlowBasedExternalConstraintDocument DtdRelease="4" DtdVersion="0" xmlns="flowbased" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="flowbasedexternalconstraintdocument-07.xsd">
   <DocumentIdentification v="17XTSO-CS------W-20200608-F229v1" />
   <DocumentVersion v="1" />
@@ -12,9 +19,9 @@
   <ExternalConstraintTimeInterval v="2020-06-07T22:00Z/2020-06-08T22:00Z" />
   <Domain codingScheme="A01" v="AREA_OF_CE_EIC" />
   <constraints>
-        <netPositionConstraint direction="IMPORT" hub="N12" id="97" name="N12_import" type="ABSOLUTE" value="6500" version="2">
+        <netPositionConstraint direction="IMPORT" hub="BE" id="97" name="BE_import" type="ABSOLUTE" value="6500" version="2">
           <timeInterval v="2020-06-07T22:00Z/2020-06-08T22:00Z"/>
-          <tsoOrigin>N12</tsoOrigin>
+          <tsoOrigin>BE</tsoOrigin>
         </netPositionConstraint>
         <netPositionConstraint direction="EXPORT" hub="N25" id="98" name="N25_export" type="ABSOLUTE" value="5750" version="0">
           <timeInterval v="2020-06-07T22:00Z/2020-06-07T23:00Z"/>
@@ -402,11 +409,11 @@
         </netPositionConstraint>
 	<netPositionConstraint direction="IMPORT" hub="BE_AL" id="1" name="BE_AL_import" type="ABSOLUTE" value="100" version="0">
 	 <timeInterval v="2020-06-07T22:00Z/2020-06-08T22:00Z"/>
-	<tsoOrigin>N12</tsoOrigin>
+	<tsoOrigin>BE</tsoOrigin>
 	</netPositionConstraint>
 	<netPositionConstraint direction="EXPORT" hub="BE_AL" id="25" name="BE_AL_export" type="ABSOLUTE" value="100" version="0">
 			<timeInterval v="2020-06-07T22:00Z/2020-06-08T22:00Z"/>
-			<tsoOrigin>N12</tsoOrigin>
+			<tsoOrigin>BE</tsoOrigin>
 	</netPositionConstraint>
 	<netPositionConstraint direction="IMPORT" hub="DE_AL" id="1" name="DE_AL_import" type="ABSOLUTE" value="100" version="0">
 			<timeInterval v="2020-06-07T22:00Z/2020-06-08T22:00Z"/>

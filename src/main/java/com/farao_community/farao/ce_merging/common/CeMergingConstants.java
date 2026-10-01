@@ -66,14 +66,15 @@ public final class CeMergingConstants {
     // formatting
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
     public static final String DATE_FORMAT = "yyyyMMdd";
-
+    public static final String EMPTY = "";
+    public static final String COMMA = ",";
     public static final String CSV_SEPARATOR = ";";
     public static final String ARROW = "->";
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
     public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    public static final String ONE = "1";
     // other strings
-    public static final String EMPTY = "";
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String VIRTUAL_HUB_ALEGRO_BE_CODE = "BE_ALEGrO";

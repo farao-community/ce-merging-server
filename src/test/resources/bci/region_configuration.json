@@ -2,7 +2,7 @@
       "name" : "CE",
       "id" : "AREA_OF_CE_EIC",
       "areasIn" : {
-        "N12" : "AREA_NUMBER12_EIC",
+        "BE" : "AREA_NUMBER12_EIC",
         "N5" : "AREA_NUMBER5_EIC",
         "N8" : "AREA_NUMBER8_EIC",
         "N3" : "AREA_NUMBER3_EIC",
