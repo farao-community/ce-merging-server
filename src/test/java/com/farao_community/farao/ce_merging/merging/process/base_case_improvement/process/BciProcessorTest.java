@@ -176,6 +176,11 @@ class BciProcessorTest {
         assertEquals(200, aldeFlows.targetFlow());
         assertEquals(100, aldeFlows.maxEc());
         assertEquals(-100, aldeFlows.minEc());
+        assertEquals(-1408, result.bciComputationResult()
+                .bciResults()
+                .get("BE")
+                .getInRegionNetPositions()
+                .target());
     }
 
     private BciProcessResult getResult(final MergingTask task) throws IOException {

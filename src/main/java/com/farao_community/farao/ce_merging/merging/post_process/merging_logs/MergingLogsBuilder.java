@@ -27,6 +27,7 @@ import java.util.Map;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CORE_REGION_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ONE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RECEIVER_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RESOLUTION;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SENDER_ID;
@@ -49,7 +50,7 @@ public class MergingLogsBuilder {
     private MergingLog.TimeSeries buildTimeSeries(final MergingTask task, final ReferenceProgram referenceProgram, final List<ReportInformationInRegion> reportInformationInRegionList, final PstOutput pstOutputs, final List<ReportInformationOutRegion> reportInformationsOutRegionList, final List<ReportCommonsInformation> tsoInformationsList, final List<AlegroReportInformation> alegroReportInformationsList) {
         final MergingLog.TimeSeries timeSeries = new MergingLog.TimeSeries();
         final MergingLog.TimeSeries.TimeSeriesIdentification timeSeriesIdentification = new MergingLog.TimeSeries.TimeSeriesIdentification();
-        timeSeriesIdentification.setV("1");
+        timeSeriesIdentification.setV(ONE);
         timeSeries.setTimeSeriesIdentification(timeSeriesIdentification);
         timeSeries.setPeriod(buildPeriod(task, referenceProgram, reportInformationInRegionList, pstOutputs, reportInformationsOutRegionList, tsoInformationsList, alegroReportInformationsList));
         return timeSeries;
