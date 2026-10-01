@@ -143,10 +143,9 @@ public class MergingTaskManagementService {
         final MergingTask task = repository.save(new MergingTask());
 
         final String inputsDir = configuration.getInputsDirectoryPath(task);
-        final RequestMetadataManager requestMgr = new RequestMetadataManager(inputsDir, inputRequestMetadata);
-
         final Path inputsPath = Path.of(inputsDir);
         try {
+            final RequestMetadataManager requestMgr = new RequestMetadataManager(inputsDir, inputRequestMetadata);
             final Path tmpInputPath = unzipInputFileInTmp(inputZip);
             requestMgr.checkIfAllInputsAvailable(tmpInputPath);
 
@@ -495,7 +494,7 @@ public class MergingTaskManagementService {
         return switch (task.getStatus()) {
             case CREATED -> throw new TaskNotRunException(String.format("Task %d has not been run", taskId));
             case RUNNING -> throw new TaskNotRunException(String.format("Task %d currently running", taskId));
-            case null -> throw new TaskNotValidException(String.format("Task %d has no status", taskId));
+            //case null -> throw new TaskNotValidException(String.format("Task %d has no status", taskId));
             case SUCCESS, ERROR -> task;
         };
     }
@@ -508,15 +507,17 @@ public class MergingTaskManagementService {
      */
     private void handleDaylightSavingTime(final MergingTask task) {
         final Inputs inputs = task.getInputs();
-
         final OffsetDateTime taskDate = inputs.getTargetDate();
         final ZoneOffset realOffset = inputs.getRealOffset();
+
+        if (taskDate == null || realOffset == null) {
+            return;
+        }
 
         // if offsets are different, we change the target date to have it at the real offset
         if (!taskDate.getOffset().equals(realOffset)) {
             inputs.setTargetDate(OffsetDateTime.of(taskDate.toLocalDateTime(), realOffset));
         }
-
     }
 
     private SavedFile getInputFile(final Long taskId,
