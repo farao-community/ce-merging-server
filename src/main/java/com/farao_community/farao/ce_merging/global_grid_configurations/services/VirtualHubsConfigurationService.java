@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toUtcLocalDateTime;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 @Service
@@ -37,7 +38,7 @@ public class VirtualHubsConfigurationService extends AbstractGridConfigurationSe
 
     public VirtualHubsConfiguration getConfiguration(OffsetDateTime targetDate) {
         try {
-            VirtualHubsConfigurationRecord configRecord = repository.findLatestValidOfType(targetDate.toLocalDateTime());
+            VirtualHubsConfigurationRecord configRecord = repository.findLatestValidOfType(toUtcLocalDateTime(targetDate));
             LOGGER.info("configuration retrieved from server");
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {
@@ -83,8 +84,8 @@ public class VirtualHubsConfigurationService extends AbstractGridConfigurationSe
         JsonVirtualHubsConfiguration.exportConfiguration(cfgWriter, configuration);
 
         return new VirtualHubsConfigurationRecord(generateUuidString(),
-                                                  validFrom.toLocalDateTime(),
-                                                  validTo.toLocalDateTime(),
+                                                  toUtcLocalDateTime(validFrom),
+                                                  toUtcLocalDateTime(validTo),
                                                   LocalDateTime.now(UTC_ZONE_ID),
                                                   cfgWriter.toString());
     }

@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toUtcLocalDateTime;
 import static java.util.function.Predicate.not;
 
 @Service
@@ -41,7 +42,7 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
 
     public JsonHvdcAlignmentConfiguration getConfiguration(OffsetDateTime targetDate) {
         try {
-            HvdcAlignmentConfigurationRecord configRecord = repository.findLatestValidOfType(targetDate.toLocalDateTime());
+            HvdcAlignmentConfigurationRecord configRecord = repository.findLatestValidOfType(toUtcLocalDateTime(targetDate));
             LOGGER.info("configuration retrieved from server");
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {
@@ -91,8 +92,8 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
 
         return new HvdcAlignmentConfigurationRecord(
                 generateUuidString(),
-                validFrom.toLocalDateTime(),
-                validTo.toLocalDateTime(),
+                toUtcLocalDateTime(validFrom),
+                toUtcLocalDateTime(validTo),
                 LocalDateTime.now(UTC_ZONE_ID),
                 xNodeCouples,
                 alignmentConfiguration.getSetZeroFlowNodes(),

@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toUtcLocalDateTime;
 
 @Service
 public class RegionConfigurationService extends AbstractGridConfigurationService<RegionConfigurationRecord, JsonRegionConfiguration> {
@@ -36,7 +37,7 @@ public class RegionConfigurationService extends AbstractGridConfigurationService
 
     public JsonRegionConfiguration getConfiguration(OffsetDateTime targetDate) {
         try {
-            RegionConfigurationRecord configRecord = repository.findLatestValidOfType(targetDate.toLocalDateTime());
+            RegionConfigurationRecord configRecord = repository.findLatestValidOfType(toUtcLocalDateTime(targetDate));
             LOGGER.info("configuration retrieved from server");
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {
@@ -82,8 +83,8 @@ public class RegionConfigurationService extends AbstractGridConfigurationService
                                                                           new ByteArrayInputStream(cfgFileContent));
 
         return new RegionConfigurationRecord(generateUuidString(),
-                                             validFrom.toLocalDateTime(),
-                                             validTo.toLocalDateTime(),
+                                             toUtcLocalDateTime(validFrom),
+                                             toUtcLocalDateTime(validTo),
                                              LocalDateTime.now(UTC_ZONE_ID),
                                              regionConfiguration);
     }

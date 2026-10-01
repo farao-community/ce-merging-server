@@ -14,6 +14,7 @@ import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -24,6 +25,7 @@ import java.util.Locale;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DATE_TIME_FORMAT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATE_FMT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
 public final class DateTimeUtils {
@@ -79,5 +81,9 @@ public final class DateTimeUtils {
 
     public static OffsetDateTime toZFormat(final OffsetDateTime targetDate) {
         return OffsetDateTime.parse(Instant.from(targetDate).toString(), ISO_DATE_TIME);
+    }
+
+    public static LocalDateTime toUtcLocalDateTime(final OffsetDateTime date) {
+        return date.atZoneSameInstant(UTC_ZONE_ID).toLocalDateTime();
     }
 }
