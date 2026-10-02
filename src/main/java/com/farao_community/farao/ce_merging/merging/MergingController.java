@@ -7,9 +7,13 @@
 package com.farao_community.farao.ce_merging.merging;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskAlreadyRunningException;
+import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskManagementService;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
+import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -69,15 +73,19 @@ public class MergingController {
                                                                       @RequestPart final MultipartFile inputFilesArchive,
                                                                       @Parameter(description = "JSON representation of the task")
                                                                       @RequestPart final String inputRequestMetadata) {
-        final MergingTaskDto createdTask = taskManager.createNewTask(inputFilesArchive, inputRequestMetadata);
-        final long taskId = createdTask.getId();
-        final UriComponents taskLocation = MvcUriComponentsBuilder.fromController(getClass())
-                .path("/tasks/{taskId}")
-                .buildAndExpand(taskId);
+        try {
+            final MergingTaskDto createdTask = taskManager.createNewTask(inputFilesArchive, inputRequestMetadata);
+            final long taskId = createdTask.getId();
+            final UriComponents taskLocation = MvcUriComponentsBuilder.fromController(getClass())
+                    .path("/tasks/{taskId}")
+                    .buildAndExpand(taskId);
 
-        return ResponseEntity
-                .created(taskLocation.toUri())
-                .body(JsonApiDocument.fromData(createdTask));
+            return ResponseEntity
+                    .created(taskLocation.toUri())
+                    .body(JsonApiDocument.fromData(createdTask));
+        } catch (ServiceIOException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping(value = "/tasks/{taskId}",
@@ -91,7 +99,14 @@ public class MergingController {
     })
     public ResponseEntity<JsonApiDocument<MergingTaskDto>> runTask(@Parameter(description = MERGING_TASK_ID)
                                                                    @PathVariable final long taskId) {
-        return ResponseEntity.ok().body(JsonApiDocument.fromData(taskManager.runTask(taskId)));
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        try {
+            return ResponseEntity.ok().body(JsonApiDocument.fromData(taskManager.runTask(taskId)));
+        } catch (TaskAlreadyRunningException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping(value = "/tasks/{taskId}",
@@ -104,6 +119,9 @@ public class MergingController {
     })
     public ResponseEntity<JsonApiDocument<MergingTaskDto>> getTask(@Parameter(description = MERGING_TASK_ID)
                                                                    @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().body(taskManager.getTaskJsonDoc(taskId));
     }
 
@@ -126,6 +144,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with the given ID was not found.")
     })
     public ResponseEntity<Void> deleteTask(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         taskManager.deleteTask(taskId);
         return ResponseEntity.noContent().build();
     }
@@ -153,6 +174,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with the given ID was not found.")
     })
     public ResponseEntity<byte[]> getInputs(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getInputsZip(taskId), "inputs_%s.zip".formatted(taskId));
     }
 
@@ -165,7 +189,14 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found.")
     })
     public ResponseEntity<byte[]> getIgm(@Parameter(description = "Merging task ID") @PathVariable final long taskId, @PathVariable final String areaId) {
-        return toAttachmentFileResponse(taskManager.getIgm(taskId, areaId));
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        try {
+            return toAttachmentFileResponse(taskManager.getIgm(taskId, areaId));
+        } catch (TaskNotValidException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping(value = "/tasks/{taskId}/inputs/areas/{areaId}/quality-report", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
@@ -177,7 +208,14 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found.")
     })
     public ResponseEntity<byte[]> getIgmQualityReport(@Parameter(description = "Merging task ID") @PathVariable final long taskId, @PathVariable final String areaId) {
-        return toAttachmentFileResponse(taskManager.getIgmQualityReport(taskId, areaId));
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        try {
+            return toAttachmentFileResponse(taskManager.getIgmQualityReport(taskId, areaId));
+        } catch (TaskNotValidException e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping(value = "/tasks/{taskId}/inputs/generation-load-shift-keys", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
@@ -188,6 +226,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found.")
     })
     public ResponseEntity<byte[]> getGenerationLoadShiftKeys(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getGenerationLoadShiftKeys(taskId));
     }
 
@@ -200,6 +241,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found.")
     })
     public ResponseEntity<byte[]> getExternalConstraints(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getExternalConstraints(taskId));
     }
 
@@ -212,6 +256,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found.")
     })
     public ResponseEntity<byte[]> getFeasibilityRanges(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getFeasibilityRanges(taskId));
     }
 
@@ -223,6 +270,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found.")
     })
     public ResponseEntity<byte[]> getDcLinks(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getDcLinks(taskId));
     }
 
@@ -235,6 +285,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with the given ID was not found.")
     })
     public ResponseEntity<byte[]> getNetPositionForecast(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getNetPositionForecast(taskId));
     }
 
@@ -250,11 +303,16 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "Virtual hubs configuration created successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Invalid file or dates.")
     })
-    public void publishVirtualHubsConfiguration(@Parameter(description = "Virtual hubs file") @RequestPart final MultipartFile configurationFile,
+    public ResponseEntity<byte[]> publishVirtualHubsConfiguration(@Parameter(description = "Virtual hubs file") @RequestPart final MultipartFile configurationFile,
                                                 @Parameter(description = "Valid from") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime validFrom,
                                                 @Parameter(description = "Valid to") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime validTo) {
 
-        taskManager.publishVirtualHubsConfiguration(configurationFile, validFrom, validTo);
+        try {
+            taskManager.publishVirtualHubsConfiguration(configurationFile, validFrom, validTo);
+            return ResponseEntity.ok().build();
+        } catch (CeMergingException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping(value = "/global-configurations/virtual-hubs-configuration",
@@ -280,11 +338,16 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "XNodes configuration created successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Invalid file or dates.")
     })
-    public void publishXNodesConfiguration(@Parameter(description = "XNodes file xml") @RequestPart final MultipartFile configurationFile,
+    public ResponseEntity<byte[]> publishXNodesConfiguration(@Parameter(description = "XNodes file xml") @RequestPart final MultipartFile configurationFile,
                                            @Parameter(description = "Valid from") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime validFrom,
                                            @Parameter(description = "Valid to") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime validTo) {
 
-        taskManager.publishXNodesConfiguration(configurationFile, validFrom, validTo);
+        try {
+            taskManager.publishXNodesConfiguration(configurationFile, validFrom, validTo);
+            return ResponseEntity.ok().build();
+        } catch (CeMergingException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping(value = "/global-configurations/xnodes-configuration", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
@@ -309,11 +372,16 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "HVDC XNode alignment configuration created successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Invalid file or dates.")
     })
-    public void publishVirtualHubsAlignmentConfiguration(@Parameter(description = "HVDC XNode alignment json file") @RequestPart final MultipartFile configurationFile,
+    public ResponseEntity<byte[]> publishVirtualHubsAlignmentConfiguration(@Parameter(description = "HVDC XNode alignment json file") @RequestPart final MultipartFile configurationFile,
                                                          @Parameter(description = "Valid from") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime validFrom,
                                                          @Parameter(description = "Valid to") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime validTo) {
 
-        taskManager.publishHvdcXNodeAlignmentConfiguration(configurationFile, validFrom, validTo);
+        try {
+            taskManager.publishHvdcXNodeAlignmentConfiguration(configurationFile, validFrom, validTo);
+            return ResponseEntity.ok().build();
+        } catch (CeMergingException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping(value = "/global-configurations/hvdc-xnode-alignment-configuration", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
@@ -338,11 +406,16 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "BEC configuration created successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Invalid file or dates.")
     })
-    public void publishBECKeyConfiguration(@Parameter(description = "BEC file csv") @RequestPart final MultipartFile configurationFile,
+    public ResponseEntity<byte[]> publishBECKeyConfiguration(@Parameter(description = "BEC file csv") @RequestPart final MultipartFile configurationFile,
                                            @Parameter(description = "Valid from") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime validFrom,
                                            @Parameter(description = "Valid to") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime validTo) {
 
-        taskManager.publishBECKeyConfiguration(configurationFile, validFrom, validTo);
+        try {
+            taskManager.publishBECKeyConfiguration(configurationFile, validFrom, validTo);
+            return ResponseEntity.ok().build();
+        } catch (CeMergingException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping(value = "/global-configurations/bec-configuration", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
@@ -367,11 +440,16 @@ public class MergingController {
         @ApiResponse(responseCode = OK, description = "EIC Code configuration created successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Invalid file or dates.")
     })
-    public void publishEICCodeConfiguration(@Parameter(description = "EIC Code file json") @RequestPart final MultipartFile configurationFile,
+    public ResponseEntity<byte[]> publishEICCodeConfiguration(@Parameter(description = "EIC Code file json") @RequestPart final MultipartFile configurationFile,
                                             @Parameter(description = "Valid from") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime validFrom,
                                             @Parameter(description = "Valid to") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime validTo) {
 
-        taskManager.publishRegionConfiguration(configurationFile, validFrom, validTo);
+        try {
+            taskManager.publishRegionConfiguration(configurationFile, validFrom, validTo);
+            return ResponseEntity.ok().build();
+        } catch (CeMergingException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @GetMapping(value = "/global-configurations/eic-configuration", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
@@ -401,6 +479,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or not reachable.")
     })
     public ResponseEntity<byte[]> getDcLoadFlowParameters(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getDcLoadFlowParameters(taskId));
     }
 
@@ -412,6 +493,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or not reachable.")
     })
     public ResponseEntity<byte[]> getAcLoadFlowParameters(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getAcLoadFlowParameters(taskId));
     }
 
@@ -423,6 +507,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or not reachable.")
     })
     public ResponseEntity<byte[]> getBasecaseImprovementParameters(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getBasecaseImprovementParameters(taskId));
     }
 
@@ -434,6 +521,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or not reachable.")
     })
     public ResponseEntity<byte[]> getBalancesAdjustmenParameters(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getBalancesAdjustmentParameters(taskId));
     }
 
@@ -449,6 +539,9 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or not reachable.")
     })
     public ResponseEntity<byte[]> getArtifacts(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(taskManager.getArtifactsZip(taskId), "artifacts_%s.zip".formatted(taskId));
     }
 
@@ -462,6 +555,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or German pre-merged IGM not available")
     })
     public ResponseEntity<byte[]> getGermanPreMerge(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getGermanPreMerge(taskId), "germanpremerged.uct");
     }
 
@@ -475,6 +575,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or DK converted IGM not available")
     })
     public ResponseEntity<byte[]> getDkConverted(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getDkConverted(taskId));
     }
 
@@ -488,6 +595,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or topological merge artifact not available")
     })
     public ResponseEntity<byte[]> getTopologicalMerge(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getTopologicalMerge(taskId), "topologicalmerged.uct");
     }
 
@@ -500,6 +614,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or cgm after recessivity artifact not available")
     })
     public ResponseEntity<byte[]> getCgmAfterRecessivity(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getCgmAfterRecessivity(taskId), "cgm-after-recessivity.uct");
     }
 
@@ -513,6 +634,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or cgm after pst-special-procedure artifact not available")
     })
     public ResponseEntity<byte[]> getCgmAfterPstSpecialProcedure(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getCgmAfterPstSpecialProcedure(taskId), "cgm-after-pst-special-procedure.uct");
     }
 
@@ -526,6 +654,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or actual GLSK not available")
     })
     public ResponseEntity<byte[]> getActualGlskQualityReport(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getActualGlskReport(taskId));
     }
 
@@ -539,6 +674,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or GLSK quality report not available")
     })
     public ResponseEntity<byte[]> getActualGlskCorrected(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getActualGlskCorrected(taskId));
     }
 
@@ -552,6 +694,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or IGMs net positions not available")
     })
     public ResponseEntity<byte[]> getIgmsNetPositions(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getIgmsNetPositions(taskId));
     }
 
@@ -564,6 +713,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or IGMs net positions not available")
     })
     public ResponseEntity<byte[]> getGermanIgmsNetPositions(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getGermanIgmsNetPositions(taskId));
     }
 
@@ -577,6 +733,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or BCI output not available")
     })
     public ResponseEntity<byte[]> getBciOutput(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getBciOutput(taskId));
     }
 
@@ -590,6 +753,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or balances adjustment target not available")
     })
     public ResponseEntity<byte[]> getBalancesAdjustmentTarget(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getBalancesAdjustmentTarget(taskId));
     }
 
@@ -602,6 +772,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or CGM net positions not available")
     })
     public ResponseEntity<byte[]> getCgmNetPositions(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getCgmNetPositions(taskId));
     }
 
@@ -614,6 +791,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or CGM net positions not available")
     })
     public ResponseEntity<byte[]> getTgmNetPositions(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getTgmNetPositions(taskId));
     }
 
@@ -626,6 +810,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or Alegro net positions not available")
     })
     public ResponseEntity<byte[]> getAlegroNetPositions(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getAlegroNetPositions(taskId));
     }
 
@@ -639,6 +830,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or CGM output of merging task not available")
     })
     public ResponseEntity<byte[]> getBalancedCgm(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getBalancedCgm(taskId), "balancedcgm.uct");
     }
 
@@ -652,6 +850,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found, or PST output of merging task not available")
     })
     public ResponseEntity<byte[]> getPstResult(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getPstOutput(taskId));
     }
 
@@ -664,6 +869,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or execution logs not available")
     })
     public ResponseEntity<byte[]> getExecutionLogs(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getExecutionLogs(taskId), "execution_logs.xml");
     }
 
@@ -676,6 +888,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or Open Loadflow logs not available")
     })
     public ResponseEntity<byte[]> getOpenLoadFlowLogs(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getOpenLoadFlowLogs(taskId));
     }
 
@@ -689,6 +908,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or xnodes information file not available")
     })
     public ResponseEntity<byte[]> getXnodesInformation(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getXnodesInformation(taskId));
     }
 
@@ -702,6 +928,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or xnodes inconsistencies file not available")
     })
     public ResponseEntity<byte[]> getXnodesInconsistencies(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getXnodesInconsistencies(taskId));
     }
 
@@ -720,6 +953,13 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getRefProgOutput(@Parameter(description = MERGING_TASK_ID)
                                                    @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getRefProg(taskId));
     }
 
@@ -734,6 +974,13 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getCgmOutput(@Parameter(description = MERGING_TASK_ID)
                                                @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getCgm(taskId));
     }
 
@@ -748,6 +995,13 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getOutputsByTaskId(@Parameter(description = MERGING_TASK_ID)
                                                      @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getOutputZip(taskId), "outputs_%s.zip".formatted(taskId));
     }
 
@@ -761,6 +1015,13 @@ public class MergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Merging task not found in the server, or BCI Report output of merging process task not available")
     })
     public ResponseEntity<byte[]> getMergingLogs(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.getMergingLogs(taskId));
     }
 
@@ -773,6 +1034,13 @@ public class MergingController {
         @ApiResponse(responseCode = "404", description = "Merging task with given ID not found in the server, or merging logs not available")
     })
     public ResponseEntity exportBciLogs(@Parameter(description = "Merging task ID") @PathVariable long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
+        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
+            return ResponseEntity.badRequest().build();
+        }
         return toAttachmentFileResponse(taskManager.exportMergingLogs(taskId), "resultat_bci_nf.xml");
     }
 }

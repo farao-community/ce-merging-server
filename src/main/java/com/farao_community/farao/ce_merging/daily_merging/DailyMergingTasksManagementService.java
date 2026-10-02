@@ -140,6 +140,9 @@ public class DailyMergingTasksManagementService {
         }
     }
 
+    public boolean checkDailyTaskExist(final long taskId) {
+        return repository.existsById(taskId);
+    }
    /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
                         INPUTS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/

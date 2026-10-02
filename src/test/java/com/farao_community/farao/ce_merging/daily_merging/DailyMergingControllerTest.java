@@ -93,12 +93,20 @@ class DailyMergingControllerTest {
 
     @Test
     void shouldRunTask() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final DailyMergingTask task = mock(DailyMergingTask.class);
         when(dailyTasksManagementService.runDailyMergingTask(TASK_ID)).thenReturn(task);
         final ResponseEntity<DailyMergingTask> response = controller.runTask(TASK_ID);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertSame(task, response.getBody());
         verify(dailyTasksManagementService).runDailyMergingTask(TASK_ID);
+    }
+
+    @Test
+    void shouldNotRunTaskNotFound() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<DailyMergingTask> response = controller.runTask(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
@@ -115,6 +123,7 @@ class DailyMergingControllerTest {
 
     @Test
     void shouldGetTask() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final DailyMergingTask task = mock(DailyMergingTask.class);
         when(dailyTasksManagementService.getTask(TASK_ID)).thenReturn(task);
         final ResponseEntity<DailyMergingTask> response = controller.getTask(TASK_ID);
@@ -124,11 +133,26 @@ class DailyMergingControllerTest {
     }
 
     @Test
+    void shouldNotGetTaskNotFound() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<DailyMergingTask> response = controller.getTask(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void shouldDeleteTask() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final ResponseEntity<Void> response = controller.deleteTask(TASK_ID);
         assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
         assertNull(response.getBody());
         verify(dailyTasksManagementService).deleteTask(TASK_ID);
+    }
+
+    @Test
+    void shouldNotDeleteTaskNotFound() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<Void> response = controller.deleteTask(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     @Test
@@ -141,6 +165,7 @@ class DailyMergingControllerTest {
 
     @Test
     void shouldGetMergingRequest() throws IOException {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final SavedFile savedFile = savedFile();
         when(dailyTasksManagementService.getMergingRequest(TASK_ID)).thenReturn(savedFile);
         final ResponseEntity<byte[]> response = controller.getMergingRequest(TASK_ID);
@@ -149,7 +174,15 @@ class DailyMergingControllerTest {
     }
 
     @Test
+    void shouldNotGetMergingRequestNotFound() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<byte[]> response = controller.getMergingRequest(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void shouldGetDailyResultPackage() throws IOException {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final byte[] content = "zip content".getBytes();
         when(dailyTasksManagementService.getDailyResultPackage(TASK_ID)).thenReturn(content);
         final ResponseEntity<byte[]> response = controller.getDailyResultPackage(TASK_ID);
@@ -159,7 +192,15 @@ class DailyMergingControllerTest {
     }
 
     @Test
+    void shouldNotGetDailyResultPackage() throws IOException {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<byte[]> response = controller.getDailyResultPackage(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void shouldGetDailyMergingResponse() throws IOException {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final SavedFile savedFile = savedFile();
         when(dailyTasksManagementService.getDailyMergingResponse(TASK_ID)).thenReturn(savedFile);
         final ResponseEntity<byte[]> response = controller.getDailyMergingResponse(TASK_ID);
@@ -168,7 +209,15 @@ class DailyMergingControllerTest {
     }
 
     @Test
+    void shouldNotGetDailyMergingResponseNotFound() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<byte[]> response = controller.getDailyMergingResponse(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void shouldGetDailyMergingLogs() throws IOException {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final SavedFile savedFile = savedFile();
         when(dailyTasksManagementService.getDailyMergingLogs(TASK_ID)).thenReturn(savedFile);
         final ResponseEntity<byte[]> response = controller.getDailyMergingLogs(TASK_ID);
@@ -177,7 +226,15 @@ class DailyMergingControllerTest {
     }
 
     @Test
+    void shouldNotGetDailyMergingLogsNotFound() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<byte[]> response = controller.getDailyMergingLogs(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void shouldGetDailyCgmZip() throws IOException {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final SavedFile savedFile = savedFile();
         when(dailyTasksManagementService.getDailyCgmZip(TASK_ID)).thenReturn(savedFile);
         final ResponseEntity<byte[]> response = controller.getDailyCgmZip(TASK_ID);
@@ -186,7 +243,15 @@ class DailyMergingControllerTest {
     }
 
     @Test
+    void shouldNotGetDailyCgmZipNotFound() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<byte[]> response = controller.getDailyCgmZip(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void shouldGetDailyGlskQualityReport() throws IOException {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final SavedFile savedFile = savedFile();
         when(dailyTasksManagementService.getDailyGlskReport(TASK_ID)).thenReturn(savedFile);
         final ResponseEntity<byte[]> response = controller.getDailyGlskQualityReport(TASK_ID);
@@ -195,7 +260,15 @@ class DailyMergingControllerTest {
     }
 
     @Test
+    void shouldNotGetDailyGlskQualityReportNotFound() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<byte[]> response = controller.getDailyGlskQualityReport(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void shouldGetMergingReport() throws IOException {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final SavedFile savedFile = savedFile();
         when(dailyTasksManagementService.getMergingReport(TASK_ID)).thenReturn(savedFile);
         final ResponseEntity<byte[]> response = controller.getMergingReport(TASK_ID);
@@ -204,12 +277,27 @@ class DailyMergingControllerTest {
     }
 
     @Test
+    void shouldNotGetMergingReportNotFound() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<byte[]> response = controller.getMergingReport(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
     void shouldGetDailyRefProgOutput() throws IOException {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(true);
         final SavedFile savedFile = savedFile();
         when(dailyTasksManagementService.getDailyRefProgOutput(TASK_ID)).thenReturn(savedFile);
         final ResponseEntity<byte[]> response = controller.getDailyRefProgOutput(TASK_ID);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(dailyTasksManagementService).getDailyRefProgOutput(TASK_ID);
+    }
+
+    @Test
+    void shouldNotGetDailyRefProgOutputNotFound() {
+        when(dailyTasksManagementService.checkDailyTaskExist(TASK_ID)).thenReturn(false);
+        final ResponseEntity<byte[]> response = controller.getDailyRefProgOutput(TASK_ID);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
     private SavedFile savedFile() throws IOException {
