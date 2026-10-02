@@ -186,6 +186,9 @@ public class DailyMergingTasksManagementService {
         return getOutputs(taskId).getMergingReport();
     }
 
+    public boolean checkDailyTaskExist(final long taskId) {
+        return repository.findById(taskId).isPresent();
+    }
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
             INTERNAL (PRIVATE & PACKAGE-PRIVATE)
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
