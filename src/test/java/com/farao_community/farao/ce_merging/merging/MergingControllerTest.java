@@ -377,6 +377,23 @@ class MergingControllerTest {
     @Test
     void shouldGetTaskConfigurationsAsAttachments() {
         when(taskManager.checkTaskExist(ID_1))
+                .thenReturn(true);
+        when(taskManager.getDcLoadFlowParameters(ID_1)).thenReturn(new SavedFile());
+        when(taskManager.getAcLoadFlowParameters(ID_1)).thenReturn(new SavedFile());
+        when(taskManager.getBasecaseImprovementParameters(ID_1)).thenReturn(new SavedFile());
+        when(taskManager.getBalancesAdjustmentParameters(ID_1)).thenReturn(new SavedFile());
+        try (MockedStatic<FileUtils> fileUtils = mockStatic(FileUtils.class)) {
+            controller.getDcLoadFlowParameters(ID_1);
+            controller.getAcLoadFlowParameters(ID_1);
+            controller.getBasecaseImprovementParameters(ID_1);
+            controller.getBalancesAdjustmenParameters(ID_1);
+            fileUtils.verify(() -> FileUtils.toAttachmentFileResponse(anyFile()), times(4));
+        }
+    }
+
+    @Test
+    void shouldNotGetTaskConfigurationsAsAttachmentsBecauseNotFound() {
+        when(taskManager.checkTaskExist(ID_1))
                 .thenReturn(false);
         final ResponseEntity<byte[]> dcLoadFlowResponse = controller.getDcLoadFlowParameters(ID_1);
         final ResponseEntity<byte[]> acLoadFlowResponse = controller.getAcLoadFlowParameters(ID_1);
