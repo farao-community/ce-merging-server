@@ -26,6 +26,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static test_utils.CeTestUtils.getSavedFile;
 
 @SpringBootTest
 class TargetNetPositionsCalculationServiceTest {
@@ -61,11 +62,11 @@ class TargetNetPositionsCalculationServiceTest {
     private MergingTask getCoreMergingTaskEntityWithoutVirtualHubsShifting() throws IOException {
         final MergingTask taskEntity = new MergingTask();
         taskEntity.getInputs().setTargetDate(TARGET_DATE);
-        final SavedFile igmsNetPositionsFile = new SavedFile(IGMS_NET_POSITIONS_FILENAME, RESOURCES_PATH + IGMS_NET_POSITIONS_FILENAME, "mock");
-        final SavedFile bciOutputFile = new SavedFile(BCI_OUTPUT_FILENAME, RESOURCES_PATH + BCI_OUTPUT_FILENAME, "mock");
-        final SavedFile forecastReferenceProgram = new SavedFile(FORECAST_REFERENCE_PROGRAM_FILENAME, RESOURCES_PATH + FORECAST_REFERENCE_PROGRAM_FILENAME, "mock");
-        final SavedFile alegroNetPositions = new SavedFile(ALEGRO_NET_POSITIONS_FILENAME, RESOURCES_PATH + ALEGRO_NET_POSITIONS_FILENAME, "mock");
-        final SavedFile tgmFileAfterRecessivity = new SavedFile(RECESSIVITY_FILENAME, RESOURCES_PATH + RECESSIVITY_FILENAME, "mock");
+        final SavedFile igmsNetPositionsFile = getSavedFile(IGMS_NET_POSITIONS_FILENAME, RESOURCES_PATH);
+        final SavedFile bciOutputFile = getSavedFile(BCI_OUTPUT_FILENAME, RESOURCES_PATH);
+        final SavedFile forecastReferenceProgram = getSavedFile(FORECAST_REFERENCE_PROGRAM_FILENAME, RESOURCES_PATH);
+        final SavedFile alegroNetPositions = getSavedFile(ALEGRO_NET_POSITIONS_FILENAME, RESOURCES_PATH);
+        final SavedFile tgmFileAfterRecessivity = getSavedFile(RECESSIVITY_FILENAME, RESOURCES_PATH);
 
         final Artifacts artifacts = new Artifacts();
         artifacts.putFile(ArtifactType.IGMS_NET_POSITIONS_FILE, igmsNetPositionsFile);

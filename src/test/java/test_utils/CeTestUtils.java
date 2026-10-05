@@ -345,4 +345,7 @@ public final class CeTestUtils {
         return mockRunner;
     }
 
+    public static SavedFile getSavedFile(String filename, String path) {
+        return new SavedFile(filename, path + filename, "mock");
+    }
 }
