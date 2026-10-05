@@ -1,0 +1,108 @@
+{
+  "netPositions" : [ {
+    "area" : "AL",
+    "netPosition" : 700.0
+  }, {
+    "area" : "AT",
+    "netPosition" : -2500.0
+  }, {
+    "area" : "BA",
+    "netPosition" : 40.0
+  }, {
+    "area" : "BE",
+    "netPosition" : -3275.999999691833
+  }, {
+    "area" : "BG",
+    "netPosition" : -1000.0
+  }, {
+    "area" : "CH",
+    "netPosition" : -3000.0
+  }, {
+    "area" : "CY",
+    "netPosition" : 0.0
+  }, {
+    "area" : "CZ",
+    "netPosition" : 1000.0
+  }, {
+    "area" : "DE",
+    "netPosition" : 3714.9700029970536
+  }, {
+    "area" : "DK",
+    "netPosition" : 2169.50000181079
+  }, {
+    "area" : "ES",
+    "netPosition" : 3603.799999995228
+  }, {
+    "area" : "FR",
+    "netPosition" : 9316.233999930282
+  }, {
+    "area" : "GB",
+    "netPosition" : 0.0
+  }, {
+    "area" : "GR",
+    "netPosition" : 630.9999994078805
+  }, {
+    "area" : "HR",
+    "netPosition" : -600.0
+  }, {
+    "area" : "HU",
+    "netPosition" : -1500.0
+  }, {
+    "area" : "IS",
+    "netPosition" : 0.0
+  }, {
+    "area" : "IT",
+    "netPosition" : -4687.49999999994
+  }, {
+    "area" : "LT",
+    "netPosition" : 0.0
+  }, {
+    "area" : "MA",
+    "netPosition" : 0.0
+  }, {
+    "area" : "MD",
+    "netPosition" : -200.0
+  }, {
+    "area" : "ME",
+    "netPosition" : 162.0
+  }, {
+    "area" : "MK",
+    "netPosition" : -400.0
+  }, {
+    "area" : "NL",
+    "netPosition" : 1665.0000000754983
+  }, {
+    "area" : "NO",
+    "netPosition" : 0.0
+  }, {
+    "area" : "PL",
+    "netPosition" : 38.20000000567177
+  }, {
+    "area" : "PT",
+    "netPosition" : -700.0
+  }, {
+    "area" : "RO",
+    "netPosition" : -500.0
+  }, {
+    "area" : "RS",
+    "netPosition" : -200.0
+  }, {
+    "area" : "SE",
+    "netPosition" : 0.0
+  }, {
+    "area" : "SI",
+    "netPosition" : -500.0
+  }, {
+    "area" : "SK",
+    "netPosition" : 100.0
+  }, {
+    "area" : "TR",
+    "netPosition" : 100.0
+  }, {
+    "area" : "UA",
+    "netPosition" : -1000.0
+  }, {
+    "area" : "XK",
+    "netPosition" : -200.0
+  } ]
+}
