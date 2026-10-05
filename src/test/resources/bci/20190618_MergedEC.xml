@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  ~ Copyright (c) 2026, RTE (http://www.rte-france.com)
-  ~ This Source Code Form is subject to the terms of the Mozilla Public
-  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
-  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
-  -->
-
-<FlowBasedExternalConstraintDocument xmlns="flowbased"
+<FlowBasedExternalConstraintDocument xmlns="flowbased" xmlns:ecc="etso-core-cmpts.xsd" xmlns:ecl="etso-code-lists.xsd"
                                      DtdRelease="0" DtdVersion="4">
     <DocumentIdentification v="17XTSO-CS------W-20160201-F228"/>
     <DocumentVersion v="1"/>
@@ -20,9 +13,9 @@
     <ExternalConstraintTimeInterval v="2019-06-17T22:30Z/2019-06-18T22:30Z"/>
     <Domain codingScheme="A01" v="10YDOM-REGION-1V"/>
     <constraints>
-        <netPositionConstraint direction="IMPORT" hub="BE" name="BE_import" type="ABSOLUTE" value="6500" version="2">
+        <netPositionConstraint direction="IMPORT" hub="N12" name="N12_import" type="ABSOLUTE" value="6500" version="2">
             <timeInterval v="2019-06-17T22:00Z/2019-06-18T22:00Z"/>
-            <tsoOrigin>BE</tsoOrigin>
+            <tsoOrigin>N12</tsoOrigin>
         </netPositionConstraint>
         <netPositionConstraint direction="IMPORT" hub="N25" name="N25_import" type="ABSOLUTE" value="5750" version="0">
             <timeInterval v="2019-06-17T22:00Z/2019-06-17T22:59Z"/>

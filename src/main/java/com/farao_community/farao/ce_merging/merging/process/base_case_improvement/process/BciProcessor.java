@@ -134,7 +134,7 @@ public class BciProcessor {
         final double countryAlegroGap = alegroToCeFlow - flows.initialFlow();
         final String countryEic = regionConfiguration.getAreaInEic(country.name());
 
-        initialRegionNetPositions.shiftFlow(countryEic, -countryAlegroGap);
+        initialRegionNetPositions.shiftFlow(countryEic, countryAlegroGap);
     }
 
     private double getAlegroConstrainedTargetFlow(final AlegroFlows toConstrain) {
