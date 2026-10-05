@@ -1,12 +1,12 @@
 # Task processing - calculations
 
 This page describes the computation steps following the [inputs preparation](/doc/hourly_task/inputPreparation.md), in
-the same order as what is done in the application.
+the same order as in the process.
 
 ### Initial net positions computation
 
 The initial calculation of the net positions is done on all the IGMs:
-either the artifacts created in the previous steps, or the input IGMs as-is if it's not concerned by these.
+either the artifacts created in the previous steps or the input IGMs as-is if it's not concerned by these.
 
 The computation is detailed [here](/doc/hourly_task/step_details/initialNp.md); its result is saved in a JSON file named _igmsNetPositions.json_.
 

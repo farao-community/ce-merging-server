@@ -24,7 +24,7 @@ if it's one of these, it defines how we model the intervals of time :
 
 **A03 :** $end(interval_i) = start(interval_{i+1})$
 ### German pre-merge
-Since there are several German TSOs, we receive 5 different IGMs, with the "country" codes being D2, D4, D6, D7 and D8.
+Since there are [several German TSOs](https://www.tsodsoplatform.eu/capacitypedia/germany), we receive 5 different IGMs, with the "country" codes being D2, D4, D6, D7 and D8.
 
 In this step, we merge these into a single German UCTE file, with the country code DE.
 The XNodes merged during the process are then converted into German standard nodes, since these are not representing a border node anymore.
@@ -39,9 +39,9 @@ $FLOW_{UPDATED} = FLOW_{INITIAL} + (M \times | \frac{FLOW_{INITIAL}}{\sum NP_{EX
 ### Denmark renaming
 The IGM files that we receive from Danish TSO have nodes defined in the **##ZD1** zone and have names starting with D1.
 
-To not clash with german country code, any node whose name starts with D1 will be moved in the **##ZDK** zone and renamed to start with K1.
+To avoid clash with german country code, any node whose name starts with _D1_ will be moved in the **##ZDK** zone and renamed to start with _K1_.
 
-An explicit list of specific nodes (HVDC ones) that do not start with D1 but are Danish nodes
+An explicit list of specific nodes (HVDC ones) that do not start with _D1_ but are Danish nodes
 will be moved in **##ZDK** zone and renamed to start with X. 
 
 Any element (line, transformer...) that references these nodes is also renamed.
@@ -49,17 +49,17 @@ Any element (line, transformer...) that references these nodes is also renamed.
 For each couple defined in the HVDC alignment configuration, we check if one of the nodes was not found in the virtual hub configuration. 
 If the two nodes have been recovered correctly, we find the corresponding countries using the _RelatedMa_ field, and then the corresponding IGMs.
 
-If we cannot find any one of these, we emit an error. Then, if we are unable to retrieve the boundary line associated with the reference or recessive node in the network, we will emit a warning.
-
+If we cannot find any one of these, we emit an error.
+Then, if we are unable to retrieve the boundary line associated with the reference or recessive node in the network, we emit a warning.
 
 If the two dangling lines have been recovered correctly, we apply the HVDC alignment :
 
-- Boundary line and generator Powers corresponding to the recessive X-Node are set to the opposite value of the reference one,
+- Boundary line and generator powers corresponding to the recessive X-Node are set to the opposite value of the reference one,
 - We also align the outage status of the recessive with the reference.
 
 We then save the modified IGMs in the artifacts with the same name.
 ### MONITA renaming
-The nodes describing the MONITA (**MON**tenegro - **ITA**ly) HVDC don't start with an X. To include them correctly in the following calculations, they have to, so we rename these :
+The nodes describing the MONITA (**MON**tenegro - **ITA**ly) HVDC don't start with an X. To include them correctly in the following calculations, they have to, so we rename these:
 - ICEPR → XCEPR
 - IKOTR → XKOTR.
 

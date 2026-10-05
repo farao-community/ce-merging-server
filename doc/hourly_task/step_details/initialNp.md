@@ -11,10 +11,10 @@ For each IGM, it starts by running a loadflow (in AC with fallback DC) and then 
 
 During the initial calculation of the net positions, for X-Nodes with area=DE, to determine the country on the other side, we look at subarea : 
 
-- subarea == "D1" → DK
+- subarea = D1 → DK
 - subarea ∈ { D2, D4, D6, D7, D8 } → DE
 
-- subarea ∉ { D1, D2, D4, D6, D7, D8 } →  Warning because the area is DE without a valid subarea
+- subarea ∉ { D1, D2, D4, D6, D7, D8 } → Warning because the area is DE without a valid subarea
 
 Here's how the X-Nodes are counted depending on their presence in config files :
 
