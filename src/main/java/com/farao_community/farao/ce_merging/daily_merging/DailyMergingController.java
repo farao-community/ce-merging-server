@@ -92,6 +92,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task with given ID not found, or not reachable.")
     })
     public ResponseEntity<DailyMergingTask> runTask(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().body(dailyTasksManagementService.runDailyMergingTask(taskId));
     }
 
@@ -113,6 +116,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task not found.")
     })
     public ResponseEntity<DailyMergingTask> getTask(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().body(dailyTasksManagementService.getTask(taskId));
     }
 
@@ -124,6 +130,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task with the given ID was not found.")
     })
     public ResponseEntity<Void>  deleteTask(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         dailyTasksManagementService.deleteTask(taskId);
         return ResponseEntity.noContent().build();
     }
@@ -151,6 +160,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task with given ID not found.")
     })
     public ResponseEntity<byte[]>  getMergingRequest(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getMergingRequest(taskId));
     }
 
@@ -167,6 +179,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily task with given ID not found in the server or daily result reports not found")
     })
     public ResponseEntity<byte[]> getDailyResultPackage(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) throws IOException {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyResultPackage(taskId), "results-package.zip");
     }
 
@@ -178,6 +193,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task not found, or merging response output of daily merging task not available.")
     })
     public ResponseEntity<byte[]> getDailyMergingResponse(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyMergingResponse(taskId));
     }
 
@@ -190,6 +208,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task not found, or daily merging logs output of daily merging task not available.")
     })
     public ResponseEntity<byte[]> getDailyMergingLogs(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyMergingLogs(taskId));
     }
 
@@ -202,6 +223,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task not found, or cgm zip output of daily merging task not available.")
     })
     public ResponseEntity<byte[]> getDailyCgmZip(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyCgmZip(taskId));
     }
 
@@ -213,6 +237,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily GLSK quality reports not found")
     })
     public ResponseEntity<byte[]> getDailyGlskQualityReport(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyGlskReport(taskId));
     }
 
@@ -225,6 +252,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily task with given ID not found in the server or merging report not found")
     })
     public ResponseEntity<byte[]> getMergingReport(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getMergingReport(taskId));
     }
 
@@ -236,6 +266,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task not found, or RefProg output of daily merging task not available.")
     })
     public ResponseEntity<byte[]> getDailyRefProgOutput(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyRefProgOutput(taskId));
     }
 }
