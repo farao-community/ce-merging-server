@@ -33,6 +33,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ARR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.COMMA;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CSV_SEPARATOR;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toUtcLocalDateTime;
 
 @Service
 public class BECKeyConfigurationService extends AbstractGridConfigurationService<BECKeyConfigurationRecord, JsonBecConfiguration> {
@@ -48,7 +49,7 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
 
     public JsonBecConfiguration getConfiguration(OffsetDateTime targetDate) {
         try {
-            BECKeyConfigurationRecord configRecord = repository.findLatestValidOfType(targetDate.toLocalDateTime());
+            BECKeyConfigurationRecord configRecord = repository.findLatestValidOfType(toUtcLocalDateTime(targetDate));
             LOGGER.info("configuration retrieved from server");
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {
@@ -90,8 +91,8 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
         final String configFileCsvContent = getTextContent(configurationFile);
         final List<BecByBoundaryDto> becMatrix = parseBecSharingKeys(validFrom, configFileCsvContent);
         return new BECKeyConfigurationRecord(generateUuidString(),
-                                             validFrom.toLocalDateTime(),
-                                             validTo.toLocalDateTime(),
+                                             toUtcLocalDateTime(validFrom),
+                                             toUtcLocalDateTime(validTo),
                                              LocalDateTime.now(UTC_ZONE_ID),
                                              becMatrix);
     }
