@@ -31,8 +31,6 @@ import static com.powsybl.iidm.network.TwoSides.TWO;
 
 public final class GermanXnodesReplacer {
     private static final String ELEMENT_NAME_PROPERTY = "elementName";
-    private static final String ELEMENT_NAME_PREFIX = "elementName_";
-    private static final String TIE_LINE_LIMITS = "tieLineLimits_";
     private static final String LINE_ID_FORMAT = "%s %s 1";
     private static final String GERMAN_UCTE_NODE_PREFIX = "D";
     private static final int SUBSTATION_ID_LENGTH = 6;
@@ -85,8 +83,10 @@ public final class GermanXnodesReplacer {
 
     }
 
-    private void replaceTieSideWithLine(final TwoSides side, final TieLine tieLine, final Bus xNodeBus, final VoltageLevel xNodeVoltageLevel) {
-        final String sideNb = String.valueOf(side.getNum());
+    private void replaceTieSideWithLine(final TwoSides side,
+                                        final TieLine tieLine,
+                                        final Bus xNodeBus,
+                                        final VoltageLevel xNodeVoltageLevel) {
         final DanglingLine danglingLine = tieLine.getDanglingLine(side);
         final Terminal terminal = tieLine.getTerminal(side);
         final String bus2Id = xNodeBus.getId();
@@ -112,12 +112,16 @@ public final class GermanXnodesReplacer {
                 .setB2(isSide1 ? 0 : b)
                 .add();
 
-        tieLine.getCurrentLimits(side).map(LoadingLimits::getPermanentLimit)
-                .map(line.newOperationalLimitsGroup1(TIE_LINE_LIMITS + sideNb)
-                             .newCurrentLimits()::setPermanentLimit)
+        final CurrentLimitsAdder currentLimitsAdder = (
+                isSide1 ? line.getOrCreateSelectedOperationalLimitsGroup1() : line.getOrCreateSelectedOperationalLimitsGroup2()
+        ).newCurrentLimits();
+
+        tieLine.getCurrentLimits(side)
+                .map(LoadingLimits::getPermanentLimit)
+                .map(currentLimitsAdder::setPermanentLimit)
                 .ifPresent(CurrentLimitsAdder::add);
 
-        Optional.ofNullable(tieLine.getProperty(ELEMENT_NAME_PREFIX + sideNb))
+        Optional.ofNullable(danglingLine.getProperty(ELEMENT_NAME_PROPERTY))
                 .ifPresent(name -> line.setProperty(ELEMENT_NAME_PROPERTY, name));
     }
 

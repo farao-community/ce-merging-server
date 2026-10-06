@@ -33,11 +33,11 @@ class GermanXnodesReplacerTest {
 
         LineAssert.assertThat(mergedGermanNetwork.getLine(D2_LINE))
                 .hasProperties(Map.of("elementName", "ELEMENT1"))
-                .hasPermanentCurrentLimits(Map.of("tieLineLimits_1", 5051.));
+                .hasPermanentCurrentLimits(Map.of("DEFAULT", 5051.));
 
         LineAssert.assertThat(mergedGermanNetwork.getLine(D4_LINE))
                 .hasProperties(Map.of("elementName", "ELEMENT2"))
-                .hasPermanentCurrentLimits(Map.of("tieLineLimits_2", 5051.));
+                .hasPermanentCurrentLimits(Map.of("DEFAULT", 5051.));
 
     }
 
