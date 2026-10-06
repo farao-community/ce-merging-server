@@ -27,6 +27,8 @@ import java.util.function.ToDoubleFunction;
 
 import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumProperty;
 import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumPropertyFiltered;
+import static com.powsybl.iidm.network.Country.BE;
+import static com.powsybl.iidm.network.Country.DE;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Math.max;
@@ -92,12 +94,12 @@ public class BciComputer {
 
     private Map<String, BciAreaResults> createResults(final FlowByAreaMap initialInRegionNpByArea) {
         return regions
-            .getAreasIn()
-            .entrySet()
-            .stream()
-            .collect(toMap(Entry::getKey, e -> createBciAreaResult(e.getValue(),
-                                                                   initialInRegionNpByArea,
-                                                                   bciAppliedByArea)));
+                .getAreasIn()
+                .entrySet()
+                .stream()
+                .collect(toMap(Entry::getKey, e -> createBciAreaResult(e.getValue(),
+                                                                       initialInRegionNpByArea,
+                                                                       bciAppliedByArea)));
     }
 
     private void shiftNpfWithAlegro(final double alBeToCeFlow,
@@ -105,13 +107,13 @@ public class BciComputer {
         // BCI process should not take Alegro flows into account.
         // inRegionNpfByArea = BE-CE from NPF file which alreadycontains ALBE-CE flow
         // That's why we must subtract by ALBE-CE flow to have only the AC target flow as the BCI target flow.
-        final String belgium = regions.getAreaInEic("BE");
-        final String germany = regions.getAreaInEic("DE");
+        final String belgium = regions.getAreaInEic(BE.name());
+        final String germany = regions.getAreaInEic(DE.name());
 
-        globalNpfByArea.shiftFlow(belgium, alBeToCeFlow);
-        inRegionNpfByArea.shiftFlow(belgium, alBeToCeFlow);
-        globalNpfByArea.shiftFlow(germany, alDeToCeFlow);
-        inRegionNpfByArea.shiftFlow(germany, alDeToCeFlow);
+        globalNpfByArea.shiftFlow(belgium, -alBeToCeFlow);
+        inRegionNpfByArea.shiftFlow(belgium, -alBeToCeFlow);
+        globalNpfByArea.shiftFlow(germany, -alDeToCeFlow);
+        inRegionNpfByArea.shiftFlow(germany, -alDeToCeFlow);
     }
 
     private BciAreaResults createBciAreaResult(final String areaId,
@@ -122,13 +124,13 @@ public class BciComputer {
         final double regionMaxFeasible = getMaxConstraint(areaId);
 
         final InRegionNetPositions inRegionResults = new InRegionNetPositions(
-            initialRegionNpByArea.getOrZero(areaId),
-            regionMinFeasible,
-            regionMaxFeasible,
-            min(regionMinFeasible, targetRegionNp),
-            max(regionMaxFeasible, targetRegionNp),
-            inRegionNpfByArea.get(areaId),
-            targetRegionNp
+                initialRegionNpByArea.getOrZero(areaId),
+                regionMinFeasible,
+                regionMaxFeasible,
+                min(regionMinFeasible, targetRegionNp),
+                max(regionMaxFeasible, targetRegionNp),
+                inRegionNpfByArea.get(areaId),
+                targetRegionNp
         );
 
         final Boolean isBciApplied = bciAppliedByArea.get(areaId);
@@ -157,8 +159,8 @@ public class BciComputer {
             return;
         }
         final double shiftAvailable = computeTotalShiftAvailableFor(
-            area -> isInMainViolation(violationsByArea.get(area)),
-            this::getAvailableShiftWithContraryViolation
+                area -> isInMainViolation(violationsByArea.get(area)),
+                this::getAvailableShiftWithContraryViolation
         );
 
         violationsByArea.forEach((area, violation) -> solveContraryViolation(area, violation, shiftAvailable));
@@ -188,12 +190,12 @@ public class BciComputer {
         }
 
         final double shiftAvailable = computeTotalShiftAvailableFor(
-            area -> !isInViolation(violationsByArea.get(area)),
-            this::getAvailableShiftWithTotalViolation
+                area -> !isInViolation(violationsByArea.get(area)),
+                this::getAvailableShiftWithTotalViolation
         );
 
         final double totalShiftToApply = totalViolations < 0 ?
-            max(shiftAvailable, totalViolations) : min(shiftAvailable, totalViolations);
+                max(shiftAvailable, totalViolations) : min(shiftAvailable, totalViolations);
 
         violationsByArea.forEach((area, violation) -> solveMainViolation(area,
                                                                          violation,
@@ -230,7 +232,7 @@ public class BciComputer {
 
     private void computeViolations() {
         violationsByArea = targetInRegionNpByArea.withValuesShiftedBy(
-            area -> -Math.clamp(targetInRegionNpByArea.get(area), getMinConstraint(area), getMaxConstraint(area))
+                area -> -Math.clamp(targetInRegionNpByArea.get(area), getMinConstraint(area), getMaxConstraint(area))
         );
     }
 
@@ -240,14 +242,15 @@ public class BciComputer {
 
     private boolean isNpfInFeasibilityRanges() {
         return inRegionNpfByArea.entrySet().stream()
-            .allMatch(e -> feasibilityRanges.get(e.getKey()).hasWithinBounds(e.getValue()));
+                .allMatch(e -> feasibilityRanges.get(e.getKey()).hasWithinBounds(e.getValue()));
     }
 
     private static boolean isNegligible(final double flowInMW) {
         return BigDecimal.valueOf(flowInMW).abs().compareTo(EPSILON) <= 0;
     }
 
-    private double getMaxOrMinConstraint(final String areaId, final boolean maxIfTrue) {
+    private double getMaxOrMinConstraint(final String areaId,
+                                         final boolean maxIfTrue) {
         if (maxIfTrue) {
             return getMaxConstraint(areaId);
         } else {
@@ -278,7 +281,8 @@ public class BciComputer {
         return getDistanceFromExtremum(area, violationsByArea.getTotalFlow() > 0);
     }
 
-    private double getDistanceFromExtremum(final String area, final boolean fromMaxIf) {
+    private double getDistanceFromExtremum(final String area,
+                                           final boolean fromMaxIf) {
         return getMaxOrMinConstraint(area, fromMaxIf) - targetInRegionNpByArea.get(area);
     }
 

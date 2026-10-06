@@ -18,13 +18,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.stream.Collectors;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.COMMA;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_HVDC_XNODES_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DK_NAMING_STRATEGY;
@@ -44,27 +42,25 @@ public class DKRenamingService {
 
     public void renameDkCountry(MergingTask task) {
         LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.DK_RENAMING);
-        SavedFile d1File = task.getInputs().getIgm(DANISH_TSO).getIgmFile();
-        try (InputStream inputStream = new FileInputStream(d1File.getPath())) {
-            String dkHvdcXnodes = Optional.ofNullable(task.getConfigurations().getDkHvdcXnodes())
-                .orElseGet(Collections::emptyList)
-                .stream()
-                .collect(Collectors.joining(","));
-            Network danishNetwork = Network.read(d1File.getPath());
-            Properties properties = buildExportProperties(dkHvdcXnodes);
-            // danishNetwork.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes); : copied from core-merging todo check if this set is mondotary or network.write(UCTE_FORMAT, properties, filePath);
+        final SavedFile d1File = task.getInputs().getIgm(DANISH_TSO).getIgmFile();
+        try {
+            final String dkHvdcXnodes = String.join(COMMA, Optional.ofNullable(task.getConfigurations().getDkHvdcXnodes())
+                    .orElseGet(Collections::emptyList));
+            final Network danishNetwork = Network.read(d1File.getPath());
+            final Properties properties = buildExportProperties(dkHvdcXnodes);
+            danishNetwork.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes);
             FileStorageUtils.saveArtifactNetwork(
-                DK_CONVERTED_FILE, danishNetwork, task, UCTE_FORMAT, properties, ceMergingConfiguration
+                    DK_CONVERTED_FILE, danishNetwork, task, UCTE_FORMAT, properties, ceMergingConfiguration
             );
-        } catch (Exception e) {
+        } catch (final Exception e) {
             String errorMessage = String.format("Denmark Renaming strategy failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
             LOGGER.error(errorMessage);
             throw new CeMergingException(errorMessage, e);
         }
     }
 
-    private Properties buildExportProperties(String dkHvdcXnodes) {
-        Properties properties = new Properties();
+    private Properties buildExportProperties(final String dkHvdcXnodes) {
+        final Properties properties = new Properties();
         properties.setProperty(UCTE_EXPORT_NAMING_STRATEGY_PROPERTY, DK_NAMING_STRATEGY);
         properties.setProperty(DK_HVDC_XNODES_PROPERTY, dkHvdcXnodes);
         return properties;
