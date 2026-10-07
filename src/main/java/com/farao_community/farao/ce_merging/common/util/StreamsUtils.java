@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.common.util;
 
 import java.util.Collection;
+import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Stream;
@@ -51,6 +52,10 @@ public final class StreamsUtils {
 
     public static <T> Stream<T> streamIterable(final Iterable<T> iterable) {
         return StreamSupport.stream(iterable.spliterator(), false);
+    }
+
+    public static <T> BinaryOperator<T> keepExistingValue() {
+        return (a,b) -> a;
     }
 
 }

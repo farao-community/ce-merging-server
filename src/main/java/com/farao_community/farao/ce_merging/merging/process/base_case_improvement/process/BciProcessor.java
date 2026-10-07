@@ -35,6 +35,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALE
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.readBytesFromPath;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.keepExistingValue;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.ExternalConstraintsImporter.calculateConstraintsForAlegro;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.InitialNetPositionsImporter.getGlobalNetPosition;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
@@ -187,7 +188,7 @@ public class BciProcessor {
                 .stream()
                 .collect(toMap(Map.Entry::getKey,
                                e -> globalNetPositionsByAreaId.getOrZero(e.getValue()),
-                               (o1, o2) -> o1,
+                               keepExistingValue(),
                                TreeMap::new));
 
         return new OutRegionResults(globalNpByCountry);

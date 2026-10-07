@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.keepExistingValue;
+
 public final class GlskBlockRedispatcher {
     private static final double ROUNDING_SCALE = 1e6;
     private static final double EXPECTED_FACTOR_SUM = 1.0;
@@ -86,7 +88,7 @@ public final class GlskBlockRedispatcher {
                 .collect(Collectors.toMap(
                         GlskRedispatchingEntity::getId,
                         GlskRedispatchingEntity::getShare,
-                        (existing, replacement) -> replacement
+                        keepExistingValue()
                 ))
                 .values()
                 .stream()
