@@ -15,10 +15,10 @@ import java.io.Serializable;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstUtils.logProcedure;
 
 public class PstOutput implements Serializable {
-    @JsonProperty("processNumberDivaca")
-    private int processNumberDivaca;
-    @JsonProperty("totalTargetFlowDivaca")
-    private double totalTargetFlowDivaca;
+    @JsonProperty("processNumber")
+    private int processNumber;
+    @JsonProperty("totalTargetFlow")
+    private double totalTargetFlow;
     @JsonProperty("targetFlowDivacaPadriciano")
     private double targetFlowDivacaPadriciano;
     @JsonProperty("targetFlowDivacaRedipuglia")
@@ -32,94 +32,36 @@ public class PstOutput implements Serializable {
     @JsonProperty("flowDivacaRedipuglia")
     private Flow flowDivacaRedipuglia;
 
-    @JsonProperty("appliedProcedureLipst")
-    private Integer appliedProcedureLipst;
-    @JsonProperty("targetFlowLipst")
-    private double targetFlowLipst;
-    @JsonProperty("tapPstLienz")
-    private Tap tapPstLienz;
-    @JsonProperty("flowLipst")
-    private Flow flowLipst;
-
-    @JsonProperty("appliedProcedureNrpst")
-    private Integer appliedProcedureNrpst;
-    @JsonProperty("targetFlowNrpst21")
-    private double targetFlowNrpst21;
-
-    @JsonProperty("flowNrpst21")
-    private Flow flowNrpst21;
-    @JsonProperty("tapPstNr21")
-    private Tap tapPstNr21;
-    @JsonProperty("targetFlowNrpst22")
-    private double targetFlowNrpst22;
-    @JsonProperty("flowNrpst22")
-    private Flow flowNrpst22;
-    @JsonProperty("tapPstNr22")
-    private Tap tapPstNr22;
-
     public PstOutput() {
         flowDivacaRedipuglia = new Flow();
         flowDivacaPadriciano = new Flow();
-        flowLipst = new Flow();
-        flowNrpst21 = new Flow();
-        flowNrpst22 = new Flow();
         tapPstDivaca = new Tap();
         tapPstPadriciano = new Tap();
-        tapPstLienz = new Tap();
-        tapPstNr21 = new Tap();
-        tapPstNr22 = new Tap();
     }
 
     public Tap getTap(final SpecialPst pst) {
         return switch (pst) {
-            case LIENZ -> tapPstLienz;
             case DIVACA -> tapPstDivaca;
             case PADRICIANO -> tapPstPadriciano;
-            case NAUDERS1 -> tapPstNr21;
-            case NAUDERS2 -> tapPstNr22;
         };
     }
 
-    public Flow getFlow(final SpecialPst pst) {
-        return switch (pst) {
-            case LIENZ -> flowLipst;
-            case NAUDERS1 -> flowNrpst21;
-            case NAUDERS2 -> flowNrpst22;
-            default -> throw new IllegalArgumentException("Call to getFlow is ambiguous for Divača or Padriciano");
-        };
-    }
-
-    public void setAndLogProcedure(final SpecialPst pst, final int processNumber) {
-        switch (pst) {
-            case LIENZ -> appliedProcedureLipst = processNumber;
-            case NAUDERS1, NAUDERS2 -> appliedProcedureNrpst = processNumber;
-            case DIVACA, PADRICIANO -> processNumberDivaca = processNumber;
-        }
+    public void setAndLogProcedure(final SpecialPst pst,
+                                   final int processNumber) {
+        this.processNumber = processNumber;
         logProcedure(processNumber, pst.getFullName());
     }
 
-    public void setTapIgmFromId(final SpecialPst pst, final String tapId, final Network igm) {
+    public void setTapIgmFromId(final SpecialPst pst,
+                                final String tapId,
+                                final Network igm) {
         getTap(pst).setIgmTapFrom(igm.getTwoWindingsTransformer(tapId));
     }
 
-    public void setTapCgmFromId(final SpecialPst pst, final String tapId, final Network cgm) {
+    public void setTapCgmFromId(final SpecialPst pst,
+                                final String tapId,
+                                final Network cgm) {
         getTap(pst).setCgmTapFrom(cgm.getTwoWindingsTransformer(tapId));
-    }
-
-    public double getTargetFlowNrpst21() {
-        return targetFlowNrpst21;
-    }
-
-    public void setTargetFlowNrpst21(double targetFlowNrpst21) {
-        this.targetFlowNrpst21 = targetFlowNrpst21;
-    }
-
-    public double getTargetFlowNrpst22() {
-        return targetFlowNrpst22;
-    }
-
-    public void setTargetFlowNrpst22(double targetFlowNrpst22) {
-        this.targetFlowNrpst22 = targetFlowNrpst22;
     }
 
     public Flow getFlowDivacaPadriciano() {
@@ -130,20 +72,12 @@ public class PstOutput implements Serializable {
         return flowDivacaRedipuglia;
     }
 
-    public void setProcessNumberDivaca(int processNumberDivaca) {
-        this.processNumberDivaca = processNumberDivaca;
+    public void setProcessNumber(int processNumber) {
+        this.processNumber = processNumber;
     }
 
-    public void setAppliedProcedureLipst(Integer appliedProcedureLipst) {
-        this.appliedProcedureLipst = appliedProcedureLipst;
-    }
-
-    public void setAppliedProcedureNrpst(Integer appliedProcedureNrpst) {
-        this.appliedProcedureNrpst = appliedProcedureNrpst;
-    }
-
-    public void setTotalTargetFlowDivaca(double totalTargetFlowDivaca) {
-        this.totalTargetFlowDivaca = totalTargetFlowDivaca;
+    public void setTotalTargetFlow(double totalTargetFlow) {
+        this.totalTargetFlow = totalTargetFlow;
     }
 
     public void setTargetFlowDivacaPadriciano(double targetFlowDivacaPadriciano) {
@@ -170,56 +104,12 @@ public class PstOutput implements Serializable {
         this.flowDivacaRedipuglia = flowDivacaRedipuglia;
     }
 
-    public Integer getAppliedProcedureLipst() {
-        return appliedProcedureLipst;
+    public int getProcessNumber() {
+        return processNumber;
     }
 
-    public Integer getAppliedProcedureNrpst() {
-        return appliedProcedureNrpst;
-    }
-
-    public void setFlowLipst(Flow flowLipst) {
-        this.flowLipst = flowLipst;
-    }
-
-    public Flow getFlowLipst() {
-        return flowLipst;
-    }
-
-    public void setTapPstLienz(Tap tapPstLienz) {
-        this.tapPstLienz = tapPstLienz;
-    }
-
-    public void setFlowNrpst21(Flow flowNrpst21) {
-        this.flowNrpst21 = flowNrpst21;
-    }
-
-    public Flow getFlowNrpst21() {
-        return flowNrpst21;
-    }
-
-    public void setTapPstNauders21(Tap tapPstNr21) {
-        this.tapPstNr21 = tapPstNr21;
-    }
-
-    public void setFlowNrpst22(Flow flowNrpst22) {
-        this.flowNrpst22 = flowNrpst22;
-    }
-
-    public Flow getFlowNrpst22() {
-        return flowNrpst22;
-    }
-
-    public void setTapPstNauders22(Tap tapPstNr22) {
-        this.tapPstNr22 = tapPstNr22;
-    }
-
-    public int getProcessNumberDivaca() {
-        return processNumberDivaca;
-    }
-
-    public double getTotalTargetFlowDivaca() {
-        return totalTargetFlowDivaca;
+    public double getTotalTargetFlow() {
+        return totalTargetFlow;
     }
 
     public double getTargetFlowDivacaPadriciano() {
@@ -228,14 +118,6 @@ public class PstOutput implements Serializable {
 
     public double getTargetFlowDivacaRedipuglia() {
         return targetFlowDivacaRedipuglia;
-    }
-
-    public double getTargetFlowLipst() {
-        return targetFlowLipst;
-    }
-
-    public void setTargetFlowLipst(double targetFlowLipst) {
-        this.targetFlowLipst = targetFlowLipst;
     }
 
 }

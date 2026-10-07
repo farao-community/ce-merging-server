@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.merging.task;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.util.FileUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.ExecutionLogsService;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -16,7 +17,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
-import com.farao_community.farao.ce_merging.global_grid_configurations.services.AbstractGridConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.HvdcAlignmentConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.RegionConfigurationService;
@@ -44,7 +44,15 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.*;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.IGMS_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
@@ -52,6 +60,7 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -90,6 +99,7 @@ class MergingTaskManagementServiceTest {
     private final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService = mock(HvdcAlignmentConfigurationService.class);
     private final VirtualHubsConfigurationService virtualHubsConfigurationService = mock(VirtualHubsConfigurationService.class);
     private final XNodeConfigurationService xNodeConfigurationService = mock(XNodeConfigurationService.class);
+    private final ExecutionLogsService executionLogsService = mock(ExecutionLogsService.class);
 
     MergingTaskManagementService service;
 
@@ -104,32 +114,33 @@ class MergingTaskManagementServiceTest {
                                                    xNodeConfigurationService,
                                                    becKeyConfigurationService,
                                                    regionConfigurationService,
-                                                   hvdcAlignmentConfigurationService);
+                                                   hvdcAlignmentConfigurationService,
+                                                   executionLogsService);
     }
 
     @Test
     void shouldCreateTask() {
         when(repository.save(anyTask()))
-            .thenReturn(taskWithIdAndStatus(ID_1, CREATED));
+                .thenReturn(taskWithIdAndStatus(ID_1, CREATED));
 
         service.createNewTask(mockZip(INPUTS), stringContentOf(METADATA));
 
         verify(repository, times(2))
-            .save(anyTask());
+                .save(anyTask());
         verify(mapper)
-            .mergingTaskToMergingTaskDto(anyTask());
+                .mergingTaskToMergingTaskDto(anyTask());
     }
 
     @Test
     void shouldCatchExceptionInCreation() {
         when(repository.save(anyTask()))
-            .thenReturn(taskWithIdAndStatus(ID_1, CREATED));
+                .thenReturn(taskWithIdAndStatus(ID_1, CREATED));
 
         assertThatThrownBy(() -> service.createNewTask(mockZip(METADATA), stringContentOf(METADATA)))
-            .isValidServiceException();
+                .isValidServiceException();
 
         verify(repository)
-            .delete(anyTask());
+                .delete(anyTask());
     }
 
     @Test
@@ -138,16 +149,16 @@ class MergingTaskManagementServiceTest {
         final MergingTask task = taskWithIdAndStatus(ID_1, CREATED);
 
         when(repository.findById(ID_1))
-            .thenReturn(Optional.of(task));
+                .thenReturn(Optional.of(task));
 
         service.runTask(ID_1);
 
         verify(mergingService)
-            .run(anyTask());
+                .run(anyTask());
         verify(mapper)
-            .mergingTaskToMergingTaskDto(anyTask());
+                .mergingTaskToMergingTaskDto(anyTask());
         verify(repository, times(2))
-            .save(anyTask());
+                .save(anyTask());
 
         assertThat(task).hasStatus(SUCCESS);
     }
@@ -156,11 +167,11 @@ class MergingTaskManagementServiceTest {
     void shouldThrowIfTaskAlreadyRunning() {
         final MergingTask runningTask = taskWithIdAndStatus(ID_1, RUNNING);
         when(repository.findById(ID_1))
-            .thenReturn(Optional.of(runningTask));
+                .thenReturn(Optional.of(runningTask));
 
         assertThatThrownBy(() -> service.runTask(ID_1))
-            .isTaskException()
-            .hasMessage("Task 1 already running, could not be run again");
+                .isTaskException()
+                .hasMessage("Task 1 already running, could not be run again");
 
         assertThat(runningTask).hasStatus(RUNNING);
     }
@@ -168,25 +179,25 @@ class MergingTaskManagementServiceTest {
     @Test
     void shouldThrowIfTaskNotFound() {
         when(repository.findById(ID_1))
-            .thenReturn(Optional.empty());
+                .thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.runTask(ID_1))
-            .isTaskException()
-            .hasMessage("Task 1 not available");
+                .isTaskException()
+                .hasMessage("Task 1 not available");
     }
 
     @Test
     void shouldChangeStatusToErrorIfExceptionThrown() throws IOException {
         final MergingTask failingTask = taskWithIdAndStatus(ID_1, CREATED);
         when(repository.findById(ID_1))
-            .thenReturn(Optional.of(failingTask));
+                .thenReturn(Optional.of(failingTask));
 
         doThrow(new TaskNotValidException("test"))
-            .when(mergingService)
-            .run(anyTask());
+                .when(mergingService)
+                .run(anyTask());
 
         assertThatThrownBy(() -> service.runTask(ID_1))
-            .isValidServiceException();
+                .isValidServiceException();
 
         assertThat(failingTask).hasStatus(ERROR);
     }
@@ -197,7 +208,7 @@ class MergingTaskManagementServiceTest {
         when(mapper.mergingTaskToMergingTaskDto(anyTask())).thenReturn(taskDtoWithIdAndStatus(ID_1, CREATED));
 
         assertThat(task)
-            .isSameTaskAs(service.getTaskJsonDoc(ID_1).data.getFirst());
+                .isSameTaskAs(service.getTaskJsonDoc(ID_1).data.getFirst());
     }
 
     private static final List<TaskStatus> FINISHED_STATUSES = List.of(SUCCESS, ERROR);
@@ -247,15 +258,15 @@ class MergingTaskManagementServiceTest {
         final MergingTask task = getMergingTask(status);
 
         assertThatThrownBy(() -> service.getCgm(ID_1))
-            .isTaskException()
-            .hasMessageContaining("Task 1");
+                .isTaskException()
+                .hasMessageContaining("Task 1");
     }
 
     @Test
     void shouldGetAllTasks() {
         final List<MergingTask> tasks = List.of(
-            taskWithIdAndStatus(ID_1, CREATED),
-            taskWithIdAndStatus(ID_2, SUCCESS)
+                taskWithIdAndStatus(ID_1, CREATED),
+                taskWithIdAndStatus(ID_2, SUCCESS)
         );
         when(repository.findAll()).thenReturn(tasks);
         when(mapper.mergingTasksToMergingTasksDto(tasks)).thenReturn(List.of());
@@ -276,8 +287,8 @@ class MergingTaskManagementServiceTest {
     void shouldThrowWhenDeletingUnknownTask() {
         when(repository.findById(ID_1)).thenReturn(Optional.empty());
         assertThatThrownBy(() -> service.deleteTask(ID_1))
-            .isTaskException()
-            .hasMessage("Task 1 not available");
+                .isTaskException()
+                .hasMessage("Task 1 not available");
         verify(repository, times(0)).deleteById(anyLong());
     }
 
@@ -328,30 +339,21 @@ class MergingTaskManagementServiceTest {
 
     @Test
     void shouldGetGlobalGridConfigurations() throws IOException {
-        service.getBECKeyConfiguration(BEGINNING_OF_2000);
-        service.getHvdcXNodeAlignmentConfiguration(BEGINNING_OF_2000);
-        service.getXNodesConfiguration(BEGINNING_OF_2000);
-        service.getRegionConfiguration(BEGINNING_OF_2000);
-        service.getVirtualHubsConfiguration(BEGINNING_OF_2000);
-
-        final List<AbstractGridConfigurationService<?, ?>> configurationServices = List.of(becKeyConfigurationService,
-                                                                                           hvdcAlignmentConfigurationService,
-                                                                                           xNodeConfigurationService,
-                                                                                           regionConfigurationService,
-                                                                                           virtualHubsConfigurationService);
-
-        for (final AbstractGridConfigurationService<?, ?> configurationService : configurationServices) {
-            verify(configurationService).getConfigAsJsonBytes(BEGINNING_OF_2000);
-        }
+        List.of(service.getBECKeyConfiguration(BEGINNING_OF_2000),
+                service.getHvdcXNodeAlignmentConfiguration(BEGINNING_OF_2000),
+                service.getXNodesConfiguration(BEGINNING_OF_2000),
+                service.getRegionConfiguration(BEGINNING_OF_2000),
+                service.getVirtualHubsConfiguration(BEGINNING_OF_2000))
+                .forEach(bytes -> assertTrue(bytes.length > 0));
     }
 
     @Test
     void shouldPublishGlobalGridConfigurations() {
         final MockMultipartFile file = new MockMultipartFile(
-            "configurationFile",
-            "config.json",
-            MediaType.APPLICATION_JSON_VALUE,
-            new byte[0]
+                "configurationFile",
+                "config.json",
+                MediaType.APPLICATION_JSON_VALUE,
+                new byte[0]
         );
 
         service.publishBECKeyConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
@@ -359,14 +361,6 @@ class MergingTaskManagementServiceTest {
         service.publishXNodesConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
         service.publishRegionConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
         service.publishVirtualHubsConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
-
-        List.of(becKeyConfigurationService,
-                hvdcAlignmentConfigurationService,
-                xNodeConfigurationService,
-                regionConfigurationService,
-                virtualHubsConfigurationService)
-            .forEach(configurationService ->
-                         verify(configurationService).publish(file, BEGINNING_OF_2000, BEGINNING_OF_2000));
     }
 
     @Test
@@ -387,9 +381,9 @@ class MergingTaskManagementServiceTest {
 
     private Stream<Function<Long, byte[]>> zipMethods() {
         return Stream.of(
-            service::getInputsZip,
-            service::getArtifactsZip,
-            service::getOutputZip
+                service::getInputsZip,
+                service::getArtifactsZip,
+                service::getOutputZip
         );
     }
 

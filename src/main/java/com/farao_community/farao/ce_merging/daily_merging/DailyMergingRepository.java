@@ -7,10 +7,14 @@
 package com.farao_community.farao.ce_merging.daily_merging;
 
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface DailyMergingRepository extends CrudRepository<DailyMergingTask, Long> {
-
+    @Query("select t.id from DailyMergingTask t")
+    List<Long> findAllIds();
 }

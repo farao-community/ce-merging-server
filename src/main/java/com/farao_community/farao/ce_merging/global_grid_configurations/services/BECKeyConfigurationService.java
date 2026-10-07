@@ -6,14 +6,15 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
-import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecCoefficientsDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BorderDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.repository.BECKeyConfigurationRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,29 +30,53 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ARROW;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.COMMA;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CSV_SEPARATOR;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
+import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toUtcLocalDateTime;
 
 @Service
 public class BECKeyConfigurationService extends AbstractGridConfigurationService<BECKeyConfigurationRecord, JsonBecConfiguration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(BECKeyConfigurationService.class);
     private final RegionConfigurationService regionConfigurationService;
-    private final GridConfigurationRepository<BECKeyConfigurationRecord> repository;
+    private final BECKeyConfigurationRepository repository;
 
-    public BECKeyConfigurationService(final RegionConfigurationService regionConfigurationService, final GridConfigurationRepository<BECKeyConfigurationRecord> repository) {
+    public BECKeyConfigurationService(final RegionConfigurationService regionConfigurationService,
+                                      final BECKeyConfigurationRepository repository) {
         this.regionConfigurationService = regionConfigurationService;
         this.repository = repository;
     }
 
-    @Override
-    protected GridConfigurationRepository<BECKeyConfigurationRecord> getRepository() {
-        return repository;
+    public JsonBecConfiguration getConfiguration(OffsetDateTime targetDate) {
+        try {
+            BECKeyConfigurationRecord configRecord = repository.findLatestValidOfType(toUtcLocalDateTime(targetDate));
+            LOGGER.info("configuration retrieved from server");
+            return getJsonConfigurationFromRecord(configRecord);
+        } catch (final Exception e) {
+            LOGGER.warn("configuration cannot be retrieved, default configuration will be used, cause : ", e);
+            return getDefaultJsonConfiguration(targetDate);
+        }
+    }
+
+    public void publish(final MultipartFile configurationFile,
+                        final OffsetDateTime validFrom,
+                        final OffsetDateTime validTo) {
+        try {
+            repository.save(getConfigurationRecordFromFile(configurationFile, validFrom, validTo));
+        } catch (final Exception e) {
+            LOGGER.error("Configuration cannot be published to server");
+            throw new CeMergingException("Configuration could not be published, file or dates could be invalid.", e);
+        }
     }
 
     @Override
-    protected JsonBecConfiguration getDefaultJsonConfiguration(final OffsetDateTime targetDate) throws IOException {
-        final String defaultCsvBecContent = new String(getDefaultFileBytes());
-        return new JsonBecConfiguration(parseBecSharingKeys(targetDate, defaultCsvBecContent));
+    protected JsonBecConfiguration getDefaultJsonConfiguration(final OffsetDateTime targetDate) {
+        try {
+            final String defaultCsvBecContent = new String(getDefaultFileBytes());
+            return new JsonBecConfiguration(parseBecSharingKeys(targetDate, defaultCsvBecContent));
+        } catch (IOException e) {
+            throw new CeMergingException("Default configuration not found, cause: ", e);
+        }
     }
 
     @Override
@@ -66,8 +91,8 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
         final String configFileCsvContent = getTextContent(configurationFile);
         final List<BecByBoundaryDto> becMatrix = parseBecSharingKeys(validFrom, configFileCsvContent);
         return new BECKeyConfigurationRecord(generateUuidString(),
-                                             validFrom.toLocalDateTime(),
-                                             validTo.toLocalDateTime(),
+                                             toUtcLocalDateTime(validFrom),
+                                             toUtcLocalDateTime(validTo),
                                              LocalDateTime.now(UTC_ZONE_ID),
                                              becMatrix);
     }
@@ -76,8 +101,8 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
                                                       final String csvContent) throws IOException {
         final List<List<String>> exchanges = new ArrayList<>();
         final RegionConfigurationDto regionConfiguration = regionConfigurationService
-            .getConfiguration(validFrom)
-            .getRegionConfiguration();
+                .getConfiguration(validFrom)
+                .getRegionConfiguration();
 
         // extract CSV elements as strings
         try (final BufferedReader br = new BufferedReader(new StringReader(csvContent))) {
@@ -109,7 +134,7 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
             for (int column = 1; column < exchanges.get(1).size(); column++) {
                 final String country = exchanges.getFirst().get(column);
                 final double coefficient = Double.parseDouble(exchanges.get(line).get(column)
-                                                      .replace(",", "."));
+                                                                      .replace(COMMA, "."));
                 bilateralExchanges.add(new BecCoefficientsDto(country, coefficient));
             }
 

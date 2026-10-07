@@ -74,16 +74,6 @@ class JaxbUtilsTest {
                       "area2=\"DE\"",
                       "subarea2=\"D2\"");
 
-        //specifying root
-        assertThat(new String(JaxbUtils.writeToBytes(XNODES_CLASS,
-                                                     xnodes,
-                                                     "http://www.rte-france.com/gsr",
-                                                     "xnodes")))
-            .contains("name=\"TEST_NODE\"",
-                      "area1=\"FR\"",
-                      "area2=\"DE\"",
-                      "subarea2=\"D2\"");
-
         /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
                       PATH
          -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -98,9 +88,6 @@ class JaxbUtilsTest {
                          .getFirst()
                          .getName());
 
-        //specifying root
-        JaxbUtils.writeToPath(XNODES_CLASS, xnodes, "http://www.rte-france.com/gsr",
-                              "xnodes", newFile);
         assertEquals("TEST_NODE",
                      JaxbUtils.readFromPath(XNODES_CLASS, newFile.toString())
                          .getXnode()
@@ -138,9 +125,7 @@ class JaxbUtilsTest {
     static Stream<ThrowableAssert.ThrowingCallable> failingWriters() {
         return throwers(() -> JaxbUtils.writeToBytes(TASK_CLASS, NEW_TASK),
                         () -> JaxbUtils.writeToPath(TASK_CLASS, NEW_TASK, Path.of("/nothing")),
-                        () -> JaxbUtils.writeToPath(TASK_CLASS, NEW_TASK, null),
-                        () -> JaxbUtils.writeToPath(TASK_CLASS, NEW_TASK, null, null, Path.of("/nothing")),
-                        () -> JaxbUtils.writeToBytes(TASK_CLASS, NEW_TASK, null, null));
+                        () -> JaxbUtils.writeToPath(TASK_CLASS, NEW_TASK, null));
     }
 
     @ParameterizedTest

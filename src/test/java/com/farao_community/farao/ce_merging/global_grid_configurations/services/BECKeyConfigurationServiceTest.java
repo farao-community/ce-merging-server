@@ -6,14 +6,17 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.GridConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
+import com.farao_community.farao.ce_merging.global_grid_configurations.repository.BECKeyConfigurationRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -25,28 +28,32 @@ class BECKeyConfigurationServiceTest {
 
     private final RegionConfigurationService rcService = mock(RegionConfigurationService.class);
 
-    private GridConfigurationRepository<BECKeyConfigurationRecord> repository = mock(GridConfigurationRepository.class);
+    private final BECKeyConfigurationRepository repository = mock(BECKeyConfigurationRepository.class);
     private final BECKeyConfigurationService service = new BECKeyConfigurationService(rcService, repository);
 
     @Test
-    void shouldThrowWhenParsingEmptyFile() throws IOException {
+    void shouldThrowWhenParsingEmptyFile() {
 
         when(rcService.getConfiguration(any()))
-            .thenReturn(new JsonRegionConfiguration(new RegionConfigurationDto()));
+                .thenReturn(new JsonRegionConfiguration(new RegionConfigurationDto()));
 
         assertThatThrownBy(() -> service.parseBecSharingKeys(BEGINNING_OF_2000, null))
-            .isValidServiceException()
-            .hasMessage("Could not parse sharing keys BEC file from class resources");
+                .isValidServiceException()
+                .hasMessage("Could not parse sharing keys BEC file from class resources");
     }
 
     @Test
-    void shouldHaveCommonMethodsWorking() throws IOException {
+    void getConfigurationRecordFromFileTest() throws IOException {
         when(rcService.getConfiguration(any()))
-            .thenReturn(new JsonRegionConfiguration(new RegionConfigurationDto()));
-
-        new ConfigurationServicesTestHelper<>(service,
-                                              new BECKeyConfigurationRecord(),
-                                              JsonBecConfiguration.class)
-            .testAllAbstractMethods();
+                .thenReturn(new JsonRegionConfiguration(new RegionConfigurationDto()));
+        final byte[] content = "Empty test file".getBytes();
+        final MockMultipartFile file = new MockMultipartFile("test", content);
+        final OffsetDateTime validFrom = OffsetDateTime.parse("2026-10-01T12:00:00+02:00");
+        final OffsetDateTime validTo = OffsetDateTime.parse("2026-10-02T12:00:00+02:00");
+        final LocalDateTime validFromLocal = LocalDateTime.parse("2026-10-01T10:00:00");
+        final LocalDateTime validToLocal = LocalDateTime.parse("2026-10-02T10:00:00");
+        final BECKeyConfigurationRecord becConfig = service.getConfigurationRecordFromFile(file, validFrom, validTo);
+        Assertions.assertThat(becConfig.getValidFrom()).isEqualTo(validFromLocal);
+        Assertions.assertThat(becConfig.getValidTo()).isEqualTo(validToLocal);
     }
 }

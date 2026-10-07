@@ -15,6 +15,7 @@ import com.farao_community.farao.ce_merging.merging.task.MergingTaskManagementSe
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -122,7 +123,7 @@ class DailyMergingTasksManagementServiceTest {
     void shouldDeleteAllTasks() {
         final DailyMergingTask task1 = dailyTask(TASK_ID_1);
         final DailyMergingTask task2 = dailyTask(TASK_ID_2);
-        when(repository.findAll()).thenReturn(List.of(task1, task2));
+        when(repository.findAllIds()).thenReturn(List.of(TASK_ID_1, TASK_ID_2));
         givenTaskFound(task1);
         givenTaskFound(task2);
         when(configuration.getDailyDirectoryPath(task1)).thenReturn(tempDir.resolve("task-1").toString());
@@ -130,6 +131,14 @@ class DailyMergingTasksManagementServiceTest {
         managementService.deleteAllTasks();
         verify(repository).deleteById(TASK_ID_1);
         verify(repository).deleteById(TASK_ID_2);
+    }
+
+    @Test
+    void doesTaskExistTest() {
+        when(repository.existsById(TASK_ID_1)).thenReturn(true);
+        when(repository.existsById(TASK_ID_2)).thenReturn(false);
+        Assertions.assertThat(managementService.checkDailyTaskExist(TASK_ID_1)).isTrue();
+        Assertions.assertThat(managementService.checkDailyTaskExist(TASK_ID_2)).isFalse();
     }
 
     @Test

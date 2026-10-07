@@ -35,7 +35,6 @@ public class XnodesInconsistencies {
         this.xnodeUndefinedList = xnodeUndefinedList;
     }
 
-    @JsonCreator
     public XnodesInconsistencies(final List<XnodeIncorrect> xnodeIncoherentList, final List<XnodeIncomplete> xnodeIncompleteList) {
         this.xnodeIncorrectList = xnodeIncoherentList;
         this.xnodeIncompleteList = xnodeIncompleteList;

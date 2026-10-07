@@ -10,7 +10,12 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceExchangeData;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
-import com.farao_community.farao.ce_merging.xsd.forecast_netpositions.*;
+import com.farao_community.farao.ce_merging.xsd.forecast_netpositions.Point;
+import com.farao_community.farao.ce_merging.xsd.forecast_netpositions.ReportingInformationMarketDocument;
+import com.farao_community.farao.ce_merging.xsd.forecast_netpositions.SeriesPeriod;
+import com.farao_community.farao.ce_merging.xsd.forecast_netpositions.StandardBusinessTypeList;
+import com.farao_community.farao.ce_merging.xsd.forecast_netpositions.TimeSeries;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.CurveTypeList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +26,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public final class ForecastNetPositionImporter {
-    private static final String A95_REASON_CODE = "A95";
-    private static final String CONSTANT_RESOLUTION_CURVE_TYPE = "A01";
-    private static final String VARIABLE_RESOLUTION_CURVE_TYPE = "A03";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForecastNetPositionImporter.class);
 
@@ -52,7 +54,7 @@ public final class ForecastNetPositionImporter {
 
     private static boolean isUsedForTheMerging(final TimeSeries timeSeries) {
         return timeSeries.getReason().stream()
-                .noneMatch(reason -> A95_REASON_CODE.equals(reason.getCode()));
+                .noneMatch(reason -> StandardBusinessTypeList.A_95.value().equals(reason.getCode()));
     }
 
     private static double getFlow(final OffsetDateTime dateTime, final TimeSeries timeSeries) {
@@ -88,9 +90,9 @@ public final class ForecastNetPositionImporter {
         final OffsetDateTime startDateTime = parseDateTime(period.getTimeInterval().getStart());
         final OffsetDateTime endDateTime = parseDateTime(period.getTimeInterval().getEnd());
         final List<Point> points = period.getPoint();
-        return switch (curveType) {
-            case CONSTANT_RESOLUTION_CURVE_TYPE -> getFlowFromConstantResolutionCurve(dateTime, startDateTime, resolutionInSeconds, points);
-            case VARIABLE_RESOLUTION_CURVE_TYPE -> getFlowFromVariableResolutionCurve(dateTime, startDateTime, endDateTime, resolutionInSeconds, points);
+        return switch (CurveTypeList.fromValue(curveType)) {
+            case A_01 -> getFlowFromConstantResolutionCurve(dateTime, startDateTime, resolutionInSeconds, points);
+            case A_03 -> getFlowFromVariableResolutionCurve(dateTime, startDateTime, endDateTime, resolutionInSeconds, points);
             default -> {
                 LOGGER.error("CurveType {} is not supported for net position forecast file", curveType);
                 throw new CeMergingException("CurveType " + curveType + " is not supported for net position forecast file");

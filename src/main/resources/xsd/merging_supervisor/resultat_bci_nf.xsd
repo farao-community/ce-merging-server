@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://www.rte-france.com/gsr" xmlns:gsr="http://www.rte-france.com/gsr">
+    <xs:element name="exportBCI">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="gsr:BCIDateTime"/>
+                <xs:element ref="gsr:BCIActive"/>
+                <xs:element ref="gsr:pays"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="BCIDateTime">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:NMTOKEN"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="pays">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" ref="gsr:hubBCI"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="hubBCI">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="gsr:BCIActive"/>
+                <xs:element minOccurs="0" ref="gsr:reference"/>
+                <xs:element ref="gsr:baseCase"/>
+            </xs:sequence>
+            <xs:attribute name="val" use="required" type="xs:NCName"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="reference">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="gsr:CWEInitialNetPositionIGM"/>
+                <xs:element ref="gsr:CWEFeasibilityRangeImport"/>
+                <xs:element ref="gsr:CWEFeasibilityRangeExport"/>
+                <xs:element ref="gsr:CWERefProgIGM"/>
+                <xs:element ref="gsr:CWERefProgCGM"/>
+                <xs:element ref="gsr:GlobalRefProgIGM"/>
+                <xs:element ref="gsr:GlobalRefProgCGM"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CWEInitialNetPositionIGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CWEFeasibilityRangeImport">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CWEFeasibilityRangeExport">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CWERefProgIGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="CWERefProgCGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="GlobalRefProgIGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="GlobalRefProgCGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="baseCase">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="gsr:balanceIGM"/>
+                <xs:element minOccurs="0" ref="gsr:balanceCGM"/>
+                <xs:element ref="gsr:verticalLoadIGM"/>
+                <xs:element minOccurs="0" ref="gsr:verticalLoadCGM"/>
+                <xs:element ref="gsr:generationIGM"/>
+                <xs:element minOccurs="0" ref="gsr:generationCGM"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="balanceIGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="balanceCGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="verticalLoadIGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="verticalLoadCGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="generationIGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="generationCGM">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:integer"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="BCIActive">
+        <xs:complexType>
+            <xs:attribute name="val" use="required" type="xs:boolean"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

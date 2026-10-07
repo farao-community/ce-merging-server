@@ -12,6 +12,8 @@ import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositio
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroData;
 import com.farao_community.farao.ce_merging.merging.process.target_net_positions.balances_adjustment.AreaNetPosition;
 import com.farao_community.farao.ce_merging.merging.process.target_net_positions.balances_adjustment.BalancesAdjustmentTarget;
@@ -48,6 +50,7 @@ public class TargetNetPositionsCalculationService {
     }
 
     public void computeTargetNetPositions(final MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.TARGET_NET_POSION_CALCULATION);
         try {
             final Map<String, Double> virtualHubsGaps = VirtualHubsShifting.applyVirtualHubFlows(task, configuration);
             final Map<String, Double> targetNetPositionsWithoutHvdc = getTargetNetPositionsFromBciOutput(task);

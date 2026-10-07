@@ -14,22 +14,34 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.API_VERSION;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BAD_REQUEST;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_DAILY_MERGING_URL;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CREATED;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_INPUTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_OUTPUTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAILY_TASK_MANAGEMENT_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JSON_API_MIME_TYPE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NOT_FOUND;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NO_CONTENT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OK;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ORIGIN_ANY;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.toAttachmentFileResponse;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
@@ -80,6 +92,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task with given ID not found, or not reachable.")
     })
     public ResponseEntity<DailyMergingTask> runTask(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().body(dailyTasksManagementService.runDailyMergingTask(taskId));
     }
 
@@ -101,6 +116,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task not found.")
     })
     public ResponseEntity<DailyMergingTask> getTask(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().body(dailyTasksManagementService.getTask(taskId));
     }
 
@@ -112,6 +130,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task with the given ID was not found.")
     })
     public ResponseEntity<Void>  deleteTask(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         dailyTasksManagementService.deleteTask(taskId);
         return ResponseEntity.noContent().build();
     }
@@ -139,6 +160,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task with given ID not found.")
     })
     public ResponseEntity<byte[]>  getMergingRequest(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getMergingRequest(taskId));
     }
 
@@ -154,7 +178,10 @@ public class DailyMergingController {
         @ApiResponse(responseCode = OK, description = "Result package returned successfully."),
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily task with given ID not found in the server or daily result reports not found")
     })
-    public ResponseEntity<byte[]> getDailyResultPackage(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+    public ResponseEntity<byte[]> getDailyResultPackage(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) throws IOException {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyResultPackage(taskId), "results-package.zip");
     }
 
@@ -166,6 +193,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task not found, or merging response output of daily merging task not available.")
     })
     public ResponseEntity<byte[]> getDailyMergingResponse(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyMergingResponse(taskId));
     }
 
@@ -178,6 +208,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task not found, or daily merging logs output of daily merging task not available.")
     })
     public ResponseEntity<byte[]> getDailyMergingLogs(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyMergingLogs(taskId));
     }
 
@@ -190,6 +223,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task not found, or cgm zip output of daily merging task not available.")
     })
     public ResponseEntity<byte[]> getDailyCgmZip(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyCgmZip(taskId));
     }
 
@@ -201,6 +237,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily GLSK quality reports not found")
     })
     public ResponseEntity<byte[]> getDailyGlskQualityReport(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyGlskReport(taskId));
     }
 
@@ -213,6 +252,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily task with given ID not found in the server or merging report not found")
     })
     public ResponseEntity<byte[]> getMergingReport(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getMergingReport(taskId));
     }
 
@@ -224,6 +266,9 @@ public class DailyMergingController {
         @ApiResponse(responseCode = NOT_FOUND, description = "Daily merging task not found, or RefProg output of daily merging task not available.")
     })
     public ResponseEntity<byte[]> getDailyRefProgOutput(@Parameter(description = "Daily merging task ID") @PathVariable long taskId) {
+        if (!dailyTasksManagementService.checkDailyTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
         return toAttachmentFileResponse(dailyTasksManagementService.getDailyRefProgOutput(taskId));
     }
 }

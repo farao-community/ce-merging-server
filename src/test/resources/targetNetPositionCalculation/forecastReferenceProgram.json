@@ -1,0 +1,209 @@
+{
+  "targetDateTime" : "2026-01-23T01:30+01:00",
+  "dailyTimeInterval" : "2026-01-22T23:00Z/2026-01-23T23:00Z",
+  "referenceExchangeDataList" : [ {
+    "areaOutId" : "22Y201903144---9",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : 200.0
+  }, {
+    "areaOutId" : "22Y201903145---4",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : -200.0
+  }, {
+    "areaOutId" : "10YAT-APG------L",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : -2000.0
+  }, {
+    "areaOutId" : "10YBE----------2",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : -3000.0
+  }, {
+    "areaOutId" : "10YCZ-CEPS-----N",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : 1000.0
+  }, {
+    "areaOutId" : "10YCB-GERMANY--8",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : 4500.0
+  }, {
+    "areaOutId" : "10YFR-RTE------C",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : 2000.0
+  }, {
+    "areaOutId" : "10YHR-HEP------M",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : -1000.0
+  }, {
+    "areaOutId" : "10YHU-MAVIR----U",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : -1500.0
+  }, {
+    "areaOutId" : "10YNL----------L",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : 2000.0
+  }, {
+    "areaOutId" : "10YPL-AREA-----S",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : 400.0
+  }, {
+    "areaOutId" : "10YRO-TEL------P",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : -1500.0
+  }, {
+    "areaOutId" : "10YSI-ELES-----O",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : -600.0
+  }, {
+    "areaOutId" : "10YSK-SEPS-----K",
+    "areaInId" : "10Y1001C--00059P",
+    "flow" : -50.0
+  }, {
+    "areaOutId" : "10YES-REE------0",
+    "areaInId" : "10YPT-REN------W",
+    "flow" : 700.0
+  }, {
+    "areaOutId" : "10YCB-GREECE---2",
+    "areaInId" : "10YCA-BULGARIA-R",
+    "flow" : 100.0
+  }, {
+    "areaOutId" : "10YCA-BULGARIA-R",
+    "areaInId" : "10YCB-TURKEY---V",
+    "flow" : -100.0
+  }, {
+    "areaOutId" : "10YCB-GREECE---2",
+    "areaInId" : "10YCB-ALBANIA--1",
+    "flow" : -300.0
+  }, {
+    "areaOutId" : "10YCB-GREECE---2",
+    "areaInId" : "10YMK-MEPSO----8",
+    "flow" : 500.0
+  }, {
+    "areaOutId" : "10YCB-GREECE---2",
+    "areaInId" : "10YCB-TURKEY---V",
+    "flow" : -50.0
+  }, {
+    "areaOutId" : "10YCS-CG-TSO---S",
+    "areaInId" : "10YCB-ALBANIA--1",
+    "flow" : -150.0
+  }, {
+    "areaOutId" : "10YCS-CG-TSO---S",
+    "areaInId" : "10YBA-JPCC-----D",
+    "flow" : -100.0
+  }, {
+    "areaOutId" : "10YMK-MEPSO----8",
+    "areaInId" : "10YCA-BULGARIA-R",
+    "flow" : 100.0
+  }, {
+    "areaOutId" : "10YMK-MEPSO----8",
+    "areaInId" : "10Y1001C--00100H",
+    "flow" : -50.0
+  }, {
+    "areaOutId" : "10YCS-SERBIATSOV",
+    "areaInId" : "10YBA-JPCC-----D",
+    "flow" : -100.0
+  }, {
+    "areaOutId" : "10YCS-SERBIATSOV",
+    "areaInId" : "10YCA-BULGARIA-R",
+    "flow" : -80.0
+  }, {
+    "areaOutId" : "10YCS-SERBIATSOV",
+    "areaInId" : "10YCS-CG-TSO---S",
+    "flow" : 20.0
+  }, {
+    "areaOutId" : "10YCS-SERBIATSOV",
+    "areaInId" : "10YMK-MEPSO----8",
+    "flow" : 10.0
+  }, {
+    "areaOutId" : "10YCS-SERBIATSOV",
+    "areaInId" : "10Y1001C--00100H",
+    "flow" : 0.0
+  }, {
+    "areaOutId" : "10Y1001C--00100H",
+    "areaInId" : "10YCB-ALBANIA--1",
+    "flow" : -200.0
+  }, {
+    "areaOutId" : "10Y1001C--00100H",
+    "areaInId" : "10YCS-CG-TSO---S",
+    "flow" : -50.0
+  }, {
+    "areaOutId" : "10YFR-RTE------C",
+    "areaInId" : "10YIT-GRTN-----B",
+    "flow" : 3000.0
+  }, {
+    "areaOutId" : "10YIT-GRTN-----B",
+    "areaInId" : "10YAT-APG------L",
+    "flow" : 50.0
+  }, {
+    "areaOutId" : "10YIT-GRTN-----B",
+    "areaInId" : "10YSI-ELES-----O",
+    "flow" : -200.0
+  }, {
+    "areaOutId" : "10YCB-GERMANY--8",
+    "areaInId" : "10YDK-1--------W",
+    "flow" : -1000.9
+  }, {
+    "areaOutId" : "10YFR-RTE------C",
+    "areaInId" : "10YES-REE------0",
+    "flow" : -2000.3
+  }, {
+    "areaOutId" : "10YRO-TEL------P",
+    "areaInId" : "10YCA-BULGARIA-R",
+    "flow" : 500.0
+  }, {
+    "areaOutId" : "10YCB-SWITZERL-D",
+    "areaInId" : "10YAT-APG------L",
+    "flow" : 150.0
+  }, {
+    "areaOutId" : "10YCB-SWITZERL-D",
+    "areaInId" : "10YCB-GERMANY--8",
+    "flow" : -800.0
+  }, {
+    "areaOutId" : "10YCB-SWITZERL-D",
+    "areaInId" : "10YFR-RTE------C",
+    "flow" : -3000.0
+  }, {
+    "areaOutId" : "10YCB-SWITZERL-D",
+    "areaInId" : "10YIT-GRTN-----B",
+    "flow" : 500.0
+  }, {
+    "areaOutId" : "10YBA-JPCC-----D",
+    "areaInId" : "10YHR-HEP------M",
+    "flow" : -200.0
+  }, {
+    "areaOutId" : "10YPL-AREA-----S",
+    "areaInId" : "10Y1001C--00003F",
+    "flow" : 300.0
+  }, {
+    "areaOutId" : "10YCS-SERBIATSOV",
+    "areaInId" : "10YHR-HEP------M",
+    "flow" : -200.0
+  }, {
+    "areaOutId" : "10YCS-SERBIATSOV",
+    "areaInId" : "10YHU-MAVIR----U",
+    "flow" : 200.0
+  }, {
+    "areaOutId" : "10YCS-SERBIATSOV",
+    "areaInId" : "10YRO-TEL------P",
+    "flow" : -100.0
+  }, {
+    "areaOutId" : "10Y1001C--00003F",
+    "areaInId" : "10YHU-MAVIR----U",
+    "flow" : -350.0
+  }, {
+    "areaOutId" : "10Y1001C--00003F",
+    "areaInId" : "10YSK-SEPS-----K",
+    "flow" : -150.0
+  }, {
+    "areaOutId" : "10Y1001C--00003F",
+    "areaInId" : "10YRO-TEL------P",
+    "flow" : -300.0
+  }, {
+    "areaOutId" : "10Y1001C--00003F",
+    "areaInId" : "10Y1001A1001A990",
+    "flow" : -20.0
+  }, {
+    "areaOutId" : "10YRO-TEL------P",
+    "areaInId" : "10Y1001A1001A990",
+    "flow" : 200.0
+  } ]
+}

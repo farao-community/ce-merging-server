@@ -15,12 +15,19 @@ import com.farao_community.farao.ce_merging.common.exception.task.TaskNotRunExce
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument;
 import com.farao_community.farao.ce_merging.common.util.FileUtils;
+import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonXNodeConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.HvdcAlignmentConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.RegionConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.VirtualHubsConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.XNodeConfigurationService;
 import com.farao_community.farao.ce_merging.merging.MergingService;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor.MergingLogsConverter;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.ExecutionLogsService;
 import com.farao_community.farao.ce_merging.merging.request_metadata.RequestMetadataManager;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
@@ -30,7 +37,9 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
+import com.powsybl.openrao.virtualhubs.VirtualHubsConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -47,7 +56,25 @@ import java.util.function.Function;
 
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.unzipInputFileInTmp;
 import static com.farao_community.farao.ce_merging.common.util.ZipUtils.zipDirectory;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.*;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BCI_OUTPUT_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_REPORT;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.IGMS_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.PST_OUTPUT_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INCONSISTENCIES;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.ERROR;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
@@ -70,6 +97,7 @@ public class MergingTaskManagementService {
     private final BECKeyConfigurationService becKeyConfigurationService;
     private final RegionConfigurationService regionConfigurationService;
     private final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService;
+    private final ExecutionLogsService executionLogsService;
 
     public MergingTaskManagementService(final CeMergingConfiguration configuration,
                                         final MergingService mergingService,
@@ -79,7 +107,8 @@ public class MergingTaskManagementService {
                                         final XNodeConfigurationService xNodeConfigurationService,
                                         final BECKeyConfigurationService becKeyConfigurationService,
                                         final RegionConfigurationService regionConfigurationService,
-                                        final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService) {
+                                        final HvdcAlignmentConfigurationService hvdcAlignmentConfigurationService,
+                                        final ExecutionLogsService executionLogsService) {
         this.configuration = configuration;
         this.mergingService = mergingService;
         this.repository = repository;
@@ -89,6 +118,7 @@ public class MergingTaskManagementService {
         this.becKeyConfigurationService = becKeyConfigurationService;
         this.regionConfigurationService = regionConfigurationService;
         this.hvdcAlignmentConfigurationService = hvdcAlignmentConfigurationService;
+        this.executionLogsService = executionLogsService;
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -101,9 +131,9 @@ public class MergingTaskManagementService {
 
     public JsonApiDocument<MergingTaskDto> getTaskJsonDoc(final Long taskId) {
         return JsonApiDocument.fromData(
-            mapper.mergingTaskToMergingTaskDto(
-                getTaskById(taskId)
-            )
+                mapper.mergingTaskToMergingTaskDto(
+                        getTaskById(taskId)
+                )
         );
     }
 
@@ -113,10 +143,9 @@ public class MergingTaskManagementService {
         final MergingTask task = repository.save(new MergingTask());
 
         final String inputsDir = configuration.getInputsDirectoryPath(task);
-        final RequestMetadataManager requestMgr = new RequestMetadataManager(inputsDir, inputRequestMetadata);
-
         final Path inputsPath = Path.of(inputsDir);
         try {
+            final RequestMetadataManager requestMgr = new RequestMetadataManager(inputsDir, inputRequestMetadata);
             final Path tmpInputPath = unzipInputFileInTmp(inputZip);
             requestMgr.checkIfAllInputsAvailable(tmpInputPath);
 
@@ -173,11 +202,13 @@ public class MergingTaskManagementService {
         return zipDirectory(configuration.getInputsDirectoryPath(getTaskById(taskId)));
     }
 
-    public SavedFile getIgm(final Long taskId, final String areaId) {
+    public SavedFile getIgm(final Long taskId,
+                            final String areaId) {
         return getIgmData(taskId, areaId).getIgmFile();
     }
 
-    public SavedFile getIgmQualityReport(final Long taskId, final String areaId) {
+    public SavedFile getIgmQualityReport(final Long taskId,
+                                         final String areaId) {
         return getIgmData(taskId, areaId).getIgmQualityReportFile();
     }
 
@@ -282,8 +313,7 @@ public class MergingTaskManagementService {
     }
 
     public SavedFile getTgmNetPositions(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        return getArtifacts(taskId).getFile(TGM_NET_POSITIONS_FILE);
     }
 
     public SavedFile getAlegroNetPositions(final Long taskId) {
@@ -299,8 +329,8 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getExecutionLogs(final Long taskId) {
-        //TODO: Implement. The method signature can be changed if necessary.
-        return null;
+        final MergingTask mergingTask = getFinishedTaskById(taskId);
+        return executionLogsService.generateLogsForMergingSupervisor(mergingTask);
     }
 
     public SavedFile getOpenLoadFlowLogs(final Long taskId) {
@@ -315,7 +345,7 @@ public class MergingTaskManagementService {
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     public byte[] getBECKeyConfiguration(final OffsetDateTime dateTime) throws IOException {
-        return becKeyConfigurationService.getConfigAsJsonBytes(dateTime);
+        return JsonUtils.writeToBytes(JsonBecConfiguration.class, becKeyConfigurationService.getConfiguration(dateTime));
     }
 
     public void publishBECKeyConfiguration(final MultipartFile configurationFile,
@@ -325,7 +355,7 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getRegionConfiguration(final OffsetDateTime dateTime) throws IOException {
-        return regionConfigurationService.getConfigAsJsonBytes(dateTime);
+        return JsonUtils.writeToBytes(JsonRegionConfiguration.class, regionConfigurationService.getConfiguration(dateTime));
     }
 
     public void publishRegionConfiguration(final MultipartFile configurationFile,
@@ -335,7 +365,7 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getHvdcXNodeAlignmentConfiguration(final OffsetDateTime dateTime) throws IOException {
-        return hvdcAlignmentConfigurationService.getConfigAsJsonBytes(dateTime);
+        return JsonUtils.writeToBytes(JsonHvdcAlignmentConfiguration.class, hvdcAlignmentConfigurationService.getConfiguration(dateTime));
     }
 
     public void publishHvdcXNodeAlignmentConfiguration(final MultipartFile configurationFile,
@@ -345,7 +375,7 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getVirtualHubsConfiguration(final OffsetDateTime dateTime) throws IOException {
-        return virtualHubsConfigurationService.getConfigAsJsonBytes(dateTime);
+        return JsonUtils.writeToBytes(VirtualHubsConfiguration.class, virtualHubsConfigurationService.getConfiguration(dateTime));
     }
 
     public void publishVirtualHubsConfiguration(final MultipartFile configurationFile,
@@ -355,7 +385,7 @@ public class MergingTaskManagementService {
     }
 
     public byte[] getXNodesConfiguration(final OffsetDateTime dateTime) throws IOException {
-        return xNodeConfigurationService.getConfigAsJsonBytes(dateTime);
+        return JsonUtils.writeToBytes(JsonXNodeConfiguration.class, xNodeConfigurationService.getConfiguration(dateTime));
     }
 
     public void publishXNodesConfiguration(final MultipartFile configurationFile,
@@ -393,8 +423,13 @@ public class MergingTaskManagementService {
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
 
     public byte[] exportMergingLogs(long taskId) {
-        //TODO
-        return null;
+        MergingTask task = getFinishedTaskById(taskId);
+        if (task.getStatus() == TaskStatus.SUCCESS) {
+            return MergingLogsConverter.convert(task);
+        } else {
+            LOGGER.error("Merging logs file for task: {} not available.", taskId);
+            throw new CeMergingException(String.format("Merging logs file for task %d not available", taskId));
+        }
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
@@ -440,7 +475,7 @@ public class MergingTaskManagementService {
 
     public MergingTask getTaskById(final Long taskId) {
         final MergingTask task = findTaskById(taskId)
-            .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available", taskId)));
+                .orElseThrow(() -> new TaskNotFoundException(String.format("Task %d not available", taskId)));
         handleDaylightSavingTime(task);
         return task;
     }
@@ -472,26 +507,31 @@ public class MergingTaskManagementService {
      */
     private void handleDaylightSavingTime(final MergingTask task) {
         final Inputs inputs = task.getInputs();
-
         final OffsetDateTime taskDate = inputs.getTargetDate();
         final ZoneOffset realOffset = inputs.getRealOffset();
+
+        if (taskDate == null || realOffset == null) {
+            return;
+        }
 
         // if offsets are different, we change the target date to have it at the real offset
         if (!taskDate.getOffset().equals(realOffset)) {
             inputs.setTargetDate(OffsetDateTime.of(taskDate.toLocalDateTime(), realOffset));
         }
-
     }
 
-    private SavedFile getInputFile(final Long taskId, final Function<Inputs, SavedFile> accessor) {
+    private SavedFile getInputFile(final Long taskId,
+                                   final Function<Inputs, SavedFile> accessor) {
         return accessor.apply(getTaskById(taskId).getInputs());
     }
 
-    private SavedFile getConfigurationFile(final Long taskId, final Function<Configurations, SavedFile> accessor) {
+    private SavedFile getConfigurationFile(final Long taskId,
+                                           final Function<Configurations, SavedFile> accessor) {
         return accessor.apply(getTaskById(taskId).getConfigurations());
     }
 
-    private IgmData getIgmData(final Long taskId, final String areaId) {
+    private IgmData getIgmData(final Long taskId,
+                               final String areaId) {
         final MergingTask task = getTaskById(taskId);
         return task.getInputs().getIgm(areaId);
     }

@@ -9,8 +9,19 @@ package com.farao_community.farao.ce_merging.common;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
+
+import static com.farao_community.farao.ce_merging.daily_merging.outputs.common.SchemaLocationNamespace.RESPONSE_XSD;
+import static jakarta.xml.bind.Marshaller.JAXB_FORMATTED_OUTPUT;
+import static jakarta.xml.bind.Marshaller.JAXB_FRAGMENT;
+import static jakarta.xml.bind.Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION;
+import static java.lang.Boolean.TRUE;
 
 public final class CeMergingConstants {
+
+    private CeMergingConstants() {
+        // constants class
+    }
 
     // app configuration
     public static final String TAG_VERSION = "1.0.0";
@@ -55,14 +66,15 @@ public final class CeMergingConstants {
     // formatting
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
     public static final String DATE_FORMAT = "yyyyMMdd";
-
+    public static final String EMPTY = "";
+    public static final String COMMA = ",";
     public static final String CSV_SEPARATOR = ";";
     public static final String ARROW = "->";
     public static final String STRING_FORMAT = "%s";
     public static final String NUMBER_FORMAT = "%d";
     public static final String XML_HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+    public static final String ONE = "1";
     // other strings
-    public static final String EMPTY = "";
     public static final String ID = "id";
     public static final String NAME = "name";
     public static final String VIRTUAL_HUB_ALEGRO_BE_CODE = "BE_ALEGrO";
@@ -84,14 +96,14 @@ public final class CeMergingConstants {
     public static final String CORE_REGION_ID = "10Y1001C--00059P";
     public static final String UCTE_IMPORT_CREATE_AREAS_KEY = "ucte.import.create-areas";
     public static final String TSO = "TSO";
+    public static final String CORE = "CORE";
+    public static final String TSO_LOWER_CASE = "tso";
     public static final String RESOLUTION = "PT60M";
-    public static final String CODING_SCHEME = "A01";
-    public static final String SENDER_ROLE = "A44";
-    public static final String RECEIVER_ROLE = "A36";
     public static final String XML_EXTENSION = "xml";
     public static final String JSON_EXTENSION = "json";
     public static final String ZIP_EXTENSION = "zip";
     public static final String RTE_GSR_URL = "http://www.rte-france.com/gsr";
+    public static final String MERGING_STEP = "merging-step";
     // Numbers
     public static final int DEFAULT_ALEGRO_THRESHOLD = 2000;
     public static final double MAX_FICTITIOUS_P = 9999.;
@@ -105,7 +117,12 @@ public final class CeMergingConstants {
     public static final DateTimeFormatter FILENAME_DATETIME_FMT = DateTimeFormatter.ofPattern(DATE_TIME_FORMAT);
     public static final DateTimeFormatter FILENAME_DATE_FMT = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
-    private CeMergingConstants() {
-        // constants class
-    }
+    //JAXB
+    public static final Map<String, Object> JAXB_PROPERTIES = Map.of(
+            JAXB_FORMATTED_OUTPUT, TRUE,
+            JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
+            RESPONSE_XSD.getName(),
+            JAXB_FRAGMENT, TRUE
+    );
+
 }

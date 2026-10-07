@@ -9,8 +9,11 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.mapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring", uses = {TsoInfosMapper.class})
 public interface RegionConfigurationMapper {
+    // The DTO ref belongs to the global configuration table: the task gets its own rows
+    @Mapping(target = "ref", ignore = true)
     RegionConfiguration mapToRegionConfiguration(RegionConfigurationDto regionConfigurationDto);
 }

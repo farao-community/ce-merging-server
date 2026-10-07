@@ -57,8 +57,8 @@ class BciComputerTest {
                                           -2500, -2500, -500, -500),
                             "N8", values(false, 1000, 1000,
                                          -700, -700, 1300, 1300),
-                            "N25", values(false, -200, -200,
-                                          -1000, -1000, 0, 0))),
+                            "BE", values(false, -200, -200,
+                                         -1000, -1000, 0, 0))),
             scenario(mockRefProg2(), mockRange123(), true, false,
                      Map.of("N1", values(false, 500, 1103.45,
                                          0, 0, 4000, 4000),
@@ -66,8 +66,8 @@ class BciComputerTest {
                                           -2500, -2500, -500, -500),
                             "N8", values(false, -500, -189.66,
                                          -700, -700, 1300, 1300),
-                            "N25", values(false, -500, -413.79,
-                                          -1000, -1000, 0, 0))),
+                            "BE", values(false, -500, -413.79,
+                                         -1000, -1000, 0, 0))),
             scenario(mockRefProg3(), mockRange123(), true, false,
                      Map.of("N1", values(true, -1000, 0,
                                          0, 0, 4000, 4000),
@@ -75,8 +75,8 @@ class BciComputerTest {
                                           -2500, -2500, -500, -500),
                             "N8", values(false, 1000, 819.15,
                                          -700, -700, 1300, 1300),
-                            "N25", values(false, 0, -106.38,
-                                          -1000, -1000, 0, 0))),
+                            "BE", values(false, 0, -106.38,
+                                         -1000, -1000, 0, 0))),
             scenario(mockRefProg4(), mockRange4(), true, false,
                      Map.of("N1", values(true, -1500, 0,
                                          0, 0, 4000, 4000),
@@ -84,8 +84,8 @@ class BciComputerTest {
                                           -2500, -2500, -500, -500),
                             "N8", values(false, 1000, 880,
                                          700, 700, 2700, 2700),
-                            "N25", values(false, 500, 420,
-                                          300, 300, 1300, 1300))),
+                            "BE", values(false, 500, 420,
+                                         300, 300, 1300, 1300))),
             scenario(mockRefProg5(), mockRange5(), true, true,
                      Map.of("N1", values(true, -3000, -755.56,
                                          0, -755.56, 4000, 4000),
@@ -93,8 +93,8 @@ class BciComputerTest {
                                           -3200, -3577.78, -1200, -1200),
                             "N8", values(false, 1500, 922.22,
                                          1300, 922.22, 3300, 3300),
-                            "N25", values(false, 3700, 3411.11,
-                                          3600, 3411.11, 4600, 4600))),
+                            "BE", values(false, 3700, 3411.11,
+                                         3600, 3411.11, 4600, 4600))),
             scenario(mockRefProg6(), mockRange6(), true, false,
                      Map.of("N1", values(true, 400, 200,
                                          -200, -200, 200, 200),
@@ -102,8 +102,8 @@ class BciComputerTest {
                                           -200, -200, 200, 200),
                             "N8", values(false, 0, 0,
                                          -200, -200, 200, 200),
-                            "N25", values(false, 0, 0,
-                                          -1000, -1000, 1000, 1000))),
+                            "BE", values(false, 0, 0,
+                                         -1000, -1000, 1000, 1000))),
             scenario(mockRefProg7(), mockRange7(), true, true,
                      Map.of("N1", values(true, 800, 371.43,
                                          -200, -200, 200, 371.43),
@@ -111,8 +111,8 @@ class BciComputerTest {
                                           -200, -200, 200, 371.43),
                             "N8", values(false, 200, 371.43,
                                          -200, -200, 200, 371.43),
-                            "N25", values(false, -1200, -1114.29,
-                                          -1400, -1400, -1200, -1114.29)))
+                            "BE", values(false, -1200, -1114.29,
+                                         -1400, -1400, -1200, -1114.29)))
     );
 
     @ParameterizedTest
@@ -163,7 +163,7 @@ class BciComputerTest {
             areasId.put("N1", "ONE");
             areasId.put("N12", "TWELVE");
             areasId.put("N8", "EIGHT");
-            areasId.put("N25", "TWENTYFIVE");
+            areasId.put("BE", "TWENTYFIVE");
             regionConfiguration.setId("CE");
             regionConfiguration.setName("CE");
             regionConfiguration.setAreasIn(areasId);

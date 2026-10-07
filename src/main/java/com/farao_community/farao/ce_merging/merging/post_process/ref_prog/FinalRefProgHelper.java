@@ -6,11 +6,11 @@
  */
 package com.farao_community.farao.ce_merging.merging.post_process.ref_prog;
 
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
 
 import java.math.BigInteger;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CODING_SCHEME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RECEIVER_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SENDER_ID;
 
@@ -22,14 +22,14 @@ public final class FinalRefProgHelper {
 
     static PublicationDocument.ReceiverIdentification getReceiverIdentification() {
         final PublicationDocument.ReceiverIdentification receiverIdentification = new PublicationDocument.ReceiverIdentification();
-        receiverIdentification.setCodingScheme(CODING_SCHEME);
+        receiverIdentification.setCodingScheme(CodingSchemeType.A_01.value());
         receiverIdentification.setV(RECEIVER_ID);
         return receiverIdentification;
     }
 
     static PublicationDocument.SenderIdentification getSenderIdentification() {
         final PublicationDocument.SenderIdentification senderIdentification = new PublicationDocument.SenderIdentification();
-        senderIdentification.setCodingScheme(CODING_SCHEME);
+        senderIdentification.setCodingScheme(CodingSchemeType.A_01.value());
         senderIdentification.setV(SENDER_ID);
         return senderIdentification;
     }

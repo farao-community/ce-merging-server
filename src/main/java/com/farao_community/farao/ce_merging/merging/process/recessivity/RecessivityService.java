@@ -9,6 +9,8 @@ package com.farao_community.farao.ce_merging.merging.process.recessivity;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.xnode.AreaInformation;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodeInformation;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus;
@@ -72,6 +74,7 @@ public class RecessivityService {
     }
 
     public void applyRecessivity(final MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.RECESSIVITY_APPLICATION);
         try {
             final List<String> recessiveCountries = task.getConfigurations().getOrDefaultRecessiveCountries();
             LOGGER.info("Recessive countries are {}", recessiveCountries);

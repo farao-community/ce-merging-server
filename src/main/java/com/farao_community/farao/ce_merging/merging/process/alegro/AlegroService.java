@@ -9,6 +9,8 @@ package com.farao_community.farao.ce_merging.merging.process.alegro;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroData;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroFlows;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
@@ -45,6 +47,7 @@ public class AlegroService {
     }
 
     public void checkAlegroXnodesQuality(final MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.ALEGRO);
         final String topologicalMergeFilePath = task.getArtifactPath(ArtifactType.TGM_FILE_AFTER_RECESSIVITY);
         final Network network = Network.read(topologicalMergeFilePath);
         final List<DanglingLine> alegroDanglingLinesList = getAlegroDanglingLines(network);
@@ -66,6 +69,7 @@ public class AlegroService {
     }
 
     public void updateAlegroP0(final MergingTask task) {
+        LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.ALEGRO);
         final AlegroData alegroData = JsonUtils.read(AlegroData.class, task.getArtifactPath(ArtifactType.ALEGRO_NET_POSITIONS));
         if (alegroData.alegroInOutage()) {
             return;

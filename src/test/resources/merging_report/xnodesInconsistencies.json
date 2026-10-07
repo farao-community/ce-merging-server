@@ -1,0 +1,26 @@
+{
+  "xnodeIncorrectList": [
+    {
+      "name": "XAB_1234",
+      "country1": "BE",
+      "status1": "CLOSE",
+      "recessive1": false,
+      "country2": "FR",
+      "status2": "OPEN",
+      "recessive2": false,
+      "finalStatus": "OPEN"
+    },
+    {
+      "name": "XCD_2345",
+      "country1": "BE",
+      "status1": "CLOSE",
+      "recessive1": false,
+      "country2": "FR",
+      "status2": "OPEN",
+      "recessive2": false,
+      "finalStatus": "OPEN"
+    }
+  ],
+  "xnodeIncompleteList": [],
+  "xnodeUndefinedList": []
+}
