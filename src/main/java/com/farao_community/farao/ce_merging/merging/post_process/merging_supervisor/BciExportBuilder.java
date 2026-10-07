@@ -174,6 +174,8 @@ public class BciExportBuilder {
         final CWERefProgCGM cweRefProgCGM = new CWERefProgCGM();
         cweRefProgCGM.setVal(BigInteger.valueOf(report.getReferenceProgram().getCoreNPtargetFinal()));
         buildCommonData(report, reference, cweRefProgCGM);
+        reference.getCWEInitialNetPositionIGM().setVal(BigInteger.valueOf(report.getBCI().getCOREInitialNPIGM()));
+
         hubBCI.setReference(reference);
         final BCIActive bciActive = new BCIActive();
         bciActive.setVal(Boolean.parseBoolean(report.getBCI().getBCIapplied()));
