@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.merging.process.dk_renaming;
 
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Bus;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Switch;
 import com.powsybl.ucte.converter.NamingStrategy;
@@ -61,8 +61,8 @@ public class DKNamingStrategy implements NamingStrategy {
     }
 
     @Override
-    public UcteNodeCode getUcteNodeCode(final DanglingLine danglingLine) {
-        return getUcteNodeCode(danglingLine.getPairingKey());
+    public UcteNodeCode getUcteNodeCode(final BoundaryLine boundaryLine) {
+        return getUcteNodeCode(boundaryLine.getPairingKey());
     }
 
     @Override
@@ -81,8 +81,8 @@ public class DKNamingStrategy implements NamingStrategy {
     }
 
     @Override
-    public UcteElementId getUcteElementId(final DanglingLine danglingLine) {
-        return getUcteElementId(danglingLine.getId());
+    public UcteElementId getUcteElementId(final BoundaryLine boundaryLine) {
+        return getUcteElementId(boundaryLine.getId());
     }
 
     private UcteNodeCode convertIfDk(final UcteNodeCode ucteNodeCode) {

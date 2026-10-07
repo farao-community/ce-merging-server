@@ -163,8 +163,8 @@ public class PstSpecialService {
         runLoadFlowWithBalanceTypeCorrection(slovenianGrid, loadFlowRunnerSupplier, loadFlowParameters);
         applySolvedTapPositionAndSolvedSectionCount(slovenianGrid);
 
-        pstOutput.getFlowDivacaPadriciano().setIgmFlowFromDanglingLine(DIVACA_PADRICIANO_DANGLING_LINE, slovenianGrid);
-        pstOutput.getFlowDivacaRedipuglia().setIgmFlowFromDanglingLine(DIVACA_REDIPULGIA_DANGLING_LINE, slovenianGrid);
+        pstOutput.getFlowDivacaPadriciano().setIgmFlowFromBoundaryLine(DIVACA_PADRICIANO_DANGLING_LINE, slovenianGrid);
+        pstOutput.getFlowDivacaRedipuglia().setIgmFlowFromBoundaryLine(DIVACA_REDIPULGIA_DANGLING_LINE, slovenianGrid);
 
         forAllSpecialPst(pst -> pstOutput.setTapIgmFromId(pst, pstIds.get(pst), task.getIgm(pst.getCountry())));
     }

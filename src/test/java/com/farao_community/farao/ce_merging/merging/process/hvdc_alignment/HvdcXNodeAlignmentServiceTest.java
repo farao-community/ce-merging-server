@@ -11,7 +11,7 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.*;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -90,28 +90,28 @@ public class HvdcXNodeAlignmentServiceTest {
     @Test
     void applyHvdcXNodeAlignment() {
         final Network dkNetworkInitial = readNetwork(task.getArtifacts().getFile(ArtifactType.DK_CONVERTED_FILE).getPath());
-        assertDanglingLine(dkNetworkInitial, XED_EE1D, 0.0, 0.0, -1.9, 248.6);
+        assertBoundaryLine(dkNetworkInitial, XED_EE1D, 0.0, 0.0, -1.9, 248.6);
         final Network nlNetworkInitial = readInputNetwork(NL_COUNTRY_CODE);
-        assertDanglingLine(nlNetworkInitial, XED_EE1N, 0.0, 0.0, 0.0, 0.0);
+        assertBoundaryLine(nlNetworkInitial, XED_EE1N, 0.0, 0.0, 0.0, 0.0);
         final Network itNetworkInitial = readInputNetwork(IT_COUNTRY_CODE);
-        assertDanglingLine(itNetworkInitial, XAR_GA1I, -485.1, 135.8, 0.0, 0.0);
+        assertBoundaryLine(itNetworkInitial, XAR_GA1I, -485.1, 135.8, 0.0, 0.0);
         final Network grNetworkInitial = readInputNetwork(GR_COUNTRY_CODE);
-        assertDanglingLine(grNetworkInitial, XAR_GA1G, 500.0, 28.0801, 0.0, 0.0);
+        assertBoundaryLine(grNetworkInitial, XAR_GA1G, 500.0, 28.0801, 0.0, 0.0);
         hvdcXNodeAlignmentService.applyHvdcXNodeAlignment(task);
 
         final Network dkNetworkAfterHvdcAlignment = readNetwork(task.getArtifacts().getFile(ArtifactType.DK_CONVERTED_FILE).getPath());
-        assertDanglingLine(dkNetworkAfterHvdcAlignment, XED_EE1D, 0.0, 0.0, 0.0, 0.0);
+        assertBoundaryLine(dkNetworkAfterHvdcAlignment, XED_EE1D, 0.0, 0.0, 0.0, 0.0);
         final Network nlNetworkAfterHvdcAlignment = readPreTreatedNetwork(NL_COUNTRY_CODE);
-        assertDanglingLine(nlNetworkAfterHvdcAlignment, XED_EE1N, 0.0, 0.0, 0.0, 0.0);
+        assertBoundaryLine(nlNetworkAfterHvdcAlignment, XED_EE1N, 0.0, 0.0, 0.0, 0.0);
         final Network itNetworkAfterHvdcAlignment = readPreTreatedNetwork(IT_COUNTRY_CODE);
-        assertDanglingLine(itNetworkAfterHvdcAlignment, XAR_GA1I, -485.1, 135.8, 0.0, 0.0);
+        assertBoundaryLine(itNetworkAfterHvdcAlignment, XAR_GA1I, -485.1, 135.8, 0.0, 0.0);
         final Network grNetworkAfterHvdcAlignment = readPreTreatedNetwork(GR_COUNTRY_CODE);
-        assertDanglingLine(grNetworkAfterHvdcAlignment, XAR_GA1G, 485.1, 28.0801, 0.0, 0.0);
+        assertBoundaryLine(grNetworkAfterHvdcAlignment, XAR_GA1G, 485.1, 28.0801, 0.0, 0.0);
     }
 
-    private static DanglingLine getDanglingLineFromNetwork(final Network network, final String nodeName) {
-        return network.getDanglingLineStream()
-                .filter(danglingLine -> danglingLine.getPairingKey().equals(nodeName))
+    private static BoundaryLine getBoundaryLineFromNetwork(final Network network, final String nodeName) {
+        return network.getBoundaryLineStream()
+                .filter(boundaryLine -> boundaryLine.getPairingKey().equals(nodeName))
                 .findFirst()
                 .orElseThrow(() -> new CeMergingException("Unable to find dangling line " + nodeName + " in network " + network.getNameOrId()));
     }
@@ -131,25 +131,25 @@ public class HvdcXNodeAlignmentServiceTest {
         return igmData;
     }
 
-    private static void assertDanglingLine(final Network network,
+    private static void assertBoundaryLine(final Network network,
                                            final String nodeName,
                                            final double expectedP0,
                                            final double expectedQ0,
                                            final double expectedTargetP,
                                            final double expectedTargetQ) {
 
-        final DanglingLine danglingLine = getDanglingLineFromNetwork(network, nodeName);
-        assertEquals(expectedP0, danglingLine.getP0(), 1e-6);
-        assertEquals(expectedQ0, danglingLine.getQ0(), 1e-6);
-        assertEquals(expectedTargetP, danglingLine.getGeneration().getTargetP(), 1e-6);
-        assertEquals(expectedTargetQ, danglingLine.getGeneration().getTargetQ(), 1e-6);
+        final BoundaryLine boundaryLine = getBoundaryLineFromNetwork(network, nodeName);
+        assertEquals(expectedP0, boundaryLine.getP0(), 1e-6);
+        assertEquals(expectedQ0, boundaryLine.getQ0(), 1e-6);
+        assertEquals(expectedTargetP, boundaryLine.getGeneration().getTargetP(), 1e-6);
+        assertEquals(expectedTargetQ, boundaryLine.getGeneration().getTargetQ(), 1e-6);
     }
 
     private static void assertZeroFlow(final Network network, final String nodeName) {
-        final DanglingLine danglingLine = getDanglingLineFromNetwork(network, nodeName);
+        final BoundaryLine boundaryLine = getBoundaryLineFromNetwork(network, nodeName);
 
-        assertEquals(0.0, danglingLine.getP0());
-        assertEquals(0.0, Math.abs(danglingLine.getGeneration().getTargetP()));
+        assertEquals(0.0, boundaryLine.getP0());
+        assertEquals(0.0, Math.abs(boundaryLine.getGeneration().getTargetP()));
     }
 
     private Network readInputNetwork(final String country) {

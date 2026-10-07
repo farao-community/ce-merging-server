@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.hvdc_alignment;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.ucte.network.UcteElementStatus;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ public class HvdcXNodeAlignmentTest {
     void shouldAlignRecessiveNodesWhenNlInOutage() {
         final Network network = readNetwork("nl_outage.uct");
         HvdcXNodeAlignment.on(network, network, alignmentCouples).align();
-        assertDanglingLine(network, DK_X_NODE, 0., 0., 0., 0., UcteElementStatus.BUSBAR_COUPLER_OUT_OF_OPERATION
+        assertBoundaryLine(network, DK_X_NODE, 0., 0., 0., 0., UcteElementStatus.BUSBAR_COUPLER_OUT_OF_OPERATION
         );
     }
 
@@ -33,14 +33,14 @@ public class HvdcXNodeAlignmentTest {
     void shouldAlignRecessiveNodesWhenDkInOutage() {
         final Network network = readNetwork("dk_outage.uct");
         HvdcXNodeAlignment.on(network, network, alignmentCouples).align();
-        assertDanglingLine(network, DK_X_NODE, 106., 0., 3., 0., UcteElementStatus.EQUIVALENT_ELEMENT_IN_OPERATION);
+        assertBoundaryLine(network, DK_X_NODE, 106., 0., 3., 0., UcteElementStatus.EQUIVALENT_ELEMENT_IN_OPERATION);
     }
 
     @Test
     void shouldAlignRecessiveNodesWhenNoOutage() {
         final Network network = readNetwork("no_outage.uct");
         HvdcXNodeAlignment.on(network, network, alignmentCouples).align();
-        assertDanglingLine(network, DK_X_NODE, -4., 11.1000, 6., 0.00324, UcteElementStatus.REAL_ELEMENT_IN_OPERATION);
+        assertBoundaryLine(network, DK_X_NODE, -4., 11.1000, 6., 0.00324, UcteElementStatus.REAL_ELEMENT_IN_OPERATION);
     }
 
     private static Network readNetwork(final String filename) {
@@ -51,22 +51,22 @@ public class HvdcXNodeAlignmentTest {
         );
     }
 
-    private static void assertDanglingLine(final Network network,
+    private static void assertBoundaryLine(final Network network,
                                            final String nodeName,
                                            final double expectedP0,
                                            final double expectedQ0,
                                            final double expectedTargetP,
                                            final double expectedTargetQ,
                                            final UcteElementStatus expectedStatus) {
-        final DanglingLine danglingLine = network.getDanglingLineStream()
-                .filter(dl -> dl.getPairingKey().equals(nodeName))
+        final BoundaryLine boundaryLine = network.getBoundaryLineStream()
+                .filter(bl -> bl.getPairingKey().equals(nodeName))
                 .findFirst()
                 .orElseThrow();
-        assertEquals(expectedP0, danglingLine.getP0(), 0.01);
-        assertEquals(expectedQ0, danglingLine.getQ0(), 0.01);
-        assertEquals(expectedTargetP, danglingLine.getGeneration().getTargetP(), 0.01);
-        assertEquals(expectedTargetQ, danglingLine.getGeneration().getTargetQ(), 0.01);
-        assertEquals(expectedStatus, HvdcXNodeAlignment.getStatus(danglingLine));
+        assertEquals(expectedP0, boundaryLine.getP0(), 0.01);
+        assertEquals(expectedQ0, boundaryLine.getQ0(), 0.01);
+        assertEquals(expectedTargetP, boundaryLine.getGeneration().getTargetP(), 0.01);
+        assertEquals(expectedTargetQ, boundaryLine.getGeneration().getTargetQ(), 0.01);
+        assertEquals(expectedStatus, HvdcXNodeAlignment.getStatus(boundaryLine));
     }
 
 }

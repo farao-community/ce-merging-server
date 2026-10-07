@@ -15,7 +15,7 @@ import com.farao_community.farao.ce_merging.merging.process.base_case_improvemen
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,15 +54,15 @@ public class VirtualHubsShifting {
     private static void applyVirtualHubFlow(final Map<String, Double> virtualHubsGaps, final List<VirtualHubRecord> virtualHubRecords, final Network network, final ReferenceExchangeData referenceExchangeData) {
         final VirtualHubRecord virtualHubRecord = findVirtualHub(virtualHubRecords, referenceExchangeData.getAreaOutId(), referenceExchangeData.getAreaInId());
         final String nodeName = virtualHubRecord.getNodeName();
-        final DanglingLine danglingLine = findDanglingLine(network, nodeName);
-        if (danglingLine.getTerminal().isConnected()) {
-            final double initialFlow = danglingLine.getP0();
+        final BoundaryLine boundaryLine = findBoundaryLine(network, nodeName);
+        if (boundaryLine.getTerminal().isConnected()) {
+            final double initialFlow = boundaryLine.getP0();
             final double targetFlow = computeTargetFlow(virtualHubRecord, referenceExchangeData);
             final double virtualHubFlowGap = targetFlow - initialFlow;
             if (virtualHubFlowGap != 0.0) {
                 final String country = CountryCodeUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
                 virtualHubsGaps.put(country, virtualHubFlowGap);
-                setDanglingLineFlow(danglingLine, targetFlow);
+                setBoundaryLineFlow(boundaryLine, targetFlow);
                 LOGGER.info("Shift virtual hub {}: {} -> {} (gap={})", nodeName, initialFlow, targetFlow, virtualHubFlowGap);
             }
         }
@@ -81,15 +81,15 @@ public class VirtualHubsShifting {
                 .orElseThrow(() -> new CeMergingException("Unable to find exchange from " + areaOut + " to " + areaIn + " in virtualHubs"));
     }
 
-    private static DanglingLine findDanglingLine(final Network network, final String nodeName) {
-        return network.getDanglingLineStream()
-                .filter(danglingLine -> nodeName.equals(danglingLine.getPairingKey()))
+    private static BoundaryLine findBoundaryLine(final Network network, final String nodeName) {
+        return network.getBoundaryLineStream()
+                .filter(boundaryLine -> nodeName.equals(boundaryLine.getPairingKey()))
                 .findFirst()
                 .orElseThrow(() -> new CeMergingException("Unable to find dangling line for node " + nodeName + " in network " + network.getId()));
     }
 
-    private static void setDanglingLineFlow(final DanglingLine danglingLine, final double targetFlow) {
-        danglingLine.setP0(targetFlow);
-        danglingLine.getGeneration().setTargetP(0.0);
+    private static void setBoundaryLineFlow(final BoundaryLine boundaryLine, final double targetFlow) {
+        boundaryLine.setP0(targetFlow);
+        boundaryLine.getGeneration().setTargetP(0.0);
     }
 }

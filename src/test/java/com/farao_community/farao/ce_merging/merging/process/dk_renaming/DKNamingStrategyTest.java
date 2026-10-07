@@ -9,7 +9,7 @@ package com.farao_community.farao.ce_merging.merging.process.dk_renaming;
 import com.farao_community.farao.ce_merging.common.CeMergingConstants;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Bus;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.ucte.converter.NamingStrategy;
 import com.powsybl.ucte.network.UcteElementId;
@@ -78,11 +78,11 @@ class DKNamingStrategyTest {
     }
 
     @Test
-    void getUcteNodeCodeWithAnotherDanglingLine() {
-        DanglingLine danglingLine = mock(DanglingLine.class);
-        when(danglingLine.getPairingKey()).thenReturn("XFL_KA11");
+    void getUcteNodeCodeWithAnotherBoundaryLine() {
+        BoundaryLine boundaryLine = mock(BoundaryLine.class);
+        when(boundaryLine.getPairingKey()).thenReturn("XFL_KA11");
 
-        assertThat(strategy.getUcteNodeCode(danglingLine))
+        assertThat(strategy.getUcteNodeCode(boundaryLine))
             .isLocatedIn(XX, "FL_KA")
             .isBusBar(VL_380, '1');
     }
@@ -146,11 +146,11 @@ class DKNamingStrategyTest {
     }
 
     @Test
-    void getUcteElementIdWithAnotherDanglingLine() {
-        DanglingLine danglingLine = mock(DanglingLine.class);
-        when(danglingLine.getId()).thenReturn("XFL_KA11 D1KAS_1  1");
+    void getUcteElementIdWithAnotherBoundaryLine() {
+        BoundaryLine boundaryLine = mock(BoundaryLine.class);
+        when(boundaryLine.getId()).thenReturn("XFL_KA11 D1KAS_1  1");
 
-        UcteElementId ucteElementId = strategy.getUcteElementId(danglingLine);
+        UcteElementId ucteElementId = strategy.getUcteElementId(boundaryLine);
 
         assertThat(ucteElementId.getNodeCode1())
             .isLocatedIn(XX, "FL_KA")

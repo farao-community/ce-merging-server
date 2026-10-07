@@ -19,7 +19,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubReco
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Line;
@@ -46,7 +46,7 @@ import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getBo
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountry;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOnOtherSide;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isBranchBorderOf;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isDanglingLineBorderOf;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isBoundaryLineBorderOf;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isHvdcLineBorderOf;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInCountry;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWithVirtualHub;
@@ -121,7 +121,7 @@ public final class CountryNetPositionHandler {
     }
 
     private NetPositions computeNetPositions() {
-        fillNetPositionsFromDanglingLines();
+        fillNetPositionsFromBoundaryLines();
         fillNetPositionsFromLines();
         fillNetPositionsFromVirtualHubNodes();
         fillNetPositionsFromHvdcLines();
@@ -197,10 +197,10 @@ public final class CountryNetPositionHandler {
                 .forEach(this::handleLine);
     }
 
-    private void fillNetPositionsFromDanglingLines() {
-        network.getDanglingLineStream()
-                .filter(isDanglingLineBorderOf(country))
-                .forEach(this::handleDanglingLine);
+    private void fillNetPositionsFromBoundaryLines() {
+        network.getBoundaryLineStream()
+                .filter(isBoundaryLineBorderOf(country))
+                .forEach(this::handleBoundaryLine);
     }
 
     private void handleVirtualHubBus(final Bus bus) {
@@ -225,15 +225,15 @@ public final class CountryNetPositionHandler {
         updatePositions(getBorderFlow(line, country), getCountryOnOtherSide(line, country), true);
     }
 
-    private void handleDanglingLine(final DanglingLine danglingLine) {
-        final double borderFlow = LoadFlowUtils.getBorderFlow(danglingLine, componentMode);
-        final Country countryOnOtherSide = otherCountry(danglingLine);
+    private void handleBoundaryLine(final BoundaryLine boundaryLine) {
+        final double borderFlow = LoadFlowUtils.getBorderFlow(boundaryLine, componentMode);
+        final Country countryOnOtherSide = otherCountry(boundaryLine);
 
-        updatePositions(borderFlow, countryOnOtherSide, !isPairedWithVirtualHub(danglingLine, virtualHubList));
+        updatePositions(borderFlow, countryOnOtherSide, !isPairedWithVirtualHub(boundaryLine, virtualHubList));
 
-        if (isPairedWithVirtualHub(danglingLine, virtualHubList)) {
+        if (isPairedWithVirtualHub(boundaryLine, virtualHubList)) {
             outBciNetPosition += borderFlow;
-            addToVirtualHubExchange(danglingLine.getPairingKey(), borderFlow);
+            addToVirtualHubExchange(boundaryLine.getPairingKey(), borderFlow);
         } else if (!bciCountries.contains(countryOnOtherSide)) {
             outBciNetPosition += borderFlow;
         }
@@ -288,12 +288,12 @@ public final class CountryNetPositionHandler {
         }
     }
 
-    private Country otherCountry(final DanglingLine danglingLine) {
-        final Country danglingLineCountry = getCountry(danglingLine);
-        final Optional<XnodeConfig> optionalXnode = getDanglingLineXnode(danglingLine);
+    private Country otherCountry(final BoundaryLine boundaryLine) {
+        final Country boundaryLineCountry = getCountry(boundaryLine);
+        final Optional<XnodeConfig> optionalXnode = getBoundaryLineXnode(boundaryLine);
 
         if (optionalXnode.isEmpty()) {
-            LOGGER.warn("Could not find dangling line UCTE code: '{}' in xnodes config file. Considering it in outbci net position", danglingLine.getPairingKey());
+            LOGGER.warn("Could not find dangling line UCTE code: '{}' in xnodes config file. Considering it in outbci net position", boundaryLine.getPairingKey());
             return null;
         }
 
@@ -310,19 +310,19 @@ public final class CountryNetPositionHandler {
         final Country area2 = Country.valueOf(xnode.getArea2());
         final String subArea2 = xnode.getSubarea2();
 
-        if (areSameArea(danglingLineCountry, area1, subArea1)) {
+        if (areSameArea(boundaryLineCountry, area1, subArea1)) {
             return getCountryFromCode(subArea2 != null ? subArea2 : xnode.getArea2());
-        } else if (areSameArea(danglingLineCountry, area2, subArea2)) {
+        } else if (areSameArea(boundaryLineCountry, area2, subArea2)) {
             return getCountryFromCode(subArea1 != null ? subArea1 : xnode.getArea1());
         } else {
-            LOGGER.warn("Error in xnodes configuration file : the node {} is not associated to country {}", xnode.getName(), danglingLineCountry);
+            LOGGER.warn("Error in xnodes configuration file : the node {} is not associated to country {}", xnode.getName(), boundaryLineCountry);
             return null;
         }
     }
 
-    private Optional<XnodeConfig> getDanglingLineXnode(final DanglingLine danglingLine) {
+    private Optional<XnodeConfig> getBoundaryLineXnode(final BoundaryLine boundaryLine) {
         return xnodeList.stream()
-                .filter(xnode -> xnode.getName().trim().equals(danglingLine.getPairingKey()))
+                .filter(xnode -> xnode.getName().trim().equals(boundaryLine.getPairingKey()))
                 .findFirst();
     }
 

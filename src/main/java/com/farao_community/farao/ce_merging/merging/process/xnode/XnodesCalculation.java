@@ -11,10 +11,10 @@ import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TwoSides;
@@ -68,16 +68,16 @@ public class XnodesCalculation {
         final String alegroVirtualHub = isGermanNode ? VIRTUAL_HUB_ALEGRO_DE_NODE_NAME : VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
         final Optional<String> tsoOpt = isGermanNode ? Optional.of(tso) : Optional.empty();
 
-        processDanglingLines(network, xnodesArea1, virtualHubList, alegroVirtualHub, xnodeInformationMap, 1, tsoOpt);
+        processBoundaryLines(network, xnodesArea1, virtualHubList, alegroVirtualHub, xnodeInformationMap, 1, tsoOpt);
 
-        processDanglingLines(network, xnodesArea2, virtualHubList, alegroVirtualHub, xnodeInformationMap, 2, tsoOpt);
+        processBoundaryLines(network, xnodesArea2, virtualHubList, alegroVirtualHub, xnodeInformationMap, 2, tsoOpt);
     }
 
     public void checkXnodesConfigConsistency(final Network network,
                                              final List<VirtualHubRecord> virtualHubList,
                                              final List<XnodeConfig> xnodes) {
         final List<String> allXnodesConfig = Stream.concat(xnodes.stream().map(XnodeConfig::getName), virtualHubList.stream().map(VirtualHubRecord::getNodeName)).distinct().toList();
-        network.getDanglingLineStream().map(DanglingLine::getPairingKey).forEach(xnodeCode -> {
+        network.getBoundaryLineStream().map(BoundaryLine::getPairingKey).forEach(xnodeCode -> {
             if (!allXnodesConfig.contains(xnodeCode)) {
                 LOGGER.error("Xnode {} present in network {} is not found in the xnodes config list nor in the virtual hubs list", xnodeCode, network.getNameOrId());
                 throw new CeMergingException("Xnode " + xnodeCode + " present in network " + network.getNameOrId() + " is not found in the xnodes config list and in the virtual hubs list");
@@ -86,23 +86,23 @@ public class XnodesCalculation {
     }
 
     private void addAreaInformation(final Map<String, XnodeInformation> xnodeInformationMap,
-                                    final DanglingLine danglingLine,
+                                    final BoundaryLine boundaryLine,
                                     final int areaNumber,
                                     final Optional<String> tsoOpt) {
-        final String xnodeCode = danglingLine.getPairingKey();
+        final String xnodeCode = boundaryLine.getPairingKey();
         switch (areaNumber) {
             case 1:
                 if (xnodeInformationMap.containsKey(xnodeCode)) {
-                    xnodeInformationMap.get(xnodeCode).setArea1Information(fillAreaInformation(danglingLine, tsoOpt));
+                    xnodeInformationMap.get(xnodeCode).setArea1Information(fillAreaInformation(boundaryLine, tsoOpt));
                 } else {
-                    xnodeInformationMap.put(xnodeCode, new XnodeInformation(fillAreaInformation(danglingLine, tsoOpt)));
+                    xnodeInformationMap.put(xnodeCode, new XnodeInformation(fillAreaInformation(boundaryLine, tsoOpt)));
                 }
                 break;
             case 2:
                 if (xnodeInformationMap.containsKey(xnodeCode)) {
-                    xnodeInformationMap.get(xnodeCode).setArea2Information(fillAreaInformation(danglingLine, tsoOpt));
+                    xnodeInformationMap.get(xnodeCode).setArea2Information(fillAreaInformation(boundaryLine, tsoOpt));
                 } else {
-                    xnodeInformationMap.put(xnodeCode, new XnodeInformation(null, fillAreaInformation(danglingLine, tsoOpt)));
+                    xnodeInformationMap.put(xnodeCode, new XnodeInformation(null, fillAreaInformation(boundaryLine, tsoOpt)));
                 }
                 break;
             default:
@@ -110,18 +110,18 @@ public class XnodesCalculation {
         }
     }
 
-    private AreaInformation fillAreaInformation(final DanglingLine danglingLine,
+    private AreaInformation fillAreaInformation(final BoundaryLine boundaryLine,
                                                 final Optional<String> tsoOpt) {
-        final XnodeStatus status = danglingLine.getTerminal().isConnected() ? CLOSE : OPEN;
-        final String country = tsoOpt.orElseGet(() -> NetworkUtil.getCountry(danglingLine).toString());
+        final XnodeStatus status = boundaryLine.getTerminal().isConnected() ? CLOSE : OPEN;
+        final String country = tsoOpt.orElseGet(() -> NetworkUtil.getCountry(boundaryLine).toString());
         double v = 0;
-        final DanglingLine.Generation generation = danglingLine.getGeneration();
-        final double p0 = danglingLine.getP0();
-        final double q0 = danglingLine.getQ0();
+        final BoundaryLine.Generation generation = boundaryLine.getGeneration();
+        final double p0 = boundaryLine.getP0();
+        final double q0 = boundaryLine.getQ0();
         final double p = generation == null ? p0 : p0 - generation.getTargetP();
-        final String nodeId = danglingLine.getTerminal().getVoltageLevel().getId();
+        final String nodeId = boundaryLine.getTerminal().getVoltageLevel().getId();
         final double q = generation == null ? q0 : q0 - generation.getTargetQ();
-        final Bus bus = danglingLine.getTerminal().getBusBreakerView().getBus();
+        final Bus bus = boundaryLine.getTerminal().getBusBreakerView().getBus();
         if (bus != null && !Double.isNaN(bus.getV())) {
             v = bus.getV(); //Always NaN because no loadflow run before
         }
@@ -252,17 +252,17 @@ public class XnodesCalculation {
         return zeroIfNaN(terminal.getP());
     }
 
-    private void processDanglingLines(final Network network,
+    private void processBoundaryLines(final Network network,
                                       final Set<String> xNodes,
                                       final List<VirtualHubRecord> virtualHubList,
                                       final String virtualHubException,
                                       final Map<String, XnodeInformation> xNodeInformationMap,
                                       final int areaNumber,
                                       final Optional<String> tsoOpt) {
-        network.getDanglingLineStream()
-                .filter(dl -> xNodes.contains(dl.getPairingKey()))
+        network.getBoundaryLineStream()
+                .filter(bl -> xNodes.contains(bl.getPairingKey()))
                 .filter(isPairedWith(virtualHubException).or(not(isPairedWithVirtualHub(virtualHubList))))
-                .forEach(dl -> addAreaInformation(xNodeInformationMap, dl, areaNumber, tsoOpt));
+                .forEach(bl -> addAreaInformation(xNodeInformationMap, bl, areaNumber, tsoOpt));
     }
 
 }

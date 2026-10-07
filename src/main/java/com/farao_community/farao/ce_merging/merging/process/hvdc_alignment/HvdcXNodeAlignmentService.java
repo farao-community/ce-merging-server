@@ -18,7 +18,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class HvdcXNodeAlignmentService {
             final String nodeName = zeroFlowNode.getXnode();
             final String country = zeroFlowNode.getCountryCode();
             getNetworkForCountry(task, country).ifPresentOrElse(
-                network -> updateDanglingLineFlow(task, network, nodeName, country, location),
+                network -> updateBoundaryLineFlow(task, network, nodeName, country, location),
                 () -> LOGGER.warn("Unable to find the IGM associated to the country {}, The xnode {} flow will not be set to 0", country, nodeName));
         });
         repository.save(task);
@@ -127,13 +127,13 @@ public class HvdcXNodeAlignmentService {
             .orElse(null);
     }
 
-    private void updateDanglingLineFlow(final MergingTask task, final Network network, final String nodeName, final String country, final String location) {
-        network.getDanglingLineStream()
-            .filter(danglingLine -> danglingLine.getPairingKey().equals(nodeName))
+    private void updateBoundaryLineFlow(final MergingTask task, final Network network, final String nodeName, final String country, final String location) {
+        network.getBoundaryLineStream()
+            .filter(boundaryLine -> boundaryLine.getPairingKey().equals(nodeName))
             .findFirst()
             .ifPresentOrElse(
-                danglingLine -> {
-                    setDanglingLineToZeroFlow(danglingLine);
+                boundaryLine -> {
+                    setBoundaryLineToZeroFlow(boundaryLine);
                     LOGGER.info("Set {} flow to 0.0", nodeName);
                     saveNetworkInArtifacts(task, network, country, location);
                 },
@@ -144,9 +144,9 @@ public class HvdcXNodeAlignmentService {
                 ));
     }
 
-    private static void setDanglingLineToZeroFlow(final DanglingLine danglingLine) {
-        danglingLine.setP0(0.0);
-        HvdcXNodeAlignment.requireGeneration(danglingLine, "dangling line").setTargetP(0.0);
+    private static void setBoundaryLineToZeroFlow(final BoundaryLine boundaryLine) {
+        boundaryLine.setP0(0.0);
+        HvdcXNodeAlignment.requireGeneration(boundaryLine, "dangling line").setTargetP(0.0);
     }
 
     private void saveNetworkInArtifacts(final MergingTask task,
