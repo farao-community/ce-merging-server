@@ -12,21 +12,19 @@ The computation is detailed [here](/doc/hourly_task/step_details/initialNp.md); 
 
 ### Topological merge
 
-This step consists in merging the previously mentioned IGM in one CGM file, of type 2D/country code UX.
-
-This network is then stored as an artifact.
+This step consists in merging the previously mentioned IGM in one CGM file, of type 2D / country code UX; this network is then stored as an artifact.
 
 ### Recessivity alignment
-Since two TSO can provide different statuses for the same X-Node, there is a notion of recessive & reference countries :
+Since two TSOs can provide different statuses for the same X-Node, there is a notion of recessive and reference countries:
 In case of conflict, we use the value provided by the reference country.
 
-This step handles such conflicts, and also handles cases where there is some missing information on the provided X-Nodes, trying to fix these using information present in [configuration files](/doc/globalGridConfigurations.md).
+This step handles such conflicts and cases where there's missing information on the provided X-Nodes, trying to fix these using information present in [configuration files](/doc/globalGridConfigurations.md).
 
 It also performs a status check between the Alegro nodes, but no fix.
 ### Alegro X-Nodes quality check
 For Alegro nodes, in addition to the previous status check, we also perform checks on flow direction and flow values.
 
-In this step, we also align the outage statuses (if one node is disconnected, we do the same for the other) and compute the gaps between the target and initial flows for these, and save the result in an artifact file.
+In addition, we align the outage statuses (if one node is disconnected, we do the same for the other) and compute the gaps between the target and initial node flows. We then save the result in an artifact file.
 ### GLSK quality check
 
 Consists of analyzing the GLSK input and comparing it to the available network elements.
@@ -35,30 +33,31 @@ This step is decomposed into two parts: GLSK quality report generation and actua
 ##### Quality report generation
 
 The generated quality report is an XML file that can contain warnings if:
-- An explicitly named node cannot be found in the CGM
-- An explicitly named node is found, but no correct associated resource (Generator or Load) can be found in the CGM
-- An explicitly named resource is found, but is not connected to the main synchronous component of the CGM
+- An explicitly named node cannot be found in the CGM,
+- An explicitly named node is found, but no correct associated resource (Generator or Load) can be found in the CGM,
+- An explicitly named resource is found, but is not connected to the main synchronous component of the CGM.
 
 ##### Actual GLSK generation
 We then create a new GLSK, filtering blocks like this:
-- If the associated GLSK is a country GLSK block, no modification is done.
-- If the associated GLSK is an auto GLSK block, invalid nodes are removed
+- If the associated GLSK is a country GLSK block, no modification is done,
+- If the associated GLSK is an auto GLSK block, invalid nodes are removed,
 - If the associated GLSK is a manual GLSK block, invalid nodes are removed, and explicit factors are rescaled proportionally to their initial value to have a 100% factors sum.
 
-If multiple blocks were used with a share value different of 100% (e.g. one GSK and one LSK), the share is never modified, except if one of the associated block is empty after previous filtering. In that case, the other associated blocks share value is rescaled proportionally to their initial value to have a 100% share sum.
+If multiple blocks were used with a share value different of 100% (e.g., one GSK and one LSK), the share is never modified, except if one of the associated blocks is empty after previous filtering.
+In that case, the other associated blocks share value is rescaled proportionally to their initial value to have a 100% share sum.
 
 ### Base case improvement
 This step is a first calculation on net positions, to bring the ones outside the feasibility ranges to acceptable values. It is detailed [here](/doc/hourly_task/step_details/bci.md).
 
-The result of this step is the _bciOutputs.json_ file.
+The result of this step is the _bciOutputs.json_ artifact file.
 
 ### Target net positions computation
 The aim of this step is the computation of the target net positions, i.e., the net positions to which we'll shift the CGM in the next step, as follows:
 
-$NP_{TARGET} = NP_{BCI} + outBciFlows$
+$NP_{TARGET} = NP_{BCIw/oHVDC} + outBciFlows$
 
 with :
-- $NP_{BCI}$: The net position of the BCI output without the HVDCs,
+- $NP_{BCIw/oHVDC}$: The net position of the BCI output without the HVDCs,
 - $outBciFlows$: HVDC Flows $+$ Flows out to areas not configured in the region configuration file.
 
 There are a few special cases:
@@ -72,13 +71,13 @@ To keep coherence between the target net position and the net position computed 
 
 In the end, given:
 - the Alegro mismatch $M_{AL}(country) =$ Alegro target flow – Alegro initial flow, 
-- $FLOW_{VH\_NO\_X}$ the sum of flows over german VH not starting with X,
+- $FLOW_{VHw/oX}$ the sum of flows over german VH not starting with X,
 
 we have:
 
 $NP_{TARGET}(BE) = NP_{BCI}(BE) + outBciFlows + M_{AL}(BE)$
 
-$NP_{TARGET}(DE) = NP_{BCI}(DE) + outBciFlows + M_{AL}(DE) - FLOW_{VH\_NO\_X}$
+$NP_{TARGET}(DE) = NP_{BCI}(DE) + outBciFlows + M_{AL}(DE) - FLOW_{VHw/oX}$
 
 ### Balances Adjustment
 Balances adjustment consists in shifting the CGM to the global target net positions.
@@ -88,8 +87,8 @@ To execute this step, we have to convert the current CGM to XIIDM format, then b
 ##### Balances area definition
 Balances adjustment algorithm is based on the definition of balance areas. Each area is defined by three important elements:
 
-- Area definition: the way to compute its net position on a network instance (e.g., area based on a country).
-- Target net position: the expected value, at the end of the algorithm, of the area net position as calculated using the previous description.
+- Area definition: the way to compute its net position on a network instance (e.g., area based on a country),
+- Target net position: the expected value, at the end of the algorithm, of the area net position as calculated using the previous description,
 - GLSK: the way in which a modification in injection changes the net position of the area.
 
 For this particular process, an area is created for each UCTE country. 
@@ -97,22 +96,23 @@ For this particular process, an area is created for each UCTE country.
 ##### Balancing algorithm
 
 The net position of the country is calculated as the sum of:
-- Active loads of XNodes connected to a substation in the country
+- Active loads of XNodes connected to a [substation](https://javadoc.io/doc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/Substation.html) in the country,
 - Leaving flows of lines connected :
   - in the country on one side
   - outside the country on the other side
 
 The leaving flow is calculated as the mean of origin and extremity flows calculated by a loadflow.
 
-With this definition of net position, the target value for each area is the global net position with HVDC for each country.
+With this definition of net position, the target value for each area is the global net position including HVDCs for each country.
 
 If a country does not provide GLSK (as it is the case for countries outside the CE region), 
 a country LSK is created, dispatching the flows proportionally on all loads. 
-The balances adjustment ignores the Pmin/Pmax limitation of generators.
+The balances adjustment ignores the $P_{min}$/$P_{max}$ limitation of generators.
 
 The algorithm is iterative: at each iteration, each area's net position mismatch is redispatched via the area's GLSK. 
 
-It continues until the sum of the square mismatches is lower than a certain threshold, or until it reaches the maximum number of iterations. This threshold and the max number of iterations are both configurable in the app.
+It continues until the sum of the square mismatches is lower than a certain threshold, or until it reaches the maximum number of iterations. 
+This threshold and the max number of iterations are both configurable in the app.
 ### Special PST treatment
 Some phase shift transformers require special treatments: [Divača / Padriciano](/doc/hourly_task/step_details/divacaPadriciano.md) and [some austrian PSTs](/doc/hourly_task/step_details/austrianPsts.md).
 ### Slack compensation
@@ -126,10 +126,10 @@ We then export the CGM as an UCT file.
 The final net positions computation is done on the CGM.
 
 It starts by running a loadflow, and then computes the following net positions for each country of the CGM:
-- **Global NP with HVDC:** active loads summed over all the XNodes + flows leaving the country merged interconnections
-- **Global NP without HVDC:** active loads summed over the XNodes corresponding to an AC interconnection + flows leaving the country merged interconnections
-- **CE NP with HVDC:** active loads summed over the XNodes corresponding to a CE interconnection, + flows leaving the country merged interconnections to CE countries
-- **CE NP without HVDC:** active loads summed over the XNodes corresponding to a CE and an AC interconnection, + flows leaving the country merged interconnections to CE countries
+- **Global with HVDC:** active loads summed over X-Nodes + flows leaving the country's interconnections
+- **Global without HVDC:** active loads summed over XNodes corresponding to an AC interconnection + flows leaving the country's interconnections
+- **CE with HVDC:** active loads summed over X-Nodes corresponding to a CE interconnection, + flows leaving the country's interconnections to CE countries
+- **CE without HVDC:** active loads summed over the X-Nodes corresponding to a CE **and** AC interconnection, + flows leaving the country's interconnections to CE countries
 
 The mentioned leaving flows are computed as the mean of origin and extremity flows.
 

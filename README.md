@@ -20,7 +20,7 @@ The nominal merging case is (done either by API call or with Swagger for testing
   - all the previously mentioned task IDs.
 - Run it with the provided daily task ID.
 
-Each of these steps corresponds to a REST endpoint; there are several other endpoints providing configurations, or a given task's specific inputs, outputs, or intermediate files (called **Artifacts**).
+Each of these steps corresponds to a REST endpoint; there are several other endpoints providing configurations or a given task's specific inputs, outputs, or intermediate files (called **Artifacts**).
 
 For more detail on the endpoints, see the **Controller** classes.
 
@@ -28,10 +28,10 @@ For more detail on the endpoints, see the **Controller** classes.
 It works with these input files :
 - Individual [UCTE](https://eepublicdownloads.entsoe.eu/clean-documents/pre2015/publications/ce/otherreports/UCTE-format.pdf) networks by country (called **IGM - Individual Grid Model**),
 - **Quality Checks** for those: contains information such as, for example, warnings about some quantity being outside expected boundaries,
-- **Net Position Forecast (NPF)**: contains the TSO's daily predictions for power generation / consumption 
-- **Generation Load Shift Key (GLSK)**: describes how a shift in power should be distributed among all the grid's nodes
-- **Feasibility Ranges & External Constraints**: define constraints on some quantities for nodes / areas
-- OLF parameters: there are a few files that specify parameters for the load flow calculation on different occurrences :
+- **Net Position Forecast (NPF)**: contains the TSO's daily predictions for power generation / consumption, 
+- **Generation Load Shift Key (GLSK)**: describes how a shift in power should be distributed among all the grid's nodes,
+- **Feasibility Ranges & External Constraints**: define constraints on some quantities for nodes / areas,
+- **OLF parameters**: there are a few files that specify parameters for the load flow calculation on different occurrences :
   - Base Case Improvement
   - Balances Adjustment
   - AC loadflow

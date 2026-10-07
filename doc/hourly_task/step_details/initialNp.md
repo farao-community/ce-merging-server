@@ -1,20 +1,19 @@
 # Initial net positions calculation details
 
-For each IGM, it starts by running a loadflow (in AC with fallback DC) and then computes the following net positions:
+For each IGM, it starts by running a loadflow in AC, and if it does not converge, another in DC. It then computes the following net positions:
 
-- **Global NP with VH:** active loads summed over all the X-Nodes/Nodes present on the virtual hubs
-  config file
-- **Global NP without VH:** active powers summed over AC interconnections
-- **CE NP with VH:** active loads summed over the CE X-Nodes/Nodes present on the virtual hubs
-  config file
-- **CE NP without VH:** active powers summed over CE AC interconnections
+- **Global with VH**: active loads summed over all the X-Nodes/Nodes present on the virtual hubs
+  config file,
+- **Global without VH**: active powers summed over AC interconnections,
+- **CE with VH**: active loads summed over the CE X-Nodes/Nodes present on the virtual hubs
+  config file,
+- **CE without VH**: active powers summed over CE AC interconnections.
 
-During the initial calculation of the net positions, for X-Nodes with area=DE, to determine the country on the other side, we look at subarea : 
+During the initial calculation of the net positions, for X-Nodes with $area = DE$, to determine the country on the other side, we look at its subarea : 
 
-- subarea = D1 → DK
-- subarea ∈ { D2, D4, D6, D7, D8 } → DE
-
-- subarea ∉ { D1, D2, D4, D6, D7, D8 } → Warning because the area is DE without a valid subarea
+- $subarea = D1 → DK$
+- $subarea ∈ { D2, D4, D6, D7, D8 } → DE$
+- $subarea ∉ { D1, D2, D4, D6, D7, D8 } →$ Warning because the area is DE without a valid subarea
 
 Here's how the X-Nodes are counted depending on their presence in config files :
 
@@ -25,13 +24,13 @@ Here's how the X-Nodes are counted depending on their presence in config files :
 | load counted in Global NP without VH | ❌                                                                      | ❌                                | ✅                                                            | ✅                 |
 | load counted in outBciNetPosition    | ✅                                                                      | ✅                                | ❌                                                            | ✅                 |
 
-\* No such X-node should be encountered in real conditions (merging not allowed by supervisor)
+_\* No such X-node should be encountered in real conditions (merging not allowed by supervisor)_
 
 ### Monita post-treatment
 
 For the MONITA HVDC, post-treatment is necessary:
 Its nodes are all present in the Italian IGM, but we need to have the XKOTR120 and XKOTR220 nodes in Montenegro's IGM to
-be able toapply the BCI step correctly.
+be able to apply the BCI step correctly.
 
 Indeed, as we can see in the reference program file provided in outputs, we have :
 
@@ -41,8 +40,8 @@ $NP(ME) = NP(ME→RS) + NP(ME→AL) + NP(ME→XK) + NP(ME→BA) + (XKOTR120 + XK
 
 And here's how the balance adjustment targets are calculated :
 
-Target NP = NP from BCI (without HVDC) + out flows from BCI
+$NP_{TARGET} = NP_{BCI w/oHVDC}+ outBciFlows$
 
-It is therefore necessary that the nodes XCEPR120 and XCEPR220 be counted in the outBciNetPosition for Italy and that
-the nodes XKOTR120 and XKTRO220 be counted in the outBciNetPosition for Montenegro to compute the correct balance
+It is therefore necessary that the nodes XCEPR120 and XCEPR220 be counted in the _outBciNetPosition_ for Italy and that
+the nodes XKOTR120 and XKTRO220 be counted in the _outBciNetPosition_ for Montenegro to compute the correct balance
 adjustment targets.
