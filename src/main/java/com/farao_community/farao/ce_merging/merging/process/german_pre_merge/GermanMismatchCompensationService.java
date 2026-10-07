@@ -127,7 +127,7 @@ public class GermanMismatchCompensationService {
         if (totalExternalNetPosition != 0) {
             externalBoundaryLines.forEach(line -> updateBoundaryLineFlow(line, mismatch, totalExternalNetPosition, componentMode));
         } else {
-            LOGGER.warn("German dangling lines not updated because total external NP = 0");
+            LOGGER.warn("German boundary lines not updated because total external NP = 0");
         }
     }
 
@@ -143,7 +143,7 @@ public class GermanMismatchCompensationService {
         line.setP0(updatedFlow);
 
         if (line.getGeneration() != null) {
-            LOGGER.info("Active Generation is set to zero for dangling line {}", line.getId());
+            LOGGER.info("Active Generation is set to zero for boundary line {}", line.getId());
             line.getGeneration().setTargetP(0);
         }
     }

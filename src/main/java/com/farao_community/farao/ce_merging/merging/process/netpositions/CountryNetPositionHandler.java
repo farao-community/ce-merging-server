@@ -17,9 +17,9 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Line;
@@ -45,8 +45,8 @@ import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isC
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getBorderFlow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountry;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOnOtherSide;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isBranchBorderOf;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isBoundaryLineBorderOf;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isBranchBorderOf;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isHvdcLineBorderOf;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInCountry;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWithVirtualHub;
@@ -293,7 +293,7 @@ public final class CountryNetPositionHandler {
         final Optional<XnodeConfig> optionalXnode = getBoundaryLineXnode(boundaryLine);
 
         if (optionalXnode.isEmpty()) {
-            LOGGER.warn("Could not find dangling line UCTE code: '{}' in xnodes config file. Considering it in outbci net position", boundaryLine.getPairingKey());
+            LOGGER.warn("Could not find boundary line UCTE code: '{}' in xnodes config file. Considering it in outbci net position", boundaryLine.getPairingKey());
             return null;
         }
 

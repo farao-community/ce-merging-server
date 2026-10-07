@@ -85,7 +85,7 @@ public class VirtualHubsShifting {
         return network.getBoundaryLineStream()
                 .filter(boundaryLine -> nodeName.equals(boundaryLine.getPairingKey()))
                 .findFirst()
-                .orElseThrow(() -> new CeMergingException("Unable to find dangling line for node " + nodeName + " in network " + network.getId()));
+                .orElseThrow(() -> new CeMergingException("Unable to find boundary line for node " + nodeName + " in network " + network.getId()));
     }
 
     private static void setBoundaryLineFlow(final BoundaryLine boundaryLine, final double targetFlow) {

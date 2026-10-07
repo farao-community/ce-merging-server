@@ -180,7 +180,7 @@ class AlegroServiceTest {
                 .filter(boundaryLine -> pairingKey.equals(boundaryLine.getPairingKey()))
                 .findFirst()
                 .orElseThrow(() -> new CeMergingException(
-                        "No dangling line found with pairing key " + pairingKey))
+                        "No boundary line found with pairing key " + pairingKey))
                 .getP0();
     }
 

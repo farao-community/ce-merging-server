@@ -9,7 +9,11 @@ package com.farao_community.farao.ce_merging.merging.process.hvdc_alignment;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
-import com.farao_community.farao.ce_merging.merging.task.entities.*;
+import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
@@ -113,7 +117,7 @@ public class HvdcXNodeAlignmentServiceTest {
         return network.getBoundaryLineStream()
                 .filter(boundaryLine -> boundaryLine.getPairingKey().equals(nodeName))
                 .findFirst()
-                .orElseThrow(() -> new CeMergingException("Unable to find dangling line " + nodeName + " in network " + network.getNameOrId()));
+                .orElseThrow(() -> new CeMergingException("Unable to find boundary line " + nodeName + " in network " + network.getNameOrId()));
     }
 
     private static Network readNetwork(final String path) {

@@ -24,8 +24,8 @@ final class HvdcXNodeAlignment {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HvdcXNodeAlignment.class);
     private static final List<UcteElementStatus> IN_OPERATION = Arrays.asList(UcteElementStatus.REAL_ELEMENT_IN_OPERATION, UcteElementStatus.EQUIVALENT_ELEMENT_IN_OPERATION, UcteElementStatus.BUSBAR_COUPLER_IN_OPERATION);
-    public static final String RECESSIVE_DANGLING_LINE = "recessive dangling line";
-    public static final String REFERENCE_DANGLING_LINE = "reference dangling line";
+    public static final String RECESSIVE_BOUNDARY_LINE = "recessive boundary line";
+    public static final String REFERENCE_BOUNDARY_LINE = "reference boundary line";
 
     private final Network referenceNetwork;
     private final Network recessiveNetwork;
@@ -44,14 +44,14 @@ final class HvdcXNodeAlignment {
     void align() {
         Optional<BoundaryLine> referenceBoundaryLineOpt = findBoundaryLine(referenceNetwork, hvdcAlignmentXNodeCouple.getReferenceXNode());
         if (referenceBoundaryLineOpt.isEmpty()) {
-            LOGGER.warn("Could not apply HVDC alignment, dangling line for reference node {} not found",
+            LOGGER.warn("Could not apply HVDC alignment, boundary line for reference node {} not found",
                     hvdcAlignmentXNodeCouple.getReferenceXNode());
             return;
         }
 
         Optional<BoundaryLine> recessiveBoundaryLineOpt = findBoundaryLine(recessiveNetwork, hvdcAlignmentXNodeCouple.getRecessiveXNode());
         if (recessiveBoundaryLineOpt.isEmpty()) {
-            LOGGER.warn("Could not apply HVDC alignment, dangling line for recessive node {} not found",
+            LOGGER.warn("Could not apply HVDC alignment, boundary line for recessive node {} not found",
                     hvdcAlignmentXNodeCouple.getRecessiveXNode());
             return;
         }
@@ -85,15 +85,15 @@ final class HvdcXNodeAlignment {
         invertBoundaryLineStatus(recessiveBoundaryLine);
         recessiveBoundaryLine.setP0(0);
         recessiveBoundaryLine.setQ0(0);
-        final BoundaryLine.Generation generation = requireGeneration(recessiveBoundaryLine, RECESSIVE_DANGLING_LINE);
+        final BoundaryLine.Generation generation = requireGeneration(recessiveBoundaryLine, RECESSIVE_BOUNDARY_LINE);
         generation.setTargetP(0);
         generation.setTargetQ(0);
     }
 
     private void applyRecessiveInOutageAlignment(final BoundaryLine referenceBoundaryLine, final BoundaryLine recessiveBoundaryLine) {
         invertBoundaryLineStatus(recessiveBoundaryLine);
-        final BoundaryLine.Generation referenceGeneration = requireGeneration(referenceBoundaryLine, REFERENCE_DANGLING_LINE);
-        final BoundaryLine.Generation recessiveGeneration = requireGeneration(recessiveBoundaryLine, RECESSIVE_DANGLING_LINE);
+        final BoundaryLine.Generation referenceGeneration = requireGeneration(referenceBoundaryLine, REFERENCE_BOUNDARY_LINE);
+        final BoundaryLine.Generation recessiveGeneration = requireGeneration(recessiveBoundaryLine, RECESSIVE_BOUNDARY_LINE);
         final double referenceTargetP = referenceGeneration.getTargetP();
         final double referenceP0 = referenceBoundaryLine.getP0();
         recessiveBoundaryLine.setP0(-referenceP0);
@@ -102,8 +102,8 @@ final class HvdcXNodeAlignment {
 
     private void applyAlignment(final BoundaryLine referenceBoundaryLine, final BoundaryLine recessiveBoundaryLine) {
         recessiveBoundaryLine.setP0(-referenceBoundaryLine.getP0());
-        final BoundaryLine.Generation referenceGeneration = requireGeneration(referenceBoundaryLine, REFERENCE_DANGLING_LINE);
-        final BoundaryLine.Generation  recessiveGeneration = requireGeneration(recessiveBoundaryLine, RECESSIVE_DANGLING_LINE);
+        final BoundaryLine.Generation referenceGeneration = requireGeneration(referenceBoundaryLine, REFERENCE_BOUNDARY_LINE);
+        final BoundaryLine.Generation  recessiveGeneration = requireGeneration(recessiveBoundaryLine, RECESSIVE_BOUNDARY_LINE);
         recessiveGeneration.setTargetP(-referenceGeneration.getTargetP());
     }
 

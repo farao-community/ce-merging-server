@@ -50,8 +50,8 @@ public class PstSpecialService {
     private final CeMergingConfiguration configuration;
     private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
 
-    private static final String DIVACA_PADRICIANO_DANGLING_LINE = "LDIVAC2[0-9A-Z] XPA_DI21 1";
-    private static final String DIVACA_REDIPULGIA_DANGLING_LINE = "LDIVAC1[0-9A-Z] XRE_DI11 1";
+    private static final String DIVACA_PADRICIANO_BOUNDARY_LINE = "LDIVAC2[0-9A-Z] XPA_DI21 1";
+    private static final String DIVACA_REDIPULGIA_BOUNDARY_LINE = "LDIVAC1[0-9A-Z] XRE_DI11 1";
     private static final String DIVACA_PADRICIANO_LINE = "LDIVAC2[0-9A-Z] XPA_DI21 1 \\+ XPA_DI21 IPDRV12[0-9A-Z] 1";
     private static final String DIVACA_REDIPULGIA_LINE = "LDIVAC1[0-9A-Z] XRE_DI11 1 \\+ XRE_DI11 IRDPVA11 1";
     private static final double DIVACA_PADRICIANO_TARGET_FLOW = 150;
@@ -163,8 +163,8 @@ public class PstSpecialService {
         runLoadFlowWithBalanceTypeCorrection(slovenianGrid, loadFlowRunnerSupplier, loadFlowParameters);
         applySolvedTapPositionAndSolvedSectionCount(slovenianGrid);
 
-        pstOutput.getFlowDivacaPadriciano().setIgmFlowFromBoundaryLine(DIVACA_PADRICIANO_DANGLING_LINE, slovenianGrid);
-        pstOutput.getFlowDivacaRedipuglia().setIgmFlowFromBoundaryLine(DIVACA_REDIPULGIA_DANGLING_LINE, slovenianGrid);
+        pstOutput.getFlowDivacaPadriciano().setIgmFlowFromBoundaryLine(DIVACA_PADRICIANO_BOUNDARY_LINE, slovenianGrid);
+        pstOutput.getFlowDivacaRedipuglia().setIgmFlowFromBoundaryLine(DIVACA_REDIPULGIA_BOUNDARY_LINE, slovenianGrid);
 
         forAllSpecialPst(pst -> pstOutput.setTapIgmFromId(pst, pstIds.get(pst), task.getIgm(pst.getCountry())));
     }

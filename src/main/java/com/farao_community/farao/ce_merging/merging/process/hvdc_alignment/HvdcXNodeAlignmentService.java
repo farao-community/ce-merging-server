@@ -17,8 +17,8 @@ import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.BoundaryLine;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,7 +138,7 @@ public class HvdcXNodeAlignmentService {
                     saveNetworkInArtifacts(task, network, country, location);
                 },
                 () -> LOGGER.warn(
-                    "Could not update XNode flows, dangling line {} not found in {} network",
+                    "Could not update XNode flows, boundary line {} not found in {} network",
                     nodeName,
                     network.getNameOrId()
                 ));
@@ -146,7 +146,7 @@ public class HvdcXNodeAlignmentService {
 
     private static void setBoundaryLineToZeroFlow(final BoundaryLine boundaryLine) {
         boundaryLine.setP0(0.0);
-        HvdcXNodeAlignment.requireGeneration(boundaryLine, "dangling line").setTargetP(0.0);
+        HvdcXNodeAlignment.requireGeneration(boundaryLine, "boundary line").setTargetP(0.0);
     }
 
     private void saveNetworkInArtifacts(final MergingTask task,

@@ -30,10 +30,10 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 
@@ -174,7 +174,7 @@ public class AlegroService {
         return alegroBoundaryLinesList.stream()
                 .filter(boundaryLine -> pairingKey.equals(boundaryLine.getPairingKey()))
                 .findFirst()
-                .orElseThrow(() -> new CeMergingException("No dangling line found for: " + pairingKey));
+                .orElseThrow(() -> new CeMergingException("No boundary line found for: " + pairingKey));
     }
 
     private void checkAlegroFlowGap(final double gap, final double threshold, final String alegroNode) {
