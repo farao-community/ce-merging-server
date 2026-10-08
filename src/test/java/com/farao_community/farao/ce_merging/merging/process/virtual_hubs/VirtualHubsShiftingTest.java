@@ -13,7 +13,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,9 +25,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,35 +54,35 @@ class VirtualHubsShiftingTest {
     void applyVirtualHubFlowsShouldNotShiftDisconnectedVirtualHub() throws FileNotFoundException {
         final MergingTask task = createTask(TASK_ID_1, "network.uct");
         final Network initialNetwork = readNetwork(task);
-        final DanglingLine initialDanglingLine = getDanglingLine(initialNetwork);
-        assertFalse(initialDanglingLine.getTerminal().isConnected());
-        assertEquals(0.0, initialDanglingLine.getP0());
+        final BoundaryLine initialBoundaryLine = getBoundaryLine(initialNetwork);
+        assertFalse(initialBoundaryLine.getTerminal().isConnected());
+        assertEquals(0.0, initialBoundaryLine.getP0());
         final Map<String, Double> virtualHubGaps = VirtualHubsShifting.applyVirtualHubFlows(task, configuration);
         final Network finalNetwork = readNetwork(task);
-        final DanglingLine finalDanglingLine = getDanglingLine(finalNetwork);
+        final BoundaryLine finalBoundaryLine = getBoundaryLine(finalNetwork);
         assertTrue(virtualHubGaps.isEmpty());
-        assertEquals(0.0, finalDanglingLine.getP0());
+        assertEquals(0.0, finalBoundaryLine.getP0());
     }
 
     @Test
     void applyVirtualHubFlowsShouldShiftConnectedVirtualHub() throws FileNotFoundException {
         final MergingTask task = createTask(TASK_ID_2, "network_terminal_connected.uct");
         final Network initialNetwork = readNetwork(task);
-        final DanglingLine initialDanglingLine = getDanglingLine(initialNetwork);
-        assertTrue(initialDanglingLine.getTerminal().isConnected());
-        assertEquals(0.0, initialDanglingLine.getP0());
+        final BoundaryLine initialBoundaryLine = getBoundaryLine(initialNetwork);
+        assertTrue(initialBoundaryLine.getTerminal().isConnected());
+        assertEquals(0.0, initialBoundaryLine.getP0());
 
         final Map<String, Double> virtualHubGaps = VirtualHubsShifting.applyVirtualHubFlows(task, configuration);
         final Network finalNetwork = readNetwork(task);
-        final DanglingLine finalDanglingLine = getDanglingLine(finalNetwork);
+        final BoundaryLine finalBoundaryLine = getBoundaryLine(finalNetwork);
         assertFalse(virtualHubGaps.isEmpty());
         assertEquals(Map.of("DE", 51.0), virtualHubGaps);
-        assertEquals(51.0, finalDanglingLine.getP0());
+        assertEquals(51.0, finalBoundaryLine.getP0());
     }
 
-    private DanglingLine getDanglingLine(final Network network) {
-        return network.getDanglingLineStream()
-                .filter(dl -> NODE_NAME.equals(dl.getPairingKey()))
+    private BoundaryLine getBoundaryLine(final Network network) {
+        return network.getBoundaryLineStream()
+                .filter(boundaryLine -> NODE_NAME.equals(boundaryLine.getPairingKey()))
                 .findFirst()
                 .orElseThrow();
     }

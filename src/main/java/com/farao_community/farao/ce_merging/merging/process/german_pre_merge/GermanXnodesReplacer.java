@@ -9,7 +9,7 @@ package com.farao_community.farao.ce_merging.merging.process.german_pre_merge;
 
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.CurrentLimitsAdder;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.LoadingLimits;
 import com.powsybl.iidm.network.Network;
@@ -55,15 +55,15 @@ public final class GermanXnodesReplacer {
                 .filter(GermanXnodesReplacer::isGermanInternal)
                 .toList();
 
-        final List<DanglingLine> danglingLinesToRemove = tieLinesToRemove.stream()
-                .flatMap(tieLine -> Stream.of(tieLine.getDanglingLine1(), tieLine.getDanglingLine2()))
+        final List<BoundaryLine> boundaryLinesToRemove = tieLinesToRemove.stream()
+                .flatMap(tieLine -> Stream.of(tieLine.getBoundaryLine1(), tieLine.getBoundaryLine2()))
                 .toList();
 
         for (final TieLine tieLine : tieLinesToRemove) {
             createCorrespondingLines(tieLine);
             tieLine.remove();
         }
-        danglingLinesToRemove.forEach(DanglingLine::remove);
+        boundaryLinesToRemove.forEach(BoundaryLine::remove);
     }
 
     private void createCorrespondingLines(final TieLine tieLine) {
@@ -87,12 +87,12 @@ public final class GermanXnodesReplacer {
                                         final TieLine tieLine,
                                         final Bus xNodeBus,
                                         final VoltageLevel xNodeVoltageLevel) {
-        final DanglingLine danglingLine = tieLine.getDanglingLine(side);
+        final BoundaryLine boundaryLine = tieLine.getBoundaryLine(side);
         final Terminal terminal = tieLine.getTerminal(side);
         final String bus2Id = xNodeBus.getId();
         final boolean isSide1 = side == ONE;
-        final double g = danglingLine.getG();
-        final double b = danglingLine.getB();
+        final double g = boundaryLine.getG();
+        final double b = boundaryLine.getB();
 
         final Line line = network.newLine()
                 .setEnsureIdUnicity(true)
@@ -103,9 +103,9 @@ public final class GermanXnodesReplacer {
                 .setBus2(bus2Id)
                 .setConnectableBus1(getConnectableBusId(terminal))
                 .setConnectableBus2(bus2Id)
-                .setR(danglingLine.getR())
-                .setX(danglingLine.getX())
-                .setFictitious(danglingLine.isFictitious())
+                .setR(boundaryLine.getR())
+                .setX(boundaryLine.getX())
+                .setFictitious(boundaryLine.isFictitious())
                 .setG1(isSide1 ? g : 0)
                 .setG2(isSide1 ? 0 : g)
                 .setB1(isSide1 ? b : 0)
@@ -121,7 +121,7 @@ public final class GermanXnodesReplacer {
                 .map(currentLimitsAdder::setPermanentLimit)
                 .ifPresent(CurrentLimitsAdder::add);
 
-        Optional.ofNullable(danglingLine.getProperty(ELEMENT_NAME_PROPERTY))
+        Optional.ofNullable(boundaryLine.getProperty(ELEMENT_NAME_PROPERTY))
                 .ifPresent(name -> line.setProperty(ELEMENT_NAME_PROPERTY, name));
     }
 

@@ -7,7 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.pst_special_process;
 
 import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
@@ -98,13 +98,13 @@ public final class PstUtils {
     }
 
     public static double getBoundaryP(final String idRegex, final Network igm) {
-        final DanglingLine danglingLine = getPstIdentifiable(idRegex, igm.getDanglingLineStream());
-        if (danglingLine == null) {
+        final BoundaryLine boundaryLine = getPstIdentifiable(idRegex, igm.getBoundaryLineStream());
+        if (boundaryLine == null) {
             return 0;
-        } else if (danglingLine.getGeneration() == null) {
-            return danglingLine.getP0();
+        } else if (boundaryLine.getGeneration() == null) {
+            return boundaryLine.getP0();
         } else {
-            return danglingLine.getP0() - danglingLine.getGeneration().getTargetP();
+            return boundaryLine.getP0() - boundaryLine.getGeneration().getTargetP();
         }
     }
 

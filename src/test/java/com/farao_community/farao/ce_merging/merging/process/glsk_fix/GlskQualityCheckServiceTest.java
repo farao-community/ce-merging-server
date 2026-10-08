@@ -9,7 +9,7 @@ package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.*;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.commons.report.TypedValue;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
 import org.junit.jupiter.api.Test;
@@ -87,7 +87,7 @@ public class GlskQualityCheckServiceTest {
     void shouldReportNodeNotFound() {
         final GSKSeriesType series = createSeriesWithNode(NODE_NAME);
         final Network network = mock(Network.class);
-        when(network.getDanglingLineStream()).thenReturn(Stream.empty());
+        when(network.getBoundaryLineStream()).thenReturn(Stream.empty());
         final ReportNode reportNode = createReport();
         glskQualityCheckService.checkAlegroGSKSeries(series, network, reportNode);
         assertEquals(1, reportNode.getChildren().size());
@@ -144,12 +144,12 @@ public class GlskQualityCheckServiceTest {
         final Terminal terminal = mock(Terminal.class);
         when(terminal.isConnected()).thenReturn(connected);
 
-        final DanglingLine danglingLine = mock(DanglingLine.class);
-        when(danglingLine.getPairingKey()).thenReturn(NODE_NAME);
-        when(danglingLine.getTerminal()).thenReturn(terminal);
+        final BoundaryLine boundaryLine = mock(BoundaryLine.class);
+        when(boundaryLine.getPairingKey()).thenReturn(NODE_NAME);
+        when(boundaryLine.getTerminal()).thenReturn(terminal);
 
         final Network network = mock(Network.class);
-        when(network.getDanglingLineStream()).thenReturn(Stream.of(danglingLine));
+        when(network.getBoundaryLineStream()).thenReturn(Stream.of(boundaryLine));
 
         return network;
     }

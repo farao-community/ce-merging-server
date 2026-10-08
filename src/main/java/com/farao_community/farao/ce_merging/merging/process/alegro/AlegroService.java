@@ -18,7 +18,7 @@ import com.farao_community.farao.ce_merging.merging.process.base_case_improvemen
 import com.farao_community.farao.ce_merging.merging.process.target_net_positions.bci.JsonBciOutputStructure;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +30,10 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 
@@ -50,15 +50,15 @@ public class AlegroService {
         LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.ALEGRO);
         final String topologicalMergeFilePath = task.getArtifactPath(ArtifactType.TGM_FILE_AFTER_RECESSIVITY);
         final Network network = Network.read(topologicalMergeFilePath);
-        final List<DanglingLine> alegroDanglingLinesList = getAlegroDanglingLines(network);
-        final boolean alegroInOutage = isAlegroInOutage(alegroDanglingLinesList);
-        final DanglingLine albeDanglingLine = getAlegroDanglingLine(alegroDanglingLinesList, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME);
-        final DanglingLine aldeDanglingLine = getAlegroDanglingLine(alegroDanglingLinesList, VIRTUAL_HUB_ALEGRO_DE_NODE_NAME);
-        final double albeFlow = getPFromDanglingLine(albeDanglingLine);
-        final double aldeFlow = getPFromDanglingLine(aldeDanglingLine);
+        final List<BoundaryLine> alegroBoundaryLinesList = getAlegroBoundaryLines(network);
+        final boolean alegroInOutage = isAlegroInOutage(alegroBoundaryLinesList);
+        final BoundaryLine albeBoundaryLine = getAlegroBoundaryLine(alegroBoundaryLinesList, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME);
+        final BoundaryLine aldeBoundaryLine = getAlegroBoundaryLine(alegroBoundaryLinesList, VIRTUAL_HUB_ALEGRO_DE_NODE_NAME);
+        final double albeFlow = getPFromBoundaryLine(albeBoundaryLine);
+        final double aldeFlow = getPFromBoundaryLine(aldeBoundaryLine);
         final int threshold = task.getInputs().getAlegroThreshold();
         if (alegroInOutage) {
-            correctOutage(network, alegroDanglingLinesList, topologicalMergeFilePath);
+            correctOutage(network, alegroBoundaryLinesList, topologicalMergeFilePath);
         } else {
             checkFlowDirection(albeFlow, aldeFlow, threshold);
             checkFlowCompliance(albeFlow, aldeFlow, threshold);
@@ -83,23 +83,23 @@ public class AlegroService {
         final double aldeFinalFlow = calculateAlegroFinalFlow(bciAlegroData.aldeFlows().targetFlow(), minEc, maxEc);
         final String tgmPath = task.getArtifactPath(ArtifactType.TGM_FILE_AFTER_RECESSIVITY);
         final Network network = Network.read(tgmPath);
-        final List<DanglingLine> alegroDanglingLinesList = getAlegroDanglingLines(network);
-        final DanglingLine albeDanglingLine = getAlegroDanglingLine(alegroDanglingLinesList, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME);
-        albeDanglingLine.setP0(albeFinalFlow);
+        final List<BoundaryLine> alegroBoundaryLinesList = getAlegroBoundaryLines(network);
+        final BoundaryLine albeBoundaryLine = getAlegroBoundaryLine(alegroBoundaryLinesList, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME);
+        albeBoundaryLine.setP0(albeFinalFlow);
         LOGGER.info("ALBE load adjusted. Initial: {} Final: {}", alegroData.albeFlows().initialFlow(), albeFinalFlow);
-        final DanglingLine aldeDanglingLine = getAlegroDanglingLine(alegroDanglingLinesList, VIRTUAL_HUB_ALEGRO_DE_NODE_NAME);
-        aldeDanglingLine.setP0(aldeFinalFlow);
+        final BoundaryLine aldeBoundaryLine = getAlegroBoundaryLine(alegroBoundaryLinesList, VIRTUAL_HUB_ALEGRO_DE_NODE_NAME);
+        aldeBoundaryLine.setP0(aldeFinalFlow);
         LOGGER.info("ALDE load adjusted. Initial: {} Final: {}", alegroData.aldeFlows().initialFlow(), aldeFinalFlow);
-        alegroDanglingLinesList.forEach(danglingLine -> {
-            if (danglingLine.getGeneration() != null) {
-                danglingLine.getGeneration().setTargetP(0);
+        alegroBoundaryLinesList.forEach(boundaryLine -> {
+            if (boundaryLine.getGeneration() != null) {
+                boundaryLine.getGeneration().setTargetP(0);
             }
         });
         network.write("UCTE", null, Path.of(tgmPath));
     }
 
-    boolean isAlegroInOutage(final List<DanglingLine> alegroDanglingLinesList) {
-        final long numberOfConnectedAlegroXnodes = alegroDanglingLinesList.stream().filter(danglingLine -> danglingLine.getTerminal().isConnected()).count();
+    boolean isAlegroInOutage(final List<BoundaryLine> alegroBoundaryLinesList) {
+        final long numberOfConnectedAlegroXnodes = alegroBoundaryLinesList.stream().filter(boundaryLine -> boundaryLine.getTerminal().isConnected()).count();
         if (numberOfConnectedAlegroXnodes == 0) {
             LOGGER.info("Both X nodes are disconnected, Alegro in outage");
             return true;
@@ -111,11 +111,11 @@ public class AlegroService {
         return false;
     }
 
-    void correctOutage(final Network network, final List<DanglingLine> alegroDanglingLinesList, final String filePath) {
-        alegroDanglingLinesList.forEach(danglingLine -> {
-            danglingLine.setP0(0);
-            if (danglingLine.getGeneration() != null) {
-                danglingLine.getGeneration().setTargetP(0);
+    void correctOutage(final Network network, final List<BoundaryLine> alegroBoundaryLinesList, final String filePath) {
+        alegroBoundaryLinesList.forEach(boundaryLine -> {
+            boundaryLine.setP0(0);
+            if (boundaryLine.getGeneration() != null) {
+                boundaryLine.getGeneration().setTargetP(0);
             }
         });
         LOGGER.info("Alegro in outage : ALBE load and ALDE load are set to 0");
@@ -162,19 +162,19 @@ public class AlegroService {
         return Math.abs(albeFlow) <= threshold && Math.abs(aldeFlow) <= threshold;
     }
 
-    private List<DanglingLine> getAlegroDanglingLines(final Network network) {
-        return network.getDanglingLineStream()
-                .filter(danglingLine ->
-                        VIRTUAL_HUB_ALEGRO_BE_NODE_NAME.equals(danglingLine.getPairingKey())
-                                || VIRTUAL_HUB_ALEGRO_DE_NODE_NAME.equals(danglingLine.getPairingKey()))
+    private List<BoundaryLine> getAlegroBoundaryLines(final Network network) {
+        return network.getBoundaryLineStream()
+                .filter(boundaryLine ->
+                        VIRTUAL_HUB_ALEGRO_BE_NODE_NAME.equals(boundaryLine.getPairingKey())
+                                || VIRTUAL_HUB_ALEGRO_DE_NODE_NAME.equals(boundaryLine.getPairingKey()))
                 .collect(Collectors.toList());
     }
 
-    private DanglingLine getAlegroDanglingLine(final List<DanglingLine> alegroDanglingLinesList, final String pairingKey) {
-        return alegroDanglingLinesList.stream()
-                .filter(danglingLine -> pairingKey.equals(danglingLine.getPairingKey()))
+    private BoundaryLine getAlegroBoundaryLine(final List<BoundaryLine> alegroBoundaryLinesList, final String pairingKey) {
+        return alegroBoundaryLinesList.stream()
+                .filter(boundaryLine -> pairingKey.equals(boundaryLine.getPairingKey()))
                 .findFirst()
-                .orElseThrow(() -> new CeMergingException("No dangling line found for: " + pairingKey));
+                .orElseThrow(() -> new CeMergingException("No boundary line found for: " + pairingKey));
     }
 
     private void checkAlegroFlowGap(final double gap, final double threshold, final String alegroNode) {
@@ -206,8 +206,8 @@ public class AlegroService {
         return ec;
     }
 
-    private double getPFromDanglingLine(final DanglingLine danglingLine) {
-        return danglingLine.getGeneration() == null ? danglingLine.getP0() : danglingLine.getP0() - danglingLine.getGeneration().getTargetP();
+    private double getPFromBoundaryLine(final BoundaryLine boundaryLine) {
+        return boundaryLine.getGeneration() == null ? boundaryLine.getP0() : boundaryLine.getP0() - boundaryLine.getGeneration().getTargetP();
     }
 
     private double getReferenceFlow(final ReferenceProgram referenceProgram, final String areaOutId) {

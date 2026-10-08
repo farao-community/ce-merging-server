@@ -10,7 +10,7 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Injection;
@@ -71,18 +71,18 @@ public final class NetworkUtil {
         return branch == null || isInOutage(branch.getTerminal1()) || isInOutage(branch.getTerminal2());
     }
 
-    public static Predicate<DanglingLine> isPairedWithVirtualHub(final List<VirtualHubRecord> virtualHubList) {
-        return danglingLine -> isPairedWithVirtualHub(danglingLine, virtualHubList);
+    public static Predicate<BoundaryLine> isPairedWithVirtualHub(final List<VirtualHubRecord> virtualHubList) {
+        return boundaryLine -> isPairedWithVirtualHub(boundaryLine, virtualHubList);
     }
 
-    public static boolean isPairedWithVirtualHub(final DanglingLine danglingLine,
+    public static boolean isPairedWithVirtualHub(final BoundaryLine boundaryLine,
                                                  final List<VirtualHubRecord> virtualHubList) {
         return virtualHubList.stream()
                 .map(VirtualHubRecord::getNodeName)
-                .anyMatch(danglingLine.getPairingKey().substring(0, 8)::equals);
+                .anyMatch(boundaryLine.getPairingKey().substring(0, 8)::equals);
     }
 
-    public static Predicate<DanglingLine> isPairedWith(final String nodeName) {
+    public static Predicate<BoundaryLine> isPairedWith(final String nodeName) {
         return l -> l.getPairingKey().equals(nodeName);
     }
 
@@ -133,8 +133,8 @@ public final class NetworkUtil {
         return country1 == country && country2 != country || country1 != country && country2 == country;
     }
 
-    public static Predicate<DanglingLine> isDanglingLineBorderOf(final Country country) {
-        return danglingLine -> getCountry(danglingLine) == country;
+    public static Predicate<BoundaryLine> isBoundaryLineBorderOf(final Country country) {
+        return boundaryLine -> getCountry(boundaryLine) == country;
     }
 
     public static double getBorderFlow(final Line line,
@@ -158,12 +158,12 @@ public final class NetworkUtil {
         return line.getTerminal(TwoSides.ONE).getVoltageLevel().getId().startsWith(zone) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(final DanglingLine danglingLine, final LoadFlowParameters.ComponentMode componentModeLfParameter) {
+    public static double getBorderFlow(final BoundaryLine boundaryLine, final LoadFlowParameters.ComponentMode componentModeLfParameter) {
         return switch (componentModeLfParameter) {
             case MAIN_CONNECTED -> // Loadflow computed only on main connected component
-                    danglingLine.getTerminal().getBusBreakerView().getConnectableBus().isInMainConnectedComponent() ? getLeavingFlow(danglingLine) : 0.;
+                    boundaryLine.getTerminal().getBusBreakerView().getConnectableBus().isInMainConnectedComponent() ? getLeavingFlow(boundaryLine) : 0.;
             case ALL_CONNECTED ->
-                    getLeavingFlow(danglingLine);
+                    getLeavingFlow(boundaryLine);
             default -> {
                 LOGGER.error(ERROR_COMPONENT_NUMBER_PARAMETER);
                 throw new CeMergingException(ERROR_COMPONENT_NUMBER_PARAMETER);
@@ -189,16 +189,16 @@ public final class NetworkUtil {
         return country == side1Country ? side2Country : side1Country;
     }
 
-    public static boolean isInMainConnectedComponent(final DanglingLine danglingLine) {
-        return danglingLine.getTerminal().getBusBreakerView().getConnectableBus().isInMainConnectedComponent();
+    public static boolean isInMainConnectedComponent(final BoundaryLine boundaryLine) {
+        return boundaryLine.getTerminal().getBusBreakerView().getConnectableBus().isInMainConnectedComponent();
     }
 
-    public static double getLeavingFlow(final DanglingLine danglingLine) {
-        return danglingLine.getTerminal().isConnected() ? zeroIfNaN(-danglingLine.getBoundary().getP()) : 0;
+    public static double getLeavingFlow(final BoundaryLine boundaryLine) {
+        return boundaryLine.getTerminal().isConnected() ? zeroIfNaN(-boundaryLine.getBoundary().getP()) : 0;
     }
 
-    public static boolean isBorderOfZone(final DanglingLine danglingLine, final String zone) {
-        return isBorderOfZone(danglingLine.getId(), zone);
+    public static boolean isBorderOfZone(final BoundaryLine boundaryLine, final String zone) {
+        return isBorderOfZone(boundaryLine.getId(), zone);
     }
 
     public static boolean isBorderOfZone(final Line line, final String zone) {

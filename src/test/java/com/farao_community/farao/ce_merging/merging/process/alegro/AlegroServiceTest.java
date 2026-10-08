@@ -12,7 +12,7 @@ import com.farao_community.farao.ce_merging.merging.process.base_case_improvemen
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
 import org.junit.jupiter.api.Test;
@@ -34,8 +34,8 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BCI_OUTPUT_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -94,8 +94,8 @@ class AlegroServiceTest {
         "true, true, false"
     })
     void shouldDetectAlegroOutageBasedOnXNodesConnection(final boolean albeConnected, final boolean aldeConnected, final boolean expectedOutage) {
-        final DanglingLine albe = mock(DanglingLine.class);
-        final DanglingLine alde = mock(DanglingLine.class);
+        final BoundaryLine albe = mock(BoundaryLine.class);
+        final BoundaryLine alde = mock(BoundaryLine.class);
 
         final Terminal albeTerminal = mock(Terminal.class);
         final Terminal aldeTerminal = mock(Terminal.class);
@@ -150,13 +150,13 @@ class AlegroServiceTest {
     void shouldSetAlegroP0ToZeroWhenInOutage() {
         final SavedFile tgmFile = copyResource("network_alegro_outage.uct");
         final Network network = Network.read(tgmFile.getPath());
-        final List<DanglingLine> alegroDanglingLines = network.getDanglingLineStream()
-                .filter(dl -> VIRTUAL_HUB_ALEGRO_BE_NODE_NAME.equals(dl.getPairingKey()) || VIRTUAL_HUB_ALEGRO_DE_NODE_NAME.equals(dl.getPairingKey()))
+        final List<BoundaryLine> alegroBoundaryLines = network.getBoundaryLineStream()
+                .filter(boundaryLine -> VIRTUAL_HUB_ALEGRO_BE_NODE_NAME.equals(boundaryLine.getPairingKey()) || VIRTUAL_HUB_ALEGRO_DE_NODE_NAME.equals(boundaryLine.getPairingKey()))
                 .toList();
         assertEquals(-100., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME), ASSERTION_DELTA);
         assertEquals(100., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_DE_NODE_NAME), ASSERTION_DELTA);
 
-        alegroService.correctOutage(network, alegroDanglingLines, tgmFile.getPath());
+        alegroService.correctOutage(network, alegroBoundaryLines, tgmFile.getPath());
 
         assertEquals(0., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME), ASSERTION_DELTA);
         assertEquals(0., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_DE_NODE_NAME), ASSERTION_DELTA);
@@ -176,11 +176,11 @@ class AlegroServiceTest {
     }
 
     private double getAlegroP0(final Network network, final String pairingKey) {
-        return network.getDanglingLineStream()
-                .filter(danglingLine -> pairingKey.equals(danglingLine.getPairingKey()))
+        return network.getBoundaryLineStream()
+                .filter(boundaryLine -> pairingKey.equals(boundaryLine.getPairingKey()))
                 .findFirst()
                 .orElseThrow(() -> new CeMergingException(
-                        "No dangling line found with pairing key " + pairingKey))
+                        "No boundary line found with pairing key " + pairingKey))
                 .getP0();
     }
 
