@@ -13,6 +13,8 @@ import com.farao_community.farao.ce_merging.merging.process.base_case_improvemen
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
+
 @Service
 public class BaseCaseImprovementService {
 
@@ -22,7 +24,7 @@ public class BaseCaseImprovementService {
         this.configuration = configuration;
     }
 
-    public void computeTargetNetPositions(MergingTask task) {
+    public void computeTargetNetPositions(final MergingTask task) throws FileNotFoundException {
         LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.BASE_CASE_IMPROVEMENT);
         BciProcessor processor = new BciProcessor(task, configuration);
         processor.run();

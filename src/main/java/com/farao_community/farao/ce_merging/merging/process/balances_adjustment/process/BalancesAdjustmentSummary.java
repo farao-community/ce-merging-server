@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.doNotReplace;
 import static java.lang.Double.parseDouble;
 import static java.lang.Integer.parseInt;
 import static java.util.Arrays.stream;
@@ -56,7 +57,7 @@ public class BalancesAdjustmentSummary {
             .stream()
             .collect(toMap(BalancesAdjustmentSummary::getCountry,
                            childNode -> createSummaryForNode(childNode, network),
-                           (existing, replacement) -> existing));
+                           doNotReplace()));
     }
 
     private static Optional<ReportNode> getLastIterationNode(final ReportNode reportNode,

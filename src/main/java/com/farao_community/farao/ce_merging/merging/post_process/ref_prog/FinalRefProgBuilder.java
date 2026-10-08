@@ -32,13 +32,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getDocumentIdentification;
-import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getDocumentVersion;
-import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getPublicationTimeInterval;
-import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getReceiverIdentification;
-import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getSenderIdentification;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.doNotReplace;
+import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.*;
+import static java.util.stream.Collectors.toUnmodifiableMap;
 
 public final class FinalRefProgBuilder {
 
@@ -101,8 +98,14 @@ public final class FinalRefProgBuilder {
         final List<PublicationDocument.PublicationTimeSeries> pubTimeSeriesList = new ArrayList<>();
         final BiMap<String, String> allAreasBiMap = HashBiMap.create(mergingTask.getConfigurations().getRegionConfiguration().getAreasAll());
         final List<VirtualHubRecord> virtualHubList = mergingTask.getConfigurations().getVirtualHubList();
-        final Map<String, String> countryMaEicCodeMap = virtualHubList.stream().collect(Collectors.toUnmodifiableMap(VirtualHubRecord::getRelatedMaEic, VirtualHubRecord::getRelatedMaCode, (firstConflictingKey, secondConflictingKey) -> firstConflictingKey));
-        final Map<String, String> countryEicCodeMap = virtualHubList.stream().collect(Collectors.toUnmodifiableMap(VirtualHubRecord::getEic, VirtualHubRecord::getCode, (firstConflictingKey, secondConflictingKey) -> firstConflictingKey));
+        final Map<String, String> countryMaEicCodeMap = virtualHubList.stream()
+                .collect(toUnmodifiableMap(VirtualHubRecord::getRelatedMaEic,
+                        VirtualHubRecord::getRelatedMaCode,
+                        doNotReplace()));
+        final Map<String, String> countryEicCodeMap = virtualHubList.stream()
+                .collect(toUnmodifiableMap(VirtualHubRecord::getEic,
+                        VirtualHubRecord::getCode,
+                        doNotReplace()));
 
         refProgResult.acExchanges().entrySet().forEach(acExchange -> pubTimeSeriesList.add(computePublicationTimeSeries(acExchange, allAreasBiMap, countryMaEicCodeMap, countryEicCodeMap, CurrentType.AC, dailyTimeInterval, position)));
         refProgResult.virtualHubsExchanges().entrySet().forEach(virtualHub -> pubTimeSeriesList.add(computePublicationTimeSeries(virtualHub, allAreasBiMap, countryMaEicCodeMap, countryEicCodeMap, CurrentType.DC, dailyTimeInterval, position)));

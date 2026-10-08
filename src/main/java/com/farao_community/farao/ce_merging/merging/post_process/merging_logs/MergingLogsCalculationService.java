@@ -11,18 +11,17 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
-import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceExchangeData;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.process.final_cgm_result.FinalCgmResult;
+import com.farao_community.farao.ce_merging.merging.process.final_cgm_result.LoadFlowOutput;
 import com.farao_community.farao.ce_merging.merging.process.pst_special_process.output.PstOutput;
 import com.farao_community.farao.ce_merging.merging.process.target_net_positions.bci.JsonBciOutputStructure;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.OutputType;
 import com.farao_community.farao.ce_merging.xsd.merging_logs.MergingLog;
 import jakarta.xml.bind.JAXBContext;
@@ -38,11 +37,14 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.*;
 
 @Service
 public class MergingLogsCalculationService {
@@ -75,20 +77,20 @@ public class MergingLogsCalculationService {
         }
     }
 
-    private MergingLog buildMergingLog(final MergingTask task) {
-        final JsonBciOutputStructure bciOutputs = JsonUtils.read(JsonBciOutputStructure.class, task.getArtifactPath(ArtifactType.BCI_OUTPUT_FILE));
-        final PstOutput pstOutputs = JsonUtils.read(PstOutput.class, task.getArtifactPath(ArtifactType.PST_OUTPUT_FILE));
-        final NetPositionsResults igmNetPositionsResults = JsonUtils.read(NetPositionsResults.class, task.getArtifactPath(ArtifactType.IGMS_NET_POSITIONS_FILE));
-        final FinalCgmResult cgmResult = JsonUtils.read(FinalCgmResult.class, task.getArtifactPath(ArtifactType.CGM_NET_POSITIONS_FILE));
-        final ReferenceProgram referenceProgram = JsonUtils.read(ReferenceProgram.class, task.getArtifactPath(ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE));
-        final String loadflowMode = cgmResult.getLoadFlowResults() != null ? cgmResult.getLoadFlowResults().getLoadflowMode() : AC;
+    private MergingLog buildMergingLog(final MergingTask task) throws FileNotFoundException {
+        final JsonBciOutputStructure bciOutputs = task.getArtifact(BCI_OUTPUT_FILE, JsonBciOutputStructure.class);
+        final PstOutput pstOutputs = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
+        final NetPositionsResults igmNetPos = task.getArtifact(IGMS_NET_POSITIONS_FILE, NetPositionsResults.class);
+        final FinalCgmResult cgmResult = task.getArtifact(CGM_NET_POSITIONS_FILE, FinalCgmResult.class);
+        final ReferenceProgram referenceProgram = task.getArtifact(REFERENCE_PROGRAM_FORECAST_FILE, ReferenceProgram.class);
+        final String loadflowMode = Optional.ofNullable(cgmResult.getLoadFlowResults()).map(LoadFlowOutput::getLoadflowMode).orElse(AC);
         final NetPositionsResults cgmNetPositionsResults = cgmResult.getNetPositionsResults();
-        final List<ReportInformationInRegion> reportInformationInRegionList = fillInRegionMergingReports(bciOutputs, cgmNetPositionsResults, igmNetPositionsResults, loadflowMode);
-        final List<ReportInformationOutRegion> reportInformationsOutRegionList = fillOutRegionMergingReports(bciOutputs, cgmNetPositionsResults, igmNetPositionsResults);
+        final List<ReportInformationInRegion> reportInformationInRegionList = fillInRegionMergingReports(bciOutputs, cgmNetPositionsResults, igmNetPos, loadflowMode);
+        final List<ReportInformationOutRegion> reportInformationsOutRegionList = fillOutRegionMergingReports(bciOutputs, cgmNetPositionsResults, igmNetPos);
         final List<ReportCommonsInformation> tsoInformationsList = tsoInformationsService.calculateTsoInformations(task);
         final MergingLogsBuilder mergingLogsBuilder = new MergingLogsBuilder();
         if (task.getInputs().getMergingWithInternalHvdc()) {
-            final List<AlegroReportInformation> alegroReportInformationsList = buildAlegroReports(referenceProgram, cgmNetPositionsResults, igmNetPositionsResults);
+            final List<AlegroReportInformation> alegroReportInformationsList = buildAlegroReports(referenceProgram, cgmNetPositionsResults, igmNetPos);
             return mergingLogsBuilder.buildMergingLog(task, reportInformationInRegionList, referenceProgram, pstOutputs, reportInformationsOutRegionList, tsoInformationsList, alegroReportInformationsList);
         } else {
             return mergingLogsBuilder.buildMergingLog(task, reportInformationInRegionList, referenceProgram, pstOutputs, reportInformationsOutRegionList, tsoInformationsList, null);

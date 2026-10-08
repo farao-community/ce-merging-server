@@ -8,23 +8,22 @@ package com.farao_community.farao.ce_merging.merging.post_process.merging_logs;
 
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
-import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.common.util.LoadFlowUtils;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isConnected;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE;
 
 @Service
 public class TsoInformationsService {
@@ -34,18 +33,19 @@ public class TsoInformationsService {
         this.loadFlowRunnerSupplier = loadFlowRunnerSupplier;
     }
 
-    public List<ReportCommonsInformation> calculateTsoInformations(final MergingTask task) {
+    public List<ReportCommonsInformation> calculateTsoInformations(final MergingTask task) throws FileNotFoundException {
         final LoadFlowParameters loadFlowParameters = task.getConfigurations().getLoadFlowParameters();
         final LoadFlowParameters.ComponentMode componentModeLfParameter = LoadFlowUtils.getComponentMode(loadFlowParameters);
-        final Network cgmNetwork = Network.read(task.getArtifactPath(ArtifactType.CGM_FILE_AFTER_PST));
+        final Network cgmNetwork = task.getArtifact(CGM_FILE_AFTER_PST, Network.class);
         LoadFlowUtils.runLoadFlow(cgmNetwork, loadFlowRunnerSupplier, loadFlowParameters);
-        List<ReportCommonsInformation> reportCommonsInformationList = new ArrayList<>();
-        List<VirtualHubRecord> virtualHubList = task.getConfigurations().getVirtualHubList();
-        Set<String> germanZones = task.getConfigurations().getRegionConfiguration().getGermanyZone().keySet();
-        NetPositionsResults germanNetPositions = JsonUtils.read(NetPositionsResults.class, task.getArtifactPath(ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE));
-        germanZones.forEach(zone -> reportCommonsInformationList.add(
-                createReportCommonsInformationForZone(germanNetPositions, cgmNetwork, zone, componentModeLfParameter, virtualHubList)));
-        return reportCommonsInformationList;
+        final List<VirtualHubRecord> virtualHubList = task.getConfigurations().getVirtualHubList();
+        final NetPositionsResults germanNetPositions = task.getArtifact(GERMAN_IGMS_NET_POSITIONS_FILE, NetPositionsResults.class);
+
+        return task.getConfigurations()
+                .getRegionConfiguration()
+                .getGermanyZone().keySet().stream()
+                .map(zone -> createReportCommonsInformationForZone(germanNetPositions, cgmNetwork, zone, componentModeLfParameter, virtualHubList))
+                .toList();
     }
 
     private ReportCommonsInformation createReportCommonsInformationForZone(final NetPositionsResults germanNetPositions, final Network cgmNetwork, final String zone, final LoadFlowParameters.ComponentMode componentModeLfParameter, List<VirtualHubRecord> virtualHubList) {
