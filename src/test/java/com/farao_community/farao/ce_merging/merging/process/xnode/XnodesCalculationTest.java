@@ -39,10 +39,10 @@ class XnodesCalculationTest {
     @Test
     void checkXnodesConfigConsistencyTest() {
         final Network network = mock(Network.class);
-        final BoundaryLine dl = mock(BoundaryLine.class);
+        final BoundaryLine boundaryLine = mock(BoundaryLine.class);
         final XnodeConfig xnode = mock(XnodeConfig.class);
-        when(dl.getPairingKey()).thenReturn(XNODE_NAME);
-        when(network.getBoundaryLineStream()).thenReturn(Stream.of(dl));
+        when(boundaryLine.getPairingKey()).thenReturn(XNODE_NAME);
+        when(network.getBoundaryLineStream()).thenReturn(Stream.of(boundaryLine));
         when(network.getNameOrId()).thenReturn(NETWORK_NAME);
         when(xnode.getName()).thenReturn(XNODE_NAME);
 
@@ -52,10 +52,10 @@ class XnodesCalculationTest {
     @Test
     void shouldThrowWhenXnodeIsMissing() {
         final Network network = mock(Network.class);
-        final BoundaryLine dl = mock(BoundaryLine.class);
+        final BoundaryLine boundaryLine = mock(BoundaryLine.class);
 
-        when(dl.getPairingKey()).thenReturn(UNKNOWN_XNODE);
-        when(network.getBoundaryLineStream()).thenReturn(Stream.of(dl));
+        when(boundaryLine.getPairingKey()).thenReturn(UNKNOWN_XNODE);
+        when(network.getBoundaryLineStream()).thenReturn(Stream.of(boundaryLine));
         when(network.getNameOrId()).thenReturn(NETWORK_NAME);
 
         assertThrows(CeMergingException.class, () -> calculation.checkXnodesConfigConsistency(network, Collections.emptyList(), Collections.emptyList()));

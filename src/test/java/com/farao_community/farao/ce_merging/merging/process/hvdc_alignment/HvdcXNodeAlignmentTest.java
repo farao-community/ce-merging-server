@@ -59,7 +59,7 @@ public class HvdcXNodeAlignmentTest {
                                            final double expectedTargetQ,
                                            final UcteElementStatus expectedStatus) {
         final BoundaryLine boundaryLine = network.getBoundaryLineStream()
-                .filter(bl -> bl.getPairingKey().equals(nodeName))
+                .filter(line -> line.getPairingKey().equals(nodeName))
                 .findFirst()
                 .orElseThrow();
         assertEquals(expectedP0, boundaryLine.getP0(), 0.01);

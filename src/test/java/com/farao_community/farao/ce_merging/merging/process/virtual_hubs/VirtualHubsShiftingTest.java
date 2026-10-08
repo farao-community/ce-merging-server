@@ -25,9 +25,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -82,7 +80,7 @@ class VirtualHubsShiftingTest {
 
     private BoundaryLine getBoundaryLine(final Network network) {
         return network.getBoundaryLineStream()
-                .filter(bl -> NODE_NAME.equals(bl.getPairingKey()))
+                .filter(boundaryLine -> NODE_NAME.equals(boundaryLine.getPairingKey()))
                 .findFirst()
                 .orElseThrow();
     }

@@ -11,13 +11,7 @@ import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
-import com.powsybl.iidm.network.BoundaryLine;
-import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.Bus;
-import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.Terminal;
-import com.powsybl.iidm.network.TwoSides;
+import com.powsybl.iidm.network.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -32,11 +26,7 @@ import java.util.stream.Stream;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.getCountryFromCode;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isConnected;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWithVirtualHub;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.*;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.CLOSE;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
 import static com.powsybl.iidm.network.Country.DE;
@@ -260,9 +250,9 @@ public class XnodesCalculation {
                                       final int areaNumber,
                                       final Optional<String> tsoOpt) {
         network.getBoundaryLineStream()
-                .filter(bl -> xNodes.contains(bl.getPairingKey()))
+                .filter(boundaryLine -> xNodes.contains(boundaryLine.getPairingKey()))
                 .filter(isPairedWith(virtualHubException).or(not(isPairedWithVirtualHub(virtualHubList))))
-                .forEach(bl -> addAreaInformation(xNodeInformationMap, bl, areaNumber, tsoOpt));
+                .forEach(boundaryLine -> addAreaInformation(xNodeInformationMap, boundaryLine, areaNumber, tsoOpt));
     }
 
 }
