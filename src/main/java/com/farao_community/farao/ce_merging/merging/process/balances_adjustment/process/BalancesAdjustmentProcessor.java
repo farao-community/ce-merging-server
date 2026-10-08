@@ -9,35 +9,21 @@ package com.farao_community.farao.ce_merging.merging.process.balances_adjustment
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputation;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationArea;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationFactoryImpl;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult;
+import com.powsybl.balances_adjustment.balance_computation.*;
 import com.powsybl.balances_adjustment.balance_computation.json_parameters.JsonBalanceComputationParameters;
 import com.powsybl.balances_adjustment.util.CountryAreaFactory;
 import com.powsybl.balances_adjustment.util.NetworkAreaFactory;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.computation.DefaultComputationManagerConfig;
 import com.powsybl.iidm.modification.scalable.Scalable;
-import com.powsybl.iidm.network.Bus;
-import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.Generator;
-import com.powsybl.iidm.network.Load;
-import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.Substation;
-import com.powsybl.iidm.network.Terminal;
+import com.powsybl.iidm.network.*;
 import com.powsybl.loadflow.LoadFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
@@ -45,17 +31,12 @@ import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.ZonalDataManager.getZonalDataFromGlsk;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.*;
 import static com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult.Status.SUCCESS;
 import static com.powsybl.iidm.modification.scalable.ScalingParameters.Priority.RESPECT_OF_VOLUME_ASKED;
 import static java.lang.Double.MAX_VALUE;
 import static java.lang.Double.isNaN;
-import static java.lang.Math.abs;
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static java.lang.Math.*;
 import static java.util.stream.Collectors.toMap;
 
 public class BalancesAdjustmentProcessor {
@@ -80,7 +61,7 @@ public class BalancesAdjustmentProcessor {
                                        final Supplier<BalanceComputationParameters> parametersSupplier) throws IOException {
         this.task = task;
         this.configuration = configuration;
-        this.network = Network.read(Paths.get(task.getArtifactPath(TGM_FILE_AFTER_RECESSIVITY)));
+        this.network = task.getArtifact(TGM_FILE_AFTER_RECESSIVITY, Network.class);
         this.loadFlowRunnerSupplier = runnerSupplier;
         this.balanceComputationParameters = getOrDefaultAdjustmentParameters(task, parametersSupplier);
         this.targetNetPositions = getTargetNetPositionsAreasFromFile(task.getArtifactFile(BALANCES_ADJUSTMENT_TARGET_FILE));

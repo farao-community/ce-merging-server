@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockedConstruction;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,7 +39,7 @@ class BaseCaseImprovementServiceTest {
     }
 
     @Test
-    void shouldCreateBciProcessorAndRun() {
+    void shouldCreateBciProcessorAndRun() throws FileNotFoundException {
         try (final MockedConstruction<BciProcessor> mockedConstruction = org.mockito.Mockito.mockConstruction(BciProcessor.class)) {
             service.computeTargetNetPositions(task);
             final List<BciProcessor> processors = mockedConstruction.constructed();

@@ -11,7 +11,6 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
-import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroData;
@@ -21,6 +20,7 @@ import com.farao_community.farao.ce_merging.merging.process.target_net_positions
 import com.farao_community.farao.ce_merging.merging.process.virtuals_hubs.VirtualHubsShifting;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.powsybl.iidm.network.Country;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,12 +29,8 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import com.powsybl.iidm.network.Country;
 
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BCI_OUTPUT_FILE;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.IGMS_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.*;
 
 @Service
 public class TargetNetPositionsCalculationService {
@@ -54,7 +50,7 @@ public class TargetNetPositionsCalculationService {
         try {
             final Map<String, Double> virtualHubsGaps = VirtualHubsShifting.applyVirtualHubFlows(task, configuration);
             final Map<String, Double> targetNetPositionsWithoutHvdc = getTargetNetPositionsFromBciOutput(task);
-            final Map<String, Double> outBciFlowsByCountry = getAdjustedOutBciNetPositions(task.getArtifactPath(IGMS_NET_POSITIONS_FILE), task.getArtifactPath(ALEGRO_NET_POSITIONS), virtualHubsGaps);
+            final Map<String, Double> outBciFlowsByCountry = getAdjustedOutBciNetPositions(task, virtualHubsGaps);
             final List<AreaNetPosition> targetNetPositionsWithHvdc = calculateTargetNetPositionsWithHvdc(targetNetPositionsWithoutHvdc, outBciFlowsByCountry);
             final BalancesAdjustmentTarget balancesAdjustmentTarget = new BalancesAdjustmentTarget(targetNetPositionsWithHvdc);
             FileStorageUtils.saveArtifactFile(BALANCES_ADJUSTMENT_TARGET_FILE, balancesAdjustmentTarget, task, configuration);
@@ -76,12 +72,11 @@ public class TargetNetPositionsCalculationService {
                 .toList();
     }
 
-    private static Map<String, Double> getAdjustedOutBciNetPositions(final String igmsNetPositionsPath,
-                                                                     final String alegroNetPositionsPath,
-                                                                     final Map<String, Double> virtualHubsGaps) {
+    private static Map<String, Double> getAdjustedOutBciNetPositions(final MergingTask task,
+                                                                     final Map<String, Double> virtualHubsGaps) throws FileNotFoundException {
         final Map<String, Double> adjustedOutBciNetPositions = new TreeMap<>();
-        final NetPositionsResults initialNetPosition = JsonUtils.read(NetPositionsResults.class, igmsNetPositionsPath);
-        final AlegroData alegroNetPosition = JsonUtils.read(AlegroData.class, alegroNetPositionsPath);
+        final NetPositionsResults initialNetPosition = task.getArtifact(IGMS_NET_POSITIONS_FILE, NetPositionsResults.class);
+        final AlegroData alegroNetPosition = task.getArtifact(ALEGRO_NET_POSITIONS, AlegroData.class);
 
         // As Alegro target flow is set in the network  --> for BE and DE : target NP must be used for alegro instead of initial NP
         // As the getOutBciNetPosition contains already Alegro initial NP, we must add the GapNpfInitialFlow (= target NP alegro - initial NP alegro)

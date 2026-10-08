@@ -12,12 +12,11 @@ import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositio
 import com.farao_community.farao.ce_merging.common.util.CountryCodeUtils;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
-import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecCoefficients;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
-import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceExchangeData;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
@@ -27,7 +26,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectio
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.merging.task.enums.OutputType;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
 import org.slf4j.Logger;
@@ -40,6 +38,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
 
 @Service
 public class RefProgCalculationService {
@@ -55,22 +56,22 @@ public class RefProgCalculationService {
         this.mergingTaskRepository = mergingTaskRepository;
     }
 
-    public void computeRefProg(final MergingTask mergingTask) {
+    public void computeRefProg(final MergingTask task) {
         try {
-            LogsCustomisationUtils.setExtraFieldsInLogsMdc(mergingTask, MergingStep.REF_PROG);
+            LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.REF_PROG);
             final Map<Border, Double> virtualHubsExchanges = new HashMap<>();
             final Map<Border, Double> acExchanges = new HashMap<>();
-            final ReferenceProgram referenceProgram = JsonUtils.read(ReferenceProgram.class, mergingTask.getArtifacts().getFile(ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE).getPath());
-            final FinalCgmResult finalCgmResult = JsonUtils.read(FinalCgmResult.class, mergingTask.getArtifacts().getFile(ArtifactType.CGM_NET_POSITIONS_FILE).getPath());
+            final ReferenceProgram referenceProgram = task.getArtifact(REFERENCE_PROGRAM_FORECAST_FILE, ReferenceProgram.class);
+            final FinalCgmResult finalCgmResult = task.getArtifact(CGM_NET_POSITIONS_FILE, FinalCgmResult.class);
 
-            computeExchanges(mergingTask, virtualHubsExchanges, acExchanges, referenceProgram, finalCgmResult);
+            computeExchanges(task, virtualHubsExchanges, acExchanges, referenceProgram, finalCgmResult);
 
             final RefProgResult refProgResult = new RefProgResult(referenceProgram.getDailyTimeInterval(), acExchanges, virtualHubsExchanges);
-            final PublicationDocument finalRefProgResult = FinalRefProgBuilder.buildFinalRefProgResult(refProgResult, mergingTask);
-            saveRefProgFileInOutputs(finalRefProgResult, mergingTask);
-            mergingTaskRepository.save(mergingTask);
+            final PublicationDocument finalRefProgResult = FinalRefProgBuilder.buildFinalRefProgResult(refProgResult, task);
+            saveRefProgFileInOutputs(finalRefProgResult, task);
+            mergingTaskRepository.save(task);
         } catch (Exception e) {
-            final String errorMessage = String.format("RefProg computation failed for task %d with target date %s, cause: %s", mergingTask.getId(), mergingTask.getInputs().getTargetDate(), e.getMessage());
+            final String errorMessage = String.format("RefProg computation failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
             LOGGER.error(errorMessage, e);
             throw new CeMergingException(errorMessage, e);
         }

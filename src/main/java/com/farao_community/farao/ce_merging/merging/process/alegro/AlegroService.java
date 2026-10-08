@@ -8,7 +8,6 @@ package com.farao_community.farao.ce_merging.merging.process.alegro;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.AlegroData;
@@ -24,18 +23,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.*;
 
 @Service
 public class AlegroService {
@@ -46,7 +42,7 @@ public class AlegroService {
         this.configuration = configuration;
     }
 
-    public void checkAlegroXnodesQuality(final MergingTask task) {
+    public void checkAlegroXnodesQuality(final MergingTask task) throws FileNotFoundException {
         LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.ALEGRO);
         final String topologicalMergeFilePath = task.getArtifactPath(ArtifactType.TGM_FILE_AFTER_RECESSIVITY);
         final Network network = Network.read(topologicalMergeFilePath);
@@ -63,26 +59,25 @@ public class AlegroService {
             checkFlowDirection(albeFlow, aldeFlow, threshold);
             checkFlowCompliance(albeFlow, aldeFlow, threshold);
         }
-        final ReferenceProgram referenceProgram = JsonUtils.read(ReferenceProgram.class, task.getArtifactPath(ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE));
+        final ReferenceProgram referenceProgram = task.getArtifact(REFERENCE_PROGRAM_FORECAST_FILE, ReferenceProgram.class);
         final AlegroData alegroData = getAlegroNetPositions(referenceProgram, alegroInOutage, albeFlow, aldeFlow, threshold);
         saveArtifactFile(ALEGRO_NET_POSITIONS, alegroData, task, configuration);
     }
 
-    public void updateAlegroP0(final MergingTask task) {
+    public void updateAlegroP0(final MergingTask task) throws FileNotFoundException {
         LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.ALEGRO);
-        final AlegroData alegroData = JsonUtils.read(AlegroData.class, task.getArtifactPath(ArtifactType.ALEGRO_NET_POSITIONS));
+        final AlegroData alegroData = task.getArtifact(ALEGRO_NET_POSITIONS, AlegroData.class);
         if (alegroData.alegroInOutage()) {
             return;
         }
-        final JsonBciOutputStructure bciOutputs = JsonUtils.read(JsonBciOutputStructure.class, task.getArtifactPath(ArtifactType.BCI_OUTPUT_FILE));
+        final JsonBciOutputStructure bciOutputs = task.getArtifact(BCI_OUTPUT_FILE, JsonBciOutputStructure.class);
         final BciAlegroData bciAlegroData = bciOutputs.getBciAlegroData();
         final double ec = getAlegroEcLimit(bciAlegroData);
         final double minEc = -ec;
         final double maxEc = ec;
         final double albeFinalFlow = calculateAlegroFinalFlow(bciAlegroData.albeFlows().targetFlow(), minEc, maxEc);
         final double aldeFinalFlow = calculateAlegroFinalFlow(bciAlegroData.aldeFlows().targetFlow(), minEc, maxEc);
-        final String tgmPath = task.getArtifactPath(ArtifactType.TGM_FILE_AFTER_RECESSIVITY);
-        final Network network = Network.read(tgmPath);
+        final Network network = task.getArtifact(TGM_FILE_AFTER_RECESSIVITY, Network.class);
         final List<DanglingLine> alegroDanglingLinesList = getAlegroDanglingLines(network);
         final DanglingLine albeDanglingLine = getAlegroDanglingLine(alegroDanglingLinesList, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME);
         albeDanglingLine.setP0(albeFinalFlow);
@@ -95,7 +90,7 @@ public class AlegroService {
                 danglingLine.getGeneration().setTargetP(0);
             }
         });
-        network.write("UCTE", null, Path.of(tgmPath));
+        network.write("UCTE", null, Path.of(task.getArtifactPath(TGM_FILE_AFTER_RECESSIVITY)));
     }
 
     boolean isAlegroInOutage(final List<DanglingLine> alegroDanglingLinesList) {

@@ -10,7 +10,6 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.CountryCodeUtils;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
-import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceExchangeData;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
@@ -34,10 +33,9 @@ public class VirtualHubsShifting {
 
     public static Map<String, Double> applyVirtualHubFlows(final MergingTask task, final CeMergingConfiguration configuration) throws FileNotFoundException {
         Map<String, Double> virtualHubsGaps = new HashMap<>();
-        final ReferenceProgram referenceProgram = JsonUtils.read(ReferenceProgram.class, task.getArtifactPath(REFERENCE_PROGRAM_FORECAST_FILE));
+        final ReferenceProgram referenceProgram = task.getArtifact(REFERENCE_PROGRAM_FORECAST_FILE, ReferenceProgram.class);
         final List<VirtualHubRecord> virtualHubRecords = task.getConfigurations().getVirtualHubList();
-        final String tgmPath = task.getArtifactPath(TGM_FILE_AFTER_RECESSIVITY);
-        final Network network = Network.read(tgmPath);
+        final Network network = task.getArtifact(TGM_FILE_AFTER_RECESSIVITY, Network.class);
         referenceProgram.getReferenceExchangeDataList().stream()
                 .filter(referenceExchangeData -> isVirtualHubsExchange(virtualHubRecords, referenceExchangeData.getAreaOutId(), referenceExchangeData.getAreaInId()))
                 .forEach(referenceExchangeData -> applyVirtualHubFlow(virtualHubsGaps, virtualHubRecords, network, referenceExchangeData));

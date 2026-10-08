@@ -12,13 +12,10 @@ import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualGSKBlockType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualNodesType;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.doReplace;
 
 public final class GlskBlockRedispatcher {
     private static final double ROUNDING_SCALE = 1e6;
@@ -86,7 +83,7 @@ public final class GlskBlockRedispatcher {
                 .collect(Collectors.toMap(
                         GlskRedispatchingEntity::getId,
                         GlskRedispatchingEntity::getShare,
-                        (existing, replacement) -> replacement
+                        doReplace()
                 ))
                 .values()
                 .stream()
@@ -97,7 +94,7 @@ public final class GlskBlockRedispatcher {
     private static void normalizeFactors(final double factorSum, final List<ManualNodesType> nodes) {
         final double difference = factorSum - EXPECTED_FACTOR_SUM;
         nodes.stream()
-                .max(Comparator.comparingDouble((ManualNodesType node) -> getFactor(node)))
+                .max(Comparator.comparingDouble(GlskBlockRedispatcher::getFactor))
                 .filter(node -> getFactor(node) > 0)
                 .ifPresent(maxNode -> {
                     final double factorValue = getFactor(maxNode);
