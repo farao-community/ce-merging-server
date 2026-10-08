@@ -121,7 +121,7 @@ class BciExportBuilderTest {
         assertEquals(BigInteger.valueOf(1050), hubBCI.getReference().getCWERefProgCGM().getVal());
         assertEquals(BigInteger.valueOf(2050), hubBCI.getReference().getGlobalRefProgCGM().getVal());
         assertEquals(BigInteger.valueOf(2000), hubBCI.getReference().getGlobalRefProgIGM().getVal());
-        assertNotNull(hubBCI.getReference().getCWEInitialNetPositionIGM());
+        assertEquals(BigInteger.valueOf(0), hubBCI.getReference().getCWEInitialNetPositionIGM().getVal());
 
         // BCIActive verification
         assertNotNull(hubBCI.getBCIActive());
