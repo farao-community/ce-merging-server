@@ -8,7 +8,7 @@ package com.farao_community.farao.ce_merging.merging.process.monita;
 
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Bus;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.ucte.converter.NamingStrategy;
 import com.powsybl.ucte.network.UcteElementId;
 import org.junit.jupiter.api.Test;
@@ -73,21 +73,21 @@ class MonitaNamingStrategyTest {
     }
 
     @Test
-    void getUcteNodeWithMonitaDanglingLine() {
-        final DanglingLine danglingLine = mock(DanglingLine.class);
-        when(danglingLine.getPairingKey()).thenReturn("XKO_LA11");
+    void getUcteNodeWithMonitaBoundaryLine() {
+        final BoundaryLine boundaryLine = mock(BoundaryLine.class);
+        when(boundaryLine.getPairingKey()).thenReturn("XKO_LA11");
 
-        assertThat(strategy.getUcteNodeCode(danglingLine))
+        assertThat(strategy.getUcteNodeCode(boundaryLine))
             .isLocatedIn(XX, "KO_LA")
             .isBusBar(VL_380, '1');
     }
 
     @Test
-    void getUcteNodeWithAnotherDanglingLine() {
-        final DanglingLine danglingLine = mock(DanglingLine.class);
-        when(danglingLine.getPairingKey()).thenReturn("XAL_PO21");
+    void getUcteNodeWithAnotherBoundaryLine() {
+        final BoundaryLine boundaryLine = mock(BoundaryLine.class);
+        when(boundaryLine.getPairingKey()).thenReturn("XAL_PO21");
 
-        assertThat(strategy.getUcteNodeCode(danglingLine))
+        assertThat(strategy.getUcteNodeCode(boundaryLine))
             .isLocatedIn(XX, "AL_PO")
             .isBusBar(VL_220, '1');
     }
@@ -151,11 +151,11 @@ class MonitaNamingStrategyTest {
     }
 
     @Test
-    void getUcteElementIdWithMonitaDanglingLine() {
-        final DanglingLine danglingLine = mock(DanglingLine.class);
-        when(danglingLine.getId()).thenReturn("XKO_LA11 IKOTR111 1");
+    void getUcteElementIdWithMonitaBoundaryLine() {
+        final BoundaryLine boundaryLine = mock(BoundaryLine.class);
+        when(boundaryLine.getId()).thenReturn("XKO_LA11 IKOTR111 1");
 
-        final UcteElementId ucteElementId = strategy.getUcteElementId(danglingLine);
+        final UcteElementId ucteElementId = strategy.getUcteElementId(boundaryLine);
 
         assertThat(ucteElementId.getNodeCode1())
             .isLocatedIn(XX, "KO_LA")
@@ -167,11 +167,11 @@ class MonitaNamingStrategyTest {
     }
 
     @Test
-    void getUcteElementIdWithAnotherDanglingLine() {
-        final DanglingLine danglingLine = mock(DanglingLine.class);
-        when(danglingLine.getId()).thenReturn("XAL_PO21 IPONTA21 1");
+    void getUcteElementIdWithAnotherBoundaryLine() {
+        final BoundaryLine boundaryLine = mock(BoundaryLine.class);
+        when(boundaryLine.getId()).thenReturn("XAL_PO21 IPONTA21 1");
 
-        final UcteElementId ucteElementId = strategy.getUcteElementId(danglingLine);
+        final UcteElementId ucteElementId = strategy.getUcteElementId(boundaryLine);
 
         assertThat(ucteElementId.getNodeCode1())
             .isLocatedIn(XX, "AL_PO")

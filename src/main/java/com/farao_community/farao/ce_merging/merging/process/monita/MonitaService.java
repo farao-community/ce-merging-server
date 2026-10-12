@@ -11,7 +11,7 @@ import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositio
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.springframework.stereotype.Service;
 
@@ -76,10 +76,10 @@ public class MonitaService {
     private static void addToMontenegroIfFound(final String monitaNode,
                                                final NetPositions montenegrinNetPositions,
                                                final Network italy) {
-        italy.getDanglingLineStream()
+        italy.getBoundaryLineStream()
             .filter(isPairedWith(monitaNode).and(isInCountry(IT)))
             .findFirst()
-            .map(DanglingLine::getP0)
+            .map(BoundaryLine::getP0)
             .ifPresent(monitaFlow -> addToMontenegro(monitaNode, monitaFlow, montenegrinNetPositions));
     }
 

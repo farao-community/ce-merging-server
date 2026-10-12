@@ -7,11 +7,11 @@
 package com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.powsybl.balances_adjustment.util.CountryAreaFactory;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.commons.report.TypedValue;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.networkarea.CountryAreaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

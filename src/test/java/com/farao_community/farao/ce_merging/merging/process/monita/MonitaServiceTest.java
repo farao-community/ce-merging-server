@@ -17,7 +17,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.lang3.function.Predicates;
 import org.junit.jupiter.api.BeforeEach;
@@ -113,8 +113,8 @@ class MonitaServiceTest {
              final MockedStatic<NetworkUtil> networkUtil = mockStatic(NetworkUtil.class)) {
             // given :
             final Network network = mock(Network.class);
-            final DanglingLine monita1 = mock(DanglingLine.class);
-            final DanglingLine monita2 = mock(DanglingLine.class);
+            final BoundaryLine monita1 = mock(BoundaryLine.class);
+            final BoundaryLine monita2 = mock(BoundaryLine.class);
 
             networkStatic.when(() -> Network.read(anyString())).thenReturn(network);
             when(monita1.getPairingKey()).thenReturn(MONITA1_ME_NODE_NAME);
@@ -123,7 +123,7 @@ class MonitaServiceTest {
             when(monita2.getP0()).thenReturn(200.0);
             networkUtil.when(() -> isPairedWith(anyString())).thenCallRealMethod();
             networkUtil.when(() -> isInCountry(IT)).thenReturn(Predicates.truePredicate());
-            when(network.getDanglingLineStream()).thenAnswer(i -> Stream.of(monita1, monita2));
+            when(network.getBoundaryLineStream()).thenAnswer(i -> Stream.of(monita1, monita2));
 
             // when :
             MonitaService.postTreatmentForMonita(task, results);

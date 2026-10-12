@@ -46,8 +46,8 @@ public class Flow implements Serializable {
         this.flowCGM = getBranchFlow(getPstTieLine(tieLineIdRegex, cgm));
     }
 
-    public void setIgmFlowFromDanglingLine(final String danglingLineIdRegex, final Network igm) {
-        this.flowIGM = getBoundaryP(danglingLineIdRegex, igm);
+    public void setIgmFlowFromBoundaryLine(final String boundaryLineIdRegex, final Network igm) {
+        this.flowIGM = getBoundaryP(boundaryLineIdRegex, igm);
     }
 
     private double getBranchFlow(final Branch<?> branch) {

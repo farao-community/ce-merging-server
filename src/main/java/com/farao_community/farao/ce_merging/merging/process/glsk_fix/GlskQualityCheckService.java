@@ -23,7 +23,7 @@ import com.powsybl.commons.report.ReportNodeAdder;
 import com.powsybl.commons.report.TypedValue;
 import com.powsybl.entsoe.commons.PowsyblEntsoeReportResourceBundle;
 import com.powsybl.glsk.ucte.quality_check.GlskQualityProcessor;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.compress.utils.IOUtils;
 import org.slf4j.Logger;
@@ -179,10 +179,10 @@ public class GlskQualityCheckService {
         manualNodes.forEach(manualnode -> nodeNames.add(manualnode.getNodeName().getV()));
 
         for (String nodeName : nodeNames) {
-            List<DanglingLine> danglingLines = network.getDanglingLineStream()
-                    .filter(danglingLine -> danglingLine.getPairingKey().equals(nodeName))
+            List<BoundaryLine> boundaryLines = network.getBoundaryLineStream()
+                    .filter(boundaryLine -> boundaryLine.getPairingKey().equals(nodeName))
                     .toList();
-            if (danglingLines.isEmpty()) {
+            if (boundaryLines.isEmpty()) {
                 reportNode.newReportNode()
                         .withMessageTemplate("glsk.node.not.found")
                         .withTypedValue(NODE_ID_KEY, nodeName, "")
@@ -191,7 +191,7 @@ public class GlskQualityCheckService {
                         .withUntypedValue("untypedValue", 3.)
                         .withSeverity(TypedValue.WARN_SEVERITY)
                         .add();
-            } else if (!danglingLines.getFirst().getTerminal().isConnected()) {
+            } else if (!boundaryLines.getFirst().getTerminal().isConnected()) {
                 reportNode.newReportNode()
                         .withMessageTemplate("glsk.node.connected")
                         .withTypedValue(NODE_ID_KEY, nodeName, "")
