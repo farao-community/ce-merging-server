@@ -320,8 +320,8 @@ public class MergingController {
     @Operation(tags = GLOBAL_CONFIGURATIONS_TAG,
             summary = "Get valid virtual hubs configuration corresponding to the input date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "Valid virtual hubs configuration  returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "No valid virtual hubs configuration found for this instant.")
+        @ApiResponse(responseCode = OK, description = "Valid or default virtual hubs configuration returned successfully."),
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "No valid virtual hubs configuration found for this instant.")
     })
     public ResponseEntity<byte[]> getVirtualHubsConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
@@ -355,7 +355,7 @@ public class MergingController {
             summary = "Get valid XNodes configuration corresponding to the input date.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "XNodes configuration returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "No valid XNodes configuration found for this instant.")
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "No valid XNodes configuration found for this instant.")
     })
     public ResponseEntity<byte[]> getXNodesConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime instant) throws CeMergingException {
         try {
@@ -389,7 +389,7 @@ public class MergingController {
             summary = "Get valid HVDC XNode alignment configuration corresponding to the input date.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "HVDC XNode alignment configuration returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "No valid HVDC XNode alignment configuration found for this instant.")
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "No valid HVDC XNode alignment configuration found for this instant.")
     })
     public ResponseEntity<byte[]> getHvdcXnodeAlignementConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
@@ -423,7 +423,7 @@ public class MergingController {
             summary = "Get valid BEC configuration corresponding to the input date.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "BEC configuration  returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "No valid BEC configuration found for this instant.")
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "No valid BEC configuration found for this instant.")
     })
     public ResponseEntity<byte[]> getBecConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) {
         try {
@@ -457,7 +457,7 @@ public class MergingController {
             summary = "Get valid EIC Code configuration corresponding to the input date.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "EIC Code configuration returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "No valid EIC Code configuration found for this instant.")
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "No valid EIC Code configuration found for this instant.")
     })
     public ResponseEntity<byte[]> getEICConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {

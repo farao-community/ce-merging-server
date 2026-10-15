@@ -26,6 +26,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -372,6 +373,23 @@ class MergingControllerTest {
             controller.getEICConfiguration(null);
             fileUtils.verify(() -> FileUtils.toAttachmentFileResponse(any(), anyString()), times(5));
         }
+    }
+
+    @Test
+    void shouldNotGetGlobalConfigurations() throws Exception {
+        final IOException test = new IOException("test");
+        when(taskManager.getVirtualHubsConfiguration(any())).thenThrow(test);
+        when(taskManager.getXNodesConfiguration(any())).thenThrow(test);
+        when(taskManager.getHvdcXNodeAlignmentConfiguration(any())).thenThrow(test);
+        when(taskManager.getBECKeyConfiguration(any())).thenThrow(test);
+        when(taskManager.getRegionConfiguration(any())).thenThrow(test);
+        OffsetDateTime date = OffsetDateTime.now();
+        Assertions.assertThatThrownBy(() -> controller.getVirtualHubsConfiguration(date)).hasCause(test);
+        Assertions.assertThatThrownBy(() -> controller.getXNodesConfiguration(date)).hasCause(test);
+        Assertions.assertThatThrownBy(() -> controller.getHvdcXnodeAlignementConfiguration(date)).hasCause(test);
+        Assertions.assertThatThrownBy(() -> controller.getBecConfiguration(date)).hasCause(test);
+        Assertions.assertThatThrownBy(() -> controller.getEICConfiguration(date)).hasCause(test);
+
     }
 
     @Test
