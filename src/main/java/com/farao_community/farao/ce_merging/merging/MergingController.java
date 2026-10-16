@@ -321,7 +321,7 @@ public class MergingController {
             summary = "Get valid virtual hubs configuration corresponding to the input date.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = OK, description = "Valid or default virtual hubs configuration returned successfully."),
-        @ApiResponse(responseCode = INTERNAL_ERROR, description = "No valid virtual hubs configuration found for this instant.")
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "Internal error while retrieving the virtual hubs configuration.")
     })
     public ResponseEntity<byte[]> getVirtualHubsConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
@@ -354,8 +354,8 @@ public class MergingController {
     @Operation(tags = GLOBAL_CONFIGURATIONS_TAG,
             summary = "Get valid XNodes configuration corresponding to the input date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "XNodes configuration returned successfully."),
-        @ApiResponse(responseCode = INTERNAL_ERROR, description = "No valid XNodes configuration found for this instant.")
+        @ApiResponse(responseCode = OK, description = "Valid or default XNodes configuration returned successfully."),
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "Internal error while retrieving the XNodes configuration.")
     })
     public ResponseEntity<byte[]> getXNodesConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime instant) throws CeMergingException {
         try {
@@ -388,8 +388,8 @@ public class MergingController {
     @Operation(tags = GLOBAL_CONFIGURATIONS_TAG,
             summary = "Get valid HVDC XNode alignment configuration corresponding to the input date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "HVDC XNode alignment configuration returned successfully."),
-        @ApiResponse(responseCode = INTERNAL_ERROR, description = "No valid HVDC XNode alignment configuration found for this instant.")
+        @ApiResponse(responseCode = OK, description = "VAlid or default HVDC XNode alignment configuration returned successfully."),
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "Internal error while retrieving the HVDC XNode alignment configuration.")
     })
     public ResponseEntity<byte[]> getHvdcXnodeAlignementConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
@@ -422,8 +422,8 @@ public class MergingController {
     @Operation(tags = GLOBAL_CONFIGURATIONS_TAG,
             summary = "Get valid BEC configuration corresponding to the input date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "BEC configuration  returned successfully."),
-        @ApiResponse(responseCode = INTERNAL_ERROR, description = "No valid BEC configuration found for this instant.")
+        @ApiResponse(responseCode = OK, description = "Valid or default BEC configuration  returned successfully."),
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "Internal error while retrieving the BEC configuration.")
     })
     public ResponseEntity<byte[]> getBecConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) {
         try {
@@ -456,8 +456,8 @@ public class MergingController {
     @Operation(tags = GLOBAL_CONFIGURATIONS_TAG,
             summary = "Get valid EIC Code configuration corresponding to the input date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "EIC Code configuration returned successfully."),
-        @ApiResponse(responseCode = INTERNAL_ERROR, description = "No valid EIC Code configuration found for this instant.")
+        @ApiResponse(responseCode = OK, description = "Valid or default EIC Code configuration returned successfully."),
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "Internal error while retrieving the EIC Code configuration.")
     })
     public ResponseEntity<byte[]> getEICConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
