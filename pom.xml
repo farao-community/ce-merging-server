@@ -181,6 +181,19 @@
                             <outputDirectory>${project.build.directory}/generated-sources/jaxb/merging_supervisor/bci_nf</outputDirectory>
                         </configuration>
                     </execution>
+                    <execution>
+                        <id>internal_bz</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/resources/xsd/internal_bz/biddingzoneuctedocument-1.xsd</source>
+                            </sources>
+                            <packageName>com.farao_community.farao.ce_merging.xsd.internal_bidding_zones</packageName>
+                            <outputDirectory>${project.build.directory}/generated-sources/jaxb/internal_bidding_zones</outputDirectory>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>

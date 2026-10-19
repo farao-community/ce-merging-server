@@ -55,14 +55,16 @@ public class Inputs implements Serializable {
     @OneToOne(cascade = ALL)
     private SavedFile netPositionForecast = new SavedFile();
     @OneToOne(cascade = ALL)
+    private SavedFile internalBiddingZones = new SavedFile();
+    @OneToOne(cascade = ALL)
     private SavedFile dcLinks = new SavedFile();
 
     public IgmData getIgm(final String country) {
         return igms.stream()
-            .filter(igmData -> igmData.getCountry().equals(country))
-            .findAny()
-            .orElseThrow(() -> new TaskNotValidException(String.format("Task does not contain country '%s' IGM",
-                                                                       country)));
+                .filter(igmData -> igmData.getCountry().equals(country))
+                .findAny()
+                .orElseThrow(() -> new TaskNotValidException(String.format("Task does not contain country '%s' IGM",
+                                                                           country)));
     }
 
     public IgmData getIgm(final Country country) {
@@ -71,17 +73,17 @@ public class Inputs implements Serializable {
 
     public ZoneOffset getRealOffset() {
         return Optional.ofNullable(realOffset)
-            .orElse(PARIS_WINTER_OFFSET);
+                .orElse(PARIS_WINTER_OFFSET);
     }
 
     public Boolean getMergingWithInternalHvdc() {
         return Optional.ofNullable(mergingWithInternalHvdc)
-            .orElse(true);
+                .orElse(true);
     }
 
     public int getAlegroThreshold() {
         return Optional.ofNullable(alegroThreshold)
-            .orElse(DEFAULT_ALEGRO_THRESHOLD);
+                .orElse(DEFAULT_ALEGRO_THRESHOLD);
     }
 
     // tagged falsely unused in IntelliJ - used for configuration deserialization
@@ -172,5 +174,13 @@ public class Inputs implements Serializable {
 
     public void setDcLinks(final SavedFile dcLinks) {
         this.dcLinks = dcLinks;
+    }
+
+    public SavedFile getInternalBiddingZones() {
+        return internalBiddingZones;
+    }
+
+    public void setInternalBiddingZones(final SavedFile italianBiddingZones) {
+        this.internalBiddingZones = italianBiddingZones;
     }
 }

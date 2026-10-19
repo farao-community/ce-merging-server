@@ -6,6 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.common.exception;
 
+import java.util.function.Supplier;
+
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INTERNAL_ERROR;
 
 public class CeMergingException extends AbstractServiceException {
@@ -26,5 +28,13 @@ public class CeMergingException extends AbstractServiceException {
     public CeMergingException(final String message,
                               final Throwable cause) {
         super(INTERNAL_ERROR, EXCEPTION_ERROR_CODE, EXCEPTION_TITLE, message, cause);
+    }
+
+    public static Supplier<CeMergingException> withMessage(final String message) {
+        return () -> new CeMergingException(message);
+    }
+
+    public static Supplier<CeMergingException> withMessage(final String message, final Object... args) {
+        return withMessage(message.formatted(args));
     }
 }

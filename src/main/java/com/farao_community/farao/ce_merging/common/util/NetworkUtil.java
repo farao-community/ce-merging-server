@@ -8,9 +8,9 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Injection;
@@ -36,6 +36,10 @@ public final class NetworkUtil {
 
     private NetworkUtil() {
         // utility
+    }
+
+    public static String getUcteNode(final Terminal terminal) {
+        return terminal.getBusView().getConnectableBus().getId();
     }
 
     public static boolean hasActivePower(final Injection injection) {
