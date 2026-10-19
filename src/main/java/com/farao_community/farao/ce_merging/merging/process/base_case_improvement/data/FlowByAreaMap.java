@@ -9,6 +9,7 @@ package com.farao_community.farao.ce_merging.merging.process.base_case_improveme
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collector;
@@ -36,7 +37,8 @@ public class FlowByAreaMap extends HashMap<String, Double> {
      * @param area for which we want to update a net position
      * @param shift will be added to area's net position
      */
-    public void shiftFlow(final String area, final Double shift) {
+    public void shiftFlow(final String area,
+                          final Double shift) {
         this.computeIfPresent(area, (a, np) -> np + shift);
     }
 
@@ -71,7 +73,14 @@ public class FlowByAreaMap extends HashMap<String, Double> {
         return collectingAndThen(toMap(keyMapper, valueMapper), FlowByAreaMap::new);
     }
 
-    public static FlowByAreaMap fromAreas(final Collection<String> areas, final Function<String, Double> areaToFlow) {
+    public static <T> Collector<T, ?, FlowByAreaMap> toFlowByAreaMap(final Function<? super T, String> keyMapper,
+                                                                     final Function<? super T, Double> valueMapper,
+                                                                     final BinaryOperator<Double> mergeFunction) {
+        return collectingAndThen(toMap(keyMapper, valueMapper, mergeFunction), FlowByAreaMap::new);
+    }
+
+    public static FlowByAreaMap fromAreas(final Collection<String> areas,
+                                          final Function<String, Double> areaToFlow) {
         return areas.stream().collect(toFlowByAreaMap(identity(), areaToFlow));
     }
 }

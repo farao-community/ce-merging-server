@@ -33,6 +33,10 @@ public class VirtualHubRecord implements Serializable {
     public VirtualHubRecord() {
     }
 
+    public boolean hasCode(final String countryCode) {
+        return countryCode.equals(code);
+    }
+
     public String getEic() {
         return eic;
     }
