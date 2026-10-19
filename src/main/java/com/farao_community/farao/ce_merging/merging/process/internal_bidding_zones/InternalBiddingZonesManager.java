@@ -41,7 +41,7 @@ public class InternalBiddingZonesManager {
                 .filter(links(from, to))
                 .map(InternalTieLineType::getBranch)
                 .map(this::toNetworkBranch)
-                .map(Branch::getTerminal1) //???????
+                .map(Branch::getTerminal1)
                 .mapToDouble(Terminal::getP)
                 .sum();
     }
@@ -66,7 +66,6 @@ public class InternalBiddingZonesManager {
 
     private static boolean areSameBranches(final BranchType branchType,
                                            final Branch<?> branch) {
-        //????????????????
         return Objects.equals(getUcteNode(branch.getTerminal1()), branchType.getFrom())
                && Objects.equals(getUcteNode(branch.getTerminal2()), branchType.getTo());
     }
