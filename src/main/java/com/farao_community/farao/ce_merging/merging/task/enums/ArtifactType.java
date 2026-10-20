@@ -23,6 +23,7 @@ public enum ArtifactType {
     TOPOLOGICAL_MERGE_FILE("%s_2D%d_UX0_TOPOLOGICAL_MERGED.uct", "topological-merge-result"),
     BALANCED_CGM_FILE("%s_2D%d_UX0_BALANCED.uct", "cgm"),
     CGM_FILE_AFTER_PST("%s_2D%d_UX0_PST_APPLIED.uct", "cgm"),
+    CGM_FILE_AFTER_COMPENSATION("%s_2D%d_UX0_AFTER_COMPENSATION.uct", "cgm"),
     GLSK_QUALITY_REPORT("%s_GLSK_QUALITY_CHECK.xml", "glsk-quality-report"),
     GLSK_QUALITY_CORRECTED_FILE("glsk_corrected_%s_2D%d_UX0.xml", "actual-glsk-report-correction"),
     IGMS_NET_POSITIONS_FILE("igmsNetPositions.json", "igms-net-positions"),
