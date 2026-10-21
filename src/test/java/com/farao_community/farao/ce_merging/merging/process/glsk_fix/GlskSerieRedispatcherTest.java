@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.merging.process.glsk_fix.model.GlskSerieShare;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.BusinessType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKDocument;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKSeriesType;
@@ -19,8 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class GlskSerieRedispatcherTest {
 
@@ -30,9 +31,9 @@ public class GlskSerieRedispatcherTest {
 
     @Test
     void shouldStoreValueByArea() {
-        final Map<String, List<GlskRedispatchingEntity>> values = new HashMap<>();
+        final Map<String, List<GlskSerieShare>> values = new HashMap<>();
 
-        GlskSerieRedispatcher.storeValue(
+        GlskUtils.addShare(
                 values,
                 AREA_1,
                 TS_001,
@@ -41,8 +42,8 @@ public class GlskSerieRedispatcherTest {
 
         assertTrue(values.containsKey(AREA_1));
         assertEquals(1, values.get(AREA_1).size());
-        assertEquals(TS_001, values.get(AREA_1).getFirst().getId());
-        assertEquals(20.0, values.get(AREA_1).getFirst().getShare());
+        assertEquals(TS_001, values.get(AREA_1).getFirst().id());
+        assertEquals(20.0, values.get(AREA_1).getFirst().share());
     }
 
     @Test
@@ -53,14 +54,14 @@ public class GlskSerieRedispatcherTest {
         document.getGSKSeries().add(series1);
         document.getGSKSeries().add(series2);
 
-        final Map<String, List<GlskRedispatchingEntity>> values = new HashMap<>();
+        final Map<String, List<GlskSerieShare>> values = new HashMap<>();
         values.put(AREA_1, List.of(
-                        new GlskRedispatchingEntity(TS_001, 50.0),
-                        new GlskRedispatchingEntity(TS_002, 25.0)
+                        new GlskSerieShare(TS_001, 50.0),
+                        new GlskSerieShare(TS_002, 25.0)
                 )
         );
 
-        GlskSerieRedispatcher.redispatchShareValue(values, document);
+        GlskSerieRedispatcher.redispatchShare(values, document);
 
         /*
          * 50 + 25 = 75
@@ -88,13 +89,13 @@ public class GlskSerieRedispatcherTest {
         series1.getBusinessType().setShare(BigDecimal.valueOf(50));
         series2.getBusinessType().setShare(BigDecimal.valueOf(70));
 
-        final Map<String, List<GlskRedispatchingEntity>> values = new HashMap<>();
+        final Map<String, List<GlskSerieShare>> values = new HashMap<>();
         values.put(AREA_1, List.of(
-                new GlskRedispatchingEntity(TS_001, 50.0),
-                new GlskRedispatchingEntity(TS_002, 70.0)
+                new GlskSerieShare(TS_001, 50.0),
+                new GlskSerieShare(TS_002, 70.0)
         ));
 
-        GlskSerieRedispatcher.redispatchShareValue(values, document);
+        GlskSerieRedispatcher.redispatchShare(values, document);
 
         assertEquals(BigDecimal.valueOf(50), series1.getBusinessType().getShare());
         assertEquals(BigDecimal.valueOf(70), series2.getBusinessType().getShare());
@@ -107,12 +108,12 @@ public class GlskSerieRedispatcherTest {
         final GSKDocument document = new GSKDocument();
         document.getGSKSeries().add(series);
 
-        final Map<String, List<GlskRedispatchingEntity>> values = new HashMap<>();
-        values.put(AREA_1, List.of(new GlskRedispatchingEntity(TS_001, 0.0)));
+        final Map<String, List<GlskSerieShare>> values = new HashMap<>();
+        values.put(AREA_1, List.of(new GlskSerieShare(TS_001, 0.0)));
 
         assertThrows(
                 CeMergingException.class,
-                () -> GlskSerieRedispatcher.redispatchShareValue(values, document)
+                () -> GlskSerieRedispatcher.redispatchShare(values, document)
         );
     }
 
