@@ -782,25 +782,6 @@ public class MergingController {
         return toAttachmentFileResponse(taskManager.getCgmNetPositions(taskId));
     }
 
-    @GetMapping(value = "/tasks/{taskId}/artifacts/tgm-net-positions", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
-    @Operation(tags = ARTIFACTS_TAG,
-            summary = "Get the TGM net positions artifact of the merging task with given ID")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "TGM net positions returned successfully"),
-        @ApiResponse(responseCode = BAD_REQUEST, description = "Merging task with given ID has not been run"),
-        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or CGM net positions not available")
-    })
-    public ResponseEntity<byte[]> getTgmNetPositions(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
-        if (!taskManager.checkTaskExist(taskId)) {
-            return ResponseEntity.notFound().build();
-        }
-        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
-        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
-            return ResponseEntity.badRequest().build();
-        }
-        return toAttachmentFileResponse(taskManager.getTgmNetPositions(taskId));
-    }
-
     @GetMapping(value = "/tasks/{taskId}/artifacts/alegro-net-positions", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
     @Operation(tags = ARTIFACTS_TAG,
             summary = "Get the alegro net positions artifact of the merging task with given ID")
