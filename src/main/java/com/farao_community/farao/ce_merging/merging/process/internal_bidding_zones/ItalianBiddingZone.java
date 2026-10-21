@@ -7,6 +7,9 @@
 
 package com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones;
 
+import java.util.Arrays;
+import java.util.Optional;
+
 public enum ItalianBiddingZone {
     INOR("NORD", "10Y1001A1001A73I"),
     ICNO("CENTRO_NORD", "10Y1001A1001A70O"),
@@ -29,5 +32,9 @@ public enum ItalianBiddingZone {
 
     public String getEic() {
         return eic;
+    }
+
+    public static Optional<ItalianBiddingZone> getByEic(final String eic) {
+        return Arrays.stream(values()).filter(bz -> bz.getEic().equals(eic)).findAny();
     }
 }

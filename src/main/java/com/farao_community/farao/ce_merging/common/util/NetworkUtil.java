@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_CODE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_CODE;
 import static com.powsybl.iidm.network.TwoSides.ONE;
 import static com.powsybl.iidm.network.TwoSides.TWO;
 import static java.lang.Double.isNaN;
@@ -213,5 +215,9 @@ public final class NetworkUtil {
         final String nodeFrom = lineId.substring(0, 8);
         final String nodeTo = lineId.substring(9, 17);
         return nodeFrom.startsWith(zone) != nodeTo.startsWith(zone);
+    }
+
+    public static boolean isAlegroNode(final String nodeName) {
+        return VIRTUAL_HUB_ALEGRO_BE_CODE.equals(nodeName) || VIRTUAL_HUB_ALEGRO_DE_CODE.equals(nodeName);
     }
 }

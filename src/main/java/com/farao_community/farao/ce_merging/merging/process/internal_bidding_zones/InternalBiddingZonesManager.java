@@ -7,7 +7,8 @@
 
 package com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones;
 
-import com.farao_community.farao.ce_merging.common.exception.CeMergingException;import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.xsd.internal_bidding_zones.BiddingZoneUCTEDocument;
 import com.farao_community.farao.ce_merging.xsd.internal_bidding_zones.BranchType;
@@ -26,13 +27,11 @@ public class InternalBiddingZonesManager {
     private final BiddingZoneUCTEDocument biddingZoneData;
     private final Network cgm;
 
-
     public InternalBiddingZonesManager(final MergingTask task) {
         this.biddingZoneData = JaxbUtils.readFromPath(BiddingZoneUCTEDocument.class,
                                                       task.getInputs().getInternalBiddingZones().getPath());
         this.cgm = Network.read(task.getOutputs().getCgm().getPath());
     }
-
 
     public double getTotalInternalExchange(final ItalianBiddingZone from,
                                            final ItalianBiddingZone to) {

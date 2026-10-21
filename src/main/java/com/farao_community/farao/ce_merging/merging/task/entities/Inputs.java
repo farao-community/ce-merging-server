@@ -108,6 +108,10 @@ public class Inputs implements Serializable {
         dcLinks.feedPathAndName(filePath);
     }
 
+    public void setInternalBiddingZonesFilePath(final String filePath) {
+        internalBiddingZones.feedPathAndName(filePath);
+    }
+
     public List<IgmData> getIgms() {
         return igms;
     }
