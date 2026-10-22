@@ -8,14 +8,10 @@ package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.*;
-
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKDocument;
 import com.powsybl.commons.report.ReportNode;
 import org.junit.jupiter.api.Test;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,8 +20,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,7 +41,6 @@ class GlskFixServiceTest {
         final byte[] glskBytes = readGlskFile(GLSK_FIX_RESOURCE_PATH + "/20160728_GLSK.xml");
         final GSKDocument resultDocument = fixGlsk(glskBytes, createEmptyReportNode());
         assertNotNull(resultDocument);
-        assertEquals(createCreationDate(), resultDocument.getCreationDateTime().getV());
         assertEquals(3, resultDocument.getGSKSeries().size());
     }
 
@@ -69,17 +64,8 @@ class GlskFixServiceTest {
     }
 
     private GSKDocument fixGlsk(final byte[] glskBytes, final ReportNode reportNode) {
-        final byte[] result = glskFixService.fixGlsk(glskBytes, reportNode, Instant.parse(TARGET_DATE), createCreationDate());
+        final byte[] result = glskFixService.fixGlsk(glskBytes, reportNode, Instant.parse(TARGET_DATE));
         return JaxbUtils.readFromBytes(GSKDocument.class, result);
-    }
-
-    private XMLGregorianCalendar createCreationDate() {
-        try {
-            return DatatypeFactory.newInstance()
-                    .newXMLGregorianCalendar(CREATION_DATE);
-        } catch (DatatypeConfigurationException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private ReportNode createEmptyReportNode() {

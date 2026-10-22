@@ -7,18 +7,22 @@
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.merging.process.glsk_fix.model.GlskSerieShare;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualGSKBlockType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualNodesType;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Set;
+
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumProperty;
+import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskUtils.getFactor;
+import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskUtils.setFactor;
+import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparingDouble;
 
 public final class GlskBlockRedispatcher {
     private static final double ROUNDING_SCALE = 1e6;
@@ -27,89 +31,78 @@ public final class GlskBlockRedispatcher {
     private GlskBlockRedispatcher() {
     }
 
-    static void storeValue(final Map<String, List<GlskRedispatchingEntity>> redispatchingEntitiesByGskName, final String gskName, final String nodeName, final double factor) {
-        redispatchingEntitiesByGskName.computeIfAbsent(gskName, key -> new ArrayList<>()).add(new GlskRedispatchingEntity(nodeName, factor));
-    }
-
-    static void redispatchFactorValue(final Map<String, List<GlskRedispatchingEntity>> incorrectValuesByGskName,
-                                      final Map<String, List<GlskRedispatchingEntity>> correctValuesByGskName,
-                                      final ManualGSKBlockType manualGSKBlock) {
+    public static void redispatchFactorValue(final Map<String, List<GlskSerieShare>> incorrectValuesByGskName,
+                                             final Map<String, List<GlskSerieShare>> correctValuesByGskName,
+                                             final ManualGSKBlockType manualGSKBlock) {
         final String gskName = Optional.ofNullable(manualGSKBlock.getGSKName())
                 .map(IdentificationType::getV)
                 .orElseThrow(() -> new CeMergingException("Missing GLSK block name"));
         final List<ManualNodesType> nodes = Optional.ofNullable(manualGSKBlock.getManualNodes())
                 .orElseThrow(() -> new CeMergingException("Missing manual nodes for GLSK block " + gskName));
 
-        nodes.forEach(node -> fixFactorValue(incorrectValuesByGskName, correctValuesByGskName, gskName, node));
+        if (incorrectValuesByGskName.containsKey(gskName) && correctValuesByGskName.containsKey(gskName)) {
+            nodes.forEach(node -> {
+                final double factor = getRedispatchFactor(incorrectValuesByGskName, correctValuesByGskName,
+                                                          gskName, tryToGetFactor(node));
+                setFactor(node, factor);
+            });
+        }
 
-        final double factorSum = nodes.stream()
-                .mapToDouble(node -> {
-                    if (node.getFactor() == null || node.getFactor().getV() == null) {
-                        throw new CeMergingException("Missing factor value for GLSK node");
-                    }
-                    return node.getFactor().getV().doubleValue();
-                })
-                .sum();
+        final double factorSum = sumProperty(nodes, GlskBlockRedispatcher::tryToGetFactor);
+
         if (factorSum != EXPECTED_FACTOR_SUM) {
             normalizeFactors(factorSum, nodes);
         }
     }
 
-    private static void fixFactorValue(final Map<String, List<GlskRedispatchingEntity>> incorrectValuesByGskName,
-                                       final Map<String, List<GlskRedispatchingEntity>> correctValuesByGskName,
-                                       final String gskName,
-                                       final ManualNodesType manualNode) {
-        if (incorrectValuesByGskName.containsKey(gskName) && correctValuesByGskName.containsKey(gskName)) {
-            if (manualNode.getFactor() == null || manualNode.getFactor().getV() == null) {
-                throw new CeMergingException("Missing factor value for GLSK node");
-            }
-            final double factorValue = manualNode.getFactor().getV().doubleValue();
-            final double newFactor = calculateRedispatchedFactorValue(incorrectValuesByGskName, correctValuesByGskName, gskName, factorValue);
-            manualNode.getFactor().setV(BigDecimal.valueOf(newFactor));
+    private static double tryToGetFactor(final ManualNodesType node) {
+        if (node.getFactor() == null || node.getFactor().getV() == null) {
+            throw new CeMergingException("Missing factor value for GLSK node");
         }
+        return getFactor(node);
     }
 
-    private static double calculateRedispatchedFactorValue(final Map<String, List<GlskRedispatchingEntity>> incorrectValuesByGskName,
-                                                           final Map<String, List<GlskRedispatchingEntity>> correctValuesByGskName,
-                                                           final String gskName,
-                                                           double factorValue) {
+    private static double getRedispatchFactor(final Map<String, List<GlskSerieShare>> incorrectValuesByGskName,
+                                              final Map<String, List<GlskSerieShare>> correctValuesByGskName,
+                                              final String gskName,
+                                              double factorValue) {
         final double correctSum = calculateBlockSum(correctValuesByGskName, gskName);
         final double incorrectSum = calculateBlockSum(incorrectValuesByGskName, gskName);
+
         if (correctSum == 0.0) {
             throw new CeMergingException(String.format("Cannot redispatch GLSK block '%s': correct block sum is zero", gskName));
         }
-        return roundGlsk(factorValue + incorrectSum * factorValue / correctSum);
+        return roundGlskFactor(factorValue + incorrectSum * factorValue / correctSum);
     }
 
-    private static double calculateBlockSum(final Map<String, List<GlskRedispatchingEntity>> valueByGskName, final String gskName) {
-        return valueByGskName.getOrDefault(gskName, Collections.emptyList()).stream()
-                .collect(Collectors.toMap(
-                        GlskRedispatchingEntity::getId,
-                        GlskRedispatchingEntity::getShare,
-                        (existing, replacement) -> replacement
-                ))
-                .values()
-                .stream()
-                .mapToDouble(Double::doubleValue)
-                .sum();
+    private static double calculateBlockSum(final Map<String, List<GlskSerieShare>> valueByGskName,
+                                            final String gskName) {
+
+        double sum = 0.;
+        final Set<String> seenIds = new HashSet<>();
+        final List<GlskSerieShare> shares = valueByGskName.getOrDefault(gskName, emptyList());
+
+        // as we want the last occurrences of ids, we iterate backwards
+        for (int i = shares.size() - 1; i > 0; i--) {
+            final GlskSerieShare share = shares.get(i);
+            if (seenIds.add(share.id())) {
+                sum += share.share();
+            }
+        }
+
+        return sum;
     }
 
-    private static void normalizeFactors(final double factorSum, final List<ManualNodesType> nodes) {
-        final double difference = factorSum - EXPECTED_FACTOR_SUM;
+    private static void normalizeFactors(final double factorSum,
+                                         final List<ManualNodesType> nodes) {
+        final double gapToNormal = EXPECTED_FACTOR_SUM - factorSum;
         nodes.stream()
-                .max(Comparator.comparingDouble((ManualNodesType node) -> getFactor(node)))
+                .max(comparingDouble(GlskUtils::getFactor))
                 .filter(node -> getFactor(node) > 0)
-                .ifPresent(maxNode -> {
-                    final double factorValue = getFactor(maxNode);
-                    maxNode.getFactor().setV(BigDecimal.valueOf(factorValue - difference));
-                });
+                .ifPresent(maxNode -> setFactor(maxNode, getFactor(maxNode) + gapToNormal));
     }
 
-    private static double getFactor(final ManualNodesType node) {
-        return node.getFactor().getV().doubleValue();
-    }
-
-    private static double roundGlsk(double factorValueToRound) {
-        return Math.round(factorValueToRound * ROUNDING_SCALE) / ROUNDING_SCALE;
+    private static double roundGlskFactor(final double factor) {
+        return Math.round(factor * ROUNDING_SCALE) / ROUNDING_SCALE;
     }
 }

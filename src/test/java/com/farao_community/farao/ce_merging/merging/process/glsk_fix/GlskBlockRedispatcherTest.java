@@ -7,7 +7,11 @@
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.*;
+import com.farao_community.farao.ce_merging.merging.process.glsk_fix.model.GlskSerieShare;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualGSKBlockType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualNodesType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.QuantityType;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -26,12 +30,12 @@ public class GlskBlockRedispatcherTest {
     @Test
     void shouldThrowExceptionWhenCorrectSumIsZero() {
         final ManualGSKBlockType block = createManualBlock(GSK_001);
-        block.getManualNodes().add(createManualNode(NODE_1, 1.0));
+        block.getManualNodes().add(createManualNode());
 
-        final Map<String, List<GlskRedispatchingEntity>> incorrectValues = new HashMap<>();
-        incorrectValues.put(GSK_001, List.of(new GlskRedispatchingEntity(NODE_1, 10)));
-        final Map<String, List<GlskRedispatchingEntity>> correctValues = new HashMap<>();
-        correctValues.put(GSK_001, List.of(new GlskRedispatchingEntity(NODE_1, 0)));
+        final Map<String, List<GlskSerieShare>> incorrectValues = new HashMap<>();
+        incorrectValues.put(GSK_001, List.of(new GlskSerieShare(NODE_1, 10)));
+        final Map<String, List<GlskSerieShare>> correctValues = new HashMap<>();
+        correctValues.put(GSK_001, List.of(new GlskSerieShare(NODE_1, 0)));
 
         assertThrows(CeMergingException.class,
                 () -> GlskBlockRedispatcher.redispatchFactorValue(
@@ -51,13 +55,13 @@ public class GlskBlockRedispatcherTest {
         return block;
     }
 
-    private ManualNodesType createManualNode(final String nodeName, final double factorValue) {
+    private ManualNodesType createManualNode() {
         final ManualNodesType node = new ManualNodesType();
         final IdentificationType nodeId = new IdentificationType();
-        nodeId.setV(nodeName);
+        nodeId.setV(GlskBlockRedispatcherTest.NODE_1);
         node.setNodeName(nodeId);
         final QuantityType factor = new QuantityType();
-        factor.setV(BigDecimal.valueOf(factorValue));
+        factor.setV(BigDecimal.valueOf(1.0));
         node.setFactor(factor);
         return node;
     }
