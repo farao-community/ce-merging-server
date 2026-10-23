@@ -42,7 +42,7 @@ class ItalianGskFixTest {
     private RegionConfiguration regionConfiguration;
 
     @BeforeEach
-    public void setupMergingTaskMocks() {
+    void setupMergingTaskMocks() {
         when(mergingTask.getConfigurations()).thenReturn(taskConfiguration);
         when(taskConfiguration.getRegionConfiguration()).thenReturn(regionConfiguration);
         when(regionConfiguration.getAreasAll()).thenReturn(Map.of("IT", "10YIT-GRTN-----B"));

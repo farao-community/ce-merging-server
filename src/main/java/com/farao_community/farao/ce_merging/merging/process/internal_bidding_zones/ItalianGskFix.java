@@ -31,9 +31,14 @@ import static com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType
 import static com.powsybl.iidm.network.Country.IT;
 import static java.util.function.Predicate.not;
 
-public class ItalianGskFix {
+public final class ItalianGskFix {
+
+    private ItalianGskFix() {
+        // utility class
+    }
+
     public static byte[] handleItalianRegionsGlsk(final byte[] glskBytes,
-                                                   final MergingTask task) {
+                                                  final MergingTask task) {
         final GSKDocument glskDocument = JaxbUtils.readFromBytes(GSKDocument.class, glskBytes);
 
         final List<GSKSeriesType> series = glskDocument.getGSKSeries();

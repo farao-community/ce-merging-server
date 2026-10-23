@@ -60,8 +60,8 @@ public class InternalBiddingZonesManager {
                 .findFirst();
 
         if (optLine.isEmpty()) {
-            LOGGER.warn("line %s linking %s to %s either doesn't exist or is in outage"
-                                .formatted(branch.getElementName(), branch.getFrom(), branch.getTo()));
+            LOGGER.warn("line {} linking {} to {} either doesn't exist or is in outage",
+                        branch.getElementName(), branch.getFrom(), branch.getTo());
         }
 
         return optLine;
