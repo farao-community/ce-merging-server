@@ -57,12 +57,13 @@ public final class CeMergingConstants {
     public static final String DK_NAMING_STRATEGY = "DKNamingStrategy";
     public static final String UCTE_EXPORT_NAMING_STRATEGY_PROPERTY = "ucte.export.naming-strategy";
     public static final String MONITA_NAMING_STRATEGY = "MonitaNamingStrategy";
-    // nodes
+    // network
     public static final String ALEGRO_NODE_PREFIX = "XLI_OB1";
     public static final String VIRTUAL_HUB_ALEGRO_BE_NODE_NAME = "XLI_OB1B";
     public static final String VIRTUAL_HUB_ALEGRO_DE_NODE_NAME = "XLI_OB1A";
     public static final String MONITA1_ME_NODE_NAME = "XKOTR120";
     public static final String MONITA2_ME_NODE_NAME = "XKOTR220";
+    public static final String ELEMENT_NAME_PROPERTY = "elementName";
     // formatting
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
     public static final String DATE_FORMAT = "yyyyMMdd";

@@ -17,9 +17,12 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.OutputType;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
+import com.powsybl.loadflow.LoadFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.function.Supplier;
 
 @Service
 public class RefProgCalculationService {
@@ -27,18 +30,20 @@ public class RefProgCalculationService {
 
     private final CeMergingConfiguration configuration;
     private final MergingTaskRepository mergingTaskRepository;
+    private final Supplier<LoadFlow.Runner> runnerSupplier;
 
     public RefProgCalculationService(final MergingTaskRepository mergingTaskRepository,
-                                     final CeMergingConfiguration configuration
-                                     ) {
+                                     final CeMergingConfiguration configuration,
+                                     final Supplier<LoadFlow.Runner> runnerSupplier) {
         this.configuration = configuration;
         this.mergingTaskRepository = mergingTaskRepository;
+        this.runnerSupplier = runnerSupplier;
     }
 
     public void computeRefProg(final MergingTask task) {
         try {
             LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.REF_PROG);
-            final PublicationDocument finalRefProgResult = RefProgCalculator.forTask(task).computeRefProg();
+            final PublicationDocument finalRefProgResult = RefProgCalculator.with(task, runnerSupplier).computeRefProg();
             saveRefProgFileInOutputs(finalRefProgResult, task);
             mergingTaskRepository.save(task);
         } catch (final Exception e) {

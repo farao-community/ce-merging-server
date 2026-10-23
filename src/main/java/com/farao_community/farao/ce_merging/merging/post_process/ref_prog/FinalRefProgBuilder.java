@@ -16,10 +16,7 @@ import com.farao_community.farao.ce_merging.merging.post_process.common.CurrentT
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.xsd.forecast_netpositions.StandardDocumentTypeList;
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.BusinessTypeList;
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.RoleTypeList;
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.UnitSymbol;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -34,11 +31,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RESOLUTION;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getDocumentIdentification;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getDocumentVersion;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getPublicationTimeInterval;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getReceiverIdentification;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getSenderIdentification;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.getByEic;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.isItalianBiddingZoneEic;
+import static com.farao_community.farao.ce_merging.xsd.glsk_fix.BusinessTypeList.A_66;
+import static com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType.A_01;
+import static com.farao_community.farao.ce_merging.xsd.glsk_fix.UnitSymbol.MAW;
 
 public final class FinalRefProgBuilder {
 
@@ -82,7 +85,7 @@ public final class FinalRefProgBuilder {
         publicationDocument.setPublicationTimeInterval(getPublicationTimeInterval(dailyTimeInterval));
 
         final PublicationDocument.Domain domain = new PublicationDocument.Domain();
-        domain.setCodingScheme(CodingSchemeType.A_01.value());
+        domain.setCodingScheme(A_01.value());
         domain.setV(CeMergingConstants.CORE_REGION_ID);
         publicationDocument.setDomain(domain);
 
@@ -116,6 +119,7 @@ public final class FinalRefProgBuilder {
                                                                                           final CurrentType currentType,
                                                                                           final String dailyTimeInterval,
                                                                                           final int position) {
+        final Border border = entry.getKey();
         final PublicationDocument.PublicationTimeSeries publTimeSeries = new PublicationDocument.PublicationTimeSeries();
         final List<PublicationDocument.PublicationTimeSeries.Period.Interval> intervalList = new ArrayList<>();
         final PublicationDocument.PublicationTimeSeries.Period.Interval interval = new PublicationDocument.PublicationTimeSeries.Period.Interval();
@@ -131,7 +135,7 @@ public final class FinalRefProgBuilder {
         final PublicationDocument.PublicationTimeSeries.Period period = new PublicationDocument.PublicationTimeSeries.Period();
         period.getInterval().addAll(intervalList);
         final PublicationDocument.PublicationTimeSeries.Period.Resolution resol = new PublicationDocument.PublicationTimeSeries.Period.Resolution();
-        resol.setV(CeMergingConstants.RESOLUTION);
+        resol.setV(RESOLUTION);
         period.setResolution(resol);
         final PublicationDocument.PublicationTimeSeries.Period.TimeInterval timeInter = new PublicationDocument.PublicationTimeSeries.Period.TimeInterval();
         timeInter.setV(dailyTimeInterval);
@@ -140,46 +144,48 @@ public final class FinalRefProgBuilder {
 
         final PublicationDocument.PublicationTimeSeries.TimeSeriesIdentification timeSeriesIdentif = new PublicationDocument.PublicationTimeSeries.TimeSeriesIdentification();
         if (currentType == CurrentType.AC) {
-
-            timeSeriesIdentif.setV(getAcTimeSeriesIdentification(entry, allAreasBiMap));
+            timeSeriesIdentif.setV(getAcTimeSeriesIdentification(border, allAreasBiMap));
             publTimeSeries.setTimeSeriesIdentification(timeSeriesIdentif);
         } else {
-            timeSeriesIdentif.setV(getDcTimeSeriesIdentification(entry, countryMaEicCodeMap, countryEicCodeMap));
+            timeSeriesIdentif.setV(getDcTimeSeriesIdentification(border, countryMaEicCodeMap, countryEicCodeMap));
             publTimeSeries.setTimeSeriesIdentification(timeSeriesIdentif);
         }
         final PublicationDocument.PublicationTimeSeries.BusinessType businessType = new PublicationDocument.PublicationTimeSeries.BusinessType();
-        businessType.setV(BusinessTypeList.A_66.value());
+        businessType.setV(A_66.value());
         publTimeSeries.setBusinessType(businessType);
 
         final PublicationDocument.PublicationTimeSeries.MeasureUnitQuantity measureUnitQuant = new PublicationDocument.PublicationTimeSeries.MeasureUnitQuantity();
-        measureUnitQuant.setV(UnitSymbol.MAW.value());
+        measureUnitQuant.setV(MAW.value());
         publTimeSeries.setMeasureUnitQuantity(measureUnitQuant);
 
         final PublicationDocument.PublicationTimeSeries.InArea inArea = new PublicationDocument.PublicationTimeSeries.InArea();
-        inArea.setV(entry.getKey().getInArea());
-        inArea.setCodingScheme(CodingSchemeType.A_01.value());
+        inArea.setV(border.getInArea());
+        inArea.setCodingScheme(A_01.value());
         publTimeSeries.setInArea(inArea);
 
         final PublicationDocument.PublicationTimeSeries.OutArea outArea = new PublicationDocument.PublicationTimeSeries.OutArea();
-        outArea.setV(entry.getKey().getOutArea());
-        outArea.setCodingScheme(CodingSchemeType.A_01.value());
+        outArea.setV(border.getOutArea());
+        outArea.setCodingScheme(A_01.value());
         publTimeSeries.setOutArea(outArea);
         return publTimeSeries;
     }
 
-    private static String getAcTimeSeriesIdentification(final Map.Entry<Border, Double> entry,
+    private static String getAcTimeSeriesIdentification(final Border border,
                                                         final BiMap<String, String> allAreasBiMap) {
-        final String countryTo = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(entry.getKey().getInArea()));
-        final String countryFrom = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(entry.getKey().getOutArea()));
+        if (isItalianBiddingZoneEic(border.getInArea()) && isItalianBiddingZoneEic(border.getOutArea())){
+            return getByEic(border.getOutArea()).name() + "-" + getByEic(border.getInArea()).name();
+        }
+        final String countryTo = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(border.getInArea()));
+        final String countryFrom = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(border.getOutArea()));
         return countryFrom + "-" + countryTo;
     }
 
-    private static String getDcTimeSeriesIdentification(final Map.Entry<Border, Double> entry,
+    private static String getDcTimeSeriesIdentification(final Border border,
                                                         final Map<String, String> countryMaEicCodeMap,
                                                         final Map<String, String> countryEicCodeMap) {
 
-        final String eicCodeFrom = entry.getKey().getOutArea();
-        final String eicCodeTo = entry.getKey().getInArea();
+        final String eicCodeFrom = border.getOutArea();
+        final String eicCodeTo = border.getInArea();
 
         final String countryEicCodeFrom = countryMaEicCodeMap.get(eicCodeFrom);
         if (countryEicCodeFrom == null) {

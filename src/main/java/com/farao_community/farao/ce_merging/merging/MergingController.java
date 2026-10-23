@@ -21,15 +21,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
@@ -38,7 +38,25 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.API_VERSION;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ARTIFACTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BAD_REQUEST;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_MERGING_URL;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CREATED;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GLOBAL_CONFIGURATIONS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INPUTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INTERNAL_ERROR;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JSON_API_MIME_TYPE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_SUPERVISOR_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_TASK_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NOT_FOUND;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NO_CONTENT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OK;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ORIGIN_ANY;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OUTPUTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_CONFIGURATIONS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_MANAGEMENT_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_NOT_RUN;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.toAttachmentFileResponse;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
@@ -104,8 +122,10 @@ public class MergingController {
         }
         try {
             return ResponseEntity.ok().body(JsonApiDocument.fromData(taskManager.runTask(taskId)));
-        } catch (TaskAlreadyRunningException e) {
+        } catch (final TaskAlreadyRunningException e) {
             return ResponseEntity.badRequest().build();
+        } catch (final CeMergingException e) {
+            return ResponseEntity.internalServerError().body(JsonApiDocument.fromServiceException(e));
         }
     }
 

@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.powsybl.iidm.network.Country;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -122,6 +123,10 @@ public class RegionConfiguration implements Serializable {
 
     public void setRef(final Long ref) {
         this.ref = ref;
+    }
+
+    public String findEic(final Country country) {
+        return getAreasAll().get(country.name());
     }
 
     @JsonIgnore

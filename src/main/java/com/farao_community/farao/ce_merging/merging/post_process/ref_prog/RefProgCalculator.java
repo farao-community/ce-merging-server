@@ -24,6 +24,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Configurations
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
+import com.powsybl.loadflow.LoadFlow;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -32,9 +33,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapDk1ToDk;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap.toFlowByAreaMap;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.isItalianBiddingZone;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
 import static java.util.function.Function.identity;
@@ -51,12 +54,13 @@ public final class RefProgCalculator {
     private final List<BecByBoundary> sharingKeysBEC;
     private final FlowByAreaMap acNetPositionOutCountry;
     final Map<String, NetPositions> npByCountry;
+    final Supplier<LoadFlow.Runner> runnerSupplier;
 
-    public static RefProgCalculator forTask(final MergingTask task) throws FileNotFoundException {
-        return new RefProgCalculator(task);
+    public static RefProgCalculator with(final MergingTask task, final Supplier<LoadFlow.Runner> runnerSupplier) throws FileNotFoundException {
+        return new RefProgCalculator(task, runnerSupplier);
     }
 
-    private RefProgCalculator(final MergingTask task) throws FileNotFoundException {
+    private RefProgCalculator(final MergingTask task, final Supplier<LoadFlow.Runner> runnerSupplier) throws FileNotFoundException {
         this.task = task;
         final Configurations configurations = task.getConfigurations();
         referenceProgram = task.getArtifact(REFERENCE_PROGRAM_FORECAST_FILE, ReferenceProgram.class);
@@ -67,6 +71,7 @@ public final class RefProgCalculator {
         sharingKeysBEC = configurations.getBecMatrixConfig();
         acNetPositionOutCountry = regionConfiguration.getAreasIn().values().stream().collect(toFlowByAreaMap(identity(), this::computeAcNetPositionOutCountry));
         npByCountry = finalCgmResult.getNetPositionsResults().getNetPositionsByCountryMap();
+        this.runnerSupplier = runnerSupplier;
     }
 
     public PublicationDocument computeRefProg() {
@@ -84,15 +89,12 @@ public final class RefProgCalculator {
 
     private void handleAcExchange(final String borderFrom,
                                   final String borderTo) {
-        final String eicFrom = toEicCode(borderFrom);
-        final String eicTo = toEicCode(borderTo);
-
-        if (isInternalItalianExchange(eicFrom, eicTo)) {
-            addInternalItalianExchange(eicFrom, eicTo);
+        if (isInternalItalianExchange(borderFrom, borderTo)) {
+            addInternalItalianExchange(borderFrom, borderTo);
         } else if (isNonCoreExchange(borderFrom, borderTo)) {
-            addNonCoreExchange(eicFrom, eicTo);
+            addNonCoreExchange(toEicCode(borderFrom), toEicCode(borderTo));
         } else if (isCoreExchange(borderFrom, borderTo)) {
-            addCoreExchange(eicFrom, eicTo);
+            addCoreExchange(toEicCode(borderFrom), toEicCode(borderTo));
         } else {
             throw new CeMergingException("Border direction from " + borderFrom + " to " + borderTo + " defined in VH config is not supported");
         }
@@ -106,9 +108,9 @@ public final class RefProgCalculator {
         return eicCode;
     }
 
-    private boolean isInternalItalianExchange(final String eicFrom,
-                                              final String eicTo) {
-        return ItalianBiddingZone.getByEic(eicFrom).isPresent() && ItalianBiddingZone.getByEic(eicTo).isPresent();
+    private boolean isInternalItalianExchange(final String borderFrom,
+                                              final String borderTo) {
+        return isItalianBiddingZone(borderFrom) && isItalianBiddingZone(borderTo);
     }
 
     private boolean isNonCoreExchange(final String borderFrom,
@@ -134,16 +136,14 @@ public final class RefProgCalculator {
                         getExchangeFromRefProg(eicFrom, eicTo).getFlow());
     }
 
-    private void addInternalItalianExchange(final String eicFrom,
-                                            final String eicTo) {
-        final ItalianBiddingZone from = ItalianBiddingZone.getByEic(eicFrom)
-                .orElseThrow(() -> new CeMergingException("%s should be an italian TSO's EIC".formatted(eicFrom)));
-        final ItalianBiddingZone to = ItalianBiddingZone.getByEic(eicTo)
-                .orElseThrow(() -> new CeMergingException("%s should be an italian TSO's EIC".formatted(eicTo)));
-        final InternalBiddingZonesManager bzManager = new InternalBiddingZonesManager(task);
+    private void addInternalItalianExchange(final String borderFrom,
+                                            final String borderTo) {
+        final InternalBiddingZonesManager bzManager = new InternalBiddingZonesManager(task, runnerSupplier);
+        final ItalianBiddingZone from = ItalianBiddingZone.valueOf(borderFrom);
+        final ItalianBiddingZone to = ItalianBiddingZone.valueOf(borderTo);
 
-        acExchanges.put(Border.from(eicFrom).to(eicTo),
-                        bzManager.getTotalInternalExchange(from, to));
+        acExchanges.put(Border.from(from.getEic()).to(to.getEic()),
+                        bzManager.getTotalFlow(from, to));
     }
 
     private void addCoreExchange(final String eicFrom,

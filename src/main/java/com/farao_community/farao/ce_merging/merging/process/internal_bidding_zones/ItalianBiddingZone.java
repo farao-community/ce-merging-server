@@ -7,8 +7,9 @@
 
 package com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones;
 
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+
 import java.util.Arrays;
-import java.util.Optional;
 
 public enum ItalianBiddingZone {
     INOR("NORD", "10Y1001A1001A73I"),
@@ -34,7 +35,16 @@ public enum ItalianBiddingZone {
         return eic;
     }
 
-    public static Optional<ItalianBiddingZone> getByEic(final String eic) {
-        return Arrays.stream(values()).filter(bz -> bz.getEic().equals(eic)).findAny();
+    public static ItalianBiddingZone getByEic(final String eic) {
+        return Arrays.stream(values()).filter(bz -> bz.getEic().equals(eic)).findAny()
+                .orElseThrow(() -> new CeMergingException("%s does not correspond to an italian bidding zone"));
+    }
+
+    public static boolean isItalianBiddingZone(final String name) {
+        return Arrays.stream(values()).anyMatch(bz -> bz.name().equals(name));
+    }
+
+    public static boolean isItalianBiddingZoneEic(final String eic) {
+        return Arrays.stream(values()).anyMatch(bz -> bz.getEic().equals(eic));
     }
 }

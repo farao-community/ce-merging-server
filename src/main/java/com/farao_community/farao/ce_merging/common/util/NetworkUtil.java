@@ -40,10 +40,6 @@ public final class NetworkUtil {
         // utility
     }
 
-    public static String getUcteNode(final Terminal terminal) {
-        return terminal.getBusView().getConnectableBus().getId();
-    }
-
     public static boolean hasActivePower(final Injection injection) {
         return !isNaN(injection.getTerminal().getP());
     }
@@ -177,8 +173,11 @@ public final class NetworkUtil {
         };
     }
 
-    public static Double getTerminalFlow(final Terminal terminal) {
+    public static double getTerminalFlow(final Terminal terminal) {
         return terminal.isConnected() ? zeroIfNaN(terminal.getP()) : 0;
+    }
+    public static double getLineFlow(final Line line) {
+        return (getTerminalFlow(line.getTerminal1()) + getTerminalFlow(line.getTerminal2()))/2;
     }
 
     public static Country getCountryOnOtherSide(final Line line,
