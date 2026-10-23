@@ -179,7 +179,11 @@ public final class NetworkUtil {
     }
 
     public static double getLineFlow(final Line line) {
-        return (getTerminalFlow(line.getTerminal1()) + getTerminalFlow(line.getTerminal2())) / 2;
+        return (getTerminalFlow(line.getTerminal1()) - getTerminalFlow(line.getTerminal2())) / 2;
+    }
+
+    public static String getVlIdOnSide(final Branch<?> branch, final TwoSides side) {
+        return branch.getTerminal(side).getVoltageLevel().getId();
     }
 
     public static Country getCountryOnOtherSide(final Line line,

@@ -8,31 +8,43 @@
 package com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.xsd.internal_bidding_zones.InternalTieLineType;
 
 import java.util.Arrays;
+import java.util.Objects;
 
 public enum ItalianBiddingZone {
-    INOR("NORD", "10Y1001A1001A73I"),
-    ICNO("CENTRO_NORD", "10Y1001A1001A70O"),
-    ICSO("CENTRO_SUD", "10Y1001A1001A71M"),
-    ISOU("SUD", "10Y1001A1001A788"),
-    ICAL("CALABRIA", "10Y1001C--00096J");
+    INOR("10Y1001A1001A73I"),
+    ICNO("10Y1001A1001A70O"),
+    ICSO("10Y1001A1001A71M"),
+    ISOU("10Y1001A1001A788"),
+    ICAL("10Y1001C--00096J");
 
-    private final String italianName;
     private final String eic;
 
-    ItalianBiddingZone(final String italianName,
-                       final String eic) {
-        this.italianName = italianName;
+    ItalianBiddingZone(final String eic) {
         this.eic = eic;
-    }
-
-    public String getItalianName() {
-        return italianName;
     }
 
     public String getEic() {
         return eic;
+    }
+
+    public double getFlowSign(final InternalTieLineType line) {
+        if (lineComesFrom(line, this)) {
+            return 1;
+        } else if (lineGoesTo(line, this)) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+
+    public static boolean lineJoinsZones(final InternalTieLineType line,
+                                         final ItalianBiddingZone bz1,
+                                         final ItalianBiddingZone bz2) {
+        return lineComesFrom(line, bz1) && lineGoesTo(line, bz2)
+               || lineComesFrom(line, bz2) && lineGoesTo(line, bz1);
     }
 
     public static ItalianBiddingZone getByEic(final String eic) {
@@ -46,5 +58,15 @@ public enum ItalianBiddingZone {
 
     public static boolean isItalianBiddingZoneEic(final String eic) {
         return Arrays.stream(values()).anyMatch(bz -> bz.getEic().equals(eic));
+    }
+
+    private static boolean lineGoesTo(final InternalTieLineType line,
+                                      final ItalianBiddingZone biddingZone) {
+        return Objects.equals(line.getBiddingZoneTo().getValue(), biddingZone.name());
+    }
+
+    private static boolean lineComesFrom(final InternalTieLineType line,
+                                         final ItalianBiddingZone biddingZone) {
+        return Objects.equals(line.getBiddingZoneFrom().getValue(), biddingZone.name());
     }
 }

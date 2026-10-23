@@ -685,6 +685,10 @@
     <xnode name="XFG.IL14" area1="FR" area2="IT"/>
 
 
+    <!--
+        Created by ALI on 22-10-2026
+        new XNodes found in sample IGMs
+     -->
     <xnode name="XFO_PL11" area1="PT" area2="ES"/>
     <xnode name="XGR_KU12" area1="DE" subarea1="D4" area2="DE" subarea2="D2"/>
 </xnodes>

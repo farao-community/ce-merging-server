@@ -12,21 +12,21 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.xsd.internal_bidding_zones.BiddingZoneUCTEDocument;
 import com.farao_community.farao.ce_merging.xsd.internal_bidding_zones.BranchType;
 import com.farao_community.farao.ce_merging.xsd.internal_bidding_zones.InternalTieLineType;
-import com.farao_community.farao.ce_merging.xsd.internal_bidding_zones.TextOnlyType;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
-import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ELEMENT_NAME_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getLineFlow;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getVlIdOnSide;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.lineJoinsZones;
+import static com.powsybl.iidm.network.TwoSides.ONE;
+import static com.powsybl.iidm.network.TwoSides.TWO;
 
 public class InternalBiddingZonesManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(InternalBiddingZonesManager.class);
@@ -38,54 +38,39 @@ public class InternalBiddingZonesManager {
         this.biddingZoneData = JaxbUtils.readFromPath(BiddingZoneUCTEDocument.class,
                                                       task.getInputs().getInternalBiddingZones().getPath());
         this.cgm = Network.read(task.getOutputs().getCgm().getPath());
-
-        final LoadFlowParameters loadFlowParameters = task.getConfigurations().getLoadFlowParameters();
-
-        runLoadFlow(cgm, loadFlowRunnerSupplier, loadFlowParameters);
+        runLoadFlow(cgm, loadFlowRunnerSupplier, task.getConfigurations().getLoadFlowParameters());
     }
 
     public double getTotalFlow(final ItalianBiddingZone bzFrom,
                                final ItalianBiddingZone bzTo) {
         double sum = 0.0;
         for (final InternalTieLineType tieLine : biddingZoneData.getInternalTieLines().getInternalTieLine()) {
-            final boolean linksOppositeWay = links(tieLine, bzTo, bzFrom);
-            if (links(tieLine, bzFrom, bzTo) || linksOppositeWay) {
-                final BranchType tieBranch = tieLine.getBranch();
-                final Optional<Line> optionalLine = toLine(tieBranch);
-                if (optionalLine.isPresent()) {
-                    final double flowOnTieLine = getLineFlow(optionalLine.get());
-                    sum += linksOppositeWay ? -flowOnTieLine : flowOnTieLine;
-                } else {
-                    LOGGER.warn("line %s linking %s to %s either doesn't exist or is in outage"
-                                        .formatted(tieBranch.getElementName(), tieBranch.getFrom(), tieBranch.getTo()));
-                }
+            if (lineJoinsZones(tieLine, bzFrom, bzTo)) {
+                // from -> to and to -> from must be counted with opposite signs (respectively +/-)
+                final double flowSign = bzFrom.getFlowSign(tieLine);
+                sum += toLine(tieLine.getBranch()).map(line -> flowSign * getLineFlow(line)).orElse(0.);
             }
         }
         return sum;
     }
 
-    private static boolean links(final InternalTieLineType line,
-                                 final ItalianBiddingZone from,
-                                 final ItalianBiddingZone to) {
-        return areSameBiddingZones(line.getBiddingZoneFrom(), from) && areSameBiddingZones(line.getBiddingZoneTo(), to);
-    }
-
-    private static boolean areSameBiddingZones(final TextOnlyType inXml,
-                                               final ItalianBiddingZone italianBiddingZone) {
-        return Objects.equals(inXml.getValue(), italianBiddingZone.name());
-    }
-
     private Optional<Line> toLine(final BranchType branch) {
-        return cgm.getLineStream()
+        final Optional<Line> optLine = cgm.getLineStream()
                 .filter(line -> areSameBranches(branch, line))
                 .findFirst();
+
+        if (optLine.isEmpty()) {
+            LOGGER.warn("line %s linking %s to %s either doesn't exist or is in outage"
+                                .formatted(branch.getElementName(), branch.getFrom(), branch.getTo()));
+        }
+
+        return optLine;
     }
 
     private static boolean areSameBranches(final BranchType branch,
                                            final Line line) {
-        return branch.getElementName().equals(line.getProperty(ELEMENT_NAME_PROPERTY))
-               || Objects.equals(line.getTerminal1().getVoltageLevel().getId(), branch.getFrom())
-                   && Objects.equals(line.getTerminal2().getVoltageLevel().getId(), branch.getTo());
+        return getVlIdOnSide(line, ONE).contains(branch.getFrom())
+               && getVlIdOnSide(line, TWO).contains(branch.getTo());
 
     }
 }

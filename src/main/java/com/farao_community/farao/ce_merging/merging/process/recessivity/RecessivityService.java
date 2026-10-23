@@ -8,8 +8,8 @@ package com.farao_community.farao.ce_merging.merging.process.recessivity;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.xnode.AreaInformation;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodeInformation;
@@ -45,6 +45,7 @@ import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getVlIdOnSide;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isConnectedTo;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
@@ -54,6 +55,8 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static com.farao_community.farao.ce_merging.merging.task.enums.GermanTso.D7;
 import static com.powsybl.iidm.network.Country.BE;
 import static com.powsybl.iidm.network.Country.DE;
+import static com.powsybl.iidm.network.TwoSides.ONE;
+import static com.powsybl.iidm.network.TwoSides.TWO;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.ObjectUtils.allNotNull;
 import static org.apache.commons.lang3.ObjectUtils.anyNull;
@@ -80,7 +83,7 @@ public class RecessivityService {
             LOGGER.info("Recessive countries are {}", recessiveCountries);
 
             checkAndCorrectInconsistencies(
-                task, recessiveCountries, task.getArtifact(TOPOLOGICAL_MERGE_FILE, Network.class)
+                    task, recessiveCountries, task.getArtifact(TOPOLOGICAL_MERGE_FILE, Network.class)
             );
         } catch (final Exception e) {
             final String errorMessage = String.format("Xnodes check failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
@@ -160,10 +163,10 @@ public class RecessivityService {
                                                     final Map<String, XnodeInformation> infosByName,
                                                     final List<String> recessiveCountries) {
         final List<XnodeIncorrect> incorrect = infosByName.entrySet()
-            .stream()
-            .filter(e -> e.getValue().isIncorrect())
-            .map(e -> fixAndGetIncorrect(network, e.getKey(), e.getValue(), recessiveCountries))
-            .collect(toList()); // NOSONAR do not change with Java 16's toList(), we want a mutable list here
+                .stream()
+                .filter(e -> e.getValue().isIncorrect())
+                .map(e -> fixAndGetIncorrect(network, e.getKey(), e.getValue(), recessiveCountries))
+                .collect(toList()); // NOSONAR do not change with Java 16's toList(), we want a mutable list here
 
         checkAlegroXnodes(incorrect, infosByName, recessiveCountries);
 
@@ -181,11 +184,11 @@ public class RecessivityService {
         if (xNode.isRecessive1() && !xNode.isRecessive2()) {
             final String country1 = xNode.getCountry1();
             getBranchToCorrect(network, name, country1, german)
-                .ifPresent(branch -> alignBranchStatusWithXnode(xNode.getStatus2(), getCountryFromCode(country1), branch));
+                    .ifPresent(branch -> alignBranchStatusWithXnode(xNode.getStatus2(), getCountryFromCode(country1), branch));
         } else if (xNode.isRecessive2() && !xNode.isRecessive1()) {
             final String country2 = xNode.getCountry2();
             getBranchToCorrect(network, name, country2, german)
-                .ifPresent(branch -> alignBranchStatusWithXnode(xNode.getStatus1(), getCountryFromCode(country2), branch));
+                    .ifPresent(branch -> alignBranchStatusWithXnode(xNode.getStatus1(), getCountryFromCode(country2), branch));
         }
 
         return xNode;
@@ -195,10 +198,10 @@ public class RecessivityService {
                                                       final Map<String, XnodeInformation> infosByName) {
 
         return infosByName.entrySet()
-            .stream()
-            .filter(e -> e.getValue().isIncomplete() && !isAlegroXnode(e.getKey()))
-            .map(e -> getIncompleteXnode(xNodesConfig, e.getKey(), e.getValue()))
-            .toList();
+                .stream()
+                .filter(e -> e.getValue().isIncomplete() && !isAlegroXnode(e.getKey()))
+                .map(e -> getIncompleteXnode(xNodesConfig, e.getKey(), e.getValue()))
+                .toList();
     }
 
     private XnodeIncomplete getIncompleteXnode(final List<XnodeConfig> xNodesConfig,
@@ -208,10 +211,10 @@ public class RecessivityService {
         final AreaInformation existingInfo = hasArea1Info ? xNodeInfo.getArea1Information() : xNodeInfo.getArea2Information();
 
         final String countryAbsent = xNodesConfig.stream()
-            .filter(xNode -> xNode.getName().equals(xNodeName))
-            .findFirst()
-            .map(cfg -> hasArea1Info ? cfg.getArea2() : cfg.getArea1())
-            .orElse("");
+                .filter(xNode -> xNode.getName().equals(xNodeName))
+                .findFirst()
+                .map(cfg -> hasArea1Info ? cfg.getArea2() : cfg.getArea1())
+                .orElse("");
 
         return new XnodeIncomplete(xNodeName, existingInfo, countryAbsent);
 
@@ -227,8 +230,8 @@ public class RecessivityService {
                                                 final boolean isGermanInternalNode) {
 
         return isGermanInternalNode ?
-            Optional.ofNullable(findCorrectGermanBranch(network, countryName, nodeId))
-            : network.getBranchStream().filter(isConnectedTo(nodeId)).findFirst();
+                Optional.ofNullable(findCorrectGermanBranch(network, countryName, nodeId))
+                : network.getBranchStream().filter(isConnectedTo(nodeId)).findFirst();
 
     }
 
@@ -240,23 +243,16 @@ public class RecessivityService {
         final String nodeInBranch = nodeId.substring(1, 8);
 
         return network.getBranchStream()
-            .filter(isConnectedTo(nodeInBranch))
-            .filter(linksGermanyRegionToNode(germanyRegionCode, node))
-            .findFirst()
-            .orElse(null);
+                .filter(isConnectedTo(nodeInBranch))
+                .filter(linksGermanyRegionToNode(germanyRegionCode, node))
+                .findFirst()
+                .orElse(null);
     }
 
-    private Predicate<Branch> linksGermanyRegionToNode(final String germanyRegionCode, final String node) {
-        return branch -> sideOneId(branch).contains(node) && sideTwoId(branch).startsWith(germanyRegionCode)
-                         || sideTwoId(branch).contains(node) && sideOneId(branch).startsWith(germanyRegionCode);
-    }
-
-    final String sideOneId(final Branch branch) {
-        return branch.getTerminal1().getVoltageLevel().getId();
-    }
-
-    final String sideTwoId(final Branch branch) {
-        return branch.getTerminal2().getVoltageLevel().getId();
+    private Predicate<Branch> linksGermanyRegionToNode(final String germanyRegionCode,
+                                                       final String node) {
+        return branch -> getVlIdOnSide(branch, ONE).contains(node) && getVlIdOnSide(branch, TWO).startsWith(germanyRegionCode)
+                         || getVlIdOnSide(branch, TWO).contains(node) && getVlIdOnSide(branch, ONE).startsWith(germanyRegionCode);
     }
 
     private void alignBranchStatusWithXnode(final XnodeStatus xnodeStatus,
@@ -265,9 +261,9 @@ public class RecessivityService {
         final Consumer<Terminal> setToXnodeStatus = xnodeStatus == OPEN ? Terminal::disconnect : Terminal::connect;
 
         Arrays.stream(TwoSides.values())
-            .filter(side -> country.equals(getCountryOfSide(branch, side)))
-            .map(branch::getTerminal)
-            .forEach(setToXnodeStatus);
+                .filter(side -> country.equals(getCountryOfSide(branch, side)))
+                .map(branch::getTerminal)
+                .forEach(setToXnodeStatus);
     }
 
 }
