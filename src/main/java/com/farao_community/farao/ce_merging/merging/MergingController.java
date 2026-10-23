@@ -311,6 +311,22 @@ public class MergingController {
         return toAttachmentFileResponse(taskManager.getNetPositionForecast(taskId));
     }
 
+    @GetMapping(value = "/tasks/{taskId}/inputs/internal-bidding-zones",
+            produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
+    @Operation(tags = INPUTS_TAG,
+            summary = "Get the internal bidding zones input of the merging task with given ID.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = OK, description = "Internal bidding zones data returned successfully."),
+        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with the given ID was not found.")
+    })
+    public ResponseEntity<byte[]> getInternalBiddingZones(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        return toAttachmentFileResponse(taskManager.getInternalBiddingZones(taskId));
+    }
+
+
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
             GLOBAL CONFIGURATIONS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
