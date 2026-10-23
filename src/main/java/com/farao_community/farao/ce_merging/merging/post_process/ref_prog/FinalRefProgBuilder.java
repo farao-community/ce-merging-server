@@ -39,6 +39,8 @@ import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getPublicationTimeInterval;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getReceiverIdentification;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getSenderIdentification;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.getByEic;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.isItalianBiddingZoneEic;
 
 public final class FinalRefProgBuilder {
 
@@ -169,8 +171,12 @@ public final class FinalRefProgBuilder {
 
     private static String getAcTimeSeriesIdentification(final Map.Entry<Border, Double> entry,
                                                         final BiMap<String, String> allAreasBiMap) {
-        final String countryTo = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(entry.getKey().getInArea()));
-        final String countryFrom = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(entry.getKey().getOutArea()));
+        final Border border = entry.getKey();
+        if (isItalianBiddingZoneEic(border.getInArea()) && isItalianBiddingZoneEic(border.getOutArea())) {
+            return getByEic(border.getOutArea()).name() + "-" + getByEic(border.getInArea()).name();
+        }
+        final String countryTo = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(border.getInArea()));
+        final String countryFrom = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(border.getOutArea()));
         return countryFrom + "-" + countryTo;
     }
 

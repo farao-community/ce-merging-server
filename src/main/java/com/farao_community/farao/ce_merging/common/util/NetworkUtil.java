@@ -8,9 +8,9 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Injection;
@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_CODE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_CODE;
 import static com.powsybl.iidm.network.TwoSides.ONE;
 import static com.powsybl.iidm.network.TwoSides.TWO;
 import static java.lang.Double.isNaN;
@@ -151,19 +153,20 @@ public final class NetworkUtil {
         return country.equals(getCountry(hvdcLine.getConverterStation1().getTerminal())) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(final Line line, final String zone) {
+    public static double getBorderFlow(final Line line,
+                                       final String zone) {
         final double flowSide1 = getTerminalFlow(line.getTerminal1());
         final double flowSide2 = getTerminalFlow(line.getTerminal2());
         final double directFlow = (flowSide1 - flowSide2) / 2;
         return line.getTerminal(TwoSides.ONE).getVoltageLevel().getId().startsWith(zone) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(final BoundaryLine boundaryLine, final LoadFlowParameters.ComponentMode componentModeLfParameter) {
+    public static double getBorderFlow(final BoundaryLine boundaryLine,
+                                       final LoadFlowParameters.ComponentMode componentModeLfParameter) {
         return switch (componentModeLfParameter) {
             case MAIN_CONNECTED -> // Loadflow computed only on main connected component
                     boundaryLine.getTerminal().getBusBreakerView().getConnectableBus().isInMainConnectedComponent() ? getLeavingFlow(boundaryLine) : 0.;
-            case ALL_CONNECTED ->
-                    getLeavingFlow(boundaryLine);
+            case ALL_CONNECTED -> getLeavingFlow(boundaryLine);
             default -> {
                 LOGGER.error(ERROR_COMPONENT_NUMBER_PARAMETER);
                 throw new CeMergingException(ERROR_COMPONENT_NUMBER_PARAMETER);
@@ -171,8 +174,16 @@ public final class NetworkUtil {
         };
     }
 
-    public static Double getTerminalFlow(final Terminal terminal) {
+    public static double getTerminalFlow(final Terminal terminal) {
         return terminal.isConnected() ? zeroIfNaN(terminal.getP()) : 0;
+    }
+
+    public static double getLineFlow(final Line line) {
+        return (getTerminalFlow(line.getTerminal1()) - getTerminalFlow(line.getTerminal2())) / 2;
+    }
+
+    public static String getVlIdOnSide(final Branch<?> branch, final TwoSides side) {
+        return branch.getTerminal(side).getVoltageLevel().getId();
     }
 
     public static Country getCountryOnOtherSide(final Line line,
@@ -197,17 +208,24 @@ public final class NetworkUtil {
         return boundaryLine.getTerminal().isConnected() ? zeroIfNaN(-boundaryLine.getBoundary().getP()) : 0;
     }
 
-    public static boolean isBorderOfZone(final BoundaryLine boundaryLine, final String zone) {
+    public static boolean isBorderOfZone(final BoundaryLine boundaryLine,
+                                         final String zone) {
         return isBorderOfZone(boundaryLine.getId(), zone);
     }
 
-    public static boolean isBorderOfZone(final Line line, final String zone) {
+    public static boolean isBorderOfZone(final Line line,
+                                         final String zone) {
         return isBorderOfZone(line.getId(), zone);
     }
 
-    private static boolean isBorderOfZone(final String lineId, final String zone) {
+    private static boolean isBorderOfZone(final String lineId,
+                                          final String zone) {
         final String nodeFrom = lineId.substring(0, 8);
         final String nodeTo = lineId.substring(9, 17);
         return nodeFrom.startsWith(zone) != nodeTo.startsWith(zone);
+    }
+
+    public static boolean isAlegroNode(final String nodeName) {
+        return VIRTUAL_HUB_ALEGRO_BE_CODE.equals(nodeName) || VIRTUAL_HUB_ALEGRO_DE_CODE.equals(nodeName);
     }
 }

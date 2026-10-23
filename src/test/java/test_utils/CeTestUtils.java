@@ -24,7 +24,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.commons.report.TypedValue;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.Terminal;
+import com.powsybl.iidm.network.TwoSides;
+import com.powsybl.iidm.network.VoltageLevel;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
@@ -45,6 +49,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ELEMENT_NAME_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.EMPTY;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.CREATED;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
@@ -229,7 +234,8 @@ public final class CeTestUtils {
         return task;
     }
 
-    public static MergingTask mockTaskWithCgmResult(final String targetDate, final String cgmPath) {
+    public static MergingTask mockTaskWithCgmResult(final String targetDate,
+                                                    final String cgmPath) {
         final String[] path = cgmPath.split("/");
         final SavedFile cgmOutput = new SavedFile(path[path.length - 1], THIS.getResource(cgmPath).getPath(), "mock");
         final MergingTask task = new MergingTask();
@@ -244,7 +250,8 @@ public final class CeTestUtils {
         return task;
     }
 
-    public static MergingTask mockTaskWithRefProgResult(final String targetDate, final String refProgPath) {
+    public static MergingTask mockTaskWithRefProgResult(final String targetDate,
+                                                        final String refProgPath) {
         final String[] path = refProgPath.split("/");
         final SavedFile refProg = new SavedFile(path[path.length - 1], THIS.getResource(refProgPath).getPath(), "mock");
         final MergingTask task = new MergingTask();
@@ -345,7 +352,34 @@ public final class CeTestUtils {
         return mockRunner;
     }
 
-    public static SavedFile getSavedFile(String filename, String path) {
+    public static SavedFile getSavedFile(String filename,
+                                         String path) {
         return new SavedFile(filename, path + filename, "mock");
+    }
+
+    public static Line mockLine(final String elementName,
+                                final String nodeFrom,
+                                final String nodeTo,
+                                final double flow) {
+        final Line line = mock(Line.class);
+        final Terminal terminal1 = mock(Terminal.class);
+        final Terminal terminal2 = mock(Terminal.class);
+        final VoltageLevel vl1 = mock(VoltageLevel.class);
+        final VoltageLevel vl2 = mock(VoltageLevel.class);
+
+        when(line.getProperty(ELEMENT_NAME_PROPERTY)).thenReturn(elementName);
+        when(line.getTerminal1()).thenReturn(terminal1);
+        when(line.getTerminal2()).thenReturn(terminal2);
+        when(line.getTerminal(TwoSides.ONE)).thenReturn(terminal1);
+        when(line.getTerminal(TwoSides.TWO)).thenReturn(terminal2);
+        when(terminal1.getVoltageLevel()).thenReturn(vl1);
+        when(terminal2.getVoltageLevel()).thenReturn(vl2);
+        // "perfect" line
+        when(terminal1.getP()).thenReturn(flow);
+        when(terminal2.getP()).thenReturn(-flow);
+        when(vl1.getId()).thenReturn(nodeFrom);
+        when(vl2.getId()).thenReturn(nodeTo);
+
+        return line;
     }
 }
