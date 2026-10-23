@@ -33,7 +33,6 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.getCountryFromCode;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getVlIdOnSide;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isConnected;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWithVirtualHub;
@@ -206,8 +205,8 @@ public class XnodesCalculation {
             throw new CeMergingException("Invalid nodeId: " + nodeId);
         }
         for (final Branch branch : branches) {
-            final String voltageLevel1 = getVlIdOnSide(branch, TwoSides.ONE);
-            final String voltageLevel2 = getVlIdOnSide(branch, TwoSides.TWO);
+            final String voltageLevel1 = branch.getTerminal1().getVoltageLevel().getId();
+            final String voltageLevel2 = branch.getTerminal2().getVoltageLevel().getId();
             final String internalNodeId = nodeId.substring(1, 7);
             if (voltageLevel1.contains(internalNodeId) && voltageLevel2.startsWith(countryName) || voltageLevel2.contains(internalNodeId) && voltageLevel1.startsWith(countryName)) {
                 return branch;

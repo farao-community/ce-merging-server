@@ -24,15 +24,6 @@ public class Border implements Serializable {
         this.inArea = inArea;
     }
 
-    public static Border from(final String outArea) {
-        return new Border(outArea, null);
-    }
-
-    public Border to(final String inArea) {
-        this.inArea = inArea;
-        return this;
-    }
-
     public Border() {
 
     }

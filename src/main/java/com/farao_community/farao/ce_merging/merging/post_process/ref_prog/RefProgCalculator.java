@@ -126,13 +126,13 @@ public final class RefProgCalculator {
     }
 
     private void addVirtualHubExchange(final VirtualHubRecord virtualHub) {
-        virtualHubsExchanges.put(Border.from(virtualHub.getRelatedMaEic()).to(virtualHub.getEic()),
+        virtualHubsExchanges.put(new Border(virtualHub.getRelatedMaEic(), virtualHub.getEic()),
                                  getVirtualHubsExchangesFromCgm().getOrZero(virtualHub.getNodeName()));
     }
 
     private void addNonCoreExchange(final String eicFrom,
                                     final String eicTo) {
-        acExchanges.put(Border.from(eicFrom).to(eicTo),
+        acExchanges.put(new Border(eicFrom, eicTo),
                         getExchangeFromRefProg(eicFrom, eicTo).getFlow());
     }
 
@@ -142,13 +142,13 @@ public final class RefProgCalculator {
         final ItalianBiddingZone from = ItalianBiddingZone.valueOf(borderFrom);
         final ItalianBiddingZone to = ItalianBiddingZone.valueOf(borderTo);
 
-        acExchanges.put(Border.from(from.getEic()).to(to.getEic()),
+        acExchanges.put(new Border(from.getEic(), to.getEic()),
                         bzManager.getTotalFlow(from, to));
     }
 
     private void addCoreExchange(final String eicFrom,
                                  final String eicTo) {
-        final Border border = Border.from(eicFrom).to(eicTo);
+        final Border border = new Border(eicFrom, eicTo);
 
         final double flow = getBexFactors(border)
                 .getCoefficientByCountry()
@@ -172,7 +172,7 @@ public final class RefProgCalculator {
     private Optional<VirtualHubRecord> findVirtualHub(final String borderFrom,
                                                       final String borderTo) {
         return virtualHubRecords.stream()
-                .filter(vh -> vh.hasCode(borderFrom) || vh.hasCode(borderTo))
+                .filter(vh -> vh.getCode().equals(borderFrom) || vh.getCode().equals(borderTo))
                 .findAny();
     }
 
