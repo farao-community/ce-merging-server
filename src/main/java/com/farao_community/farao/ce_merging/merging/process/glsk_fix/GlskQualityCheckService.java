@@ -143,7 +143,6 @@ public class GlskQualityCheckService {
         }
     }
 
-
     private ReportNode createRootReportNode() {
         return ReportNode.newRootReportNode()
                 .withResourceBundles(REPORT_BASE_NAME, PowsyblEntsoeReportResourceBundle.BASE_NAME)

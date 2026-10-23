@@ -84,8 +84,8 @@ public class InternalBiddingZonesManager {
     private static boolean areSameBranches(final BranchType branch,
                                            final Line line) {
         return branch.getElementName().equals(line.getProperty(ELEMENT_NAME_PROPERTY))
-               || (Objects.equals(line.getTerminal1().getVoltageLevel().getId(), branch.getFrom())
-                   && Objects.equals(line.getTerminal2().getVoltageLevel().getId(), branch.getTo()));
+               || Objects.equals(line.getTerminal1().getVoltageLevel().getId(), branch.getFrom())
+                   && Objects.equals(line.getTerminal2().getVoltageLevel().getId(), branch.getTo());
 
     }
 }

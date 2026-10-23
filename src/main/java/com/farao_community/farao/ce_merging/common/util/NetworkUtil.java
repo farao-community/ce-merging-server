@@ -153,19 +153,20 @@ public final class NetworkUtil {
         return country.equals(getCountry(hvdcLine.getConverterStation1().getTerminal())) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(final Line line, final String zone) {
+    public static double getBorderFlow(final Line line,
+                                       final String zone) {
         final double flowSide1 = getTerminalFlow(line.getTerminal1());
         final double flowSide2 = getTerminalFlow(line.getTerminal2());
         final double directFlow = (flowSide1 - flowSide2) / 2;
         return line.getTerminal(TwoSides.ONE).getVoltageLevel().getId().startsWith(zone) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(final BoundaryLine boundaryLine, final LoadFlowParameters.ComponentMode componentModeLfParameter) {
+    public static double getBorderFlow(final BoundaryLine boundaryLine,
+                                       final LoadFlowParameters.ComponentMode componentModeLfParameter) {
         return switch (componentModeLfParameter) {
             case MAIN_CONNECTED -> // Loadflow computed only on main connected component
                     boundaryLine.getTerminal().getBusBreakerView().getConnectableBus().isInMainConnectedComponent() ? getLeavingFlow(boundaryLine) : 0.;
-            case ALL_CONNECTED ->
-                    getLeavingFlow(boundaryLine);
+            case ALL_CONNECTED -> getLeavingFlow(boundaryLine);
             default -> {
                 LOGGER.error(ERROR_COMPONENT_NUMBER_PARAMETER);
                 throw new CeMergingException(ERROR_COMPONENT_NUMBER_PARAMETER);
@@ -176,8 +177,9 @@ public final class NetworkUtil {
     public static double getTerminalFlow(final Terminal terminal) {
         return terminal.isConnected() ? zeroIfNaN(terminal.getP()) : 0;
     }
+
     public static double getLineFlow(final Line line) {
-        return (getTerminalFlow(line.getTerminal1()) + getTerminalFlow(line.getTerminal2()))/2;
+        return (getTerminalFlow(line.getTerminal1()) + getTerminalFlow(line.getTerminal2())) / 2;
     }
 
     public static Country getCountryOnOtherSide(final Line line,
@@ -202,15 +204,18 @@ public final class NetworkUtil {
         return boundaryLine.getTerminal().isConnected() ? zeroIfNaN(-boundaryLine.getBoundary().getP()) : 0;
     }
 
-    public static boolean isBorderOfZone(final BoundaryLine boundaryLine, final String zone) {
+    public static boolean isBorderOfZone(final BoundaryLine boundaryLine,
+                                         final String zone) {
         return isBorderOfZone(boundaryLine.getId(), zone);
     }
 
-    public static boolean isBorderOfZone(final Line line, final String zone) {
+    public static boolean isBorderOfZone(final Line line,
+                                         final String zone) {
         return isBorderOfZone(line.getId(), zone);
     }
 
-    private static boolean isBorderOfZone(final String lineId, final String zone) {
+    private static boolean isBorderOfZone(final String lineId,
+                                          final String zone) {
         final String nodeFrom = lineId.substring(0, 8);
         final String nodeTo = lineId.substring(9, 17);
         return nodeFrom.startsWith(zone) != nodeTo.startsWith(zone);

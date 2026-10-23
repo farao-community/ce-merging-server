@@ -172,7 +172,7 @@ public final class FinalRefProgBuilder {
 
     private static String getAcTimeSeriesIdentification(final Border border,
                                                         final BiMap<String, String> allAreasBiMap) {
-        if (isItalianBiddingZoneEic(border.getInArea()) && isItalianBiddingZoneEic(border.getOutArea())){
+        if (isItalianBiddingZoneEic(border.getInArea()) && isItalianBiddingZoneEic(border.getOutArea())) {
             return getByEic(border.getOutArea()).name() + "-" + getByEic(border.getInArea()).name();
         }
         final String countryTo = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(border.getInArea()));
