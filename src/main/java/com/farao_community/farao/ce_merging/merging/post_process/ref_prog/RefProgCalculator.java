@@ -41,6 +41,7 @@ import static com.farao_community.farao.ce_merging.merging.process.internal_bidd
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
 import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 public final class RefProgCalculator {
     private final MergingTask task;
@@ -127,7 +128,7 @@ public final class RefProgCalculator {
 
     private void addVirtualHubExchange(final VirtualHubRecord virtualHub) {
         virtualHubsExchanges.put(new Border(virtualHub.getRelatedMaEic(), virtualHub.getEic()),
-                                 getVirtualHubsExchangesFromCgm().getOrZero(virtualHub.getNodeName()));
+                                 getVirtualHubsExchangesFromCgm().getOrDefault(virtualHub.getNodeName(), 0.));
     }
 
     private void addNonCoreExchange(final String eicFrom,
@@ -176,7 +177,7 @@ public final class RefProgCalculator {
                 .findAny();
     }
 
-    private FlowByAreaMap getVirtualHubsExchangesFromCgm() {
+    private Map<String, Double> getVirtualHubsExchangesFromCgm() {
         return finalCgmResult.getNetPositionsResults()
                 .getNetPositionsByCountryMap()
                 .values()
@@ -184,7 +185,7 @@ public final class RefProgCalculator {
                 .map(NetPositions::getVirtualHubsExchanges)
                 .map(Map::entrySet)
                 .flatMap(Set::stream)
-                .collect(toFlowByAreaMap(Map.Entry::getKey,
+                .collect(toMap(Map.Entry::getKey,
                                          Map.Entry::getValue,
                                          (a, b) -> b));
     }
