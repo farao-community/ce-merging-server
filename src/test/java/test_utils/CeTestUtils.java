@@ -352,9 +352,15 @@ public final class CeTestUtils {
         return mockRunner;
     }
 
-    public static SavedFile getSavedFile(String filename,
-                                         String path) {
-        return new SavedFile(filename, path + filename, "mock");
+    public static SavedFile mockSavedFile(final String filePath) {
+        final String[] splitPath = filePath.split("/");
+
+        return new SavedFile(splitPath[splitPath.length - 1], filePath, "mock");
+    }
+
+    public static SavedFile mockSavedFile(final String fileName,
+                                          final String parentPath) {
+        return new SavedFile(fileName, parentPath + fileName, "mock");
     }
 
     public static Line mockLine(final String elementName,

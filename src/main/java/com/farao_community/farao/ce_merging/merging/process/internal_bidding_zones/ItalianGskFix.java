@@ -21,9 +21,8 @@ import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualGSKBlockType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualNodesType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.TimeIntervalType;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.HUNDRED;
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toHourlyInterval;
@@ -35,8 +34,6 @@ import static com.powsybl.iidm.network.Country.IT;
 import static java.util.function.Predicate.not;
 
 public final class ItalianGskFix {
-
-    private static final Predicate<AutoNodesType> DISTINCT_NODENAME = distinctByKey(AutoNodesType::getNodeName);
 
     private ItalianGskFix() {
         // utility class
@@ -74,18 +71,18 @@ public final class ItalianGskFix {
     }
 
     private static List<AutoNodesType> extractNodes(final GSKSeriesType itBzSeries) {
-        final List<AutoNodesType> autoNodes = itBzSeries.getAutoGSKBlock()
+        final List<AutoNodesType> autoNodes = new ArrayList<>(itBzSeries.getAutoGSKBlock()
                 .stream()
                 .map(AutoGSKBlockType::getAutoNodes)
                 .flatMap(List::stream)
-                .filter(DISTINCT_NODENAME)
-                .collect(Collectors.toList()); // do not replace, since we want a mutable list
+                .filter(distinctByKey(AutoNodesType::getNodeName))
+                .toList()); // do not replace, since we want a mutable list
 
         final List<AutoNodesType> fromManualNodes = itBzSeries.getManualGSKBlock().stream()
                 .map(ManualGSKBlockType::getManualNodes)
                 .flatMap(List::stream)
-                .map(ItalianGskFix::fromManualNode)
-                .filter(DISTINCT_NODENAME)
+                .map(ItalianGskFix::convertManualNodeToAutoNode)
+                .filter(distinctByKey(AutoNodesType::getNodeName))
                 .toList();
 
         autoNodes.addAll(fromManualNodes);
@@ -93,7 +90,7 @@ public final class ItalianGskFix {
         return autoNodes;
     }
 
-    private static AutoNodesType fromManualNode(final ManualNodesType manualNode) {
+    private static AutoNodesType convertManualNodeToAutoNode(final ManualNodesType manualNode) {
         final AutoNodesType autoNode = new AutoNodesType();
         autoNode.setNodeName(manualNode.getNodeName());
         return autoNode;

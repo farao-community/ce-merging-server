@@ -54,8 +54,8 @@ public final class RefProgCalculator {
     private final List<VirtualHubRecord> virtualHubRecords;
     private final List<BecByBoundary> sharingKeysBEC;
     private final FlowByAreaMap acNetPositionOutCountry;
-    final Map<String, NetPositions> npByCountry;
-    final Supplier<LoadFlow.Runner> runnerSupplier;
+    private final Map<String, NetPositions> npByCountry;
+    private final InternalBiddingZonesManager biddingZonesManager;
 
     public static RefProgCalculator with(final MergingTask task, final Supplier<LoadFlow.Runner> runnerSupplier) throws FileNotFoundException {
         return new RefProgCalculator(task, runnerSupplier);
@@ -72,7 +72,7 @@ public final class RefProgCalculator {
         sharingKeysBEC = configurations.getBecMatrixConfig();
         acNetPositionOutCountry = regionConfiguration.getAreasIn().values().stream().collect(toFlowByAreaMap(identity(), this::computeAcNetPositionOutCountry));
         npByCountry = finalCgmResult.getNetPositionsResults().getNetPositionsByCountryMap();
-        this.runnerSupplier = runnerSupplier;
+        this.biddingZonesManager = new InternalBiddingZonesManager(task, runnerSupplier);
     }
 
     public PublicationDocument computeRefProg() {
@@ -139,12 +139,11 @@ public final class RefProgCalculator {
 
     private void addInternalItalianExchange(final String borderFrom,
                                             final String borderTo) {
-        final InternalBiddingZonesManager bzManager = new InternalBiddingZonesManager(task, runnerSupplier);
         final ItalianBiddingZone from = ItalianBiddingZone.valueOf(borderFrom);
         final ItalianBiddingZone to = ItalianBiddingZone.valueOf(borderTo);
 
         acExchanges.put(new Border(from.getEic(), to.getEic()),
-                        bzManager.getTotalFlow(from, to));
+                        biddingZonesManager.getTotalFlow(from, to));
     }
 
     private void addCoreExchange(final String eicFrom,

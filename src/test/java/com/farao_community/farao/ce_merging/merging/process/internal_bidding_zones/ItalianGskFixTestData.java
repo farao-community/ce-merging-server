@@ -20,14 +20,19 @@ import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualGSKBlockType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualNodesType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.TimeIntervalType;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.HUNDRED;
 import static com.farao_community.farao.ce_merging.xsd.glsk_fix.BusinessTypeList.Z_02;
 import static com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType.A_01;
 
-public class ItalianGskFixTestData {
+public final class ItalianGskFixTestData {
+
+    private ItalianGskFixTestData() {
+        // data class, should not be instantiated
+    }
+
     public static byte[] getInputWithoutCountryBlock() {
         // Create input GSK document with 5 Italian bidding zones
         final GSKDocument inputDocument = new GSKDocument();
@@ -95,25 +100,25 @@ public class ItalianGskFixTestData {
     }
 
     public static IdentificationType createIdentificationType(String value) {
-        IdentificationType identificationType = new IdentificationType();
+        final IdentificationType identificationType = new IdentificationType();
         identificationType.setV(value);
         return identificationType;
     }
 
     public static GSKSeriesType createGskSerie(String eic) {
-        GSKSeriesType serie = new GSKSeriesType();
+        final GSKSeriesType serie = new GSKSeriesType();
 
-        AreaType area = new AreaType();
+        final AreaType area = new AreaType();
         area.setCodingScheme(A_01);
         area.setV(eic);
         serie.setArea(area);
 
-        BusinessType businessType = new BusinessType();
+        final BusinessType businessType = new BusinessType();
         businessType.setV(Z_02);
-        businessType.setShare(BigDecimal.valueOf(100.));
+        businessType.setShare(HUNDRED);
         serie.setBusinessType(businessType);
 
-        IdentificationType id = new IdentificationType();
+        final IdentificationType id = new IdentificationType();
         id.setV("TestSerie");
         serie.setTimeSeriesIdentification(id);
 

@@ -41,8 +41,8 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
-import static test_utils.CeTestUtils.getSavedFile;
 import static test_utils.CeTestUtils.mockLine;
+import static test_utils.CeTestUtils.mockSavedFile;
 
 class InternalBiddingZonesManagerTest {
 
@@ -81,7 +81,7 @@ class InternalBiddingZonesManagerTest {
         }
     }
 
-    BiddingZoneUCTEDocument mockBiddingZoneDoc() {
+    private BiddingZoneUCTEDocument mockBiddingZoneDoc() {
         final BiddingZoneUCTEDocument biddingZoneDoc = mock(BiddingZoneUCTEDocument.class);
         final InternalTieLinesType internalTieLines = mock(InternalTieLinesType.class);
         when(biddingZoneDoc.getInternalTieLines()).thenReturn(internalTieLines);
@@ -92,12 +92,12 @@ class InternalBiddingZonesManagerTest {
         return biddingZoneDoc;
     }
 
-    MergingTask getTask() {
+    private MergingTask getTask() {
         final MergingTask task = new MergingTask();
         final Inputs inputs = new Inputs();
-        inputs.setInternalBiddingZones(getSavedFile("ita_bz", "path/to/"));
+        inputs.setInternalBiddingZones(mockSavedFile("path/to/ita_bz"));
         final Outputs outputs = new Outputs();
-        outputs.setCgm(getSavedFile("cgm", "path/to/"));
+        outputs.setCgm(mockSavedFile("path/to/cgm"));
         task.setInputs(inputs);
         final Configurations configurations = new Configurations();
         configurations.setLoadFlowParameters(new LoadFlowParameters());
@@ -106,7 +106,7 @@ class InternalBiddingZonesManagerTest {
         return task;
     }
 
-    InternalTieLineType mockItalianTieLine(final String elementName,
+    private InternalTieLineType mockItalianTieLine(final String elementName,
                                            final String nodeFrom,
                                            final String nodeTo) {
         final InternalTieLineType tieLine = new InternalTieLineType();
