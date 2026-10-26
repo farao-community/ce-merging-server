@@ -21,10 +21,13 @@ import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualGSKBlockType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualNodesType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.TimeIntervalType;
 
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.HUNDRED;
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toHourlyInterval;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.distinctByKey;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.isItalianBiddingZoneEic;
 import static com.farao_community.farao.ce_merging.xsd.glsk_fix.BusinessTypeList.Z_02;
 import static com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType.A_01;
@@ -32,6 +35,8 @@ import static com.powsybl.iidm.network.Country.IT;
 import static java.util.function.Predicate.not;
 
 public final class ItalianGskFix {
+
+    private static final Predicate<AutoNodesType> DISTINCT_NODENAME = distinctByKey(AutoNodesType::getNodeName);
 
     private ItalianGskFix() {
         // utility class
@@ -47,35 +52,45 @@ public final class ItalianGskFix {
                 .stream()
                 .filter(serie -> isItalianBiddingZoneEic(serie.getArea().getV()))
                 .toList();
-        final GSKSeriesType itSerie = createItGsk(task, itBzSeries.getFirst().getTimeSeriesIdentification());
 
-        series.removeAll(itBzSeries);
+        if (!itBzSeries.isEmpty()) {
+            final GSKSeriesType itSerie = createItGsk(task, itBzSeries.getFirst().getTimeSeriesIdentification());
 
-        if (hasCountryBlock(itBzSeries)) {
-            itSerie.getCountryGSKBlock().add(createItCountryBlock(task));
-        } else {
-            final AutoGSKBlockType autoBlock = createItAutoBlock(task);
-            itBzSeries.stream()
-                    .map(GSKSeriesType::getAutoGSKBlock)
-                    .flatMap(List::stream)
-                    .map(AutoGSKBlockType::getAutoNodes)
-                    .flatMap(List::stream)
-                    .forEach(autoBlock.getAutoNodes()::add);
+            series.removeAll(itBzSeries);
 
-            itBzSeries.stream()
-                    .map(GSKSeriesType::getManualGSKBlock)
-                    .flatMap(List::stream)
-                    .map(ManualGSKBlockType::getManualNodes)
-                    .flatMap(List::stream)
-                    .map(ItalianGskFix::fromManualNode)
-                    .forEach(autoBlock.getAutoNodes()::add);
+            if (hasCountryBlock(itBzSeries)) {
+                itSerie.getCountryGSKBlock().add(createItCountryBlock(task));
+            } else {
+                final AutoGSKBlockType autoBlock = createItAutoBlock(task);
+                itBzSeries.stream()
+                        .map(ItalianGskFix::extractNodes)
+                        .forEach(autoBlock.getAutoNodes()::addAll);
+                itSerie.getAutoGSKBlock().add(autoBlock);
+            }
 
-            itSerie.getAutoGSKBlock().add(autoBlock);
+            series.add(itSerie);
         }
-
-        series.add(itSerie);
-
         return JaxbUtils.writeToBytes(GSKDocument.class, glskDocument);
+    }
+
+    private static List<AutoNodesType> extractNodes(final GSKSeriesType itBzSeries) {
+        final List<AutoNodesType> autoNodes = itBzSeries.getAutoGSKBlock()
+                .stream()
+                .map(AutoGSKBlockType::getAutoNodes)
+                .flatMap(List::stream)
+                .filter(DISTINCT_NODENAME)
+                .collect(Collectors.toList()); // do not replace, since we want a mutable list
+
+        final List<AutoNodesType> fromManualNodes = itBzSeries.getManualGSKBlock().stream()
+                .map(ManualGSKBlockType::getManualNodes)
+                .flatMap(List::stream)
+                .map(ItalianGskFix::fromManualNode)
+                .filter(DISTINCT_NODENAME)
+                .toList();
+
+        autoNodes.addAll(fromManualNodes);
+
+        return autoNodes;
     }
 
     private static AutoNodesType fromManualNode(final ManualNodesType manualNode) {
@@ -97,14 +112,14 @@ public final class ItalianGskFix {
         italy.setV(itaEic);
         final BusinessType businessType = new BusinessType();
         businessType.setV(Z_02);
-        businessType.setShare(BigDecimal.valueOf(100.));
+        businessType.setShare(HUNDRED);
 
-        final GSKSeriesType italySerie = new GSKSeriesType();
-        italySerie.setBusinessType(businessType);
-        italySerie.setTimeSeriesIdentification(id);
-        italySerie.setArea(italy);
+        final GSKSeriesType italianGskSerie = new GSKSeriesType();
+        italianGskSerie.setBusinessType(businessType);
+        italianGskSerie.setTimeSeriesIdentification(id);
+        italianGskSerie.setArea(italy);
 
-        return italySerie;
+        return italianGskSerie;
     }
 
     private static CountryGSKBlockType createItCountryBlock(final MergingTask task) {
