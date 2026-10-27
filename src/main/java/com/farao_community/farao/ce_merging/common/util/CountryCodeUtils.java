@@ -11,8 +11,10 @@ import com.powsybl.iidm.network.Country;
 import com.powsybl.ucte.network.UcteCountryCode;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.isItalianBiddingZone;
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.Country.DK;
+import static com.powsybl.iidm.network.Country.IT;
 
 public final class CountryCodeUtils {
     public static final String DK1_CODE = "DK1";
@@ -28,6 +30,8 @@ public final class CountryCodeUtils {
             return DE;
         } else if (DANISH_TSO.equals(countryName)) {
             return DK;
+        } else if (isItalianBiddingZone(countryName)) {
+            return IT;
         } else {
             return Country.valueOf(countryName);
         }
@@ -39,6 +43,10 @@ public final class CountryCodeUtils {
 
     public static String mapXkToKs(final String country) {
         return KOSOVO_ISO_COUNTRY_CODE.equals(country) ? KOSOVO_COUNTRY_CODE : country;
+    }
+
+    public static String mapItBzToIt(final String countryCode) {
+        return isItalianBiddingZone(countryCode) ? IT.name() : countryCode;
     }
 
     private CountryCodeUtils() {

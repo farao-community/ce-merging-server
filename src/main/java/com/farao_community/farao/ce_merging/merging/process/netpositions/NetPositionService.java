@@ -34,6 +34,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapItBzToIt;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection;
 import static com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler.computeCountryNetPositions;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
@@ -97,7 +98,7 @@ public class NetPositionService {
                                              final SavedFile savedNetwork,
                                              final String countryCode) {
         final Network network = prepareNetwork(task, savedNetwork);
-        final Country country = EntsoeGeographicalCode.valueOf(countryCode).getCountry();
+        final Country country = EntsoeGeographicalCode.valueOf(mapItBzToIt(countryCode)).getCountry();
 
         return computeCountryNetPositions(country, network, task.getConfigurations());
     }

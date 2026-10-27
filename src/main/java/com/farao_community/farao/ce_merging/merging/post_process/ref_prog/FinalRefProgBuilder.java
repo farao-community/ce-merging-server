@@ -8,7 +8,6 @@ package com.farao_community.farao.ce_merging.merging.post_process.ref_prog;
 
 import com.farao_community.farao.ce_merging.common.CeMergingConstants;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.util.CountryCodeUtils;
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
 import com.farao_community.farao.ce_merging.common.util.OutputUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
@@ -34,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapXkToKs;
+import static com.farao_community.farao.ce_merging.merging.post_process.common.CurrentType.AC;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getDocumentIdentification;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getDocumentVersion;
 import static com.farao_community.farao.ce_merging.merging.post_process.ref_prog.FinalRefProgHelper.getPublicationTimeInterval;
@@ -106,7 +107,7 @@ public final class FinalRefProgBuilder {
         final Map<String, String> countryMaEicCodeMap = virtualHubList.stream().collect(Collectors.toUnmodifiableMap(VirtualHubRecord::getRelatedMaEic, VirtualHubRecord::getRelatedMaCode, (firstConflictingKey, secondConflictingKey) -> firstConflictingKey));
         final Map<String, String> countryEicCodeMap = virtualHubList.stream().collect(Collectors.toUnmodifiableMap(VirtualHubRecord::getEic, VirtualHubRecord::getCode, (firstConflictingKey, secondConflictingKey) -> firstConflictingKey));
 
-        refProgResult.acExchanges().entrySet().forEach(acExchange -> pubTimeSeriesList.add(computePublicationTimeSeries(acExchange, allAreasBiMap, countryMaEicCodeMap, countryEicCodeMap, CurrentType.AC, dailyTimeInterval, position)));
+        refProgResult.acExchanges().entrySet().forEach(acExchange -> pubTimeSeriesList.add(computePublicationTimeSeries(acExchange, allAreasBiMap, countryMaEicCodeMap, countryEicCodeMap, AC, dailyTimeInterval, position)));
         refProgResult.virtualHubsExchanges().entrySet().forEach(virtualHub -> pubTimeSeriesList.add(computePublicationTimeSeries(virtualHub, allAreasBiMap, countryMaEicCodeMap, countryEicCodeMap, CurrentType.DC, dailyTimeInterval, position)));
         return pubTimeSeriesList;
     }
@@ -141,8 +142,7 @@ public final class FinalRefProgBuilder {
         publTimeSeries.setPeriod(period);
 
         final PublicationDocument.PublicationTimeSeries.TimeSeriesIdentification timeSeriesIdentif = new PublicationDocument.PublicationTimeSeries.TimeSeriesIdentification();
-        if (currentType == CurrentType.AC) {
-
+        if (currentType == AC) {
             timeSeriesIdentif.setV(getAcTimeSeriesIdentification(entry, allAreasBiMap));
             publTimeSeries.setTimeSeriesIdentification(timeSeriesIdentif);
         } else {
@@ -170,14 +170,15 @@ public final class FinalRefProgBuilder {
     }
 
     private static String getAcTimeSeriesIdentification(final Map.Entry<Border, Double> entry,
-                                                        final BiMap<String, String> allAreasBiMap) {
+                                                        final BiMap<String, String> allAreas) {
         final Border border = entry.getKey();
-        if (isItalianBiddingZoneEic(border.getInArea()) && isItalianBiddingZoneEic(border.getOutArea())) {
-            return getByEic(border.getOutArea()).name() + "-" + getByEic(border.getInArea()).name();
-        }
-        final String countryTo = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(border.getInArea()));
-        final String countryFrom = CountryCodeUtils.mapXkToKs(allAreasBiMap.inverse().get(border.getOutArea()));
-        return countryFrom + "-" + countryTo;
+        return getAreaName(border.getOutArea(), allAreas) + "-" + getAreaName(border.getInArea(), allAreas);
+    }
+
+    private static String getAreaName(final String eic, final BiMap<String, String> allAreas) {
+        return isItalianBiddingZoneEic(eic) ?
+                getByEic(eic).name()
+                : mapXkToKs(allAreas.inverse().get(eic));
     }
 
     private static String getDcTimeSeriesIdentification(final Map.Entry<Border, Double> entry,
