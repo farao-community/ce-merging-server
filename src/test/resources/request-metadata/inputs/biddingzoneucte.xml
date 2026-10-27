@@ -1,4 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2026, RTE (http://www.rte-france.com)
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  -->
+
 <BiddingZoneUCTEDocument DtdVersion="4" DtdRelease="0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="biddingzoneuctedocument-1.xsd">
   <DocumentIdentification v="17XTSO-CS------W-20260707F301v2" />
   <DocumentVersion v="2" />
@@ -12,23 +19,23 @@
   <Internal_tie_lines count="24">
     <Internal_tie_line id="1">
       <branch from="ICNOR12" to="INORD12" elementName="CN_N" />
-      <bidding_zone_from>CENTRO_NORD</bidding_zone_from>
+      <bidding_zone_from>ICNO</bidding_zone_from>
       <bidding_zone_to>NORD</bidding_zone_to>
     </Internal_tie_line>
     <Internal_tie_line id="2">
       <branch from="ICNOR12" to="ICSUD12" elementName="CN_CS" />
-      <bidding_zone_from>CENTRO_NORD</bidding_zone_from>
-      <bidding_zone_to>CENTRO_SUD</bidding_zone_to>
+      <bidding_zone_from>ICNO</bidding_zone_from>
+      <bidding_zone_to>ICSO</bidding_zone_to>
     </Internal_tie_line>
     <Internal_tie_line id="3">
       <branch from="ICALA11" to="ICSUD12" elementName="CA_CS" />
       <bidding_zone_from>CALABRIA</bidding_zone_from>
-      <bidding_zone_to>CENTRO_SUD</bidding_zone_to>
+      <bidding_zone_to>ICSO</bidding_zone_to>
     </Internal_tie_line>
     <Internal_tie_line id="4">
       <branch from="ISUDN11" to="ICSUD12" elementName="S_CS" />
       <bidding_zone_from>SUD</bidding_zone_from>
-      <bidding_zone_to>CENTRO_SUD</bidding_zone_to>
+      <bidding_zone_to>ICSO</bidding_zone_to>
     </Internal_tie_line>
     <Internal_tie_line id="5">
       <branch from="ISUDN11" to="ICALA11" elementName="S_CA" />
@@ -39,27 +46,27 @@
   <Bidding_zones count="5">
     <Bidding_zone>
       <TimeInterval v="2026-07-06T22:00Z/2026-07-06T23:00Z" />
-      <Area codingScheme="A01" v="CENTRO_NORD" />
+      <Area codingScheme="A01" v="ICNO" />
       <NodeName v="ICNOR12" />
     </Bidding_zone>
     <Bidding_zone>
       <TimeInterval v="2026-07-06T22:00Z/2026-07-06T23:00Z" />
-      <Area codingScheme="A01" v="NORD" />
+      <Area codingScheme="A01" v="INOR" />
       <NodeName v="INORD12" />
     </Bidding_zone>
     <Bidding_zone>
       <TimeInterval v="2026-07-06T22:00Z/2026-07-06T23:00Z" />
-      <Area codingScheme="A01" v="CENTRO_SUD" />
+      <Area codingScheme="A01" v="ICSO" />
       <NodeName v="ICSUD12" />
     </Bidding_zone>
     <Bidding_zone>
       <TimeInterval v="2026-07-06T22:00Z/2026-07-06T23:00Z" />
-      <Area codingScheme="A01" v="CALABRIA" />
+      <Area codingScheme="A01" v="ICAL" />
       <NodeName v="ICALA11" />
     </Bidding_zone>
     <Bidding_zone>
       <TimeInterval v="2026-07-06T22:00Z/2026-07-06T23:00Z" />
-      <Area codingScheme="A01" v="SUD" />
+      <Area codingScheme="A01" v="ISOU" />
       <NodeName v="ISUDN11" />
     </Bidding_zone>
   </Bidding_zones>
