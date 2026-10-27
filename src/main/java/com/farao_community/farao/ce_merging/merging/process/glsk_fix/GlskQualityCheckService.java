@@ -46,7 +46,7 @@ import com.powsybl.entsoe.commons.PowsyblEntsoeReportResourceBundle;
 import com.powsybl.glsk.ucte.quality_check.GlskQualityProcessor;
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
-import org.apache.commons.compress.utils.IOUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -79,6 +79,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianGskFix.handleItalianRegionsGlsk;
 
 @Service
 public class GlskQualityCheckService {
@@ -105,7 +106,7 @@ public class GlskQualityCheckService {
         final SavedFile glskFile = inputs.getGenerationLoadShiftKeys();
         try (InputStream mergedFileIs = new FileInputStream(mergedFile.getPath());
              InputStream glskFileIs = new FileInputStream(glskFile.getPath())) {
-            final byte[] glskBytes = IOUtils.toByteArray(glskFileIs);
+            final byte[] glskBytes = handleItalianRegionsGlsk(IOUtils.toByteArray(glskFileIs), task);
             glskFixService.checkTimeInterval(glskBytes, inputs.getTargetDate());
             ReportNode rootReportNode = createRootReportNode();
             GlskQualityProcessor.process(mergedFile.getOriginalName(), mergedFileIs, new ByteArrayInputStream(glskBytes), processTargetDate.toInstant(), rootReportNode);
