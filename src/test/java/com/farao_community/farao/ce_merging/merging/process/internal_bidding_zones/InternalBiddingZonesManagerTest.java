@@ -46,14 +46,25 @@ import static test_utils.CeTestUtils.mockSavedFile;
 
 class InternalBiddingZonesManagerTest {
 
+    private static final String LINE_1 = "LINE_1";
+    private static final String LINE_2 = "LINE_2";
+    private static final String NODE_A = "NODE_A";
+    private static final String NODE_B = "NODE_B";
+    private static final String NODE_C = "NODE_C";
+    private static final String NODE_D = "NODE_D";
+    private static final String CGM_PATH = "path/to/cgm";
+    private static final String BZ_PATH = "path/to/ita_bz";
+    private static final double A_TO_B_FLOW = 100;
+    private static final double C_TO_D_FLOW = 50;
+
     @Test
     void shouldSumFlowsOnInternalTieLines() {
         final BiddingZoneUCTEDocument bzDoc = mockBiddingZoneDoc();
 
         // Mock Network with same lines as BZ doc
         final Network network = mock(Network.class);
-        final Line line1 = mockLine("LINE_1", "NODE_A", "NODE_B", 100.0);
-        final Line line2 = mockLine("LINE_2", "NODE_C", "NODE_D", 50.0);
+        final Line line1 = mockLine(LINE_1, NODE_A, NODE_B, A_TO_B_FLOW);
+        final Line line2 = mockLine(LINE_2, NODE_C, NODE_D, C_TO_D_FLOW);
         doAnswer(call -> Stream.of(line1, line2))
                 .when(network).getLineStream();
         try (final MockedStatic<JaxbUtils> jaxbUtils = mockStatic(JaxbUtils.class);
@@ -61,9 +72,9 @@ class InternalBiddingZonesManagerTest {
              final MockedStatic<LoadFlowUtils> loadFlowUtils = mockStatic(LoadFlowUtils.class);
              final MockedStatic<NetworkUtil> networkUtil = mockStatic(NetworkUtil.class)) {
 
-            jaxbUtils.when(() -> readFromPath(BiddingZoneUCTEDocument.class, "path/to/ita_bz"))
+            jaxbUtils.when(() -> readFromPath(BiddingZoneUCTEDocument.class, BZ_PATH))
                     .thenReturn(bzDoc);
-            networkStatic.when(() -> Network.read("path/to/cgm")).thenReturn(network);
+            networkStatic.when(() -> Network.read(CGM_PATH)).thenReturn(network);
             loadFlowUtils.when(() -> runLoadFlow(any(), any(), any(LoadFlowParameters.class)))
                     .thenAnswer(invocation -> null);
             networkUtil.when(() -> getVlIdOnSide(any(), any())).thenCallRealMethod();
@@ -74,10 +85,9 @@ class InternalBiddingZonesManagerTest {
 
             final InternalBiddingZonesManager manager = new InternalBiddingZonesManager(getTask(),
                                                                                         CeTestUtils::mockLoadFlowRunner);
-            double totalFlow = manager.getTotalFlow(INOR, ICNO);
 
             // Expected: sum of flows on both lines
-            assertEquals(150.0, totalFlow, 0.01);
+            assertEquals(A_TO_B_FLOW + C_TO_D_FLOW, manager.getTotalFlow(INOR, ICNO), 0.01);
         }
     }
 
@@ -87,17 +97,17 @@ class InternalBiddingZonesManagerTest {
         when(biddingZoneDoc.getInternalTieLines()).thenReturn(internalTieLines);
 
         // Create two "tie lines" from INOR to ICNO
-        when(internalTieLines.getInternalTieLine()).thenReturn(List.of(mockItalianTieLine("LINE_1", "NODE_A", "NODE_B"),
-                                                                       mockItalianTieLine("LINE_2", "NODE_C", "NODE_D")));
+        when(internalTieLines.getInternalTieLine()).thenReturn(List.of(mockItalianTieLine(LINE_1, NODE_A, NODE_B),
+                                                                       mockItalianTieLine(LINE_2, NODE_C, NODE_D)));
         return biddingZoneDoc;
     }
 
     private MergingTask getTask() {
         final MergingTask task = new MergingTask();
         final Inputs inputs = new Inputs();
-        inputs.setInternalBiddingZones(mockSavedFile("path/to/ita_bz"));
+        inputs.setInternalBiddingZones(mockSavedFile(BZ_PATH));
         final Outputs outputs = new Outputs();
-        outputs.setCgm(mockSavedFile("path/to/cgm"));
+        outputs.setCgm(mockSavedFile(CGM_PATH));
         task.setInputs(inputs);
         final Configurations configurations = new Configurations();
         configurations.setLoadFlowParameters(new LoadFlowParameters());
@@ -107,8 +117,8 @@ class InternalBiddingZonesManagerTest {
     }
 
     private InternalTieLineType mockItalianTieLine(final String elementName,
-                                           final String nodeFrom,
-                                           final String nodeTo) {
+                                                   final String nodeFrom,
+                                                   final String nodeTo) {
         final InternalTieLineType tieLine = new InternalTieLineType();
         final TextOnlyType bzFrom = new TextOnlyType();
         final TextOnlyType bzTo = new TextOnlyType();

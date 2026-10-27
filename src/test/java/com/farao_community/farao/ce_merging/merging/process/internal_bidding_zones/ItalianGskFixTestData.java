@@ -33,6 +33,16 @@ public final class ItalianGskFixTestData {
         // data class, should not be instantiated
     }
 
+    private static final String INTERVAL = "2026-10-23T12:00Z/2026-10-23T13:00Z";
+    private static final String AUTONODE = "AutoNode";
+    private static final String MANUALNODE = "ManualNode";
+
+    public static final List<String> EXPECTED_GSK_NODE_NAMES = List.of("AutoNode1", "AutoNode2", "ManualNode3",
+                                                                       "AutoNode4", "AutoNode5", "ManualNode6",
+                                                                       "AutoNode7", "AutoNode8", "ManualNode9",
+                                                                       "AutoNode10", "AutoNode11", "ManualNode12",
+                                                                       "AutoNode13", "AutoNode14", "ManualNode15");
+
     public static byte[] getInputWithoutCountryBlock() {
         // Create input GSK document with 5 Italian bidding zones
         final GSKDocument inputDocument = new GSKDocument();
@@ -46,18 +56,18 @@ public final class ItalianGskFixTestData {
             // Add auto block with 2 nodes
             final AutoGSKBlockType autoBlock = new AutoGSKBlockType();
             final TimeIntervalType interval = new TimeIntervalType();
-            interval.setV("2026-10-23T12:00Z/2026-10-23T13:00Z");
+            interval.setV(INTERVAL);
             autoBlock.setTimeInterval(interval);
             final IdentificationType name = new IdentificationType();
             name.setV(zone.name());
             autoBlock.setGSKName(name);
 
             final AutoNodesType autoNode1 = new AutoNodesType();
-            autoNode1.setNodeName(createIdentificationType("AutoNode" + nodeCounter++));
+            autoNode1.setNodeName(createIdentificationType(AUTONODE + nodeCounter++));
             autoBlock.getAutoNodes().add(autoNode1);
 
             final AutoNodesType autoNode2 = new AutoNodesType();
-            autoNode2.setNodeName(createIdentificationType("AutoNode" + nodeCounter++));
+            autoNode2.setNodeName(createIdentificationType(AUTONODE + nodeCounter++));
             autoBlock.getAutoNodes().add(autoNode2);
 
             serie.getAutoGSKBlock().add(autoBlock);
@@ -68,7 +78,7 @@ public final class ItalianGskFixTestData {
             manualBlock.setGSKName(name);
 
             final ManualNodesType manualNode = new ManualNodesType();
-            manualNode.setNodeName(createIdentificationType("ManualNode" + nodeCounter++));
+            manualNode.setNodeName(createIdentificationType(MANUALNODE + nodeCounter++));
             manualBlock.getManualNodes().add(manualNode);
 
             serie.getManualGSKBlock().add(manualBlock);
@@ -87,7 +97,7 @@ public final class ItalianGskFixTestData {
             final GSKSeriesType serie = createGskSerie(zone.getEic());
             final CountryGSKBlockType countryBlock = new CountryGSKBlockType();
             final TimeIntervalType interval = new TimeIntervalType();
-            interval.setV("2026-10-23T12:00Z/2026-10-23T13:00Z");
+            interval.setV(INTERVAL);
             countryBlock.setTimeInterval(interval);
             final IdentificationType name = new IdentificationType();
             name.setV(zone.name());
@@ -99,13 +109,13 @@ public final class ItalianGskFixTestData {
         return JaxbUtils.writeToBytes(GSKDocument.class, inputDocument);
     }
 
-    public static IdentificationType createIdentificationType(String value) {
+    private static IdentificationType createIdentificationType(String value) {
         final IdentificationType identificationType = new IdentificationType();
         identificationType.setV(value);
         return identificationType;
     }
 
-    public static GSKSeriesType createGskSerie(String eic) {
+    private static GSKSeriesType createGskSerie(String eic) {
         final GSKSeriesType serie = new GSKSeriesType();
 
         final AreaType area = new AreaType();

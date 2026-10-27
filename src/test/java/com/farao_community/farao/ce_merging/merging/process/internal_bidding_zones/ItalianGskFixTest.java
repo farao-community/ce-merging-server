@@ -7,13 +7,14 @@
 
 package com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones;
 
-import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.AutoGSKBlockType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.AutoNodesType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKDocument;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKSeriesType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,14 +25,19 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static com.farao_community.farao.ce_merging.common.util.JaxbUtils.readFromBytes;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianGskFix.handleItalianRegionsGlsk;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianGskFixTestData.EXPECTED_GSK_NODE_NAMES;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianGskFixTestData.getInputWithCountryBlock;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianGskFixTestData.getInputWithoutCountryBlock;
+import static com.powsybl.iidm.network.Country.IT;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ItalianGskFixTest {
 
+    private static final String ITALY_EIC = "10YIT-GRTN-----B";
     @Mock
     private MergingTask mergingTask;
 
@@ -45,44 +51,40 @@ class ItalianGskFixTest {
     void setupMergingTaskMocks() {
         when(mergingTask.getConfigurations()).thenReturn(taskConfiguration);
         when(taskConfiguration.getRegionConfiguration()).thenReturn(regionConfiguration);
-        when(regionConfiguration.getAreasAll()).thenReturn(Map.of("IT", "10YIT-GRTN-----B"));
+        when(regionConfiguration.getAreasAll()).thenReturn(Map.of(IT.name(), ITALY_EIC));
         when(mergingTask.getTargetDate()).thenReturn(OffsetDateTime.parse("2026-10-23T12:00:00Z"));
     }
 
     @Test
     void shouldHandleGlskWithItaBzCountryBlocks() {
-        // Create input GSK document with 5 Italian bidding zones country blocks
-        final byte[] inputBytes = getInputWithCountryBlock();
-
-        // Execute
-        byte[] resultBytes = ItalianGskFix.handleItalianRegionsGlsk(inputBytes, mergingTask);
-        GSKDocument resultDocument = JaxbUtils.readFromBytes(GSKDocument.class, resultBytes);
-
-        // Verify
-        List<GSKSeriesType> resultSeries = resultDocument.getGSKSeries();
+        final List<GSKSeriesType> resultSeries = getGskFixResult(getInputWithCountryBlock());
         assertHasMergedBiddingZones(resultSeries);
         assertThat(resultSeries.getFirst().getCountryGSKBlock()).hasSize(1);
     }
 
     @Test
     void shouldHandleGlskWithItaBzAutoAndManualBlocks() {
-        final byte[] inputBytes = getInputWithoutCountryBlock();
-
-        // Execute
-        byte[] resultBytes = ItalianGskFix.handleItalianRegionsGlsk(inputBytes, mergingTask);
-        GSKDocument resultDocument = JaxbUtils.readFromBytes(GSKDocument.class, resultBytes);
-
-        // Verify
-        List<GSKSeriesType> resultSeries = resultDocument.getGSKSeries();
+        final List<GSKSeriesType> resultSeries = getGskFixResult(getInputWithoutCountryBlock());
         assertHasMergedBiddingZones(resultSeries);
-        AutoGSKBlockType resultAutoBlock = resultSeries.getFirst().getAutoGSKBlock().getFirst();
-        assertThat(resultAutoBlock.getAutoNodes()).hasSize(15);
+        final AutoGSKBlockType resultAutoBlock = resultSeries.getFirst().getAutoGSKBlock().getFirst();
+        final List<String> resultNodeNames = resultAutoBlock.getAutoNodes().stream()
+                .map(AutoNodesType::getNodeName)
+                .map(IdentificationType::getV)
+                .toList();
+        assertThat(resultNodeNames)
+                .hasSize(15)
+                .containsOnlyOnceElementsOf(EXPECTED_GSK_NODE_NAMES);
+    }
+
+    private List<GSKSeriesType> getGskFixResult(final byte[] input) {
+        return readFromBytes(GSKDocument.class, handleItalianRegionsGlsk(input, mergingTask))
+                .getGSKSeries();
     }
 
     private void assertHasMergedBiddingZones(final List<GSKSeriesType> gskSeries) {
         assertThat(gskSeries).hasSize(1);
         final GSKSeriesType italySerie = gskSeries.getFirst();
-        assertThat(italySerie.getArea().getV()).isEqualTo("10YIT-GRTN-----B");
+        assertThat(italySerie.getArea().getV()).isEqualTo(ITALY_EIC);
     }
 
 }
