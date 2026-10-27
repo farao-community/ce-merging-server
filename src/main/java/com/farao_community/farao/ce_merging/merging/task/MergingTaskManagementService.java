@@ -231,6 +231,10 @@ public class MergingTaskManagementService {
         return getInputFile(taskId, Inputs::getDcLinks);
     }
 
+    public SavedFile getInternalBiddingZones(final Long taskId) {
+        return getInputFile(taskId, Inputs::getInternalBiddingZones);
+    }
+
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
                       TASK CONFIGURATIONS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/

@@ -18,6 +18,7 @@ import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.Outputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
@@ -41,9 +42,13 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static test_utils.CeTestUtils.mockSavedFile;
 
 @SpringBootTest
 class RefProgCalculationServiceTest {
+    private static final String BIDDING_ZONE_FILE_PATH = "src/test/resources/request-metadata/inputs/biddingzoneucte.xml";
+    private static final String LF_PARAMS_FILE_PATH = "loadflow_parameters/ac-load-flow-parameters_all_components.json";
+    private static final String CGM_FILE_PATH = "src/test/resources/targetNetPositionCalculation/20260123_0130_2D5_UX0_RECESSIVITY_APPLIED.uct";
     private static final String RESOURCES_PATH = "src/test/resources/refProg";
     private static final String CGM_NET_POSITION_FILE_NAME = "cgmNetPositions.json";
     private static final String PEVF_FILE_NAME = "20231103_0030_FO5_UX1.PEVF";
@@ -51,7 +56,7 @@ class RefProgCalculationServiceTest {
     private static final OffsetDateTime TARGET_DATE = OffsetDateTime.parse("2023-11-03T00:30Z");
 
     private Map<String, Double> virtualHubsExchanges;
-    private Map<String, BigInteger> coreExchangeResults;
+    private Map<String, BigInteger> ceExchangeResults;
     private Map<String, Double> nonCoreExchangeResults;
     private Map<String, PublicationDocument.PublicationTimeSeries> indexedTimeSeries;
 
@@ -71,9 +76,9 @@ class RefProgCalculationServiceTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        initCoreMergingTaskEntity();
+        initTask();
         virtualHubsExchanges = initVirtualHubsExchanges();
-        coreExchangeResults = initCoreExchangeResults();
+        ceExchangeResults = initCoreExchangeResults();
         nonCoreExchangeResults = initNonCoreExchanges();
     }
 
@@ -99,7 +104,7 @@ class RefProgCalculationServiceTest {
     }
 
     private void checkCoreExchanges() {
-        coreExchangeResults.forEach((tsId, val) -> assertEquals(val, getPublicationTimeSeriesByTimeSeriesIdentification(tsId).getPeriod().getInterval().getFirst().getQty().getV()));
+        ceExchangeResults.forEach((tsId, val) -> assertEquals(val, getPublicationTimeSeriesByTimeSeriesIdentification(tsId).getPeriod().getInterval().getFirst().getQty().getV()));
     }
 
     private void checkNonCoreExchanges() {
@@ -214,7 +219,7 @@ class RefProgCalculationServiceTest {
     }
 
     private PublicationDocument.PublicationTimeSeries getPublicationTimeSeriesByTimeSeriesIdentification(final String timeSeriesIdentification) {
-        PublicationDocument.PublicationTimeSeries pub =  indexedTimeSeries.get(timeSeriesIdentification);
+        PublicationDocument.PublicationTimeSeries pub = indexedTimeSeries.get(timeSeriesIdentification);
         if (pub == null) {
             throw new CeMergingException("Unable to find timeserie " + timeSeriesIdentification + " in refProg result");
         }
@@ -330,12 +335,15 @@ class RefProgCalculationServiceTest {
         return Map.copyOf(initNonCoreExchangeResults);
     }
 
-    private void initCoreMergingTaskEntity() throws Exception {
+    private void initTask() throws Exception {
         TaskTestUtils.setTaskDefaultConfigurations(task);
+        TaskTestUtils.setLoadflowParameters(task, LF_PARAMS_FILE_PATH);
         repository.save(task);
         initArtifacts();
         initInputs();
         initBecByBoundary();
+        task.setOutputs(new Outputs());
+        task.getOutputs().setCgm(mockSavedFile(CGM_FILE_PATH));
 
         Files.createDirectories(Paths.get(configuration.getInputsDirectoryPath(task)));
         Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(task)));
@@ -357,15 +365,14 @@ class RefProgCalculationServiceTest {
     private void initInputs() {
         final Inputs inputs = new Inputs();
 
-        final SavedFile pevfFile = new SavedFile(PEVF_FILE_NAME, RESOURCES_PATH + "/" + PEVF_FILE_NAME, "mock");
-
-        inputs.setNetPositionForecast(pevfFile);
+        inputs.setNetPositionForecast(mockSavedFile(RESOURCES_PATH + "/" + PEVF_FILE_NAME));
         inputs.setTargetDate(TARGET_DATE);
+        inputs.setInternalBiddingZones(mockSavedFile(BIDDING_ZONE_FILE_PATH));
 
         task.setInputs(inputs);
     }
 
-    private void initBecByBoundary() throws Exception {
+    private void initBecByBoundary() {
         final List<BecByBoundaryDto> becByBoundaryDtos = becKeyConfigurationService.getConfiguration(TARGET_DATE).getBecByBoundaries();
         final List<BecByBoundary> becByBoundaryList = becByBoundaryDtos.stream()
                 .map(becByBoundaryDto -> {

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  ~ Copyright (c) 2026, RTE (http://www.rte-france.com)
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  -->
+
 <Configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Created="2026-03-16T14:11:07Z" xsi:noNamespaceSchemaLocation="configuration-23.xsd">
     <DocumentIdentification v="17XTSO-CS------W-20260318F326v1"/>
     <Sender Code="CORE" Eic="17XTSO-CS------W" Type="CCO"/>
@@ -261,5 +268,10 @@
         <BorderDirection From="DK1" To="DK1_NL_COBRA" SDAC="false"/>
         <BorderDirection From="NL" To="NL_DK1_COBRA" SDAC="false"/>
         <BorderDirection From="PL" To="PL_SE4_SwePol" SDAC="false"/>
+        <BorderDirection From="INOR" To="ICNO" SDAC="false"/>
+        <BorderDirection From="ICNO" To="ICSO" SDAC="false"/>
+        <BorderDirection From="ICSO" To="ISOU" SDAC="false"/>
+        <BorderDirection From="ICSO" To="ICAL" SDAC="false"/>
+        <BorderDirection From="ISOU" To="ICAL" SDAC="false"/>
     </BorderDirections>
 </Configuration>
