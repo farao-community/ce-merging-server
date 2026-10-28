@@ -7,13 +7,17 @@
 package com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
+import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
-import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.*;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Properties;
+import java.util.regex.Pattern;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.save;
@@ -21,6 +25,7 @@ import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.
 @Service
 public class PisaService {
     private final CeMergingConfiguration configuration;
+    private static final Pattern FFG_NODE_NAME_PATTERN = Pattern.compile("FFG\\.IL1[1-4] FFG\\.IL1[1-4].*");
 
     public PisaService(final CeMergingConfiguration configuration) {
         this.configuration = configuration;
@@ -39,6 +44,24 @@ public class PisaService {
     }
 
     private static Network getCgm(final MergingTask task) {
-        return Network.read(task.getArtifactPath(ArtifactType.CGM_FILE_AFTER_COMPENSATION));
+        Network cgm = Network.read(task.getArtifactPath(ArtifactType.CGM_FILE_AFTER_COMPENSATION));
+        removeLines(cgm);
+        return cgm;
     }
+
+    private static void removeLines(final Network cgm) {
+        final List<Branch> branchesToCheck = cgm.getBranchStream()
+                .filter(c -> FFG_NODE_NAME_PATTERN.matcher(c.getId()).matches())
+                .toList();
+        for (final Branch<?> branch : branchesToCheck) {
+            if (NetworkUtil.isInOutage(branch)) {
+                if (branch instanceof Line line) {
+                    line.remove();
+                }
+            } else {
+                throw new CeMergingException("Cannot remove Pisa line because it is in operation.");
+            }
+        }
+    }
+
 }

@@ -23,8 +23,7 @@ import static com.powsybl.ucte.network.UcteCountryCode.XX;
 public class PisaNamingStrategy implements NamingStrategy {
     private final Map<String, UcteNodeCode> ucteNodeIds = new HashMap<>();
     private final Map<String, UcteElementId> ucteElementIds = new HashMap<>();
-    private static final String FFG_NODE_NAME_REGEX = "FFG\\.IL1[1-4]";
-    private static final String XPI_NODE_NAME_REGEX = "XPI_GI1[1-2]";
+    public static final String FFG_NODE_NAME_REGEX = "FFG\\.IL1[1-4]";
 
     @Override
     public void initializeNetwork(Network network) {
@@ -76,7 +75,6 @@ public class PisaNamingStrategy implements NamingStrategy {
     private UcteNodeCode convertPisaNode(final UcteNodeCode ucteNodeCode) {
         if (ucteNodeCode.toString().matches(FFG_NODE_NAME_REGEX)) {
             ucteNodeCode.setUcteCountryCode(XX);
-            ucteNodeCode.setBusbar('0');
         }
         return ucteNodeCode;
     }
