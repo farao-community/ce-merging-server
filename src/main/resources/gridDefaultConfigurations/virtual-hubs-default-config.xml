@@ -129,7 +129,7 @@
         <ControlArea Code="SE4_NB" Eic="46Y000000000004S" MCParticipant="false" techCounterparty="false" SDAC="false"/>
     </ControlAreas>
     <VirtualHubs>
-        <VirtualHub Eic="10YDOM-1010A0108" Code="GR_GrIt" RelatedMA="IT" MCParticipant="false" NodeName="XAR_GA1I" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="10YDOM-1010A0108" Code="GR_GrIt" RelatedMA="ISOU" MCParticipant="false" NodeName="XAR_GA1I" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17Y000000930809C" Code="UK_IFA2000_link1" RelatedMA="FR" MCParticipant="false" NodeName="XMA_SE11" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17Y000000930811P" Code="UK_IFA2000_link2" RelatedMA="FR" MCParticipant="false" NodeName="XMA_SE13" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17Y000000930813L" Code="UK_Eleclink" RelatedMA="FR" MCParticipant="false" NodeName="XMA_SE15" AHC="false" SDAC="false"/>
@@ -143,12 +143,12 @@
         <VirtualHub Eic="17YXXXXXXAAAAAAP" Code="NO_Skagerrak3" RelatedMA="DK1" MCParticipant="false" NodeName="XTJ_K31K" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17YXXXXXXAAAAAAQ" Code="NO_Skagerrak4" RelatedMA="DK1" MCParticipant="false" NodeName="XTJ_K41K" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17YXXXXXXAAAAAAR" Code="IT_MONITA2" RelatedMA="ME" MCParticipant="false" OppositeHub="ME_MONITA2" NodeName="XKOTR220" AHC="false" SDAC="false"/>
-        <VirtualHub Eic="17YXXXXXXAAAAAAS" Code="ME_MONITA1" RelatedMA="IT" MCParticipant="false" OppositeHub="IT_MONITA1" NodeName="XCEPR120" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAS" Code="ME_MONITA1" RelatedMA="ICSO" MCParticipant="false" OppositeHub="IT_MONITA1" NodeName="XCEPR120" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17YXXXXXXAAAAAAT" Code="IT_MONITA1" RelatedMA="ME" MCParticipant="false" OppositeHub="ME_MONITA1" NodeName="XKOTR120" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17YXXXXXXAAAAAAU" Code="IT_GrIt" RelatedMA="GR" MCParticipant="false" NodeName="XAR_GA1G" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17YXXXXXXAAAAAAV" Code="MA_ESMA_link1" RelatedMA="ES" MCParticipant="false" NodeName="XTA_FA11" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17YXXXXXXAAAAAAW" Code="MA_ESMA_link2" RelatedMA="ES" MCParticipant="false" NodeName="XTA_FA12" AHC="false" SDAC="false"/>
-        <VirtualHub Eic="17YXXXXXXAAAAAAX" Code="ME_MONITA2" RelatedMA="IT" MCParticipant="false" OppositeHub="IT_MONITA2" NodeName="XCEPR220" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17YXXXXXXAAAAAAX" Code="ME_MONITA2" RelatedMA="ICSO" MCParticipant="false" OppositeHub="IT_MONITA2" NodeName="XCEPR220" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17YXXXXXXAAAAAAY" Code="UK_Viking1" RelatedMA="DK1" MCParticipant="false" NodeName="XBI_R11K" AHC="false" SDAC="false"/>
         <VirtualHub Eic="17YXXXXXXAAAAAAZ" Code="UK_Viking2" RelatedMA="DK1" MCParticipant="false" NodeName="XBI_R21K" AHC="false" SDAC="false"/>
         <VirtualHub Eic="22Y201903144---9" Code="BE_AL" RelatedMA="BE" MCParticipant="true" OppositeHub="DE_AL" NodeName="XLI_OB1B" AHC="false" SDAC="false"/>
@@ -202,10 +202,10 @@
         <BorderDirection From="CH" To="DE" SDAC="false"/>
         <BorderDirection From="CH" To="AT" SDAC="false"/>
         <BorderDirection From="CH" To="FR" SDAC="false"/>
-        <BorderDirection From="CH" To="IT" SDAC="false"/>
+        <BorderDirection From="CH" To="INOR" SDAC="false"/>
         <BorderDirection From="FR" To="ES" SDAC="false"/>
         <BorderDirection From="ES" To="PT" SDAC="false"/>
-        <BorderDirection From="IT" To="SI" SDAC="false"/>
+        <BorderDirection From="INOR" To="SI" SDAC="false"/>
         <BorderDirection From="RS" To="BG" SDAC="false"/>
         <BorderDirection From="RS" To="RO" SDAC="false"/>
         <BorderDirection From="RO" To="BG" SDAC="false"/>
@@ -222,8 +222,8 @@
         <BorderDirection From="ME" To="BA" SDAC="false"/>
         <BorderDirection From="ME" To="AL" SDAC="false"/>
         <BorderDirection From="BA" To="HR" SDAC="false"/>
-        <BorderDirection From="FR" To="IT" SDAC="false"/>
-        <BorderDirection From="IT" To="AT" SDAC="false"/>
+        <BorderDirection From="FR" To="INOR" SDAC="false"/>
+        <BorderDirection From="INOR" To="AT" SDAC="false"/>
         <BorderDirection From="BG" To="TR" SDAC="false"/>
         <BorderDirection From="NL" To="UK_BritNed" SDAC="false"/>
         <BorderDirection From="BE" To="UK_Nemolink" SDAC="false"/>
@@ -239,9 +239,9 @@
         <BorderDirection From="DK1" To="DK2_GreatBelt" SDAC="false"/>
         <BorderDirection From="DK1" To="NO_Skagerrak1" SDAC="false"/>
         <BorderDirection From="DK1" To="NO_Skagerrak2" SDAC="false"/>
-        <BorderDirection From="IT" To="GR_GrIt" SDAC="false"/>
+        <BorderDirection From="ISOU" To="GR_GrIt" SDAC="false"/>
         <BorderDirection From="GR" To="IT_GrIt" SDAC="false"/>
-        <BorderDirection From="IT" To="ME_MONITA1" SDAC="false"/>
+        <BorderDirection From="ICSO" To="ME_MONITA1" SDAC="false"/>
         <BorderDirection From="ME" To="IT_MONITA1" SDAC="false"/>
         <BorderDirection From="DE" To="NO_Nordlink_link1" SDAC="false"/>
         <BorderDirection From="DE" To="NO_Nordlink_link2" SDAC="false"/>
@@ -259,7 +259,7 @@
         <BorderDirection From="BE" To="BE_AL" SDAC="false"/>
         <BorderDirection From="DE" To="DE_AL" SDAC="false"/>
         <BorderDirection From="SI" To="HU" SDAC="false"/>
-        <BorderDirection From="IT" To="ME_MONITA2" SDAC="false"/>
+        <BorderDirection From="ICSO" To="ME_MONITA2" SDAC="false"/>
         <BorderDirection From="ME" To="IT_MONITA2" SDAC="false"/>
         <BorderDirection From="ES" To="MA_ESMA_link1" SDAC="false"/>
         <BorderDirection From="ES" To="MA_ESMA_link2" SDAC="false"/>

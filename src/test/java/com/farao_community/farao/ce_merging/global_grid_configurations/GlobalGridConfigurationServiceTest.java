@@ -11,6 +11,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
+import com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone;
 import com.farao_community.farao.ce_merging.merging.task.entities.BorderDirectionRecord;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
@@ -30,6 +31,7 @@ import java.util.Map;
 
 import static com.powsybl.iidm.network.Country.XK;
 import static com.powsybl.ucte.network.UcteCountryCode.KS;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -58,11 +60,11 @@ class GlobalGridConfigurationServiceTest {
         List<BorderDirectionRecord> defaultBorderDirection = task.getConfigurations().getBorderDirectionRecords();
 
         assertNotNull(defaultVirtualHubs);
-        assertEquals(35, defaultVirtualHubs.size());
+        assertEquals(37, defaultVirtualHubs.size());
         // sort virtualHubs alphabetically based on code
         defaultVirtualHubs.sort(Comparator.comparing(VirtualHubRecord::getCode));
 
-        VirtualHubRecord beAlegroVirtualHub = defaultVirtualHubs.get(0);
+        VirtualHubRecord beAlegroVirtualHub = defaultVirtualHubs.getFirst();
         assertEquals("BE_AL", beAlegroVirtualHub.getCode());
         assertEquals("22Y201903144---9", beAlegroVirtualHub.getEic());
         assertEquals("XLI_OB1B", beAlegroVirtualHub.getNodeName());
@@ -72,10 +74,17 @@ class GlobalGridConfigurationServiceTest {
         assertEquals("22Y201903145---4", deAlegroVirtualHub.getEic());
         assertEquals("XLI_OB1A", deAlegroVirtualHub.getNodeName());
 
-        VirtualHubRecord dk1CobraVirtualHub = defaultVirtualHubs.get(2);
-        assertEquals("DK1_COBRA", dk1CobraVirtualHub.getCode());
-        assertEquals("10Y1001C--00001J", dk1CobraVirtualHub.getEic());
+        VirtualHubRecord dk1CobraVirtualHub = defaultVirtualHubs.get(3);
+        assertEquals("DK1_NL_COBRA", dk1CobraVirtualHub.getCode());
+        assertEquals("45Y0000000000046", dk1CobraVirtualHub.getEic());
         assertEquals("XED_EE1N", dk1CobraVirtualHub.getNodeName());
+
+        //ICSO, ISOU
+        assertThat(defaultVirtualHubs.stream()
+                           .map(VirtualHubRecord::getRelatedMaCode)
+                           .distinct()
+                           .filter(ItalianBiddingZone::isItalianBiddingZone)
+                           .count()).isEqualTo(2);
 
         List<BorderDirectionRecord> borderDirectionRecordWithKs = getBorderDirectionRecordsByCountry(defaultBorderDirection, KS.name());
         assertEquals(0, borderDirectionRecordWithKs.size());
@@ -145,18 +154,18 @@ class GlobalGridConfigurationServiceTest {
             Map.entry("PL", "10YPL-AREA-----S"),
             Map.entry("RO", "10YRO-TEL------P"),
             Map.entry("SI", "10YSI-ELES-----O"),
-            Map.entry("FR", "10YFR-RTE------C")
+            Map.entry("FR", "10YFR-RTE------C"),
+            Map.entry("CH", "10YCB-SWITZERL-D"),
+            Map.entry("IT", "10YIT-GRTN-----B")
         );
 
         final Map<String, String> expectedAreasOut = Map.ofEntries(
             Map.entry("AL", "10YCB-ALBANIA--1"),
             Map.entry("BA", "10YBA-JPCC-----D"),
             Map.entry("BG", "10YCA-BULGARIA-R"),
-            Map.entry("CH", "10YCB-SWITZERL-D"),
             Map.entry("DK", "10YDK-1--------W"),
             Map.entry("ES", "10YES-REE------0"),
             Map.entry("GR", "10YCB-GREECE---2"),
-            Map.entry("IT", "10YIT-GRTN-----B"),
             Map.entry("ME", "10YCS-CG-TSO---S"),
             Map.entry("MK", "10YMK-MEPSO----8"),
             Map.entry("PT", "10YPT-REN------W"),

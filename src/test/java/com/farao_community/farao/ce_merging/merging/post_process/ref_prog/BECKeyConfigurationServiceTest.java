@@ -50,10 +50,10 @@ class BECKeyConfigurationServiceTest {
     }
 
     @Test
-    void parseSharingKeysBEC() throws Exception {
+    void parseSharingKeysBEC() {
         final List<BecByBoundaryDto> sharingKeysBEC = becKeyConfigurationService.getConfiguration(TEST_DATE).getBecByBoundaries();
-        assertEquals(17, sharingKeysBEC.size());
-        sharingKeysBEC.forEach(becByBoundary -> assertEquals(12, becByBoundary.getCoefficientByCountry().size()));
+        assertEquals(25, sharingKeysBEC.size());
+        sharingKeysBEC.forEach(becByBoundary -> assertEquals(14, becByBoundary.getCoefficientByCountry().size()));
         assertEquals(3, sharingKeysBEC.stream().filter(becByBoundary -> becByBoundary.getBorder().getOutArea().equals("10YAT-APG------L")).count());
     }
 }
