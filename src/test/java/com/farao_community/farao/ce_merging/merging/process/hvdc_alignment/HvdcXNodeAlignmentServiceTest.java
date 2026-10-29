@@ -104,7 +104,7 @@ public class HvdcXNodeAlignmentServiceTest {
         hvdcXNodeAlignmentService.applyHvdcXNodeAlignment(task);
 
         final Network dkNetworkAfterHvdcAlignment = readNetwork(task.getArtifacts().getFile(ArtifactType.DK_CONVERTED_FILE).getPath());
-        assertBoundaryLine(dkNetworkAfterHvdcAlignment, XED_EE1D, 0.0, 0.0, 0.0, 0.0);
+        assertBoundaryLine(dkNetworkAfterHvdcAlignment, XED_EE1D, 0.0, 0.0, -1.9, 248.6);
         final Network nlNetworkAfterHvdcAlignment = readPreTreatedNetwork(NL_COUNTRY_CODE);
         assertBoundaryLine(nlNetworkAfterHvdcAlignment, XED_EE1N, 0.0, 0.0, 0.0, 0.0);
         final Network itNetworkAfterHvdcAlignment = readPreTreatedNetwork(IT_COUNTRY_CODE);

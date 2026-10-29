@@ -36,10 +36,13 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapDk1ToDk;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapItBzToIt;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap.toFlowByAreaMap;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.isItalianBiddingZone;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.isItalianBiddingZoneEic;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
+import static com.powsybl.iidm.network.Country.IT;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
@@ -57,11 +60,13 @@ public final class RefProgCalculator {
     private final Map<String, NetPositions> npByCountry;
     private final InternalBiddingZonesManager biddingZonesManager;
 
-    public static RefProgCalculator with(final MergingTask task, final Supplier<LoadFlow.Runner> runnerSupplier) throws FileNotFoundException {
+    public static RefProgCalculator with(final MergingTask task,
+                                         final Supplier<LoadFlow.Runner> runnerSupplier) throws FileNotFoundException {
         return new RefProgCalculator(task, runnerSupplier);
     }
 
-    private RefProgCalculator(final MergingTask task, final Supplier<LoadFlow.Runner> runnerSupplier) throws FileNotFoundException {
+    private RefProgCalculator(final MergingTask task,
+                              final Supplier<LoadFlow.Runner> runnerSupplier) throws FileNotFoundException {
         this.task = task;
         final Configurations configurations = task.getConfigurations();
         referenceProgram = task.getArtifact(REFERENCE_PROGRAM_FORECAST_FILE, ReferenceProgram.class);
@@ -76,21 +81,21 @@ public final class RefProgCalculator {
     }
 
     public PublicationDocument computeRefProg() {
-        borderDirectionRecords.forEach(this::handleBorderDirection);
-        final RefProgResult refProgResult = new RefProgResult(referenceProgram.getDailyTimeInterval(), acExchanges, virtualHubsExchanges);
+        borderDirectionRecords.forEach(this::addBorderExchange);
+        final RefProgResult refProgResult = new RefProgResult(referenceProgram.getDailyTimeInterval(),
+                                                              acExchanges,
+                                                              virtualHubsExchanges);
         return FinalRefProgBuilder.buildFinalRefProgResult(refProgResult, task);
     }
 
-    private void handleBorderDirection(final BorderDirectionRecord borderDirection) {
+    private void addBorderExchange(final BorderDirectionRecord borderDirection) {
         final String borderFrom = mapDk1ToDk(borderDirection.getBorderFrom());
         final String borderTo = mapDk1ToDk(borderDirection.getBorderTo());
-        findVirtualHub(borderFrom, borderTo).ifPresentOrElse(this::addVirtualHubExchange,
-                                                             () -> handleAcExchange(borderFrom, borderTo));
-    }
+        final Optional<VirtualHubRecord> optVirtualHub = findVirtualHub(borderFrom, borderTo);
 
-    private void handleAcExchange(final String borderFrom,
-                                  final String borderTo) {
-        if (isInternalItalianExchange(borderFrom, borderTo)) {
+        if (optVirtualHub.isPresent()) {
+            addVirtualHubExchange(optVirtualHub.get());
+        } else if (isInternalItalianExchange(borderFrom, borderTo)) {
             addInternalItalianExchange(borderFrom, borderTo);
         } else if (isNonCoreExchange(borderFrom, borderTo)) {
             addNonCoreExchange(toEicCode(borderFrom), toEicCode(borderTo));
@@ -102,7 +107,8 @@ public final class RefProgCalculator {
     }
 
     private String toEicCode(final String country) {
-        final String eicCode = regionConfiguration.getAreasAll().get(country);
+        final String eicCode = Optional.ofNullable(regionConfiguration.getAreasAll().get(country))
+                .orElse(isItalianBiddingZone(country) ? ItalianBiddingZone.valueOf(country).getEic() : null);
         if (eicCode == null) {
             throw new CeMergingException("EIC code cannot be found for country: " + country);
         }
@@ -123,7 +129,7 @@ public final class RefProgCalculator {
     private boolean isCoreExchange(final String borderFrom,
                                    final String borderTo) {
         final Map<String, String> areasIn = regionConfiguration.getAreasIn();
-        return areasIn.containsKey(borderFrom) && areasIn.containsKey(borderTo);
+        return areasIn.containsKey(mapItBzToIt(borderFrom)) && areasIn.containsKey(mapItBzToIt(borderTo));
     }
 
     private void addVirtualHubExchange(final VirtualHubRecord virtualHub) {
@@ -134,7 +140,9 @@ public final class RefProgCalculator {
     private void addNonCoreExchange(final String eicFrom,
                                     final String eicTo) {
         acExchanges.put(new Border(eicFrom, eicTo),
-                        getExchangeFromRefProg(eicFrom, eicTo).getFlow());
+                        getExchangeFromRefProg(mapItaBzToItaCountry(eicFrom),
+                                               mapItaBzToItaCountry(eicTo))
+                                .getFlow());
     }
 
     private void addInternalItalianExchange(final String borderFrom,
@@ -148,15 +156,26 @@ public final class RefProgCalculator {
 
     private void addCoreExchange(final String eicFrom,
                                  final String eicTo) {
-        final Border border = new Border(eicFrom, eicTo);
 
-        final double flow = getBexFactors(border)
+        // same if not Italy
+        final Border realBorder = new Border(eicFrom, eicTo);
+        final Border bexBorder = new Border(mapItaBzToItaCountry(eicFrom), mapItaBzToItaCountry(eicTo));
+
+        final double flow = getBexFactors(bexBorder)
                 .getCoefficientByCountry()
                 .stream()
                 .mapToDouble(this::getBorderExchange)
                 .sum();
 
-        acExchanges.put(border, flow);
+        acExchanges.put(realBorder, flow);
+    }
+
+    private String mapItaBzToItaCountry(final String eic) {
+        if (isItalianBiddingZoneEic(eic)) {
+            return regionConfiguration.getAreasAll().get(IT.name());
+        } else {
+            return eic;
+        }
     }
 
     private double getBorderExchange(final BecCoefficients becCoefficients) {
@@ -185,8 +204,8 @@ public final class RefProgCalculator {
                 .map(Map::entrySet)
                 .flatMap(Set::stream)
                 .collect(toMap(Map.Entry::getKey,
-                                         Map.Entry::getValue,
-                                         (a, b) -> b));
+                               Map.Entry::getValue,
+                               (a, b) -> b));
     }
 
     private ReferenceExchangeData getExchangeFromRefProg(final String eicFrom,
