@@ -33,6 +33,7 @@ public class InputsDto implements Serializable {
     private String feasibilityRangesLocation;
     private String dcLinksLocation;
     private String netPositionForecastLocation;
+    private String internalBiddingZonesLocation;
 
     public String getMergingRequestLocation() {
         return mergingRequestLocation;
@@ -114,5 +115,13 @@ public class InputsDto implements Serializable {
 
     public void setNetPositionForecastLocation(final String netPositionForecastLocation) {
         this.netPositionForecastLocation = netPositionForecastLocation;
+    }
+
+    public String getInternalBiddingZonesLocation() {
+        return internalBiddingZonesLocation;
+    }
+
+    public void setInternalBiddingZonesLocation(final String internalBiddingZonesLocation) {
+        this.internalBiddingZonesLocation = internalBiddingZonesLocation;
     }
 }

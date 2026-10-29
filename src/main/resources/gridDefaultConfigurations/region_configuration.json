@@ -13,17 +13,17 @@
     "PL": "10YPL-AREA-----S",
     "RO": "10YRO-TEL------P",
     "SI": "10YSI-ELES-----O",
-    "FR": "10YFR-RTE------C"
+    "FR": "10YFR-RTE------C",
+    "IT": "10YIT-GRTN-----B",
+    "CH": "10YCB-SWITZERL-D"
   },
   "areasOut": {
     "AL": "10YCB-ALBANIA--1",
     "BA": "10YBA-JPCC-----D",
     "BG": "10YCA-BULGARIA-R",
-    "CH": "10YCB-SWITZERL-D",
     "DK": "10YDK-1--------W",
     "ES": "10YES-REE------0",
     "GR": "10YCB-GREECE---2",
-    "IT": "10YIT-GRTN-----B",
     "ME": "10YCS-CG-TSO---S",
     "MK": "10YMK-MEPSO----8",
     "PT": "10YPT-REN------W",
@@ -38,7 +38,7 @@
     "MA": "10YMA-ONE------O",
     "LT": "10YLT-1001A0008Q",
     "NO": "10YNO-0--------C",
-    "MD" : "10Y1001A1001A990"
+    "MD": "10Y1001A1001A990"
   },
   "germanyZones": {
     "D2": {

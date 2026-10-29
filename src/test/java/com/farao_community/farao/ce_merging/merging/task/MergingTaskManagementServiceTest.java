@@ -9,13 +9,6 @@ package com.farao_community.farao.ce_merging.merging.task;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.task.TaskNotValidException;
 import com.farao_community.farao.ce_merging.common.util.FileUtils;
-import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.ExecutionLogsService;
-import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
-import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
-import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.farao_community.farao.ce_merging.common.util.ZipUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.HvdcAlignmentConfigurationService;
@@ -23,6 +16,13 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.services.
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.VirtualHubsConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.XNodeConfigurationService;
 import com.farao_community.farao.ce_merging.merging.MergingService;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.ExecutionLogsService;
+import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
+import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
+import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
+import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
+import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import com.farao_community.farao.ce_merging.merging.task.mapper.MergingTaskMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -105,7 +105,7 @@ class MergingTaskManagementServiceTest {
 
     @BeforeEach
     void setUp() {
-        // to obtain configuration from autowire
+        // to get configuration from autowire
         service = new MergingTaskManagementService(ceMergingConfiguration,
                                                    mergingService,
                                                    repository,

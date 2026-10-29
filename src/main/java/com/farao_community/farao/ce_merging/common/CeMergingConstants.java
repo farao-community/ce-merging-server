@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -58,13 +59,14 @@ public final class CeMergingConstants {
     public static final String UCTE_EXPORT_NAMING_STRATEGY_PROPERTY = "ucte.export.naming-strategy";
     public static final String MONITA_NAMING_STRATEGY = "MonitaNamingStrategy";
     public static final String PISA_NAMING_STRATEGY = "PisaNamingStrategy";
-    // nodes
+    // network
     public static final String ALEGRO_NODE_PREFIX = "XLI_OB1";
     public static final String VIRTUAL_HUB_ALEGRO_BE_NODE_NAME = "XLI_OB1B";
     public static final String VIRTUAL_HUB_ALEGRO_DE_NODE_NAME = "XLI_OB1A";
     public static final String MONITA1_ME_NODE_NAME = "XKOTR120";
     public static final String MONITA2_ME_NODE_NAME = "XKOTR220";
     public static final String XNODES_PREFIX = "X";
+    public static final String ELEMENT_NAME_PROPERTY = "elementName";
     // formatting
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
     public static final String DATE_FORMAT = "yyyyMMdd";
@@ -112,6 +114,7 @@ public final class CeMergingConstants {
     public static final double MAX_FICTITIOUS_Q = 99999.;
     public static final int MERGING_DAY_START_INDEX = 18;
     public static final int MERGING_DATE_TIME_END_INDEX = 35;
+    public static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
     // Date management
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
