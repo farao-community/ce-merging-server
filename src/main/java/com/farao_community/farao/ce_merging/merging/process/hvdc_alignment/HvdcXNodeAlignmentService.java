@@ -28,9 +28,9 @@ import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.getCountryFromCode;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapItBzToIt;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
-import static com.powsybl.iidm.network.Country.IT;
 
 @Service
 public class HvdcXNodeAlignmentService {
@@ -112,8 +112,7 @@ public class HvdcXNodeAlignmentService {
             final SavedFile igm = switch (getCountryFromCode(countryCode)) {
                 case DE -> task.getArtifacts().getFile(GERMAN_PRE_MERGED_IGM);
                 case DK -> task.getArtifacts().getFile(DK_CONVERTED_FILE);
-                case IT -> task.getIgmFile(IT);
-                default -> getIgm(countryCode, task);
+                default -> getIgm(mapItBzToIt(countryCode), task);
             };
             return igm != null ? Optional.of(Network.read(igm.getPath())) : Optional.empty();
         } catch (final Exception e) {
