@@ -8,17 +8,20 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.powsybl.iidm.network.Branch;
-import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.BoundaryLine;
+import com.powsybl.iidm.network.Branch;
+import com.powsybl.iidm.network.Connectable;
+import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
+import com.powsybl.iidm.network.TieLine;
 import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.ucte.network.UcteCountryCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XNODES_PREFIX;
 import static com.powsybl.iidm.network.TwoSides.ONE;
 import static com.powsybl.iidm.network.TwoSides.TWO;
 import static java.lang.Double.isNaN;
@@ -38,12 +42,19 @@ public final class NetworkUtil {
         // utility
     }
 
-    public static boolean hasActivePower(final Injection injection) {
-        return !isNaN(injection.getTerminal().getP());
-    }
-
     public static double zeroIfNaN(final double value) {
         return isNaN(value) ? 0 : value;
+    }
+
+    public static String getNodeName(final Terminal terminal) {
+        return terminal.getBusBreakerView().getConnectableBus().getId();
+    }
+
+    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    CHECKS & PREDICATES
+     -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+    public static boolean hasActivePower(final Injection injection) {
+        return !isNaN(injection.getTerminal().getP());
     }
 
     public static boolean isConnected(final Branch branch) {
@@ -63,11 +74,25 @@ public final class NetworkUtil {
         return identifiable -> idPattern.matcher(identifiable.getId()).matches();
     }
 
-    public static boolean isInOutage(final Terminal terminal) {
+    public static boolean isInOutage(final Connectable connectable) {
+        return switch (connectable) {
+            case TieLine tieLine -> isInOutage(tieLine.getBoundaryLine1()) || isInOutage(tieLine.getBoundaryLine2());
+            case BoundaryLine boundaryLine -> isInOutage(boundaryLine);
+            case Terminal terminal -> isInOutage(terminal);
+            case Branch<?> branch -> isInOutage(branch);
+            default -> throw new CeMergingException("outage check not implemented for class %s".formatted(connectable.getClass().getName()));
+        };
+    }
+
+    private static boolean isInOutage(final BoundaryLine line) {
+        return isInOutage(line.getTerminal());
+    }
+
+    private static boolean isInOutage(final Terminal terminal) {
         return terminal == null || !terminal.isConnected();
     }
 
-    public static boolean isInOutage(final Branch branch) {
+    private static boolean isInOutage(final Branch branch) {
         return branch == null || isInOutage(branch.getTerminal1()) || isInOutage(branch.getTerminal2());
     }
 
@@ -86,6 +111,20 @@ public final class NetworkUtil {
         return l -> l.getPairingKey().equals(nodeName);
     }
 
+    public static boolean isAnXNode(final String nodeName) {
+        return nodeName.startsWith(XNODES_PREFIX);
+    }
+
+    public static String toCountryElementId(final UcteCountryCode countryCode,
+                                            final String previousElementId,
+                                            final int endIndex) {
+        // 1 because we replace the first character (= country identifier) with the country one
+        return countryCode.getUcteCode() + previousElementId.substring(1, endIndex);
+    }
+
+    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    COUNTRY & BORDERS
+     -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
     public static Country getCountryOfSide(final Branch branch,
                                            final TwoSides side) {
         return branch.getTerminal(side)
@@ -151,19 +190,20 @@ public final class NetworkUtil {
         return country.equals(getCountry(hvdcLine.getConverterStation1().getTerminal())) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(final Line line, final String zone) {
+    public static double getBorderFlow(final Line line,
+                                       final String zone) {
         final double flowSide1 = getTerminalFlow(line.getTerminal1());
         final double flowSide2 = getTerminalFlow(line.getTerminal2());
         final double directFlow = (flowSide1 - flowSide2) / 2;
         return line.getTerminal(TwoSides.ONE).getVoltageLevel().getId().startsWith(zone) ? directFlow : -directFlow;
     }
 
-    public static double getBorderFlow(final BoundaryLine boundaryLine, final LoadFlowParameters.ComponentMode componentModeLfParameter) {
+    public static double getBorderFlow(final BoundaryLine boundaryLine,
+                                       final LoadFlowParameters.ComponentMode componentModeLfParameter) {
         return switch (componentModeLfParameter) {
             case MAIN_CONNECTED -> // Loadflow computed only on main connected component
                     boundaryLine.getTerminal().getBusBreakerView().getConnectableBus().isInMainConnectedComponent() ? getLeavingFlow(boundaryLine) : 0.;
-            case ALL_CONNECTED ->
-                    getLeavingFlow(boundaryLine);
+            case ALL_CONNECTED -> getLeavingFlow(boundaryLine);
             default -> {
                 LOGGER.error(ERROR_COMPONENT_NUMBER_PARAMETER);
                 throw new CeMergingException(ERROR_COMPONENT_NUMBER_PARAMETER);
@@ -197,15 +237,18 @@ public final class NetworkUtil {
         return boundaryLine.getTerminal().isConnected() ? zeroIfNaN(-boundaryLine.getBoundary().getP()) : 0;
     }
 
-    public static boolean isBorderOfZone(final BoundaryLine boundaryLine, final String zone) {
+    public static boolean isBorderOfZone(final BoundaryLine boundaryLine,
+                                         final String zone) {
         return isBorderOfZone(boundaryLine.getId(), zone);
     }
 
-    public static boolean isBorderOfZone(final Line line, final String zone) {
+    public static boolean isBorderOfZone(final Line line,
+                                         final String zone) {
         return isBorderOfZone(line.getId(), zone);
     }
 
-    private static boolean isBorderOfZone(final String lineId, final String zone) {
+    private static boolean isBorderOfZone(final String lineId,
+                                          final String zone) {
         final String nodeFrom = lineId.substring(0, 8);
         final String nodeTo = lineId.substring(9, 17);
         return nodeFrom.startsWith(zone) != nodeTo.startsWith(zone);

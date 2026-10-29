@@ -6,9 +6,9 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa;
 
-import com.powsybl.iidm.network.Bus;
-import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.BoundaryLine;
+import com.powsybl.iidm.network.Branch;
+import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Switch;
 import com.powsybl.ucte.converter.UcteException;
@@ -19,8 +19,13 @@ import org.junit.jupiter.api.Test;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PISA_NAMING_STRATEGY;
 import static com.powsybl.ucte.network.UcteCountryCode.XX;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class PisaNamingStrategyTest {
 
@@ -46,7 +51,6 @@ class PisaNamingStrategyTest {
     void shouldConvertFfgNode() {
         final UcteNodeCode nodeCode = namingStrategy.getUcteNodeCode("FFG.IL11");
         assertEquals(XX, nodeCode.getUcteCountryCode());
-        assertEquals('0', nodeCode.getBusbar());
     }
 
     @Test
@@ -54,7 +58,6 @@ class PisaNamingStrategyTest {
         for (int i = 11; i <= 14; i++) {
             UcteNodeCode nodeCode = namingStrategy.getUcteNodeCode("FFG.IL" + i);
             assertEquals(XX, nodeCode.getUcteCountryCode());
-            assertEquals('0', nodeCode.getBusbar());
         }
     }
 
@@ -64,7 +67,6 @@ class PisaNamingStrategyTest {
         when(bus.getId()).thenReturn("FFG.IL11");
         final UcteNodeCode nodeCode = namingStrategy.getUcteNodeCode(bus);
         assertEquals(XX, nodeCode.getUcteCountryCode());
-        assertEquals('0', nodeCode.getBusbar());
     }
 
     @Test
@@ -82,9 +84,7 @@ class PisaNamingStrategyTest {
         final UcteElementId elementId = namingStrategy.getUcteElementId("FFG.IL11 FFG.IL12 1");
         assertNotNull(elementId);
         assertEquals(XX, elementId.getNodeCode1().getUcteCountryCode());
-        assertEquals('0', elementId.getNodeCode1().getBusbar());
         assertEquals(XX, elementId.getNodeCode2().getUcteCountryCode());
-        assertEquals('0', elementId.getNodeCode2().getBusbar());
     }
 
     @Test

@@ -11,57 +11,116 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
-import com.powsybl.iidm.network.*;
+import com.powsybl.iidm.network.BoundaryLine;
+import com.powsybl.iidm.network.Connectable;
+import com.powsybl.iidm.network.Line;
+import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.Terminal;
 import org.springframework.stereotype.Service;
 
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PISA_NAMING_STRATEGY;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_EXPORT_NAMING_STRATEGY_PROPERTY;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.save;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getNodeName;
+import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaNamingStrategy.FFG_NODE_NAME_PATTERN;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_COMPENSATION;
 
 @Service
 public class PisaService {
+    private static final Pattern XPI_NODE_NAME_PATTERN = Pattern.compile("XPI_GI1[1-2]");
+
     private final CeMergingConfiguration configuration;
-    private static final Pattern FFG_NODE_NAME_PATTERN = Pattern.compile("FFG\\.IL1[1-4] FFG\\.IL1[1-4].*");
 
     public PisaService(final CeMergingConfiguration configuration) {
         this.configuration = configuration;
     }
 
-    public void renameNode(final MergingTask task) {
+    public void displacePisaNodes(final MergingTask task) throws FileNotFoundException {
         final Properties properties = new Properties();
         properties.setProperty(UCTE_EXPORT_NAMING_STRATEGY_PROPERTY, PISA_NAMING_STRATEGY);
 
+        final Network cgm = displacePisaNodes(task.getArtifact(CGM_FILE_AFTER_COMPENSATION, Network.class));
+
         final SavedFile cgmFile = save(configuration.getOutputsDirectoryPath(task),
-                task.getOutputCgmFileName(),
-                String.format("/tasks/%d/outputs/cgm", task.getId()),
-                path -> getCgm(task).write(UCTE_FORMAT, properties, path));
+                                       task.getOutputCgmFileName(),
+                                       String.format("/tasks/%d/outputs/cgm", task.getId()),
+                                       path -> cgm.write(UCTE_FORMAT, properties, path));
 
         task.getOutputs().setCgm(cgmFile);
     }
 
-    private static Network getCgm(final MergingTask task) {
-        Network cgm = Network.read(task.getArtifactPath(ArtifactType.CGM_FILE_AFTER_COMPENSATION));
-        removeLines(cgm);
+    private static Network displacePisaNodes(final Network cgm) {
+        prepareFrenchBoundary(cgm);
+        moveItalianBoundary(cgm);
         return cgm;
     }
 
-    private static void removeLines(final Network cgm) {
-        final List<Branch> branchesToCheck = cgm.getBranchStream()
-                .filter(c -> FFG_NODE_NAME_PATTERN.matcher(c.getId()).matches())
+    private static void prepareFrenchBoundary(final Network cgm) {
+        final List<Line> linesToRemove = new ArrayList<>(cgm.getLineStream()
+                                                                 .filter(PisaService::wouldBecomeLineBetweenXnodes)
+                                                                 .toList());
+
+        final List<BoundaryLine> boundaryLinesToRemove = cgm.getBoundaryLineStream()
+                .filter(PisaService::wouldBecomeLineBetweenXnodes)
                 .toList();
-        for (final Branch<?> branch : branchesToCheck) {
-            if (NetworkUtil.isInOutage(branch)) {
-                if (branch instanceof Line line) {
-                    line.remove();
-                }
-            } else {
-                throw new CeMergingException("Cannot remove Pisa line because it is in operation.");
-            }
+
+        Stream.concat(linesToRemove.stream(), boundaryLinesToRemove.stream())
+                .forEach(PisaService::tryToRemove);
+    }
+
+    private static void tryToRemove(final Connectable connectable) {
+        if (NetworkUtil.isInOutage(connectable)) {
+            connectable.remove();
+        } else {
+            throw new CeMergingException("PiSa post-treatment: cannot remove line %s because it is in operation."
+                                                 .formatted(connectable.getNameOrId()));
         }
+    }
+
+    private static void moveItalianBoundary(final Network cgm) {
+        final List<BoundaryLine> pisaItalySide = cgm.getBoundaryLineStream()
+                .filter(PisaService::willHaveItalianNode)
+                .toList();
+
+        PisaXnodesReplacer.on(cgm).replace(pisaItalySide);
+    }
+
+    private static boolean willHaveItalianNode(final BoundaryLine boundaryLine) {
+        return willBecomeItalianNode(boundaryLine.getPairingKey());
+    }
+
+    private static boolean wouldBecomeLineBetweenXnodes(final Line line) {
+        final Terminal terminal1 = line.getTerminal1();
+        final Terminal terminal2 = line.getTerminal2();
+
+        return willBecomeFrenchXnode(terminal1) && willBecomeFrenchXnode(terminal2);
+    }
+
+    private static boolean wouldBecomeLineBetweenXnodes(final BoundaryLine line) {
+        final String node = line.getPairingKey();
+        final Terminal terminal = line.getTerminal();
+
+        return !willBecomeItalianNode(node) && willBecomeFrenchXnode(terminal);
+    }
+
+    private static boolean willBecomeItalianNode(final String node) {
+        return XPI_NODE_NAME_PATTERN.matcher(node).matches();
+    }
+
+    public static boolean willBecomeFrenchXnode(final Terminal terminal) {
+        return willBecomeFrenchXnode(getNodeName(terminal));
+    }
+
+    private static boolean willBecomeFrenchXnode(final String nodeName) {
+        return FFG_NODE_NAME_PATTERN.matcher(nodeName).matches();
     }
 
 }

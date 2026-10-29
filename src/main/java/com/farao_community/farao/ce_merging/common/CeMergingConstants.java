@@ -64,6 +64,7 @@ public final class CeMergingConstants {
     public static final String VIRTUAL_HUB_ALEGRO_DE_NODE_NAME = "XLI_OB1A";
     public static final String MONITA1_ME_NODE_NAME = "XKOTR120";
     public static final String MONITA2_ME_NODE_NAME = "XKOTR220";
+    public static final String XNODES_PREFIX = "X";
     // formatting
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
     public static final String DATE_FORMAT = "yyyyMMdd";

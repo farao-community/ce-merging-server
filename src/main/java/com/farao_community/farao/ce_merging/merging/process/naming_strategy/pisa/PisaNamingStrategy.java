@@ -6,24 +6,31 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa;
 
-import com.powsybl.iidm.network.*;
+import com.powsybl.iidm.network.BoundaryLine;
+import com.powsybl.iidm.network.Branch;
+import com.powsybl.iidm.network.Bus;
+import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.Switch;
 import com.powsybl.ucte.converter.NamingStrategy;
 import com.powsybl.ucte.converter.UcteException;
+import com.powsybl.ucte.network.UcteCountryCode;
 import com.powsybl.ucte.network.UcteElementId;
 import com.powsybl.ucte.network.UcteNodeCode;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PISA_NAMING_STRATEGY;
+import static com.powsybl.ucte.network.UcteCountryCode.XX;
 import static com.powsybl.ucte.network.UcteElementId.parseUcteElementId;
 import static com.powsybl.ucte.network.UcteNodeCode.parseUcteNodeCode;
-import static com.powsybl.ucte.network.UcteCountryCode.XX;
 
 public class PisaNamingStrategy implements NamingStrategy {
     private final Map<String, UcteNodeCode> ucteNodeIds = new HashMap<>();
     private final Map<String, UcteElementId> ucteElementIds = new HashMap<>();
-    public static final String FFG_NODE_NAME_REGEX = "FFG\\.IL1[1-4]";
+    public static final Pattern FFG_NODE_NAME_PATTERN = Pattern.compile("FFG\\.IL1[1-4]");
+    public static final Pattern XPI_NODE_NAME_PATTERN = Pattern.compile("XPI_GI1[1-2]");
 
     @Override
     public void initializeNetwork(Network network) {
@@ -73,8 +80,11 @@ public class PisaNamingStrategy implements NamingStrategy {
     }
 
     private UcteNodeCode convertPisaNode(final UcteNodeCode ucteNodeCode) {
-        if (ucteNodeCode.toString().matches(FFG_NODE_NAME_REGEX)) {
+        if (FFG_NODE_NAME_PATTERN.matcher(ucteNodeCode.toString()).matches()) {
             ucteNodeCode.setUcteCountryCode(XX);
+        }
+        if (XPI_NODE_NAME_PATTERN.matcher(ucteNodeCode.toString()).matches()) {
+            ucteNodeCode.setUcteCountryCode(UcteCountryCode.IT);
         }
         return ucteNodeCode;
     }

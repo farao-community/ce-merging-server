@@ -13,15 +13,15 @@ import com.farao_community.farao.ce_merging.merging.post_process.ref_prog.RefPro
 import com.farao_community.farao.ce_merging.merging.process.alegro.AlegroService;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentService;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.BaseCaseImprovementService;
-import com.farao_community.farao.ce_merging.merging.process.naming_strategy.dk_renaming.DKRenamingService;
 import com.farao_community.farao.ce_merging.merging.process.final_cgm_result.FinalCgmService;
 import com.farao_community.farao.ce_merging.merging.process.forecast_netpositions.ForecastNetPositionService;
 import com.farao_community.farao.ce_merging.merging.process.german_pre_merge.GermanPreMergeService;
 import com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService;
 import com.farao_community.farao.ce_merging.merging.process.hvdc_alignment.HvdcXNodeAlignmentService;
+import com.farao_community.farao.ce_merging.merging.process.naming_strategy.dk_renaming.DKRenamingService;
 import com.farao_community.farao.ce_merging.merging.process.naming_strategy.monita.MonitaService;
-import com.farao_community.farao.ce_merging.merging.process.netpositions.NetPositionService;
 import com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaService;
+import com.farao_community.farao.ce_merging.merging.process.netpositions.NetPositionService;
 import com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstSpecialService;
 import com.farao_community.farao.ce_merging.merging.process.recessivity.RecessivityService;
 import com.farao_community.farao.ce_merging.merging.process.slack_compensation.SlackCompensationService;
@@ -134,7 +134,7 @@ public class MergingService {
         balancesAdjustmentService.shiftCgm(task);
         pstSpecialService.fixPst(task);
         slackCompensationService.compensateFinalCgmSlackImbalance(task);
-        pisaService.renameNode(task);
+        pisaService.displacePisaNodes(task);
         finalCgmService.computeFinalCgmResult(task);
     }
 
