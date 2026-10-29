@@ -30,6 +30,7 @@ public class PisaNamingStrategy implements NamingStrategy {
     private final Map<String, UcteNodeCode> ucteNodeIds = new HashMap<>();
     private final Map<String, UcteElementId> ucteElementIds = new HashMap<>();
     public static final Pattern FFG_NODE_NAME_PATTERN = Pattern.compile("FFG\\.IL1[1-4]");
+    public static final Pattern XFG_NODE_NAME_PATTERN = Pattern.compile("XFG\\.IL1[1-4]");
     public static final Pattern XPI_NODE_NAME_PATTERN = Pattern.compile("XPI_GI1[1-2]");
 
     @Override

@@ -174,6 +174,10 @@
         <VirtualHub Eic="45Y0000000000070" Code="DK2_DE_VH" RelatedMA="DK2" MCParticipant="false" AHC="false" SDAC="false"/>
         <VirtualHub Eic="10YDE-SE4-VBZ-01" Code="DE_SE4_Baltic" RelatedMA="DE" MCParticipant="false" NodeName="D2HWKR1D" AHC="true" SDAC="false"/>
         <VirtualHub Eic="46Y000000000005Q" Code="SE4_DE_Baltic" RelatedMA="SE4" MCParticipant="false" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17Y000000930817D" Code="FR_PISA1" RelatedMA="FR" MCParticipant="true" OppositeHub="IT_PISA1" NodeName="XFG.IL12" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17Y000000930816F" Code="IT_PISA1" RelatedMA="INOR" MCParticipant="true" OppositeHub="FR_PISA1" NodeName="XFG.IL11" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17Y000002400999I" Code="FR_PISA2" RelatedMA="FR" MCParticipant="true" OppositeHub="IT_PISA2" NodeName="XFG.IL14" AHC="false" SDAC="false"/>
+        <VirtualHub Eic="17Y000002396295E" Code="IT_PISA2" RelatedMA="INOR" MCParticipant="true" OppositeHub="FR_PISA2" NodeName="XFG.IL13" AHC="false" SDAC="false"/>
     </VirtualHubs>
     <BorderDirections>
         <BorderDirection From="BE" To="NL" SDAC="false"/>
@@ -273,5 +277,9 @@
         <BorderDirection From="ICSO" To="ISOU" SDAC="false"/>
         <BorderDirection From="ICSO" To="ICAL" SDAC="false"/>
         <BorderDirection From="ISOU" To="ICAL" SDAC="false"/>
+        <BorderDirection From="FR" To="FR_PISA1" AHC="false" SDAC="false" ACDCBorder="true"/>
+        <BorderDirection From="INOR" To="IT_PISA1" AHC="false" SDAC="false" ACDCBorder="true"/>
+        <BorderDirection From="FR" To="FR_PISA2" AHC="false" SDAC="false" ACDCBorder="true"/>
+        <BorderDirection From="INOR" To="IT_PISA2" AHC="false" SDAC="false" ACDCBorder="true"/>
     </BorderDirections>
 </Configuration>
