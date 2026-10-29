@@ -7,8 +7,8 @@
 
 package com.farao_community.farao.ce_merging.merging.process.german_pre_merge;
 
-import com.powsybl.iidm.network.BoundaryLine;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.CurrentLimitsAdder;
 import com.powsybl.iidm.network.Line;
@@ -34,7 +34,6 @@ import static com.powsybl.iidm.network.TwoSides.TWO;
 
 public final class GermanXnodesReplacer {
     private static final String LINE_ID_FORMAT = "%s %s 1";
-    private static final String GERMAN_UCTE_NODE_PREFIX = "D";
     private static final int SUBSTATION_ID_LENGTH = 6;
     private static final int VOLTAGE_LEVEL_ID_LENGTH = 7;
     private static final int BUS_ID_LENGTH = 8;
