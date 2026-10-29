@@ -119,7 +119,6 @@ public class HvdcXNodeAlignmentService {
             LOGGER.warn("Country {} not found in Country enum values", countryCode);
             return Optional.empty();
         }
-
     }
 
     private static SavedFile getIgm(final String countryCode,
@@ -127,7 +126,6 @@ public class HvdcXNodeAlignmentService {
         return Optional.ofNullable(task.getArtifacts().getPreTreatedIgmMap().get(countryCode))
                 .orElseGet(() -> task.getInputs().getIgm(countryCode).getIgmFile());
     }
-
 
     private void updateBoundaryLineFlow(final MergingTask task,
                                         final Network network,
