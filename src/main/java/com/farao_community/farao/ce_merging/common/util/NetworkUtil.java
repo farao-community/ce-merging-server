@@ -217,6 +217,14 @@ public final class NetworkUtil {
         return terminal.isConnected() ? zeroIfNaN(terminal.getP()) : 0;
     }
 
+    public static double getLineFlow(final Line line) {
+        return (getTerminalFlow(line.getTerminal1()) - getTerminalFlow(line.getTerminal2())) / 2;
+    }
+
+    public static String getVlIdOnSide(final Branch<?> branch, final TwoSides side) {
+        return branch.getTerminal(side).getVoltageLevel().getId();
+    }
+
     public static Country getCountryOnOtherSide(final Line line,
                                                 final Country country) {
         final Country side1Country = getCountry(line, ONE);

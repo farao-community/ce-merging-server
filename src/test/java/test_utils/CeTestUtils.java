@@ -176,7 +176,7 @@ public final class CeTestUtils {
                                               final String name,
                                          final String path) {
         final Artifacts artifacts = new Artifacts();
-        artifacts.putFile(type, getSavedFile(name, path));
+        artifacts.putFile(type, mockSavedFile(name, path));
         return artifacts;
     }
 
