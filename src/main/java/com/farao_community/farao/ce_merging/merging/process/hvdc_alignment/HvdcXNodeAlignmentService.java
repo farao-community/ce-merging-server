@@ -39,7 +39,8 @@ public class HvdcXNodeAlignmentService {
     private final CeMergingConfiguration configuration;
     private final MergingTaskRepository repository;
 
-    public HvdcXNodeAlignmentService(final CeMergingConfiguration configuration, final MergingTaskRepository repository) {
+    public HvdcXNodeAlignmentService(final CeMergingConfiguration configuration,
+                                     final MergingTaskRepository repository) {
         this.configuration = configuration;
         this.repository = repository;
     }
@@ -52,8 +53,8 @@ public class HvdcXNodeAlignmentService {
             final String nodeName = zeroFlowNode.getXnode();
             final String country = zeroFlowNode.getCountryCode();
             getNetworkForCountry(task, country).ifPresentOrElse(
-                network -> updateBoundaryLineFlow(task, network, nodeName, country, location),
-                () -> LOGGER.warn("Unable to find the IGM associated to the country {}, The xnode {} flow will not be set to 0", country, nodeName));
+                    network -> updateBoundaryLineFlow(task, network, nodeName, country, location),
+                    () -> LOGGER.warn("Unable to find the IGM associated to the country {}, The xnode {} flow will not be set to 0", country, nodeName));
         });
         repository.save(task);
     }
@@ -84,18 +85,20 @@ public class HvdcXNodeAlignmentService {
     private static String getVirtualHubCountry(final List<VirtualHubRecord> virtualHubRecords,
                                                final String nodeName) {
         VirtualHubRecord virtualHubRecord = virtualHubRecords.stream()
-            .filter(vhRecord -> nodeName.equals(vhRecord.getNodeName()))
-            .findFirst()
-            .orElseThrow(() -> {
-                String errorMessage = "Could not find node " + nodeName + " in virtual hub config";
-                LOGGER.error(errorMessage);
-                return new CeMergingException(errorMessage);
-            });
+                .filter(vhRecord -> nodeName.equals(vhRecord.getNodeName()))
+                .findFirst()
+                .orElseThrow(() -> {
+                    String errorMessage = "Could not find node " + nodeName + " in virtual hub config";
+                    LOGGER.error(errorMessage);
+                    return new CeMergingException(errorMessage);
+                });
 
         return CountryCodeUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
     }
 
-    private static Network getNetworkOrThrow(final MergingTask task, final String country, final String nodeName) {
+    private static Network getNetworkOrThrow(final MergingTask task,
+                                             final String country,
+                                             final String nodeName) {
         return getNetworkForCountry(task, country).orElseThrow(() -> {
             String errorMessage = "Unable to find the IGM associated to the country " + country + " for node " + nodeName;
             LOGGER.error(errorMessage);
@@ -110,8 +113,7 @@ public class HvdcXNodeAlignmentService {
                 case DE -> task.getArtifacts().getFile(GERMAN_PRE_MERGED_IGM);
                 case DK -> task.getArtifacts().getFile(DK_CONVERTED_FILE);
                 case IT -> task.getIgmFile(IT);
-                default -> Optional.ofNullable(task.getArtifacts().getPreTreatedIgmMap().get(countryCode))
-                    .orElseGet(() -> task.getInputs().getIgm(countryCode).getIgmFile());
+                default -> getIgm(countryCode, task);
             };
             return igm != null ? Optional.of(Network.read(igm.getPath())) : Optional.empty();
         } catch (final Exception e) {
@@ -121,21 +123,32 @@ public class HvdcXNodeAlignmentService {
 
     }
 
-    private void updateBoundaryLineFlow(final MergingTask task, final Network network, final String nodeName, final String country, final String location) {
+    private static SavedFile getIgm(final String countryCode,
+                                    final MergingTask task) {
+        return Optional.ofNullable(task.getArtifacts().getPreTreatedIgmMap().get(countryCode))
+                .orElseGet(() -> task.getInputs().getIgm(countryCode).getIgmFile());
+    }
+
+
+    private void updateBoundaryLineFlow(final MergingTask task,
+                                        final Network network,
+                                        final String nodeName,
+                                        final String country,
+                                        final String location) {
         network.getBoundaryLineStream()
-            .filter(boundaryLine -> boundaryLine.getPairingKey().equals(nodeName))
-            .findFirst()
-            .ifPresentOrElse(
-                boundaryLine -> {
-                    setBoundaryLineToZeroFlow(boundaryLine);
-                    LOGGER.info("Set {} flow to 0.0", nodeName);
-                    saveNetworkInArtifacts(task, network, country, location);
-                },
-                () -> LOGGER.warn(
-                    "Could not update XNode flows, boundary line {} not found in {} network",
-                    nodeName,
-                    network.getNameOrId()
-                ));
+                .filter(boundaryLine -> boundaryLine.getPairingKey().equals(nodeName))
+                .findFirst()
+                .ifPresentOrElse(
+                        boundaryLine -> {
+                            setBoundaryLineToZeroFlow(boundaryLine);
+                            LOGGER.info("Set {} flow to 0.0", nodeName);
+                            saveNetworkInArtifacts(task, network, country, location);
+                        },
+                        () -> LOGGER.warn(
+                                "Could not update XNode flows, boundary line {} not found in {} network",
+                                nodeName,
+                                network.getNameOrId()
+                        ));
     }
 
     private static void setBoundaryLineToZeroFlow(final BoundaryLine boundaryLine) {
@@ -149,8 +162,8 @@ public class HvdcXNodeAlignmentService {
                                         final String location) {
 
         final SavedFile savedFile = FileStorageUtils.save(
-            configuration.getArtifactsDirectoryPath(task), network.getNameOrId() + ".uct", location,
-            path -> network.write(UCTE_FORMAT, null, path)
+                configuration.getArtifactsDirectoryPath(task), network.getNameOrId() + ".uct", location,
+                path -> network.write(UCTE_FORMAT, null, path)
         );
 
         final Country country = getCountryFromCode(countryCode);
