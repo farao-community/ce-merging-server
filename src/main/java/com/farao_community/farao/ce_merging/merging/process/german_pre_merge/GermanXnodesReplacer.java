@@ -7,6 +7,7 @@
 
 package com.farao_community.farao.ce_merging.merging.process.german_pre_merge;
 
+import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.CurrentLimitsAdder;
@@ -18,6 +19,7 @@ import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TieLine;
 import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.iidm.network.VoltageLevel;
+import com.powsybl.ucte.network.UcteCountryCode;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +34,6 @@ import static com.powsybl.iidm.network.TwoSides.TWO;
 
 public final class GermanXnodesReplacer {
     private static final String LINE_ID_FORMAT = "%s %s 1";
-    private static final String GERMAN_UCTE_NODE_PREFIX = "D";
     private static final int SUBSTATION_ID_LENGTH = 6;
     private static final int VOLTAGE_LEVEL_ID_LENGTH = 7;
     private static final int BUS_ID_LENGTH = 8;
@@ -156,6 +157,6 @@ public final class GermanXnodesReplacer {
 
     private String toGermanElementId(final TieLine tieLine, final int endIndex) {
         // 1 because we replace the first character (= country identifier) with the German one
-        return GERMAN_UCTE_NODE_PREFIX + tieLine.getPairingKey().substring(1, endIndex);
+        return NetworkUtil.toCountryElementId(UcteCountryCode.DE, tieLine.getPairingKey(), endIndex);
     }
 }

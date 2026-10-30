@@ -172,6 +172,14 @@ public final class CeTestUtils {
         return artifacts;
     }
 
+    public static Artifacts withArtifact(final ArtifactType type,
+                                              final String name,
+                                         final String path) {
+        final Artifacts artifacts = new Artifacts();
+        artifacts.putFile(type, mockSavedFile(name, path));
+        return artifacts;
+    }
+
     public static Inputs singletonIgmInputs(final Country country,
                                             final String igmPath) {
         return singletonIgmInputs(country.name(), igmPath);
