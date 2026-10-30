@@ -22,7 +22,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PISA_NAMING_STRATEGY;
@@ -31,12 +30,11 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCT
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.save;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getNodeName;
 import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaNamingStrategy.FFG_NODE_NAME_PATTERN;
+import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaNamingStrategy.XPI_NODE_NAME_PATTERN;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_COMPENSATION;
 
 @Service
 public class PisaService {
-    private static final Pattern XPI_NODE_NAME_PATTERN = Pattern.compile("XPI_GI1[1-2]");
-
     private final CeMergingConfiguration configuration;
 
     public PisaService(final CeMergingConfiguration configuration) {

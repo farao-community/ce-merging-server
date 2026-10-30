@@ -23,6 +23,7 @@ import com.powsybl.ucte.network.UcteCountryCode;
 import java.util.List;
 import java.util.Optional;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MAX_FICTITIOUS_P;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XNODES_PREFIX;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getNodeName;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.toCountryElementId;
@@ -103,11 +104,11 @@ public final class PisaXnodesReplacer {
                 .setQ0(boundaryLine.getQ0())
                 .setConnectableBus(xNodeBus.getId())
                 .newGeneration()// will be fixed in future release : https://github.com/powsybl/powsybl-core/pull/4105
-                .setMinP(0.0)
-                .setMaxP(0.0)
-                .setTargetP(0.0)
-                .setTargetQ(0.0)
-                .setTargetV(1.0)
+                .setMinP(-MAX_FICTITIOUS_P)
+                .setMaxP(MAX_FICTITIOUS_P)
+                .setTargetP(boundaryLine.getP0())
+                .setTargetQ(boundaryLine.getQ0())
+                .setTargetV(terminal.getVoltageLevel().getNominalV())
                 .setVoltageRegulationOn(false)
                 .add();
 
