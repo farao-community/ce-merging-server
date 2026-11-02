@@ -7,6 +7,7 @@
 
 package test_utils.assertions;
 
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import org.assertj.core.api.AbstractAssert;
@@ -27,6 +28,15 @@ public class NetworkAssert extends AbstractAssert<NetworkAssert, Network> {
         final Line line = actual.getLine(lineId);
         if (line == null) {
             failWithMessage("line %s doesn't exist in network %s".formatted(lineId, actual.getId()));
+        }
+        return this;
+    }
+
+    @CanIgnoreReturnValue
+    public NetworkAssert hasBoundaryLine(final String lineId) {
+        final BoundaryLine line = actual.getBoundaryLine(lineId);
+        if (line == null) {
+            failWithMessage("boundary line %s doesn't exist in network %s".formatted(lineId, actual.getId()));
         }
         return this;
     }

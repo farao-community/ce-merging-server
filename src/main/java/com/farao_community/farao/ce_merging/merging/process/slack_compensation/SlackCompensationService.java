@@ -35,11 +35,12 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.save;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isConnected;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_COMPENSATION;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
 import static com.powsybl.iidm.network.Country.ES;
 import static com.powsybl.ucte.network.UcteNodeTypeCode.UT;
@@ -71,13 +72,7 @@ public class SlackCompensationService {
         LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.SLACK_COMPENSATION);
         final Network compensatedNetwork = compensateNetwork(task);
         addSlackNode(compensatedNetwork, task);
-
-        final SavedFile cgmFile = save(configuration.getOutputsDirectoryPath(task),
-                                       task.getOutputCgmFileName(),
-                                       String.format("/tasks/%d/outputs/cgm", task.getId()),
-                                       path -> compensatedNetwork.write(UCTE_FORMAT, null, path));
-
-        task.getOutputs().setCgm(cgmFile);
+        saveArtifactNetwork(CGM_FILE_AFTER_COMPENSATION, compensatedNetwork, task, UCTE_FORMAT, configuration);
     }
 
     private Network compensateNetwork(final MergingTask task) {

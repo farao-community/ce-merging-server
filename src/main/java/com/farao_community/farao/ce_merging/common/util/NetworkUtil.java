@@ -10,6 +10,7 @@ import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Branch;
+import com.powsybl.iidm.network.Connectable;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Identifiable;
@@ -17,8 +18,10 @@ import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
+import com.powsybl.iidm.network.TieLine;
 import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.loadflow.LoadFlowParameters;
+import com.powsybl.ucte.network.UcteCountryCode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +31,7 @@ import java.util.regex.Pattern;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_CODE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XNODES_PREFIX;
 import static com.powsybl.iidm.network.TwoSides.ONE;
 import static com.powsybl.iidm.network.TwoSides.TWO;
 import static java.lang.Double.isNaN;
@@ -40,12 +44,19 @@ public final class NetworkUtil {
         // utility
     }
 
-    public static boolean hasActivePower(final Injection injection) {
-        return !isNaN(injection.getTerminal().getP());
-    }
-
     public static double zeroIfNaN(final double value) {
         return isNaN(value) ? 0 : value;
+    }
+
+    public static String getNodeName(final Terminal terminal) {
+        return terminal.getBusBreakerView().getConnectableBus().getId();
+    }
+
+    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    CHECKS & PREDICATES
+     -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
+    public static boolean hasActivePower(final Injection injection) {
+        return !isNaN(injection.getTerminal().getP());
     }
 
     public static boolean isConnected(final Branch branch) {
@@ -65,11 +76,25 @@ public final class NetworkUtil {
         return identifiable -> idPattern.matcher(identifiable.getId()).matches();
     }
 
-    public static boolean isInOutage(final Terminal terminal) {
+    public static boolean isInOutage(final Connectable connectable) {
+        return switch (connectable) {
+            case TieLine tieLine -> isInOutage(tieLine.getBoundaryLine1()) || isInOutage(tieLine.getBoundaryLine2());
+            case BoundaryLine boundaryLine -> isInOutage(boundaryLine);
+            case Terminal terminal -> isInOutage(terminal);
+            case Branch<?> branch -> isInOutage(branch);
+            default -> throw new CeMergingException("outage check not implemented for class %s".formatted(connectable.getClass().getName()));
+        };
+    }
+
+    private static boolean isInOutage(final BoundaryLine line) {
+        return isInOutage(line.getTerminal());
+    }
+
+    private static boolean isInOutage(final Terminal terminal) {
         return terminal == null || !terminal.isConnected();
     }
 
-    public static boolean isInOutage(final Branch branch) {
+    private static boolean isInOutage(final Branch branch) {
         return branch == null || isInOutage(branch.getTerminal1()) || isInOutage(branch.getTerminal2());
     }
 
@@ -88,6 +113,20 @@ public final class NetworkUtil {
         return l -> l.getPairingKey().equals(nodeName);
     }
 
+    public static boolean isAnXNode(final String nodeName) {
+        return nodeName.startsWith(XNODES_PREFIX);
+    }
+
+    public static String toCountryElementId(final UcteCountryCode countryCode,
+                                            final String previousElementId,
+                                            final int endIndex) {
+        // 1 because we replace the first character (= country identifier) with the country one
+        return countryCode.getUcteCode() + previousElementId.substring(1, endIndex);
+    }
+
+    /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+                    COUNTRY & BORDERS
+     -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
     public static Country getCountryOfSide(final Branch branch,
                                            final TwoSides side) {
         return branch.getTerminal(side)
@@ -174,7 +213,7 @@ public final class NetworkUtil {
         };
     }
 
-    public static double getTerminalFlow(final Terminal terminal) {
+    public static Double getTerminalFlow(final Terminal terminal) {
         return terminal.isConnected() ? zeroIfNaN(terminal.getP()) : 0;
     }
 

@@ -4,12 +4,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.dk_renaming;
+package com.farao_community.farao.ce_merging.merging.process.naming_strategy.dk_renaming;
 
 import com.farao_community.farao.ce_merging.common.CeMergingConstants;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Bus;
-import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.ucte.converter.NamingStrategy;
 import com.powsybl.ucte.network.UcteElementId;
