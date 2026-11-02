@@ -16,56 +16,57 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 class FileStorageUtilsTest {
+
+    private static final String FILE_NAME = "test.txt";
+    private static final String FILE_CONTENT = "content";
+    private static final String LOCATION = "/tasks/1/artifacts/test";
 
     @TempDir
     Path tempDir;
 
     @Test
     void shouldSaveFile() throws IOException {
-        final String fileName = "test.txt";
-        final String location = "/tasks/1/artifacts/test";
         final SavedFile savedFile = FileStorageUtils.save(
             tempDir.toString(),
-            fileName,
-            location,
+            FILE_NAME,
+            LOCATION,
             path -> {
                 try {
-                    Files.writeString(path, "content");
+                    Files.writeString(path, FILE_CONTENT);
                 } catch (IOException e) {
                     throw new CeMergingException("Cannot write test file", e);
                 }
             }
         );
-        final Path expectedPath = tempDir.resolve(fileName);
+        final Path expectedPath = tempDir.resolve(FILE_NAME);
 
         assertTrue(Files.exists(expectedPath));
-        assertEquals("content", Files.readString(expectedPath));
-        assertEquals(fileName, savedFile.getOriginalName());
+        assertEquals(FILE_CONTENT, Files.readString(expectedPath));
+        assertEquals(FILE_NAME, savedFile.getOriginalName());
         assertEquals(expectedPath.toString(), savedFile.getPath());
-        assertEquals(location, savedFile.getLocation());
+        assertEquals(LOCATION, savedFile.getLocation());
     }
 
     @Test
     void shouldThrowCeMergingExceptionWhenWriterFails() {
+        final IllegalStateException cause = new IllegalStateException("exception");
         final CeMergingException exception = assertThrows(
             CeMergingException.class,
             () -> FileStorageUtils.save(
                 tempDir.toString(),
-                "test.txt",
+                FILE_NAME,
                 "/location",
                 path -> {
-                    throw new IllegalStateException("exception");
+                    throw cause;
                 })
         );
 
         assertEquals("Cannot write file 'test.txt'", exception.getMessage());
-        assertInstanceOf(IllegalStateException.class, exception.getCause());
+        assertEquals(cause, exception.getCause());
     }
 }

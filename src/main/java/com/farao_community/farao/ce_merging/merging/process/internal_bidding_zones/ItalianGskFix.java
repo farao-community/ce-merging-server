@@ -24,7 +24,7 @@ import com.farao_community.farao.ce_merging.xsd.glsk_fix.TimeIntervalType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.HUNDRED;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BUSINESS_SHARE;
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toHourlyInterval;
 import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.distinctByKey;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.isItalianBiddingZoneEic;
@@ -109,7 +109,7 @@ public final class ItalianGskFix {
         italy.setV(itaEic);
         final BusinessType businessType = new BusinessType();
         businessType.setV(Z_02);
-        businessType.setShare(HUNDRED);
+        businessType.setShare(BUSINESS_SHARE);
 
         final GSKSeriesType italianGskSerie = new GSKSeriesType();
         italianGskSerie.setBusinessType(businessType);
