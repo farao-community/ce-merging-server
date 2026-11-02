@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_COMPENSATION;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,7 +42,11 @@ class PisaServiceTest {
         final PisaService service = new PisaService(configuration);
         service.displacePisaNodes(task);
 
-        final Network cgm = Network.read(task.getOutputs().getCgm().getPath());
+        final String cgmPath = task.getOutputs().getCgm().getPath();
+        assertThat(cgmPath).isNotNull();
+        assertThat(new File(cgmPath)).exists();
+
+        final Network cgm = Network.read(cgmPath);
 
         NetworkAssert.assertThat(cgm)
                 .hasBoundaryLine("XFG.IL11 F.TEST11 1")

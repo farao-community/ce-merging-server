@@ -67,7 +67,11 @@ public final class CeMergingConstants {
     public static final String MONITA2_ME_NODE_NAME = "XKOTR220";
     public static final String XNODES_PREFIX = "X";
     public static final String ELEMENT_NAME_PROPERTY = "elementName";
+    public static final int SUBSTATION_ID_LENGTH = 6;
+    public static final int VOLTAGE_LEVEL_ID_LENGTH = 7;
+    public static final int BUS_ID_LENGTH = 8;
     // formatting
+    public static final String LINE_ID_FORMAT = "%s %s 1";
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
     public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String EMPTY = "";
@@ -104,7 +108,6 @@ public final class CeMergingConstants {
     public static final String TSO_LOWER_CASE = "tso";
     public static final String RESOLUTION = "PT60M";
     public static final String XML_EXTENSION = "xml";
-    public static final String JSON_EXTENSION = "json";
     public static final String ZIP_EXTENSION = "zip";
     public static final String RTE_GSR_URL = "http://www.rte-france.com/gsr";
     public static final String MERGING_STEP = "merging-step";

@@ -7,7 +7,7 @@
   -->
 
 <xnodes xmlns="http://www.rte-france.com/gsr"
->
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <xnode name="XBI_MO31" area1="AL" area2="GR" />
     <xnode name="XZE_KA11" area1="AL" area2="GR" />
     <xnode name="XVD_PO21" area1="AL" area2="ME" />

@@ -23,8 +23,14 @@ import com.powsybl.ucte.network.UcteCountryCode;
 import java.util.List;
 import java.util.Optional;
 
+
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BUS_ID_LENGTH;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ELEMENT_NAME_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MAX_FICTITIOUS_P;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.LINE_ID_FORMAT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XNODES_PREFIX;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SUBSTATION_ID_LENGTH;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VOLTAGE_LEVEL_ID_LENGTH;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getNodeName;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.toCountryElementId;
 import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaService.willBecomeFrenchXnode;
@@ -32,11 +38,6 @@ import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.TopologyKind.BUS_BREAKER;
 
 public final class PisaXnodesReplacer {
-    private static final String ELEMENT_NAME_PROPERTY = "elementName";
-    private static final String LINE_ID_FORMAT = "%s %s 1";
-    private static final int SUBSTATION_ID_LENGTH = 6;
-    private static final int VOLTAGE_LEVEL_ID_LENGTH = 7;
-    private static final int BUS_ID_LENGTH = 8;
     private final Network network;
 
     private PisaXnodesReplacer(final Network network) {
@@ -65,8 +66,8 @@ public final class PisaXnodesReplacer {
         final VoltageLevel voltageLevel = network.getVoltageLevel(toItalianElementId(boundaryLine, VOLTAGE_LEVEL_ID_LENGTH));
         final String busId = toItalianElementId(boundaryLine, BUS_ID_LENGTH);
         final Bus bus = network.getBusBreakerView().getBus(busId);
-        final Substation xNodeSubstation = substation != null ? substation : getDefaultSubstation(substationId);
-        final VoltageLevel xNodeVoltageLevel = voltageLevel != null ? voltageLevel : getDefaultVoltageLevel(boundaryLine, xNodeSubstation);
+        final Substation xNodeSubstation = substation != null ? substation : createDefaultSubstation(substationId);
+        final VoltageLevel xNodeVoltageLevel = voltageLevel != null ? voltageLevel : createDefaultVoltageLevel(boundaryLine, xNodeSubstation);
 
         final Bus xNodeBus = bus != null ? bus : xNodeVoltageLevel.getBusBreakerView().newBus()
                 .setId(busId)
@@ -160,10 +161,6 @@ public final class PisaXnodesReplacer {
 
     }
 
-    public String getLineName(final String fromId, final String toId) {
-        return String.format(LINE_ID_FORMAT, fromId, toId);
-    }
-
     private String getBusId(final Terminal terminal) {
         return getConnectedBusIdOrElse(terminal, getConnectableBusId(terminal));
     }
@@ -179,15 +176,15 @@ public final class PisaXnodesReplacer {
         return terminal.getBusBreakerView().getConnectableBus().getId();
     }
 
-    private Substation getDefaultSubstation(final String substationId) {
+    private Substation createDefaultSubstation(final String substationId) {
         return network.newSubstation()
                 .setId(substationId)
                 .setCountry(IT)
                 .add();
     }
 
-    private VoltageLevel getDefaultVoltageLevel(final BoundaryLine boundaryLine,
-                                                final Substation substation) {
+    private VoltageLevel createDefaultVoltageLevel(final BoundaryLine boundaryLine,
+                                                   final Substation substation) {
         return substation.newVoltageLevel()
                 .setId(toItalianElementId(boundaryLine, VOLTAGE_LEVEL_ID_LENGTH))
                 .setNominalV(boundaryLine.getTerminal().getVoltageLevel().getNominalV())
