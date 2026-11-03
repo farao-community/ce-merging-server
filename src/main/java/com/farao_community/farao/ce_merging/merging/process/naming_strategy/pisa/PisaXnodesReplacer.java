@@ -88,11 +88,8 @@ public final class PisaXnodesReplacer {
                                     final VoltageLevel voltageLevel,
                                     final Bus xNodeBus) {
         final Terminal terminal = boundaryLine.getTerminal();
-        final boolean fromXNode = boundaryLine.getId().startsWith(XNODES_PREFIX);
         final String frenchBusId = getBusId(terminal);
-
-        final String boundaryLineId = fromXNode ? getLineName(xNodeBus, frenchBusId)
-                : getLineName(frenchBusId, xNodeBus);
+        final String xNodeId = xNodeBus.getId();
 
         final Generator generator = getBusGenerator(frenchBusId, network);
         final BoundaryLineAdder adder = voltageLevel.newBoundaryLine()
@@ -103,11 +100,11 @@ public final class PisaXnodesReplacer {
                 .setPairingKey(toCountryElementId(FR, getNodeName(terminal), BUS_ID_LENGTH))
                 .setEnsureIdUnicity(true)
                 .setFictitious(boundaryLine.isFictitious())
-                .setId(boundaryLineId)
-                .setBus(xNodeBus.getId())
+                .setId(getLineName(xNodeId, frenchBusId, boundaryLine.getId().startsWith(XNODES_PREFIX)))
+                .setBus(xNodeId)
                 .setP0(boundaryLine.getP0())
                 .setQ0(boundaryLine.getQ0())
-                .setConnectableBus(xNodeBus.getId());
+                .setConnectableBus(xNodeId);
 
         Optional.ofNullable(generator)
                 .ifPresentOrElse(generation -> adder.newGeneration()
@@ -140,12 +137,9 @@ public final class PisaXnodesReplacer {
         final double g = boundaryLine.getG();
         final double b = boundaryLine.getB();
 
-        final String lineId = fromXNode ? getLineName(xNodeBus, getBusId(terminal))
-                : getLineName(getBusId(terminal), xNodeBus);
-
         final Line line = network.newLine()
                 .setEnsureIdUnicity(true)
-                .setId(lineId)
+                .setId(getLineName(xNodeId, getBusId(terminal), fromXNode))
                 .setVoltageLevel1(fromXNode ? xNodeVoltageLevel.getId() : terminal.getVoltageLevel().getId())
                 .setVoltageLevel2(fromXNode ? terminal.getVoltageLevel().getId() : xNodeVoltageLevel.getId())
                 .setBus1(fromXNode ? xNodeId : getConnectedBusIdOrElse(terminal, null))
@@ -175,9 +169,10 @@ public final class PisaXnodesReplacer {
 
     }
 
-    private String getLineName(final Object fromId,
-                               final Object toId) {
-        return String.format(LINE_ID_FORMAT, fromId, toId);
+    private String getLineName(final String idBusA,
+                               final String idBusB,
+                               final boolean isFromAToB) {
+        return String.format(LINE_ID_FORMAT, isFromAToB ? idBusA : idBusB, isFromAToB ? idBusB : idBusA);
     }
 
     private String getBusId(final Terminal terminal) {
