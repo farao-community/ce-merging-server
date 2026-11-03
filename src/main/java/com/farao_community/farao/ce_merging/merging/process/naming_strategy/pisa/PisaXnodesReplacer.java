@@ -27,6 +27,7 @@ import java.util.Optional;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BUS_ID_LENGTH;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ELEMENT_NAME_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.LINE_ID_FORMAT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MAX_FICTITIOUS_P;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SUBSTATION_ID_LENGTH;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VOLTAGE_LEVEL_ID_LENGTH;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XNODES_PREFIX;
@@ -93,7 +94,7 @@ public final class PisaXnodesReplacer {
         final String boundaryLineId = fromXNode ? getLineName(xNodeBus, frenchBusId)
                 : getLineName(frenchBusId, xNodeBus);
 
-        final Generator generation = getBusGenerator(frenchBusId, network);
+        final Generator generator = getBusGenerator(frenchBusId, network);
         final BoundaryLineAdder adder = voltageLevel.newBoundaryLine()
                 .setB(boundaryLine.getB())
                 .setG(boundaryLine.getG())
@@ -106,15 +107,25 @@ public final class PisaXnodesReplacer {
                 .setBus(xNodeBus.getId())
                 .setP0(boundaryLine.getP0())
                 .setQ0(boundaryLine.getQ0())
-                .setConnectableBus(xNodeBus.getId())
-                .newGeneration()
-                .setMinP(generation.getMinP())
-                .setMaxP(generation.getMaxP())
-                .setTargetP(generation.getTargetP())
-                .setTargetQ(generation.getTargetQ())
-                .setTargetV(generation.getTargetV())
-                .setVoltageRegulationOn(generation.isVoltageRegulatorOn())
-                .add();
+                .setConnectableBus(xNodeBus.getId());
+
+        Optional.ofNullable(generator)
+                .ifPresentOrElse(generation -> adder.newGeneration()
+                                         .setMinP(generation.getMinP())
+                                         .setMaxP(generation.getMaxP())
+                                         .setTargetP(generation.getTargetP())
+                                         .setTargetQ(generation.getTargetQ())
+                                         .setTargetV(generation.getTargetV())
+                                         .setVoltageRegulationOn(generation.isVoltageRegulatorOn())
+                                         .add(),
+                                 () -> adder.newGeneration() // will be useless in future release : https://github.com/powsybl/powsybl-core/pull/4105
+                                         .setMinP(-MAX_FICTITIOUS_P)
+                                         .setMaxP(MAX_FICTITIOUS_P)
+                                         .setTargetP(0)
+                                         .setTargetQ(0)
+                                         .setTargetV(voltageLevel.getNominalV())
+                                         .setVoltageRegulationOn(false)
+                                         .add());
 
         adder.add();
 
@@ -165,7 +176,7 @@ public final class PisaXnodesReplacer {
     }
 
     private String getLineName(final Object fromId,
-                              final Object toId) {
+                               final Object toId) {
         return String.format(LINE_ID_FORMAT, fromId, toId);
     }
 
