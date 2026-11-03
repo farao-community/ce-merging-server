@@ -11,6 +11,7 @@ import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.BoundaryLineAdder;
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.CurrentLimitsAdder;
+import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.LoadingLimits;
 import com.powsybl.iidm.network.Network;
@@ -26,15 +27,16 @@ import java.util.Optional;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BUS_ID_LENGTH;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ELEMENT_NAME_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.LINE_ID_FORMAT;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MAX_FICTITIOUS_P;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SUBSTATION_ID_LENGTH;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VOLTAGE_LEVEL_ID_LENGTH;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XNODES_PREFIX;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getBusGenerator;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getNodeName;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.toCountryElementId;
 import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaService.willBecomeFrenchXnode;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.TopologyKind.BUS_BREAKER;
+import static com.powsybl.ucte.network.UcteCountryCode.FR;
 
 public final class PisaXnodesReplacer {
     private final Network network;
@@ -86,30 +88,32 @@ public final class PisaXnodesReplacer {
                                     final Bus xNodeBus) {
         final Terminal terminal = boundaryLine.getTerminal();
         final boolean fromXNode = boundaryLine.getId().startsWith(XNODES_PREFIX);
+        final String frenchBusId = getBusId(terminal);
 
-        final String boundaryLineId = fromXNode ? String.format(LINE_ID_FORMAT, xNodeBus, getBusId(terminal))
-                : String.format(LINE_ID_FORMAT, getBusId(terminal), xNodeBus);
+        final String boundaryLineId = fromXNode ? getLineName(xNodeBus, frenchBusId)
+                : getLineName(frenchBusId, xNodeBus);
 
+        final Generator generation = getBusGenerator(frenchBusId, network);
         final BoundaryLineAdder adder = voltageLevel.newBoundaryLine()
                 .setB(boundaryLine.getB())
                 .setG(boundaryLine.getG())
                 .setR(boundaryLine.getR())
                 .setX(boundaryLine.getX())
-                .setPairingKey(toCountryElementId(UcteCountryCode.FR, getNodeName(terminal), BUS_ID_LENGTH))
+                .setPairingKey(toCountryElementId(FR, getNodeName(terminal), BUS_ID_LENGTH))
                 .setEnsureIdUnicity(true)
-                .setFictitious(false)
+                .setFictitious(boundaryLine.isFictitious())
                 .setId(boundaryLineId)
                 .setBus(xNodeBus.getId())
                 .setP0(boundaryLine.getP0())
                 .setQ0(boundaryLine.getQ0())
                 .setConnectableBus(xNodeBus.getId())
-                .newGeneration()// will be fixed in future release : https://github.com/powsybl/powsybl-core/pull/4105
-                .setMinP(-MAX_FICTITIOUS_P)
-                .setMaxP(MAX_FICTITIOUS_P)
-                .setTargetP(boundaryLine.getP0())
-                .setTargetQ(boundaryLine.getQ0())
-                .setTargetV(terminal.getVoltageLevel().getNominalV())
-                .setVoltageRegulationOn(false)
+                .newGeneration()
+                .setMinP(generation.getMinP())
+                .setMaxP(generation.getMaxP())
+                .setTargetP(generation.getTargetP())
+                .setTargetQ(generation.getTargetQ())
+                .setTargetV(generation.getTargetV())
+                .setVoltageRegulationOn(generation.isVoltageRegulatorOn())
                 .add();
 
         adder.add();
@@ -125,8 +129,8 @@ public final class PisaXnodesReplacer {
         final double g = boundaryLine.getG();
         final double b = boundaryLine.getB();
 
-        final String lineId = fromXNode ? String.format(LINE_ID_FORMAT, xNodeBus, getBusId(terminal))
-                : String.format(LINE_ID_FORMAT, getBusId(terminal), xNodeBus);
+        final String lineId = fromXNode ? getLineName(xNodeBus, getBusId(terminal))
+                : getLineName(getBusId(terminal), xNodeBus);
 
         final Line line = network.newLine()
                 .setEnsureIdUnicity(true)
@@ -160,8 +164,8 @@ public final class PisaXnodesReplacer {
 
     }
 
-    public String getLineName(final String fromId,
-                              final String toId) {
+    private String getLineName(final Object fromId,
+                              final Object toId) {
         return String.format(LINE_ID_FORMAT, fromId, toId);
     }
 
