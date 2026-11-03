@@ -37,7 +37,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.getNowDate;
 
 public class MergingLogsBuilder {
-    private static final String CORE_REPORT_TYPE_INFO = "CORE";
+    private static final String CORE_REPORT_TYPE_INFO = "CE";
     private static final String OUT_CORE_REPORT_TYPE_INFO = "nonCORE";
 
     MergingLog buildMergingLog(final MergingTask task, final List<ReportInformationInRegion> reportInformationInRegionList, final ReferenceProgram referenceProgram, final PstOutput pstOutputs, final List<ReportInformationOutRegion> reportInformationsOutRegionList, final List<ReportCommonsInformation> tsoInformationsList, final List<AlegroReportInformation> alegroReportInformationsList) {

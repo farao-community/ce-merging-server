@@ -3,15 +3,15 @@
   "dailyTimeInterval" : "2023-11-02T23:00Z/2023-11-03T23:00Z",
   "referenceExchangeDataList" : [ {
     "areaOutId" : "22Y201903144---9",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -10.0
   }, {
     "areaOutId" : "22Y201903145---4",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 10.0
   }, {
     "areaOutId" : "10YAT-APG------L",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -770.0
   }, {
     "areaOutId" : "10YBA-JPCC-----D",
@@ -19,7 +19,7 @@
     "flow" : 0.0
   }, {
     "areaOutId" : "10YBE----------2",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -230.0
   }, {
     "areaOutId" : "10YCA-BULGARIA-R",
@@ -43,11 +43,11 @@
     "flow" : 1500.0
   }, {
     "areaOutId" : "10YCZ-CEPS-----N",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 1055.0
   }, {
     "areaOutId" : "10YDE-EON------1",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -275.0
   }, {
     "areaOutId" : "10YDE-EON------1",
@@ -59,7 +59,7 @@
     "flow" : 330.0
   }, {
     "areaOutId" : "10YDE-ENBW-----N",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -1890.0
   }, {
     "areaOutId" : "10YDE-RWENET---I",
@@ -67,15 +67,15 @@
     "flow" : 230.0
   }, {
     "areaOutId" : "10YDE-RWENET---I",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -266.0
   }, {
     "areaOutId" : "10YDE-VE-------2",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 2230.0
   }, {
     "areaOutId" : "10YCB-GERMANY--8",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -270.0
   }, {
     "areaOutId" : "10YCB-GERMANY--8",
@@ -91,7 +91,7 @@
     "flow" : 999.0
   }, {
     "areaOutId" : "10YFR-RTE------C",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 1100.0
   }, {
     "areaOutId" : "10YFR-RTE------C",
@@ -119,11 +119,11 @@
     "flow" : -10.0
   }, {
     "areaOutId" : "10YHR-HEP------M",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 440.0
   }, {
     "areaOutId" : "10YHU-MAVIR----U",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -430.0
   }, {
     "areaOutId" : "10YIT-GRTN-----B",
@@ -135,7 +135,7 @@
     "flow" : -254.0
   }, {
     "areaOutId" : "10YLU-CEGEDEL-NQ",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -200.0
   }, {
     "areaOutId" : "10YCS-CG-TSO---S",
@@ -155,11 +155,11 @@
     "flow" : 45.0
   }, {
     "areaOutId" : "10YNL----------L",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 660.0
   }, {
     "areaOutId" : "10YPL-AREA-----S",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -400.0
   }, {
     "areaOutId" : "10YRO-TEL------P",
@@ -167,7 +167,7 @@
     "flow" : 300.0
   }, {
     "areaOutId" : "10YRO-TEL------P",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 400.0
   }, {
     "areaOutId" : "10YCS-SERBIATSOV",
@@ -203,11 +203,11 @@
     "flow" : 0.0
   }, {
     "areaOutId" : "10YSI-ELES-----O",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -420.0
   }, {
     "areaOutId" : "10YSK-SEPS-----K",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 300.0
   }, {
     "areaOutId" : "10Y1001C--00003F",

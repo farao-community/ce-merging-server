@@ -1,6 +1,6 @@
 {
   "processDateTime" : "2026-01-23T01:30+01:00",
-  "regionName" : "CORE",
+  "regionName" : "CE",
   "bciComputationResult" : {
     "bciActive" : false,
     "bciFeasibilityRangesExtended" : false,

@@ -12,16 +12,19 @@ import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Connectable;
 import com.powsybl.iidm.network.Country;
+import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.HvdcLine;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Line;
+import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TieLine;
 import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.ucte.network.UcteCountryCode;
+import jakarta.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +53,12 @@ public final class NetworkUtil {
 
     public static String getNodeName(final Terminal terminal) {
         return terminal.getBusBreakerView().getConnectableBus().getId();
+    }
+
+    @Nullable
+    public static Generator getBusGenerator(final String busId, final Network network) {
+        final String generatorId = busId + "_generator";
+        return network.getGenerator(generatorId);
     }
 
     /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

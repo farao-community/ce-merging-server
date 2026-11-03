@@ -140,7 +140,7 @@ class GlobalGridConfigurationServiceTest {
     void taskShouldContainDefaultRegionConfigurations() throws IOException {
         service.setRegionEicConfiguration(task);
 
-        final String expectedNameConfig = "CORE";
+        final String expectedNameConfig = "CE";
 
         final Map<String, String> expectedAreasIn = Map.ofEntries(
             Map.entry("BE", "10YBE----------2"),

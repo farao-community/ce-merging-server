@@ -8,7 +8,7 @@
 
 <Configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Created="2026-03-16T14:11:07Z" xsi:noNamespaceSchemaLocation="configuration-23.xsd">
     <DocumentIdentification v="17XTSO-CS------W-20260318F326v1"/>
-    <Sender Code="CORE" Eic="17XTSO-CS------W" Type="CCO"/>
+    <Sender Code="CE" Eic="17XTSO-CS------W" Type="CCO"/>
     <Receiver Code="CORESO" Eic="22XCORESO------S" Type="RSC"/>
     <MarketAreas>
         <MarketArea Code="GBNI" Eic="10Y1001A1001A016" MCParticipant="false" AHC="false" techCounterparty="false" SDAC="false"/>
