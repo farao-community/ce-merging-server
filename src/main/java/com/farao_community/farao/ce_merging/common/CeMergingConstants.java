@@ -117,7 +117,7 @@ public final class CeMergingConstants {
     public static final double MAX_FICTITIOUS_Q = 99999.;
     public static final int MERGING_DAY_START_INDEX = 18;
     public static final int MERGING_DATE_TIME_END_INDEX = 35;
-    public static final BigDecimal BUSINESS_SHARE = BigDecimal.valueOf(100);
+    public static final BigDecimal MAX_GSK_SHARE = BigDecimal.valueOf(100);
     // Date management
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");
