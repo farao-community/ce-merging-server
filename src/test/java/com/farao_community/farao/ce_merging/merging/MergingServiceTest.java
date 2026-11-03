@@ -145,6 +145,7 @@ class MergingServiceTest {
 
         verify(netPositionService).computeInitialNetPositions(task);
         verify(topologicalMergeService).mergeInitialIgms(task);
+        verify(pisaService).displacePisaNodes(task);
         verify(recessivityService).applyRecessivity(task);
 
         verify(glskQualityCheckService).runQualityCheck(task);
@@ -154,7 +155,7 @@ class MergingServiceTest {
         verify(balancesAdjustmentService).shiftCgm(task);
         verify(pstSpecialService).fixPst(task);
         verify(slackCompensationService).compensateFinalCgmSlackImbalance(task);
-        verify(pisaService).displacePisaNodes(task);
+
         verify(finalCgmService).computeFinalCgmResult(task);
         verify(refProgCalculationService).computeRefProg(task);
         verify(mergingLogsCalculationService).computeMergingLogs(task);
@@ -223,7 +224,6 @@ class MergingServiceTest {
                 balancesAdjustmentService,
                 pstSpecialService,
                 slackCompensationService,
-                pisaService,
                 finalCgmService,
                 refProgCalculationService,
                 mergingLogsCalculationService,
@@ -242,6 +242,7 @@ class MergingServiceTest {
 
         inOrder.verify(netPositionService).computeInitialNetPositions(task);
         inOrder.verify(topologicalMergeService).mergeInitialIgms(task);
+        inOrder.verify(pisaService).displacePisaNodes(task);
         inOrder.verify(recessivityService).applyRecessivity(task);
 
         inOrder.verify(alegroService).checkAlegroXnodesQuality(task);
@@ -253,7 +254,6 @@ class MergingServiceTest {
         inOrder.verify(balancesAdjustmentService).shiftCgm(task);
         inOrder.verify(pstSpecialService).fixPst(task);
         inOrder.verify(slackCompensationService).compensateFinalCgmSlackImbalance(task);
-        inOrder.verify(pisaService).displacePisaNodes(task);
         inOrder.verify(finalCgmService).computeFinalCgmResult(task);
         inOrder.verify(refProgCalculationService).computeRefProg(task);
         inOrder.verify(mergingLogsCalculationService).computeMergingLogs(task);

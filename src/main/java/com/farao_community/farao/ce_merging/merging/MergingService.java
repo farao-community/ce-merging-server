@@ -135,7 +135,6 @@ public class MergingService {
         balancesAdjustmentService.shiftCgm(task);
         pstSpecialService.fixPst(task);
         slackCompensationService.compensateFinalCgmSlackImbalance(task);
-        pisaService.displacePisaNodes(task);
         finalCgmService.computeFinalCgmResult(task);
     }
 
