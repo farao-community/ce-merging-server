@@ -101,7 +101,7 @@ public final class PisaXnodesReplacer {
                 .setEnsureIdUnicity(true)
                 .setFictitious(boundaryLine.isFictitious())
                 .setId(getLineName(xNodeId, frenchBusId, boundaryLine.getId().startsWith(XNODES_PREFIX)))
-                .setBus(xNodeId)
+                .setBus(terminal.isConnected() ? xNodeId : null)
                 .setP0(boundaryLine.getP0())
                 .setQ0(boundaryLine.getQ0())
                 .setConnectableBus(xNodeId);

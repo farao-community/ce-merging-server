@@ -83,7 +83,7 @@ public final class NetworkUtil {
         return i -> getCountry(i) == country;
     }
 
-    public static Predicate<Branch> isConnectedTo(final String nodeId) {
+    public static Predicate<Branch> hasInId(final String nodeId) {
         return branch -> branch.getId().contains(nodeId);
     }
 

@@ -104,7 +104,7 @@ public class PisaService {
         return !willBecomeItalianNode(node) && willBecomeFrenchXnode(terminal);
     }
 
-    private static boolean willBecomeItalianNode(final String node) {
+    public static boolean willBecomeItalianNode(final String node) {
         return XPI_NODE_NAME_PATTERN.matcher(node).matches();
     }
 

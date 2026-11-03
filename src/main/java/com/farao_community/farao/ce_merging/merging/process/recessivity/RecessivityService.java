@@ -45,7 +45,7 @@ import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isConnectedTo;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.hasInId;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PISA_RENAMING;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
@@ -228,7 +228,7 @@ public class RecessivityService {
 
         return isGermanInternalNode ?
             Optional.ofNullable(findCorrectGermanBranch(network, countryName, nodeId))
-            : network.getBranchStream().filter(isConnectedTo(nodeId)).findFirst();
+            : network.getBranchStream().filter(hasInId(nodeId)).findFirst();
 
     }
 
@@ -240,7 +240,7 @@ public class RecessivityService {
         final String nodeInBranch = nodeId.substring(1, 8);
 
         return network.getBranchStream()
-            .filter(isConnectedTo(nodeInBranch))
+            .filter(hasInId(nodeInBranch))
             .filter(linksGermanyRegionToNode(germanyRegionCode, node))
             .findFirst()
             .orElse(null);
