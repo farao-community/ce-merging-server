@@ -25,8 +25,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BUS_ID_LENGTH;import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ELEMENT_NAME_PROPERTY;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.LINE_ID_FORMAT;import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SUBSTATION_ID_LENGTH;import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VOLTAGE_LEVEL_ID_LENGTH;import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BUS_ID_LENGTH;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ELEMENT_NAME_PROPERTY;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.LINE_ID_FORMAT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SUBSTATION_ID_LENGTH;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VOLTAGE_LEVEL_ID_LENGTH;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.TopologyKind.BUS_BREAKER;
 import static com.powsybl.iidm.network.TwoSides.ONE;
@@ -126,7 +130,8 @@ public final class GermanXnodesReplacer {
         return getConnectedBusIdOrElse(terminal, getConnectableBusId(terminal));
     }
 
-    private String getConnectedBusIdOrElse(final Terminal terminal, final String defaultValue) {
+    private String getConnectedBusIdOrElse(final Terminal terminal,
+                                           final String defaultValue) {
         return terminal.isConnected() ?
                 terminal.getBusBreakerView().getBus().getId() :
                 defaultValue;
@@ -143,7 +148,8 @@ public final class GermanXnodesReplacer {
                 .add();
     }
 
-    private VoltageLevel getDefaultVoltageLevel(final TieLine tieLine, final Substation substation) {
+    private VoltageLevel getDefaultVoltageLevel(final TieLine tieLine,
+                                                final Substation substation) {
         return substation.newVoltageLevel()
                 .setId(toGermanElementId(tieLine, VOLTAGE_LEVEL_ID_LENGTH))
                 .setNominalV(tieLine.getTerminal1().getVoltageLevel().getNominalV())
@@ -151,7 +157,8 @@ public final class GermanXnodesReplacer {
                 .add();
     }
 
-    private String toGermanElementId(final TieLine tieLine, final int endIndex) {
+    private String toGermanElementId(final TieLine tieLine,
+                                     final int endIndex) {
         // 1 because we replace the first character (= country identifier) with the German one
         return NetworkUtil.toCountryElementId(UcteCountryCode.DE, tieLine.getPairingKey(), endIndex);
     }
