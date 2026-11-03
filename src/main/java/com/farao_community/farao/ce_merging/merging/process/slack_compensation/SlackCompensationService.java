@@ -7,8 +7,8 @@
 package com.farao_community.farao.ce_merging.merging.process.slack_compensation;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -35,12 +35,11 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.save;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isConnected;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_COMPENSATION;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PST;
 import static com.powsybl.iidm.network.Country.ES;
 import static com.powsybl.ucte.network.UcteNodeTypeCode.UT;
@@ -72,7 +71,12 @@ public class SlackCompensationService {
         LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.SLACK_COMPENSATION);
         final Network compensatedNetwork = compensateNetwork(task);
         addSlackNode(compensatedNetwork, task);
-        saveArtifactNetwork(CGM_FILE_AFTER_COMPENSATION, compensatedNetwork, task, UCTE_FORMAT, configuration);
+        final SavedFile cgmFile = save(configuration.getOutputsDirectoryPath(task),
+                                       task.getOutputCgmFileName(),
+                                       String.format("/tasks/%d/outputs/cgm", task.getId()),
+                                       path -> compensatedNetwork.write(UCTE_FORMAT, null, path));
+
+        task.getOutputs().setCgm(cgmFile);
     }
 
     private Network compensateNetwork(final MergingTask task) {

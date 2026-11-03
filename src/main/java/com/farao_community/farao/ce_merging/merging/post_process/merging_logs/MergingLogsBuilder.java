@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CORE_REGION_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_REGION_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ONE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RECEIVER_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RESOLUTION;
@@ -111,7 +111,7 @@ public class MergingLogsBuilder {
         mergingLog.setReportTimeInterval(reportTimeInterval);
         final MergingLog.Domain domain = new MergingLog.Domain();
         domain.setCodingScheme(CodingSchemeType.A_01.value());
-        domain.setV(CORE_REGION_ID);
+        domain.setV(CE_REGION_ID);
         mergingLog.setDomain(domain);
     }
 

@@ -97,10 +97,10 @@ public final class CeMergingConstants {
     public static final String REPORT_BASE_NAME = "i18n.reports";
     public static final String SENDER_ID = "22XCORESO------S";
     public static final String RECEIVER_ID = "17XTSO-CS------W";
-    public static final String CORE_REGION_ID = "10Y1001C--00059P";
+    public static final String CE_REGION_ID = "10Y1001C--00030C";
     public static final String UCTE_IMPORT_CREATE_AREAS_KEY = "ucte.import.create-areas";
     public static final String TSO = "TSO";
-    public static final String CORE = "CORE";
+    public static final String CE = "CE";
     public static final String TSO_LOWER_CASE = "tso";
     public static final String RESOLUTION = "PT60M";
     public static final String XML_EXTENSION = "xml";

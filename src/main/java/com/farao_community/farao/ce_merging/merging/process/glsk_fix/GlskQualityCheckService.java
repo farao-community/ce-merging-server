@@ -70,7 +70,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CORE_REGION_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_REGION_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RECEIVER_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_BASE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SENDER_ID;
@@ -348,7 +348,7 @@ public class GlskQualityCheckService {
 
         AreaType domain = new AreaType();
         domain.setCodingScheme(CodingSchemeType.A_01);
-        domain.setV(CORE_REGION_ID);
+        domain.setV(CE_REGION_ID);
         qualityCheckReport.setDomain(domain);
     }
 

@@ -18,7 +18,8 @@ import test_utils.assertions.NetworkAssert;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_COMPENSATION;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PISA_RENAMING;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,11 +38,11 @@ class PisaServiceTest {
     @Test
     void shouldDisplaceNodes() throws FileNotFoundException {
         final MergingTask task = getPisaTask("network_ok.uct");
-        when(configuration.getOutputsDirectoryPath(any(MergingTask.class))).thenReturn(tempDirectory.getPath());
+        when(configuration.getArtifactsDirectoryPath(any(MergingTask.class))).thenReturn(tempDirectory.getPath());
         final PisaService service = new PisaService(configuration);
         service.displacePisaNodes(task);
 
-        final Network cgm = Network.read(task.getOutputs().getCgm().getPath());
+        final Network cgm = task.getArtifact(CGM_FILE_AFTER_PISA_RENAMING, Network.class);
 
         NetworkAssert.assertThat(cgm)
                 .hasBoundaryLine("XFG.IL11 F.TEST11 1")
@@ -61,6 +62,6 @@ class PisaServiceTest {
     }
 
     private MergingTask getPisaTask(final String networkName) {
-        return createMockTask(1L, new Inputs(), withArtifact(CGM_FILE_AFTER_COMPENSATION, networkName, stringPathOf("pisa") + "/"));
+        return createMockTask(1L, new Inputs(), withArtifact(TOPOLOGICAL_MERGE_FILE, networkName, stringPathOf("pisa") + "/"));
     }
 }

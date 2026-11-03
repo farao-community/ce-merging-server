@@ -48,8 +48,8 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.CLOSE;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PISA_RENAMING;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INCONSISTENCIES;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.GermanTso.D6;
@@ -276,7 +276,7 @@ class RecessivityServiceTest {
         }
         when(mock.getId()).thenReturn(id);
         when(mock.getArtifacts()).thenReturn(artifacts);
-        when(mock.getArtifact(TOPOLOGICAL_MERGE_FILE, Network.class)).thenReturn(network);
+        when(mock.getArtifact(CGM_FILE_AFTER_PISA_RENAMING, Network.class)).thenReturn(network);
         when(mock.getArtifact(XNODES_INFORMATION_FILE, XnodesCheck.class)).thenReturn(xnodesCheck);
         when(mock.getConfigurations()).thenReturn(mockCfg);
 

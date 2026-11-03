@@ -25,7 +25,7 @@
                 <Voltage Nominal="110" Initial="1.00000" SlackSearchPriority="4"/>
             </InitialVoltages>
         </SynchronousArea>
-        <SynchronousArea Eic="10Y1001C--00059P" Code="CNE" Live="true" MainArea="true">
+        <SynchronousArea Eic="10Y1001C--00030C" Code="CNE" Live="true" MainArea="true">
             <LocalLOT3Parameters/>
             <InitialVoltages>
                 <Voltage Nominal="750" Initial="1.00000" SlackSearchPriority="0"/>

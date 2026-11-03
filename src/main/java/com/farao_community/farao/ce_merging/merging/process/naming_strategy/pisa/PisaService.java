@@ -10,7 +10,6 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Connectable;
 import com.powsybl.iidm.network.Line;
@@ -27,11 +26,12 @@ import java.util.stream.Stream;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PISA_NAMING_STRATEGY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_EXPORT_NAMING_STRATEGY_PROPERTY;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
-import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.save;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFileWithWriter;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getNodeName;
 import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaNamingStrategy.FFG_NODE_NAME_PATTERN;
 import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaNamingStrategy.XPI_NODE_NAME_PATTERN;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_COMPENSATION;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PISA_RENAMING;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
 
 @Service
 public class PisaService {
@@ -45,14 +45,9 @@ public class PisaService {
         final Properties properties = new Properties();
         properties.setProperty(UCTE_EXPORT_NAMING_STRATEGY_PROPERTY, PISA_NAMING_STRATEGY);
 
-        final Network cgm = displacePisaNodes(task.getArtifact(CGM_FILE_AFTER_COMPENSATION, Network.class));
+        final Network cgm = displacePisaNodes(task.getArtifact(TOPOLOGICAL_MERGE_FILE, Network.class));
 
-        final SavedFile cgmFile = save(configuration.getOutputsDirectoryPath(task),
-                                       task.getOutputCgmFileName(),
-                                       String.format("/tasks/%d/outputs/cgm", task.getId()),
-                                       path -> cgm.write(UCTE_FORMAT, properties, path));
-
-        task.getOutputs().setCgm(cgmFile);
+        saveArtifactFileWithWriter(CGM_FILE_AFTER_PISA_RENAMING, task, configuration, path -> cgm.write(UCTE_FORMAT, properties, path));
     }
 
     private static Network displacePisaNodes(final Network cgm) {
