@@ -23,7 +23,11 @@ import com.powsybl.ucte.network.UcteCountryCode;
 import java.util.List;
 import java.util.Optional;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BUS_ID_LENGTH;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ELEMENT_NAME_PROPERTY;import static com.farao_community.farao.ce_merging.common.CeMergingConstants.LINE_ID_FORMAT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MAX_FICTITIOUS_P;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SUBSTATION_ID_LENGTH;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VOLTAGE_LEVEL_ID_LENGTH;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XNODES_PREFIX;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getNodeName;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.toCountryElementId;
@@ -32,11 +36,6 @@ import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.TopologyKind.BUS_BREAKER;
 
 public final class PisaXnodesReplacer {
-    private static final String ELEMENT_NAME_PROPERTY = "elementName";
-    private static final String LINE_ID_FORMAT = "%s %s 1";
-    private static final int SUBSTATION_ID_LENGTH = 6;
-    private static final int VOLTAGE_LEVEL_ID_LENGTH = 7;
-    private static final int BUS_ID_LENGTH = 8;
     private final Network network;
 
     private PisaXnodesReplacer(final Network network) {
