@@ -223,6 +223,7 @@ class MergingServiceTest {
                 balancesAdjustmentService,
                 pstSpecialService,
                 slackCompensationService,
+                pisaService,
                 finalCgmService,
                 refProgCalculationService,
                 mergingLogsCalculationService,

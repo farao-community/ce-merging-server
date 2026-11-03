@@ -23,7 +23,7 @@ import com.farao_community.farao.ce_merging.xsd.glsk_fix.TimeIntervalType;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.HUNDRED;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MAX_GSK_SHARE;
 import static com.farao_community.farao.ce_merging.xsd.glsk_fix.BusinessTypeList.Z_02;
 import static com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType.A_01;
 
@@ -125,7 +125,7 @@ public final class ItalianGskFixTestData {
 
         final BusinessType businessType = new BusinessType();
         businessType.setV(Z_02);
-        businessType.setShare(HUNDRED);
+        businessType.setShare(MAX_GSK_SHARE);
         serie.setBusinessType(businessType);
 
         final IdentificationType id = new IdentificationType();
