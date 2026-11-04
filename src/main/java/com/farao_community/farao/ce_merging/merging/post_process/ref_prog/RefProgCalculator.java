@@ -97,10 +97,10 @@ public final class RefProgCalculator {
             addVirtualHubExchange(optVirtualHub.get());
         } else if (isInternalItalianExchange(borderFrom, borderTo)) {
             addInternalItalianExchange(borderFrom, borderTo);
-        } else if (isNonCoreExchange(borderFrom, borderTo)) {
-            addNonCoreExchange(toEicCode(borderFrom), toEicCode(borderTo));
-        } else if (isCoreExchange(borderFrom, borderTo)) {
-            addCoreExchange(toEicCode(borderFrom), toEicCode(borderTo));
+        } else if (isNonCeExchange(borderFrom, borderTo)) {
+            addNonCeExchange(toEicCode(borderFrom), toEicCode(borderTo));
+        } else if (isCeExchange(borderFrom, borderTo)) {
+            addCeExchange(toEicCode(borderFrom), toEicCode(borderTo));
         } else {
             throw new CeMergingException("Border direction from " + borderFrom + " to " + borderTo + " defined in VH config is not supported");
         }
@@ -120,14 +120,14 @@ public final class RefProgCalculator {
         return isItalianBiddingZone(borderFrom) && isItalianBiddingZone(borderTo);
     }
 
-    private boolean isNonCoreExchange(final String borderFrom,
-                                      final String borderTo) {
+    private boolean isNonCeExchange(final String borderFrom,
+                                    final String borderTo) {
         return regionConfiguration.getAreasOut().keySet().stream()
                 .anyMatch(country -> borderFrom.equals(country) || borderTo.equals(country));
     }
 
-    private boolean isCoreExchange(final String borderFrom,
-                                   final String borderTo) {
+    private boolean isCeExchange(final String borderFrom,
+                                 final String borderTo) {
         final Map<String, String> areasIn = regionConfiguration.getAreasIn();
         return areasIn.containsKey(mapItBzToIt(borderFrom)) && areasIn.containsKey(mapItBzToIt(borderTo));
     }
@@ -137,8 +137,8 @@ public final class RefProgCalculator {
                                  getVirtualHubsExchangesFromCgm().getOrDefault(virtualHub.getNodeName(), 0.));
     }
 
-    private void addNonCoreExchange(final String eicFrom,
-                                    final String eicTo) {
+    private void addNonCeExchange(final String eicFrom,
+                                  final String eicTo) {
         acExchanges.put(new Border(eicFrom, eicTo),
                         getExchangeFromRefProg(mapItaBzToItaCountry(eicFrom),
                                                mapItaBzToItaCountry(eicTo))
@@ -154,8 +154,8 @@ public final class RefProgCalculator {
                         biddingZonesManager.getTotalFlow(from, to));
     }
 
-    private void addCoreExchange(final String eicFrom,
-                                 final String eicTo) {
+    private void addCeExchange(final String eicFrom,
+                               final String eicTo) {
 
         // same if not Italy
         final Border realBorder = new Border(eicFrom, eicTo);

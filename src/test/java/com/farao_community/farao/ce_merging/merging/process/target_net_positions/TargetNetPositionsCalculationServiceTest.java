@@ -49,7 +49,7 @@ class TargetNetPositionsCalculationServiceTest {
 
     @Test
     void computeTargetNetPositions() throws IOException {
-        final MergingTask taskEntity = getCoreMergingTaskEntityWithoutVirtualHubsShifting();
+        final MergingTask taskEntity = getMergingTaskEntityWithoutVirtualHubsShifting();
 
         targetNetPositionsCalculationService.computeTargetNetPositions(taskEntity);
 
@@ -59,7 +59,7 @@ class TargetNetPositionsCalculationServiceTest {
         assertEquals(balancesAdjustmentTargetExpected, balancesAdjustmentTarget);
     }
 
-    private MergingTask getCoreMergingTaskEntityWithoutVirtualHubsShifting() throws IOException {
+    private MergingTask getMergingTaskEntityWithoutVirtualHubsShifting() throws IOException {
         final MergingTask taskEntity = new MergingTask();
         taskEntity.getInputs().setTargetDate(TARGET_DATE);
         final SavedFile igmsNetPositionsFile = mockSavedFile(IGMS_NET_POSITIONS_FILENAME, RESOURCES_PATH);

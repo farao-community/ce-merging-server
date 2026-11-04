@@ -116,11 +116,11 @@ public class MergingReportBuilder {
     private String getIgmKind(final MergingTask task,
                               final Country country) {
 
-        final boolean hasCountryInCore = task.getInputs().getIgms().stream()
+        final boolean hasCountryInCe = task.getInputs().getIgms().stream()
                 .map(IgmData::getIgmName)
                 .anyMatch(name -> name.contains(country.toString()) && name.contains(D2CF.getTypeCode()));
 
-        return hasCountryInCore ? D2CF.name() : DACF.name();
+        return hasCountryInCe ? D2CF.name() : DACF.name();
     }
 
     private Map<Integer, Interval> getIntervalsByPosition() {
