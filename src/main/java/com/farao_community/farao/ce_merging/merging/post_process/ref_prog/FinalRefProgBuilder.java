@@ -86,7 +86,7 @@ public final class FinalRefProgBuilder {
 
         final PublicationDocument.Domain domain = new PublicationDocument.Domain();
         domain.setCodingScheme(CodingSchemeType.A_01.value());
-        domain.setV(CeMergingConstants.CORE_REGION_ID);
+        domain.setV(CeMergingConstants.CE_REGION_ID);
         publicationDocument.setDomain(domain);
 
         final List<PublicationDocument.PublicationTimeSeries> publicationTimeSeries = computeAllTimeSeries(refProgResult,

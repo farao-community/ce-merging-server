@@ -28,7 +28,6 @@ import java.util.function.Predicate;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
-import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaNamingStrategy.XFG_NODE_NAME_PATTERN;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 
@@ -61,10 +60,6 @@ public class VirtualHubsShifting {
     private static void applyVirtualHubFlow(final Map<String, Double> virtualHubsGaps, final List<VirtualHubRecord> virtualHubRecords, final Network network, final ReferenceExchangeData referenceExchangeData) {
         final VirtualHubRecord virtualHubRecord = findVirtualHub(virtualHubRecords, referenceExchangeData.getAreaOutId(), referenceExchangeData.getAreaInId());
         final String nodeName = virtualHubRecord.getNodeName();
-        if (XFG_NODE_NAME_PATTERN.matcher(nodeName).matches()) {
-            // as XFG... nodes are defined in virtual hubs, but do not exist at this point, ignore them
-            return;
-        }
         final BoundaryLine boundaryLine = findBoundaryLine(network, nodeName);
         if (boundaryLine.getTerminal().isConnected()) {
             final double initialFlow = boundaryLine.getP0();

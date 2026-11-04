@@ -120,6 +120,7 @@ public class MergingService {
     private void process(final MergingTask task) throws IOException {
         netPositionService.computeInitialNetPositions(task);
         topologicalMergeService.mergeInitialIgms(task);
+        pisaService.displacePisaNodes(task);
         recessivityService.applyRecessivity(task);
         final boolean isMergingWithInternalHvdc = task.getInputs().getMergingWithInternalHvdc();
         if (isMergingWithInternalHvdc) {
@@ -134,7 +135,6 @@ public class MergingService {
         balancesAdjustmentService.shiftCgm(task);
         pstSpecialService.fixPst(task);
         slackCompensationService.compensateFinalCgmSlackImbalance(task);
-        pisaService.displacePisaNodes(task);
         finalCgmService.computeFinalCgmResult(task);
     }
 
