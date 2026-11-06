@@ -43,7 +43,7 @@ import com.powsybl.commons.report.ReportNode;
 import com.powsybl.commons.report.ReportNodeAdder;
 import com.powsybl.commons.report.TypedValue;
 import com.powsybl.entsoe.commons.PowsyblEntsoeReportResourceBundle;
-import com.powsybl.glsk.ucte.quality_check.GlskQualityProcessor;
+import com.powsybl.glsk.ucte.qualitycheck.GlskQualityProcessor;
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.apache.commons.io.IOUtils;
