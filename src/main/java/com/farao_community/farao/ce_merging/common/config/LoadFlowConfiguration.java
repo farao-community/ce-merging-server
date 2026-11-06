@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common.config;
 
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
+import com.powsybl.balancesadjustment.computation.BalanceComputationParameters;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.springframework.context.annotation.Bean;

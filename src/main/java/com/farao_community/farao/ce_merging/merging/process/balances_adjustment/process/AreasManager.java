@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process;
 
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationArea;
+import com.powsybl.balancesadjustment.computation.BalanceComputationArea;
 import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Network;
 

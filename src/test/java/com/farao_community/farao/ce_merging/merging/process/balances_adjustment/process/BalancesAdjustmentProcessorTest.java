@@ -11,7 +11,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
+import com.powsybl.balancesadjustment.computation.BalanceComputationParameters;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
