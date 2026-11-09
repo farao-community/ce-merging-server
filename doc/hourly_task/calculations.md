@@ -13,15 +13,15 @@ This step consists in merging the previously mentioned IGM in one CGM file, of t
 
 ## PiSa displacement
 In the case of Piemonte-Savoie HVDC, we have to "move" the border to different terminals. In the network model, that means having some X-Nodes transformed into normal nodes, and inversely : 
-- FFG.IL/11/12/13/14 become X-Nodes (XFG...)
-- XPI_GI11 and 12 become normal Italian nodes (IPI...)
+- **FFG.IL/11/12/13/14** become X-Nodes (**XFG**...)
+- **XPI_GI11/12** become normal Italian nodes (**IPI**...)
 
 To achieve that, because we are changing two kinds of nodes at the same time, we must proceed in order :
 - Check if any defined line would become a line between X-Nodes. If such a case arise :
   - if the line is disconnected, remove it from the network
   - if not, stop there and raise an exception
 - Depending on the appearance/disappearance of boundary lines, there could be [tie lines](https://javadoc.io/doc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/TieLine.html) that could no longer exist: we delete them early on to be able to create the desired network elements.
-- Handle the change of line type (done by **PisaXNodesReplacer**) : 
+- Handle the change of line type : 
   - A [boundary line](https://javadoc.io/doc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/BoundaryLine.html) could become a [simple line](https://javadoc.io/doc/com.powsybl/powsybl-core/2.6.1/com/powsybl/iidm/network/Line.html), or the other way around,
   - There could also be a boundary line that we have to "invert": in addition to the changes in names, we have to feed the terminal data from what will become the boundary line's terminal.
 - Then, all the nodes and network elements referring to them are renamed through a custom [PowSyBl naming strategy](https://powsybl.readthedocs.io/projects/powsybl-core/en/latest/grid_features/network_modifications/topology_modifications.html#naming-strategy).
@@ -57,6 +57,13 @@ We then create a new GLSK, filtering blocks like this:
 
 If multiple blocks were used with a share value different of 100% (e.g., one GSK and one LSK), the share is never modified, except if one of the associated blocks is empty after previous filtering.
 In that case, the other associated blocks share value is rescaled proportionally to their initial value to have a 100% share sum.
+
+#### Special case : Italian bidding zones
+In the case of Italy, we can receive a GLSK with data for the [italian bidding zones](https://eepublicdownloads.entsoe.eu/clean-documents/cep/implementation/BZ/A4_BZRM_CSI_SQ.pdf) separately. To use it for the following computations, we have to transform it to a single Italian input. 
+
+Depending on the inputs :
+- If any bidding zone is defined with a <CountryGSK> block, we create an Italian block with a country block within.
+- Else, we get all Italian bidding zone's nodes and group them in a single Italian block with an <AutoNode> list. If we encounter manual nodes, we convert them to auto nodes, stripping their factor.
 
 ## Base case improvement
 This step is a first calculation on net positions, to bring the ones outside the feasibility ranges to acceptable values. More details in the [Base Case Improvement page](/doc/hourly_task/step_details/bci.md).
@@ -118,7 +125,7 @@ With this definition of net position, the target value for each area is the glob
 
 If a country does not provide GLSK (as it is the case for countries outside the CE region), 
 a country LSK is created, dispatching the flows proportionally on all loads. 
-The balances adjustment ignores the $P_{min}$/$P_{max}$ limitation of generators.
+The balances adjustment ignores the $P_{min}$ / $P_{max}$ limitation of generators.
 
 The algorithm is iterative: at each iteration, each area's net position mismatch is redispatched via the area's GLSK. 
 
