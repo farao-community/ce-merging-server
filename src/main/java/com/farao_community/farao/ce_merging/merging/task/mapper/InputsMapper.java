@@ -22,6 +22,7 @@ public interface InputsMapper {
     @Mapping(source = "feasibilityRanges.location", target = "feasibilityRangesLocation")
     @Mapping(source = "dcLinks.location", target = "dcLinksLocation")
     @Mapping(source = "netPositionForecast.location", target = "netPositionForecastLocation")
+    @Mapping(source = "internalBiddingZones.location", target = "internalBiddingZonesLocation")
     InputsDto inputsToInputsDto(Inputs inputs);
 
     @Mapping(source = "igmFile.location", target = "igmFileLocation")

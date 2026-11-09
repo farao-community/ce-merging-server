@@ -21,6 +21,7 @@ import com.farao_community.farao.ce_merging.merging.process.target_net_positions
 import com.farao_community.farao.ce_merging.merging.process.virtuals_hubs.VirtualHubsShifting;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.powsybl.iidm.network.Country;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -29,8 +30,8 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import com.powsybl.iidm.network.Country;
 
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isAnXNode;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BCI_OUTPUT_FILE;
@@ -39,7 +40,6 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 @Service
 public class TargetNetPositionsCalculationService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TargetNetPositionsCalculationService.class);
-    private static final String XNODES_PREFIX = "X";
     private final MergingTaskRepository repository;
     private final CeMergingConfiguration configuration;
 
@@ -119,7 +119,7 @@ public class TargetNetPositionsCalculationService {
 
     private static double getGermanNonXVirtualHubFlows(final NetPositions netPositions) {
         return netPositions.getVirtualHubsExchanges().entrySet().stream()
-                .filter(entry -> !entry.getKey().startsWith(XNODES_PREFIX))
+                .filter(entry -> !isAnXNode(entry.getKey()))
                 .mapToDouble(Map.Entry::getValue)
                 .sum();
     }

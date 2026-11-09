@@ -7,9 +7,10 @@
 
 package com.farao_community.farao.ce_merging.merging.process.german_pre_merge;
 
+import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.CurrentLimitsAdder;
-import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.LoadingLimits;
 import com.powsybl.iidm.network.Network;
@@ -18,11 +19,17 @@ import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TieLine;
 import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.iidm.network.VoltageLevel;
+import com.powsybl.ucte.network.UcteCountryCode;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BUS_ID_LENGTH;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ELEMENT_NAME_PROPERTY;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.LINE_ID_FORMAT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.SUBSTATION_ID_LENGTH;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VOLTAGE_LEVEL_ID_LENGTH;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.TopologyKind.BUS_BREAKER;
@@ -30,12 +37,6 @@ import static com.powsybl.iidm.network.TwoSides.ONE;
 import static com.powsybl.iidm.network.TwoSides.TWO;
 
 public final class GermanXnodesReplacer {
-    private static final String ELEMENT_NAME_PROPERTY = "elementName";
-    private static final String LINE_ID_FORMAT = "%s %s 1";
-    private static final String GERMAN_UCTE_NODE_PREFIX = "D";
-    private static final int SUBSTATION_ID_LENGTH = 6;
-    private static final int VOLTAGE_LEVEL_ID_LENGTH = 7;
-    private static final int BUS_ID_LENGTH = 8;
     private final Network network;
 
     private GermanXnodesReplacer(final Network network) {
@@ -55,15 +56,15 @@ public final class GermanXnodesReplacer {
                 .filter(GermanXnodesReplacer::isGermanInternal)
                 .toList();
 
-        final List<DanglingLine> danglingLinesToRemove = tieLinesToRemove.stream()
-                .flatMap(tieLine -> Stream.of(tieLine.getDanglingLine1(), tieLine.getDanglingLine2()))
+        final List<BoundaryLine> boundaryLinesToRemove = tieLinesToRemove.stream()
+                .flatMap(tieLine -> Stream.of(tieLine.getBoundaryLine1(), tieLine.getBoundaryLine2()))
                 .toList();
 
         for (final TieLine tieLine : tieLinesToRemove) {
             createCorrespondingLines(tieLine);
             tieLine.remove();
         }
-        danglingLinesToRemove.forEach(DanglingLine::remove);
+        boundaryLinesToRemove.forEach(BoundaryLine::remove);
     }
 
     private void createCorrespondingLines(final TieLine tieLine) {
@@ -87,12 +88,12 @@ public final class GermanXnodesReplacer {
                                         final TieLine tieLine,
                                         final Bus xNodeBus,
                                         final VoltageLevel xNodeVoltageLevel) {
-        final DanglingLine danglingLine = tieLine.getDanglingLine(side);
+        final BoundaryLine boundaryLine = tieLine.getBoundaryLine(side);
         final Terminal terminal = tieLine.getTerminal(side);
         final String bus2Id = xNodeBus.getId();
         final boolean isSide1 = side == ONE;
-        final double g = danglingLine.getG();
-        final double b = danglingLine.getB();
+        final double g = boundaryLine.getG();
+        final double b = boundaryLine.getB();
 
         final Line line = network.newLine()
                 .setEnsureIdUnicity(true)
@@ -103,9 +104,9 @@ public final class GermanXnodesReplacer {
                 .setBus2(bus2Id)
                 .setConnectableBus1(getConnectableBusId(terminal))
                 .setConnectableBus2(bus2Id)
-                .setR(danglingLine.getR())
-                .setX(danglingLine.getX())
-                .setFictitious(danglingLine.isFictitious())
+                .setR(boundaryLine.getR())
+                .setX(boundaryLine.getX())
+                .setFictitious(boundaryLine.isFictitious())
                 .setG1(isSide1 ? g : 0)
                 .setG2(isSide1 ? 0 : g)
                 .setB1(isSide1 ? b : 0)
@@ -121,7 +122,7 @@ public final class GermanXnodesReplacer {
                 .map(currentLimitsAdder::setPermanentLimit)
                 .ifPresent(CurrentLimitsAdder::add);
 
-        Optional.ofNullable(danglingLine.getProperty(ELEMENT_NAME_PROPERTY))
+        Optional.ofNullable(boundaryLine.getProperty(ELEMENT_NAME_PROPERTY))
                 .ifPresent(name -> line.setProperty(ELEMENT_NAME_PROPERTY, name));
     }
 
@@ -129,7 +130,8 @@ public final class GermanXnodesReplacer {
         return getConnectedBusIdOrElse(terminal, getConnectableBusId(terminal));
     }
 
-    private String getConnectedBusIdOrElse(final Terminal terminal, final String defaultValue) {
+    private String getConnectedBusIdOrElse(final Terminal terminal,
+                                           final String defaultValue) {
         return terminal.isConnected() ?
                 terminal.getBusBreakerView().getBus().getId() :
                 defaultValue;
@@ -146,7 +148,8 @@ public final class GermanXnodesReplacer {
                 .add();
     }
 
-    private VoltageLevel getDefaultVoltageLevel(final TieLine tieLine, final Substation substation) {
+    private VoltageLevel getDefaultVoltageLevel(final TieLine tieLine,
+                                                final Substation substation) {
         return substation.newVoltageLevel()
                 .setId(toGermanElementId(tieLine, VOLTAGE_LEVEL_ID_LENGTH))
                 .setNominalV(tieLine.getTerminal1().getVoltageLevel().getNominalV())
@@ -154,8 +157,9 @@ public final class GermanXnodesReplacer {
                 .add();
     }
 
-    private String toGermanElementId(final TieLine tieLine, final int endIndex) {
+    private String toGermanElementId(final TieLine tieLine,
+                                     final int endIndex) {
         // 1 because we replace the first character (= country identifier) with the German one
-        return GERMAN_UCTE_NODE_PREFIX + tieLine.getPairingKey().substring(1, endIndex);
+        return NetworkUtil.toCountryElementId(UcteCountryCode.DE, tieLine.getPairingKey(), endIndex);
     }
 }

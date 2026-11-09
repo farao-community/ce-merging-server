@@ -15,8 +15,6 @@ import com.powsybl.balances_adjustment.balance_computation.BalanceComputationFac
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
 import com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult;
 import com.powsybl.balances_adjustment.balance_computation.json_parameters.JsonBalanceComputationParameters;
-import com.powsybl.balances_adjustment.util.CountryAreaFactory;
-import com.powsybl.balances_adjustment.util.NetworkAreaFactory;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.computation.DefaultComputationManagerConfig;
 import com.powsybl.iidm.modification.scalable.Scalable;
@@ -28,6 +26,8 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.loadflow.LoadFlow;
+import com.powsybl.networkarea.CountryAreaFactory;
+import com.powsybl.networkarea.NetworkAreaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +40,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REPORT_BASE_NAME;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile;

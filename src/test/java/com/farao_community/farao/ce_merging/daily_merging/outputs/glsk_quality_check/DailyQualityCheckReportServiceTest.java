@@ -36,7 +36,7 @@ class DailyQualityCheckReportServiceTest {
     private final Path resourceDirectory = Paths.get("src", "test", "resources", "glskFix");
 
     @Autowired
-    private DailyMergingRepository dailyCoreMergingRepository;
+    private DailyMergingRepository dailyCeMergingRepository;
 
     @Autowired
     private CeMergingConfiguration configuration;
@@ -70,14 +70,14 @@ class DailyQualityCheckReportServiceTest {
 
     @Test
     void shouldComputeAndSaveGlskQualityReport() throws IOException {
-        final DailyMergingTask dailyCoreMergingEntity = createDailyMergingTask();
+        final DailyMergingTask dailyMergingTask = createDailyMergingTask();
         final List<MergingTask> tasks = Arrays.asList(task1, task2);
         final String requestInterval = "2016-07-28T22:00Z/2016-07-29T22:00Z";
 
-        Files.createDirectories(Paths.get(configuration.getDailyOutputsDirectoryPath(dailyCoreMergingEntity)));
-        dailyQualityCheckReportService.computeDailyGlskQualityReport(dailyCoreMergingEntity, tasks, requestInterval);
+        Files.createDirectories(Paths.get(configuration.getDailyOutputsDirectoryPath(dailyMergingTask)));
+        dailyQualityCheckReportService.computeDailyGlskQualityReport(dailyMergingTask, tasks, requestInterval);
 
-        final SavedFile report = dailyCoreMergingEntity.getDailyOutputs().getGlskQualityReport();
+        final SavedFile report = dailyMergingTask.getDailyOutputs().getGlskQualityReport();
         assertTrue(new File(report.getPath()).exists());
         assertEquals("22XCORESO------S_10V1001C--00236Y_CORE-FB-A16A48-117_20160729-F117-04.xml", report.getOriginalName());
     }
@@ -94,7 +94,7 @@ class DailyQualityCheckReportServiceTest {
         final DailyMergingTask dailyMergingTask = new DailyMergingTask();
         dailyMergingTask.setVersion(4);
         dailyMergingTask.setDailyInputs(new DailyInputs());
-        return dailyCoreMergingRepository.save(dailyMergingTask);
+        return dailyCeMergingRepository.save(dailyMergingTask);
     }
 }
 

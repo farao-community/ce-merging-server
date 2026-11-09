@@ -12,7 +12,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
@@ -73,7 +73,7 @@ class XnodesServiceTest {
 
         final Network germanNetwork = mock(Network.class);
         when(germanNetwork.getNameOrId()).thenReturn("german_net");
-        final DanglingLine germanDl = mock(DanglingLine.class);
+        final BoundaryLine germanDl = mock(BoundaryLine.class);
         when(germanDl.getPairingKey()).thenReturn(XDE_NODE);
         final Terminal germanTerminal = mock(Terminal.class);
         when(germanDl.getTerminal()).thenReturn(germanTerminal);
@@ -88,11 +88,11 @@ class XnodesServiceTest {
         when(germanVl.getId()).thenReturn("GERMAN_VL");
         when(germanDl.getP0()).thenReturn(10.0);
         when(germanDl.getQ0()).thenReturn(5.0);
-        when(germanNetwork.getDanglingLineStream()).thenAnswer(invocation -> Stream.of(germanDl));
+        when(germanNetwork.getBoundaryLineStream()).thenAnswer(invocation -> Stream.of(germanDl));
 
         final Network frNetwork = mock(Network.class);
         when(frNetwork.getNameOrId()).thenReturn("fr_net");
-        final DanglingLine frDl = mock(DanglingLine.class);
+        final BoundaryLine frDl = mock(BoundaryLine.class);
         when(frDl.getPairingKey()).thenReturn(XFR_NODE);
         final Terminal frTerminal = mock(Terminal.class);
         when(frDl.getTerminal()).thenReturn(frTerminal);
@@ -107,7 +107,7 @@ class XnodesServiceTest {
         when(frVl.getId()).thenReturn("FR_VL");
         when(frDl.getP0()).thenReturn(20.0);
         when(frDl.getQ0()).thenReturn(10.0);
-        when(frNetwork.getDanglingLineStream()).thenAnswer(invocation -> Stream.of(frDl));
+        when(frNetwork.getBoundaryLineStream()).thenAnswer(invocation -> Stream.of(frDl));
 
         when(initialImportService.importInitialIgms(task)).thenReturn(Map.of(D2.name(), germanNetwork,
                                                                              FR.name(), frNetwork));

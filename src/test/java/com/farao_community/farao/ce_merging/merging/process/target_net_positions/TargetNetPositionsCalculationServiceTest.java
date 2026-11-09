@@ -25,8 +25,8 @@ import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static test_utils.CeTestUtils.getSavedFile;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.mockSavedFile;
 
 @SpringBootTest
 class TargetNetPositionsCalculationServiceTest {
@@ -49,7 +49,7 @@ class TargetNetPositionsCalculationServiceTest {
 
     @Test
     void computeTargetNetPositions() throws IOException {
-        final MergingTask taskEntity = getCoreMergingTaskEntityWithoutVirtualHubsShifting();
+        final MergingTask taskEntity = getMergingTaskEntityWithoutVirtualHubsShifting();
 
         targetNetPositionsCalculationService.computeTargetNetPositions(taskEntity);
 
@@ -59,14 +59,14 @@ class TargetNetPositionsCalculationServiceTest {
         assertEquals(balancesAdjustmentTargetExpected, balancesAdjustmentTarget);
     }
 
-    private MergingTask getCoreMergingTaskEntityWithoutVirtualHubsShifting() throws IOException {
+    private MergingTask getMergingTaskEntityWithoutVirtualHubsShifting() throws IOException {
         final MergingTask taskEntity = new MergingTask();
         taskEntity.getInputs().setTargetDate(TARGET_DATE);
-        final SavedFile igmsNetPositionsFile = getSavedFile(IGMS_NET_POSITIONS_FILENAME, RESOURCES_PATH);
-        final SavedFile bciOutputFile = getSavedFile(BCI_OUTPUT_FILENAME, RESOURCES_PATH);
-        final SavedFile forecastReferenceProgram = getSavedFile(FORECAST_REFERENCE_PROGRAM_FILENAME, RESOURCES_PATH);
-        final SavedFile alegroNetPositions = getSavedFile(ALEGRO_NET_POSITIONS_FILENAME, RESOURCES_PATH);
-        final SavedFile tgmFileAfterRecessivity = getSavedFile(RECESSIVITY_FILENAME, RESOURCES_PATH);
+        final SavedFile igmsNetPositionsFile = mockSavedFile(IGMS_NET_POSITIONS_FILENAME, RESOURCES_PATH);
+        final SavedFile bciOutputFile = mockSavedFile(BCI_OUTPUT_FILENAME, RESOURCES_PATH);
+        final SavedFile forecastReferenceProgram = mockSavedFile(FORECAST_REFERENCE_PROGRAM_FILENAME, RESOURCES_PATH);
+        final SavedFile alegroNetPositions = mockSavedFile(ALEGRO_NET_POSITIONS_FILENAME, RESOURCES_PATH);
+        final SavedFile tgmFileAfterRecessivity = mockSavedFile(RECESSIVITY_FILENAME, RESOURCES_PATH);
 
         final Artifacts artifacts = new Artifacts();
         artifacts.putFile(ArtifactType.IGMS_NET_POSITIONS_FILE, igmsNetPositionsFile);

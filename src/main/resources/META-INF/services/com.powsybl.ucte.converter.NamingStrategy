@@ -1,2 +1,3 @@
-com.farao_community.farao.ce_merging.merging.process.dk_renaming.DKNamingStrategy
-com.farao_community.farao.ce_merging.merging.process.monita.MonitaNamingStrategy
+com.farao_community.farao.ce_merging.merging.process.naming_strategy.dk_renaming.DKNamingStrategy
+com.farao_community.farao.ce_merging.merging.process.naming_strategy.monita.MonitaNamingStrategy
+com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaNamingStrategy

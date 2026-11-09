@@ -31,8 +31,12 @@ public class XnodeInformation {
         this(area1Information, area2Information, null);
     }
 
-    public XnodeInformation(AreaInformation xnodeConnection1) {
-        this(xnodeConnection1, null);
+    public static XnodeInformation fromArea1(final AreaInformation xnodeConnection1) {
+        return new XnodeInformation(xnodeConnection1, null);
+    }
+
+    public static XnodeInformation fromArea2(final AreaInformation xnodeConnection2) {
+        return new XnodeInformation(null, xnodeConnection2);
     }
 
     public AreaInformation getArea1Information() {

@@ -8,8 +8,8 @@ package com.farao_community.farao.ce_merging.merging.process.recessivity;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.xnode.AreaInformation;
 import com.farao_community.farao.ce_merging.merging.process.xnode.XnodeInformation;
@@ -45,10 +45,10 @@ import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountryOfSide;
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isConnectedTo;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.hasInId;
 import static com.farao_community.farao.ce_merging.merging.process.xnode.XnodeStatus.OPEN;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PISA_RENAMING;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INCONSISTENCIES;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.GermanTso.D7;
@@ -80,7 +80,7 @@ public class RecessivityService {
             LOGGER.info("Recessive countries are {}", recessiveCountries);
 
             checkAndCorrectInconsistencies(
-                task, recessiveCountries, task.getArtifact(TOPOLOGICAL_MERGE_FILE, Network.class)
+                task, recessiveCountries, task.getArtifact(CGM_FILE_AFTER_PISA_RENAMING, Network.class)
             );
         } catch (final Exception e) {
             final String errorMessage = String.format("Xnodes check failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
@@ -228,7 +228,7 @@ public class RecessivityService {
 
         return isGermanInternalNode ?
             Optional.ofNullable(findCorrectGermanBranch(network, countryName, nodeId))
-            : network.getBranchStream().filter(isConnectedTo(nodeId)).findFirst();
+            : network.getBranchStream().filter(hasInId(nodeId)).findFirst();
 
     }
 
@@ -240,7 +240,7 @@ public class RecessivityService {
         final String nodeInBranch = nodeId.substring(1, 8);
 
         return network.getBranchStream()
-            .filter(isConnectedTo(nodeInBranch))
+            .filter(hasInId(nodeInBranch))
             .filter(linksGermanyRegionToNode(germanyRegionCode, node))
             .findFirst()
             .orElse(null);

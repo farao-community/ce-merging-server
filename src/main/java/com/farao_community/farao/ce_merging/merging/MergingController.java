@@ -21,15 +21,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
@@ -38,7 +38,25 @@ import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.Optional;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.API_VERSION;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ARTIFACTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.BAD_REQUEST;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_MERGING_URL;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CREATED;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.GLOBAL_CONFIGURATIONS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INPUTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.INTERNAL_ERROR;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.JSON_API_MIME_TYPE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_SUPERVISOR_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MERGING_TASK_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NOT_FOUND;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NO_CONTENT;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OK;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ORIGIN_ANY;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OUTPUTS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_CONFIGURATIONS_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_MANAGEMENT_TAG;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_NOT_RUN;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.toAttachmentFileResponse;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
@@ -104,8 +122,10 @@ public class MergingController {
         }
         try {
             return ResponseEntity.ok().body(JsonApiDocument.fromData(taskManager.runTask(taskId)));
-        } catch (TaskAlreadyRunningException e) {
+        } catch (final TaskAlreadyRunningException e) {
             return ResponseEntity.badRequest().build();
+        } catch (final CeMergingException e) {
+            return ResponseEntity.internalServerError().body(JsonApiDocument.fromServiceException(e));
         }
     }
 
@@ -291,6 +311,22 @@ public class MergingController {
         return toAttachmentFileResponse(taskManager.getNetPositionForecast(taskId));
     }
 
+    @GetMapping(value = "/tasks/{taskId}/inputs/internal-bidding-zones",
+            produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
+    @Operation(tags = INPUTS_TAG,
+            summary = "Get the internal bidding zones input of the merging task with given ID.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = OK, description = "Internal bidding zones data returned successfully."),
+        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with the given ID was not found.")
+    })
+    public ResponseEntity<byte[]> getInternalBiddingZones(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
+        if (!taskManager.checkTaskExist(taskId)) {
+            return ResponseEntity.notFound().build();
+        }
+        return toAttachmentFileResponse(taskManager.getInternalBiddingZones(taskId));
+    }
+
+
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
             GLOBAL CONFIGURATIONS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -320,8 +356,8 @@ public class MergingController {
     @Operation(tags = GLOBAL_CONFIGURATIONS_TAG,
             summary = "Get valid virtual hubs configuration corresponding to the input date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "Valid virtual hubs configuration  returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "No valid virtual hubs configuration found for this instant.")
+        @ApiResponse(responseCode = OK, description = "Valid or default virtual hubs configuration returned successfully."),
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "Internal error while retrieving the virtual hubs configuration.")
     })
     public ResponseEntity<byte[]> getVirtualHubsConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
@@ -354,8 +390,8 @@ public class MergingController {
     @Operation(tags = GLOBAL_CONFIGURATIONS_TAG,
             summary = "Get valid XNodes configuration corresponding to the input date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "XNodes configuration returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "No valid XNodes configuration found for this instant.")
+        @ApiResponse(responseCode = OK, description = "Valid or default XNodes configuration returned successfully."),
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "Internal error while retrieving the XNodes configuration.")
     })
     public ResponseEntity<byte[]> getXNodesConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime instant) throws CeMergingException {
         try {
@@ -388,8 +424,8 @@ public class MergingController {
     @Operation(tags = GLOBAL_CONFIGURATIONS_TAG,
             summary = "Get valid HVDC XNode alignment configuration corresponding to the input date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "HVDC XNode alignment configuration returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "No valid HVDC XNode alignment configuration found for this instant.")
+        @ApiResponse(responseCode = OK, description = "VAlid or default HVDC XNode alignment configuration returned successfully."),
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "Internal error while retrieving the HVDC XNode alignment configuration.")
     })
     public ResponseEntity<byte[]> getHvdcXnodeAlignementConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
@@ -422,8 +458,8 @@ public class MergingController {
     @Operation(tags = GLOBAL_CONFIGURATIONS_TAG,
             summary = "Get valid BEC configuration corresponding to the input date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "BEC configuration  returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "No valid BEC configuration found for this instant.")
+        @ApiResponse(responseCode = OK, description = "Valid or default BEC configuration  returned successfully."),
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "Internal error while retrieving the BEC configuration.")
     })
     public ResponseEntity<byte[]> getBecConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) {
         try {
@@ -456,8 +492,8 @@ public class MergingController {
     @Operation(tags = GLOBAL_CONFIGURATIONS_TAG,
             summary = "Get valid EIC Code configuration corresponding to the input date.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "EIC Code configuration returned successfully."),
-        @ApiResponse(responseCode = NOT_FOUND, description = "No valid EIC Code configuration found for this instant.")
+        @ApiResponse(responseCode = OK, description = "Valid or default EIC Code configuration returned successfully."),
+        @ApiResponse(responseCode = INTERNAL_ERROR, description = "Internal error while retrieving the EIC Code configuration.")
     })
     public ResponseEntity<byte[]> getEICConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
@@ -780,25 +816,6 @@ public class MergingController {
             return ResponseEntity.badRequest().build();
         }
         return toAttachmentFileResponse(taskManager.getCgmNetPositions(taskId));
-    }
-
-    @GetMapping(value = "/tasks/{taskId}/artifacts/tgm-net-positions", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})
-    @Operation(tags = ARTIFACTS_TAG,
-            summary = "Get the TGM net positions artifact of the merging task with given ID")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = OK, description = "TGM net positions returned successfully"),
-        @ApiResponse(responseCode = BAD_REQUEST, description = "Merging task with given ID has not been run"),
-        @ApiResponse(responseCode = NOT_FOUND, description = "Merging task with given ID not found in the server, or CGM net positions not available")
-    })
-    public ResponseEntity<byte[]> getTgmNetPositions(@Parameter(description = "Merging task ID") @PathVariable final long taskId) {
-        if (!taskManager.checkTaskExist(taskId)) {
-            return ResponseEntity.notFound().build();
-        }
-        final TaskStatus status = taskManager.getTaskById(taskId).getStatus();
-        if (status != TaskStatus.SUCCESS && status != TaskStatus.ERROR) {
-            return ResponseEntity.badRequest().build();
-        }
-        return toAttachmentFileResponse(taskManager.getTgmNetPositions(taskId));
     }
 
     @GetMapping(value = "/tasks/{taskId}/artifacts/alegro-net-positions", produces = {MediaType.APPLICATION_OCTET_STREAM_VALUE, JSON_API_MIME_TYPE})

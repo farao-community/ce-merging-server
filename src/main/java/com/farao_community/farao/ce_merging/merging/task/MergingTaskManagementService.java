@@ -71,7 +71,6 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.LOAD_FLOW_ON_FINAL_CGM_LOGS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.PST_OUTPUT_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
-import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_NET_POSITIONS_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INCONSISTENCIES;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.XNODES_INFORMATION_FILE;
@@ -232,6 +231,10 @@ public class MergingTaskManagementService {
         return getInputFile(taskId, Inputs::getDcLinks);
     }
 
+    public SavedFile getInternalBiddingZones(final Long taskId) {
+        return getInputFile(taskId, Inputs::getInternalBiddingZones);
+    }
+
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-
                       TASK CONFIGURATIONS
      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-*/
@@ -310,10 +313,6 @@ public class MergingTaskManagementService {
 
     public SavedFile getBalancesAdjustmentTarget(final Long taskId) {
         return getArtifacts(taskId).getFile(BALANCES_ADJUSTMENT_TARGET_FILE);
-    }
-
-    public SavedFile getTgmNetPositions(final Long taskId) {
-        return getArtifacts(taskId).getFile(TGM_NET_POSITIONS_FILE);
     }
 
     public SavedFile getAlegroNetPositions(final Long taskId) {

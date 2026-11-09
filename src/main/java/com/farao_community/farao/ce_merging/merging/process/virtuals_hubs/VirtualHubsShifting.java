@@ -15,7 +15,7 @@ import com.farao_community.farao.ce_merging.merging.process.base_case_improvemen
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +24,10 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 
@@ -48,21 +50,25 @@ public class VirtualHubsShifting {
     private static boolean isVirtualHubsExchange(final List<VirtualHubRecord> virtualHubRecords, final String areaOut, final String areaIn) {
         return virtualHubRecords
                 .stream()
-                .anyMatch(virtualHubRecord -> virtualHubRecord.getEic().equals(areaOut) || virtualHubRecord.getEic().equals(areaIn));
+                .anyMatch(isInArea(areaOut).or(isInArea(areaIn)));
+    }
+
+    private static Predicate<VirtualHubRecord> isInArea(final String area) {
+        return virtualHubRecord -> virtualHubRecord.getEic().equals(area);
     }
 
     private static void applyVirtualHubFlow(final Map<String, Double> virtualHubsGaps, final List<VirtualHubRecord> virtualHubRecords, final Network network, final ReferenceExchangeData referenceExchangeData) {
         final VirtualHubRecord virtualHubRecord = findVirtualHub(virtualHubRecords, referenceExchangeData.getAreaOutId(), referenceExchangeData.getAreaInId());
         final String nodeName = virtualHubRecord.getNodeName();
-        final DanglingLine danglingLine = findDanglingLine(network, nodeName);
-        if (danglingLine.getTerminal().isConnected()) {
-            final double initialFlow = danglingLine.getP0();
+        final BoundaryLine boundaryLine = findBoundaryLine(network, nodeName);
+        if (boundaryLine.getTerminal().isConnected()) {
+            final double initialFlow = boundaryLine.getP0();
             final double targetFlow = computeTargetFlow(virtualHubRecord, referenceExchangeData);
             final double virtualHubFlowGap = targetFlow - initialFlow;
             if (virtualHubFlowGap != 0.0) {
                 final String country = CountryCodeUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
                 virtualHubsGaps.put(country, virtualHubFlowGap);
-                setDanglingLineFlow(danglingLine, targetFlow);
+                setBoundaryLineFlow(boundaryLine, targetFlow);
                 LOGGER.info("Shift virtual hub {}: {} -> {} (gap={})", nodeName, initialFlow, targetFlow, virtualHubFlowGap);
             }
         }
@@ -76,20 +82,20 @@ public class VirtualHubsShifting {
 
     private static VirtualHubRecord findVirtualHub(final List<VirtualHubRecord> virtualHubRecords, final String areaOut, final String areaIn) {
         return virtualHubRecords.stream()
-                .filter(virtualHubRecord -> virtualHubRecord.getEic().equals(areaOut) || virtualHubRecord.getEic().equals(areaIn))
+                .filter(isInArea(areaOut).or(isInArea(areaIn)))
                 .findFirst()
                 .orElseThrow(() -> new CeMergingException("Unable to find exchange from " + areaOut + " to " + areaIn + " in virtualHubs"));
     }
 
-    private static DanglingLine findDanglingLine(final Network network, final String nodeName) {
-        return network.getDanglingLineStream()
-                .filter(danglingLine -> nodeName.equals(danglingLine.getPairingKey()))
+    private static BoundaryLine findBoundaryLine(final Network network, final String nodeName) {
+        return network.getBoundaryLineStream()
+                .filter(isPairedWith(nodeName))
                 .findFirst()
-                .orElseThrow(() -> new CeMergingException("Unable to find dangling line for node " + nodeName + " in network " + network.getId()));
+                .orElseThrow(() -> new CeMergingException("Unable to find boundary line for node " + nodeName + " in network " + network.getId()));
     }
 
-    private static void setDanglingLineFlow(final DanglingLine danglingLine, final double targetFlow) {
-        danglingLine.setP0(targetFlow);
-        danglingLine.getGeneration().setTargetP(0.0);
+    private static void setBoundaryLineFlow(final BoundaryLine boundaryLine, final double targetFlow) {
+        boundaryLine.setP0(targetFlow);
+        boundaryLine.getGeneration().setTargetP(0.0);
     }
 }

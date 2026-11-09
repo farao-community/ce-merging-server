@@ -1,4 +1,6 @@
 <?xml version="1.0"?>
+
+
 <xnodes xmlns="http://www.rte-france.com/gsr"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <xnode name="XBI_MO31" area1="AL" area2="GR" />
@@ -162,6 +164,7 @@
     <xnode name="XGR_RH21" area1="DE" subarea1="D4" area2="DE" subarea2="D7" />
     <xnode name="XGR_HO11" area1="DE" subarea1="D4" area2="DE" subarea2="D2" />
     <xnode name="XGR_KU11" area1="DE" subarea1="D4" area2="DE" subarea2="D2" />
+    <xnode name="XGR_KU12" area1="DE" subarea1="D4" area2="DE" subarea2="D2" />
     <xnode name="XHO_HO21" area1="DE" subarea1="D4" area2="DE" subarea2="D7" />
     <xnode name="XHR_HO11" area1="DE" subarea1="D4" area2="DE" subarea2="D7" />
     <xnode name="XHR_TI11" area1="DE" subarea1="D4" area2="DE" subarea2="D7" />
@@ -356,7 +359,7 @@
     <xnode name="XWE_SI2C" area1="DE" subarea1="D2" area2="AT" />
     <xnode name="XYV_SI21" area1="DE" subarea1="D2" area2="AT" />
     <xnode name="XYV_SI22" area1="DE" subarea1="D2" area2="AT" />
-    <xnode name="XWE_KE21" area1="AT" area2="DE" subarea2="D7" />
+    <xnode name="XWE_KE21" area1="AT" area2="DE" subarea2="D7"/>
     <xnode name="XWE_VO21" area1="AT" area2="DE" subarea2="D7" />
     <xnode name="XVI_TI2O" area1="IT"  area2="ME" />
     <xnode name="XVI_TI2I" area1="IT"  area2="ME" />
@@ -669,4 +672,48 @@
       -->
     <xnode name="XED_KL11" area1="DE" subarea1="D1" area2="DE" subarea2="D2" />
     <xnode name="XED_KL12" area1="DE" subarea1="D1" area2="DE" subarea2="D2" />
+
+    <!--
+    Created by MMA on 30-03-2026
+    Do not Delete
+    xnode was changed due to changes in the network in DE
+      -->
+    <xnode name="XGR_ST12" area1="DE" subarea1="D2" area2="DE" subarea2="D4" />
+
+    <!--
+    Created by JGA on 09-06-2026
+    Do not Delete
+    xnode was changed due to changes in the network in DE
+      -->
+    <xnode name="XFO_PL11" area1="ES" area2="PT"  />
+
+
+    <!--
+    XNODES  Created by GLE 09-08-2023
+    Do not Delete
+      -->
+    <xnode name="XPE_OH11" area1="DE" subarea1="D2" area2="AT" />
+    <xnode name="XPE_SI11" area1="DE" subarea1="D2" area2="AT"/>
+    <xnode name="XRH_RH11" area1="DE" subarea1="D4" area2="DE" subarea2="D7" />
+    <xnode name="XDO_NR11" area1="DE" subarea1="D2" area2="DE" subarea2="D7" />
+    <xnode name="XDO_NR12" area1="DE" subarea1="D2" area2="DE" subarea2="D7" />
+
+    <!--
+    for EIRGRID : first three are between IE & GB, last two are the CELTIC cable
+    -->
+    <xnode name="XAU_BA82" area1="IE" area2="GB"/>
+    <xnode name="XIE_GB1I " area1="IE" area2="GB"/>
+    <xnode name="XPE_LO12" area1="IE" area2="GB"/>
+    <xnode name="XKN_MA11" area1="IE" area2="FR"/>
+    <xnode name="XKN_MA12" area1="FR" area2="IE"/>
+
+    <!--
+    Created by AHU on 29-10-2026
+    xnodes added to simulate PISA VH
+      -->
+    <xnode name="XFG.IL12" area1="FR"  area2="IT" />
+    <xnode name="XFG.IL14" area1="FR"  area2="IT"  />
+    <xnode name="XFG_IL11" area1="IT"  area2="FR" />
+    <xnode name="XFG.IL13" area1="IT"  area2="FR"  />
+
 </xnodes>

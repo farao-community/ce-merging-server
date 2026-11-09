@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.common;
 
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -57,13 +58,20 @@ public final class CeMergingConstants {
     public static final String DK_NAMING_STRATEGY = "DKNamingStrategy";
     public static final String UCTE_EXPORT_NAMING_STRATEGY_PROPERTY = "ucte.export.naming-strategy";
     public static final String MONITA_NAMING_STRATEGY = "MonitaNamingStrategy";
-    // nodes
+    public static final String PISA_NAMING_STRATEGY = "PisaNamingStrategy";
+    // network
     public static final String ALEGRO_NODE_PREFIX = "XLI_OB1";
     public static final String VIRTUAL_HUB_ALEGRO_BE_NODE_NAME = "XLI_OB1B";
     public static final String VIRTUAL_HUB_ALEGRO_DE_NODE_NAME = "XLI_OB1A";
     public static final String MONITA1_ME_NODE_NAME = "XKOTR120";
     public static final String MONITA2_ME_NODE_NAME = "XKOTR220";
+    public static final String XNODES_PREFIX = "X";
+    public static final String ELEMENT_NAME_PROPERTY = "elementName";
+    public static final int SUBSTATION_ID_LENGTH = 6;
+    public static final int VOLTAGE_LEVEL_ID_LENGTH = 7;
+    public static final int BUS_ID_LENGTH = 8;
     // formatting
+    public static final String LINE_ID_FORMAT = "%s %s 1";
     public static final String DATE_TIME_FORMAT = "yyyyMMdd_HHmm";
     public static final String DATE_FORMAT = "yyyyMMdd";
     public static final String EMPTY = "";
@@ -93,14 +101,13 @@ public final class CeMergingConstants {
     public static final String REPORT_BASE_NAME = "i18n.reports";
     public static final String SENDER_ID = "22XCORESO------S";
     public static final String RECEIVER_ID = "17XTSO-CS------W";
-    public static final String CORE_REGION_ID = "10Y1001C--00059P";
+    public static final String CE_REGION_ID = "10Y1001C--00030C";
     public static final String UCTE_IMPORT_CREATE_AREAS_KEY = "ucte.import.create-areas";
     public static final String TSO = "TSO";
-    public static final String CORE = "CORE";
+    public static final String CE = "CE";
     public static final String TSO_LOWER_CASE = "tso";
     public static final String RESOLUTION = "PT60M";
     public static final String XML_EXTENSION = "xml";
-    public static final String JSON_EXTENSION = "json";
     public static final String ZIP_EXTENSION = "zip";
     public static final String RTE_GSR_URL = "http://www.rte-france.com/gsr";
     public static final String MERGING_STEP = "merging-step";
@@ -110,6 +117,7 @@ public final class CeMergingConstants {
     public static final double MAX_FICTITIOUS_Q = 99999.;
     public static final int MERGING_DAY_START_INDEX = 18;
     public static final int MERGING_DATE_TIME_END_INDEX = 35;
+    public static final BigDecimal MAX_GSK_SHARE = BigDecimal.valueOf(100);
     // Date management
     public static final ZoneOffset PARIS_WINTER_OFFSET = ZoneOffset.of("+01:00");
     public static final ZoneId UTC_ZONE_ID = ZoneId.of("UTC");

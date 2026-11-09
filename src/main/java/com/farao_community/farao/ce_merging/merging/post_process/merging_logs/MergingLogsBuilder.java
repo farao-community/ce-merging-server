@@ -26,7 +26,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CORE_REGION_ID;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE_REGION_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ONE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RECEIVER_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.RESOLUTION;
@@ -37,8 +38,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.getNowDate;
 
 public class MergingLogsBuilder {
-    private static final String CORE_REPORT_TYPE_INFO = "CORE";
-    private static final String OUT_CORE_REPORT_TYPE_INFO = "nonCORE";
+    private static final String OUT_TYPE = "nonCE";
 
     MergingLog buildMergingLog(final MergingTask task, final List<ReportInformationInRegion> reportInformationInRegionList, final ReferenceProgram referenceProgram, final PstOutput pstOutputs, final List<ReportInformationOutRegion> reportInformationsOutRegionList, final List<ReportCommonsInformation> tsoInformationsList, final List<AlegroReportInformation> alegroReportInformationsList) {
         final MergingLog mergingLog = new MergingLog();
@@ -57,13 +57,7 @@ public class MergingLogsBuilder {
     }
 
     private MergingLog.TimeSeries.Period buildPeriod(final MergingTask task, final ReferenceProgram referenceProgram, final List<ReportInformationInRegion> reportInformationInRegionList, final PstOutput pstOutputs, final List<ReportInformationOutRegion> reportInformationsOutRegionList, final List<ReportCommonsInformation> tsoInformationsList, final List<AlegroReportInformation> alegroReportInformationsList) {
-        final MergingLog.TimeSeries.Period period = new MergingLog.TimeSeries.Period();
-        final MergingLog.TimeSeries.Period.Resolution resolution = new MergingLog.TimeSeries.Period.Resolution();
-        resolution.setV(RESOLUTION);
-        period.setResolution(resolution);
-        final MergingLog.TimeSeries.Period.TimeInterval timeInterval = new MergingLog.TimeSeries.Period.TimeInterval();
-        timeInterval.setV(referenceProgram.getDailyTimeInterval());
-        period.setTimeInterval(timeInterval);
+        final MergingLog.TimeSeries.Period period = createPeriod(referenceProgram);
         final MergingLog.TimeSeries.Period.Interval interval = new MergingLog.TimeSeries.Period.Interval();
         interval.setMergingReport(computeMergingReport(task, reportInformationInRegionList, pstOutputs, reportInformationsOutRegionList, tsoInformationsList, alegroReportInformationsList));
         final MergingLog.TimeSeries.Period.Interval.Pos pos = new MergingLog.TimeSeries.Period.Interval.Pos();
@@ -73,6 +67,17 @@ public class MergingLogsBuilder {
         pos.setV(String.valueOf(position));
         interval.setPos(pos);
         period.getInterval().add(interval);
+        return period;
+    }
+
+    private static MergingLog.TimeSeries.Period createPeriod(final ReferenceProgram referenceProgram) {
+        final MergingLog.TimeSeries.Period period = new MergingLog.TimeSeries.Period();
+        final MergingLog.TimeSeries.Period.Resolution resolution = new MergingLog.TimeSeries.Period.Resolution();
+        resolution.setV(RESOLUTION);
+        period.setResolution(resolution);
+        final MergingLog.TimeSeries.Period.TimeInterval timeInterval = new MergingLog.TimeSeries.Period.TimeInterval();
+        timeInterval.setV(referenceProgram.getDailyTimeInterval());
+        period.setTimeInterval(timeInterval);
         return period;
     }
 
@@ -111,7 +116,7 @@ public class MergingLogsBuilder {
         mergingLog.setReportTimeInterval(reportTimeInterval);
         final MergingLog.Domain domain = new MergingLog.Domain();
         domain.setCodingScheme(CodingSchemeType.A_01.value());
-        domain.setV(CORE_REGION_ID);
+        domain.setV(CE_REGION_ID);
         mergingLog.setDomain(domain);
     }
 
@@ -140,7 +145,7 @@ public class MergingLogsBuilder {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report = new MergingLog.TimeSeries.Period.Interval.MergingReport.Report();
         final ReportCommonsInformation reportCommonsInformation = reportInformationInRegion.reportCommonsInformation();
         report.setName(Country.valueOf(reportCommonsInformation.countryName()).getName());
-        report.setTypeInfo(CORE_REPORT_TYPE_INFO);
+        report.setTypeInfo(CE);
         report.setId(task.getConfigurations().getRegionConfiguration().getAreasIn().get(reportCommonsInformation.countryName()));
         report.setBCI(getBci(reportInformationInRegion));
         report.setReferenceProgram(getReferenceProgramForRegion(reportInformationInRegion));
@@ -151,7 +156,7 @@ public class MergingLogsBuilder {
     private MergingLog.TimeSeries.Period.Interval.MergingReport.Report computeAlegroReport(final AlegroReportInformation alegroReportInformation) {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report = new MergingLog.TimeSeries.Period.Interval.MergingReport.Report();
         report.setName(alegroReportInformation.countryName());
-        report.setTypeInfo(CORE_REPORT_TYPE_INFO);
+        report.setTypeInfo(CE);
         report.setId(getAlegroReportId(alegroReportInformation.countryName()));
         report.setReferenceProgram(getAlegroReferenceProgram(alegroReportInformation));
         report.setLoadFlow(getAlegroLoadFlow(alegroReportInformation));
@@ -219,7 +224,7 @@ public class MergingLogsBuilder {
     private MergingLog.TimeSeries.Period.Interval.MergingReport.Report computeOutCoreReport(final MergingTask task, final ReportInformationOutRegion reportInformationsOutRegion) {
         MergingLog.TimeSeries.Period.Interval.MergingReport.Report report = new MergingLog.TimeSeries.Period.Interval.MergingReport.Report();
         report.setName(Country.valueOf(reportInformationsOutRegion.reportCommonsInformation().countryName()).getName());
-        report.setTypeInfo(OUT_CORE_REPORT_TYPE_INFO);
+        report.setTypeInfo(OUT_TYPE);
         report.setId(task.getConfigurations().getRegionConfiguration().getAreasAll().get(reportInformationsOutRegion.reportCommonsInformation().countryName()));
         report.setReferenceProgram(getReferenceProgramOutRegion(reportInformationsOutRegion));
         report.setLoadFlow(computeLoadFlow(reportInformationsOutRegion.reportCommonsInformation()));

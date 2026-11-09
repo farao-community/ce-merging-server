@@ -26,6 +26,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -375,6 +376,23 @@ class MergingControllerTest {
     }
 
     @Test
+    void shouldNotGetGlobalConfigurations() throws Exception {
+        final IOException test = new IOException("test");
+        when(taskManager.getVirtualHubsConfiguration(any())).thenThrow(test);
+        when(taskManager.getXNodesConfiguration(any())).thenThrow(test);
+        when(taskManager.getHvdcXNodeAlignmentConfiguration(any())).thenThrow(test);
+        when(taskManager.getBECKeyConfiguration(any())).thenThrow(test);
+        when(taskManager.getRegionConfiguration(any())).thenThrow(test);
+        OffsetDateTime date = OffsetDateTime.now();
+        Assertions.assertThatThrownBy(() -> controller.getVirtualHubsConfiguration(date)).hasCause(test);
+        Assertions.assertThatThrownBy(() -> controller.getXNodesConfiguration(date)).hasCause(test);
+        Assertions.assertThatThrownBy(() -> controller.getHvdcXnodeAlignementConfiguration(date)).hasCause(test);
+        Assertions.assertThatThrownBy(() -> controller.getBecConfiguration(date)).hasCause(test);
+        Assertions.assertThatThrownBy(() -> controller.getEICConfiguration(date)).hasCause(test);
+
+    }
+
+    @Test
     void shouldGetTaskConfigurationsAsAttachments() {
         when(taskManager.checkTaskExist(ID_1))
                 .thenReturn(true);
@@ -428,7 +446,6 @@ class MergingControllerTest {
         when(taskManager.getBciOutput(ID_1)).thenReturn(new SavedFile());
         when(taskManager.getBalancesAdjustmentTarget(ID_1)).thenReturn(new SavedFile());
         when(taskManager.getCgmNetPositions(ID_1)).thenReturn(new SavedFile());
-        when(taskManager.getTgmNetPositions(ID_1)).thenReturn(new SavedFile());
         when(taskManager.getAlegroNetPositions(ID_1)).thenReturn(new SavedFile());
         when(taskManager.getBalancedCgm(ID_1)).thenReturn(new byte[0]);
         when(taskManager.getPstOutput(ID_1)).thenReturn(new SavedFile());
@@ -450,7 +467,6 @@ class MergingControllerTest {
             controller.getBciOutput(ID_1);
             controller.getBalancesAdjustmentTarget(ID_1);
             controller.getCgmNetPositions(ID_1);
-            controller.getTgmNetPositions(ID_1);
             controller.getAlegroNetPositions(ID_1);
             controller.getBalancedCgm(ID_1);
             controller.getPstResult(ID_1);
@@ -458,7 +474,7 @@ class MergingControllerTest {
             controller.getOpenLoadFlowLogs(ID_1);
             controller.getXnodesInformation(ID_1);
             controller.getXnodesInconsistencies(ID_1);
-            fileUtils.verify(() -> FileUtils.toAttachmentFileResponse(anyFile()), times(14));
+            fileUtils.verify(() -> FileUtils.toAttachmentFileResponse(anyFile()), times(13));
             fileUtils.verify(() -> FileUtils.toAttachmentFileResponse(any(), anyString()), times(7));
         }
     }
@@ -480,7 +496,6 @@ class MergingControllerTest {
         final ResponseEntity<byte[]> bciOutput = controller.getBciOutput(ID_1);
         final ResponseEntity<byte[]> balancesAdjustmentTarget = controller.getBalancesAdjustmentTarget(ID_1);
         final ResponseEntity<byte[]> cgmNetPositions = controller.getCgmNetPositions(ID_1);
-        final ResponseEntity<byte[]> tgmNetPositions = controller.getTgmNetPositions(ID_1);
         final ResponseEntity<byte[]> alegroNetPositions = controller.getAlegroNetPositions(ID_1);
         final ResponseEntity<byte[]> balancedCgm = controller.getBalancedCgm(ID_1);
         final ResponseEntity<byte[]> pstResult = controller.getPstResult(ID_1);
@@ -502,7 +517,6 @@ class MergingControllerTest {
         Assertions.assertThat(bciOutput.getStatusCode()).isEqualTo(NOT_FOUND);
         Assertions.assertThat(balancesAdjustmentTarget.getStatusCode()).isEqualTo(NOT_FOUND);
         Assertions.assertThat(cgmNetPositions.getStatusCode()).isEqualTo(NOT_FOUND);
-        Assertions.assertThat(tgmNetPositions.getStatusCode()).isEqualTo(NOT_FOUND);
         Assertions.assertThat(alegroNetPositions.getStatusCode()).isEqualTo(NOT_FOUND);
         Assertions.assertThat(balancedCgm.getStatusCode()).isEqualTo(NOT_FOUND);
         Assertions.assertThat(pstResult.getStatusCode()).isEqualTo(NOT_FOUND);
@@ -533,7 +547,6 @@ class MergingControllerTest {
         final ResponseEntity<byte[]> bciOutput = controller.getBciOutput(ID_1);
         final ResponseEntity<byte[]> balancesAdjustmentTarget = controller.getBalancesAdjustmentTarget(ID_1);
         final ResponseEntity<byte[]> cgmNetPositions = controller.getCgmNetPositions(ID_1);
-        final ResponseEntity<byte[]> tgmNetPositions = controller.getTgmNetPositions(ID_1);
         final ResponseEntity<byte[]> alegroNetPositions = controller.getAlegroNetPositions(ID_1);
         final ResponseEntity<byte[]> balancedCgm = controller.getBalancedCgm(ID_1);
         final ResponseEntity<byte[]> pstResult = controller.getPstResult(ID_1);
@@ -554,7 +567,6 @@ class MergingControllerTest {
         Assertions.assertThat(bciOutput.getStatusCode()).isEqualTo(BAD_REQUEST);
         Assertions.assertThat(balancesAdjustmentTarget.getStatusCode()).isEqualTo(BAD_REQUEST);
         Assertions.assertThat(cgmNetPositions.getStatusCode()).isEqualTo(BAD_REQUEST);
-        Assertions.assertThat(tgmNetPositions.getStatusCode()).isEqualTo(BAD_REQUEST);
         Assertions.assertThat(alegroNetPositions.getStatusCode()).isEqualTo(BAD_REQUEST);
         Assertions.assertThat(balancedCgm.getStatusCode()).isEqualTo(BAD_REQUEST);
         Assertions.assertThat(pstResult.getStatusCode()).isEqualTo(BAD_REQUEST);

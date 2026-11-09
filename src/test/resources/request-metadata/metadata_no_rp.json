@@ -15,7 +15,8 @@
         "externalConstraintsFilePath" : "EC.EC",
         "feasibilityRangesFilePath" : "FR.xml",
         "netPositionForecastFilePath" : "NPF.PEVF",
-        "dcLinksFilePath" : "DCLinks.CGMES_EQX"
+        "dcLinksFilePath" : "DCLinks.CGMES_EQX",
+        "internalBiddingZonesFilePath" : "biddingzoneucte.xml"
       }
     },
     "configurations" : {

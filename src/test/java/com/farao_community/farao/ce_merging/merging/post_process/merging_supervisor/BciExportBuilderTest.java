@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CORE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.CE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
@@ -121,7 +121,7 @@ class BciExportBuilderTest {
         assertEquals(BigInteger.valueOf(1050), hubBCI.getReference().getCWERefProgCGM().getVal());
         assertEquals(BigInteger.valueOf(2050), hubBCI.getReference().getGlobalRefProgCGM().getVal());
         assertEquals(BigInteger.valueOf(2000), hubBCI.getReference().getGlobalRefProgIGM().getVal());
-        assertNotNull(hubBCI.getReference().getCWEInitialNetPositionIGM());
+        assertEquals(BigInteger.valueOf(0), hubBCI.getReference().getCWEInitialNetPositionIGM().getVal());
 
         // BCIActive verification
         assertNotNull(hubBCI.getBCIActive());
@@ -216,9 +216,10 @@ class BciExportBuilderTest {
         return mergingLog;
     }
 
-    private MergingLog.TimeSeries.Period.Interval.MergingReport.Report createCeReport(final String id, final String name) {
+    private MergingLog.TimeSeries.Period.Interval.MergingReport.Report createCeReport(final String id,
+                                                                                      final String name) {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report = new MergingLog.TimeSeries.Period.Interval.MergingReport.Report();
-        report.setTypeInfo(CORE);
+        report.setTypeInfo(CE);
         report.setId(id);
         report.setName(name);
 
@@ -242,7 +243,7 @@ class BciExportBuilderTest {
 
     private MergingLog.TimeSeries.Period.Interval.MergingReport.Report createAlegroReport(final String id) {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report = new MergingLog.TimeSeries.Period.Interval.MergingReport.Report();
-        report.setTypeInfo(CORE);
+        report.setTypeInfo(CE);
         report.setId(id);
         report.setName(id);
 
@@ -256,7 +257,8 @@ class BciExportBuilderTest {
         return report;
     }
 
-    private MergingLog.TimeSeries.Period.Interval.MergingReport.Report createTsoReport(final String id, final String name) {
+    private MergingLog.TimeSeries.Period.Interval.MergingReport.Report createTsoReport(final String id,
+                                                                                       final String name) {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report = new MergingLog.TimeSeries.Period.Interval.MergingReport.Report();
         report.setTypeInfo(TSO);
         report.setId(id);

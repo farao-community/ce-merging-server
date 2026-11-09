@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026, RTE (http://www.rte-france.com)
+  ~ This Source Code Form is subject to the terms of the Mozilla Public
+  ~ License, v. 2.0. If a copy of the MPL was not distributed with this
+  ~ file, You can obtain one at http://mozilla.org/MPL/2.0/.
+  -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<xsd:import namespace="etso-core-cmpts.xsd" schemaLocation="etso-core-cmpts.xsd" />
+	<xsd:import namespace="etso-code-lists.xsd" schemaLocation="etso-code-lists.xsd" />
+
+  <xsd:element name="BiddingZoneUCTEDocument">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="DocumentIdentification" type="ValueElementType"/>
+        <xsd:element name="DocumentVersion" type="ValueElementType"/>
+        <xsd:element name="DocumentType" type="ValueElementType"/>
+        <xsd:element name="ProcessType" type="ValueElementType"/>
+        <xsd:element name="SenderIdentification" type="CodingSchemeValueElementType"/>
+        <xsd:element name="SenderRole" type="ValueElementType"/>
+        <xsd:element name="ReceiverIdentification" type="CodingSchemeValueElementType"/>
+        <xsd:element name="ReceiverRole" type="ValueElementType"/>
+        <xsd:element name="CreationDateTime" type="ValueElementType"/>
+        <xsd:element name="Internal_tie_lines" type="InternalTieLinesType"/>
+        <xsd:element name="Bidding_zones" type="BiddingZonesType"/>
+      </xsd:sequence>
+      <xsd:attribute name="DtdRelease" type="xsd:string" use="required" fixed="0"/>
+      <xsd:attribute name="DtdVersion" type="xsd:string" use="required" fixed="4"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:complexType name="ValueElementType">
+    <xsd:attribute name="v" type="xsd:string" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="CodingSchemeValueElementType">
+    <xsd:attribute name="codingScheme" type="xsd:string" use="required"/>
+    <xsd:attribute name="v" type="xsd:string" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="InternalTieLinesType">
+    <xsd:sequence>
+      <xsd:element name="Internal_tie_line" type="InternalTieLineType" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="count" type="xsd:nonNegativeInteger" use="optional"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="InternalTieLineType">
+    <xsd:sequence>
+      <xsd:element name="branch" type="BranchType"/>
+      <xsd:element name="bidding_zone_from" type="TextOnlyType"/>
+      <xsd:element name="bidding_zone_to" type="TextOnlyType"/>
+    </xsd:sequence>
+    <xsd:attribute name="id" type="xsd:positiveInteger" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="BranchType">
+    <xsd:attribute name="from" type="xsd:string" use="required"/>
+    <xsd:attribute name="to" type="xsd:string" use="required"/>
+    <xsd:attribute name="elementName" type="xsd:string" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="TextOnlyType">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string"/>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+  <xsd:complexType name="BiddingZonesType">
+    <xsd:sequence>
+      <xsd:element name="Bidding_zone" type="BiddingZoneType" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="count" type="xsd:nonNegativeInteger" use="optional"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="BiddingZoneType">
+    <xsd:sequence>
+      <xsd:element name="TimeInterval" type="ValueElementType"/>
+      <xsd:element name="Area" type="CodingSchemeValueElementType"/>
+      <xsd:element name="NodeName" type="ValueElementType" minOccurs="1" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>

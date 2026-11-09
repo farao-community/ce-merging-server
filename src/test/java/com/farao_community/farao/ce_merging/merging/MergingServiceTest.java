@@ -13,13 +13,14 @@ import com.farao_community.farao.ce_merging.merging.post_process.ref_prog.RefPro
 import com.farao_community.farao.ce_merging.merging.process.alegro.AlegroService;
 import com.farao_community.farao.ce_merging.merging.process.balances_adjustment.BalancesAdjustmentService;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.BaseCaseImprovementService;
-import com.farao_community.farao.ce_merging.merging.process.dk_renaming.DKRenamingService;
 import com.farao_community.farao.ce_merging.merging.process.final_cgm_result.FinalCgmService;
 import com.farao_community.farao.ce_merging.merging.process.forecast_netpositions.ForecastNetPositionService;
 import com.farao_community.farao.ce_merging.merging.process.german_pre_merge.GermanPreMergeService;
 import com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService;
 import com.farao_community.farao.ce_merging.merging.process.hvdc_alignment.HvdcXNodeAlignmentService;
-import com.farao_community.farao.ce_merging.merging.process.monita.MonitaService;
+import com.farao_community.farao.ce_merging.merging.process.naming_strategy.dk_renaming.DKRenamingService;
+import com.farao_community.farao.ce_merging.merging.process.naming_strategy.monita.MonitaService;
+import com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaService;
 import com.farao_community.farao.ce_merging.merging.process.netpositions.NetPositionService;
 import com.farao_community.farao.ce_merging.merging.process.pst_special_process.PstSpecialService;
 import com.farao_community.farao.ce_merging.merging.process.recessivity.RecessivityService;
@@ -90,6 +91,8 @@ class MergingServiceTest {
     private NetPositionService netPositionService;
 
     @Mock
+    private PisaService pisaService;
+    @Mock
     private PstSpecialService pstSpecialService;
 
     @Mock
@@ -142,6 +145,7 @@ class MergingServiceTest {
 
         verify(netPositionService).computeInitialNetPositions(task);
         verify(topologicalMergeService).mergeInitialIgms(task);
+        verify(pisaService).displacePisaNodes(task);
         verify(recessivityService).applyRecessivity(task);
 
         verify(glskQualityCheckService).runQualityCheck(task);
@@ -151,6 +155,7 @@ class MergingServiceTest {
         verify(balancesAdjustmentService).shiftCgm(task);
         verify(pstSpecialService).fixPst(task);
         verify(slackCompensationService).compensateFinalCgmSlackImbalance(task);
+
         verify(finalCgmService).computeFinalCgmResult(task);
         verify(refProgCalculationService).computeRefProg(task);
         verify(mergingLogsCalculationService).computeMergingLogs(task);
@@ -188,6 +193,7 @@ class MergingServiceTest {
         verify(balancesAdjustmentService).shiftCgm(task);
         verify(pstSpecialService).fixPst(task);
         verify(slackCompensationService).compensateFinalCgmSlackImbalance(task);
+        verify(pisaService).displacePisaNodes(task);
         verify(finalCgmService).computeFinalCgmResult(task);
         verify(mergingLogsCalculationService).computeMergingLogs(task);
         verify(exportResultsService).generateOutputFiles(task);
@@ -209,6 +215,7 @@ class MergingServiceTest {
                 monitaService,
                 netPositionService,
                 topologicalMergeService,
+                pisaService,
                 recessivityService,
                 alegroService,
                 glskQualityCheckService,
@@ -235,6 +242,7 @@ class MergingServiceTest {
 
         inOrder.verify(netPositionService).computeInitialNetPositions(task);
         inOrder.verify(topologicalMergeService).mergeInitialIgms(task);
+        inOrder.verify(pisaService).displacePisaNodes(task);
         inOrder.verify(recessivityService).applyRecessivity(task);
 
         inOrder.verify(alegroService).checkAlegroXnodesQuality(task);

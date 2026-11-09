@@ -7,8 +7,8 @@
 package com.farao_community.farao.ce_merging.merging.process.slack_compensation;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
-import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
+import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
@@ -71,7 +71,6 @@ public class SlackCompensationService {
         LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.SLACK_COMPENSATION);
         final Network compensatedNetwork = compensateNetwork(task);
         addSlackNode(compensatedNetwork, task);
-
         final SavedFile cgmFile = save(configuration.getOutputsDirectoryPath(task),
                                        task.getOutputCgmFileName(),
                                        String.format("/tasks/%d/outputs/cgm", task.getId()),

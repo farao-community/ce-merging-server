@@ -4,14 +4,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.monita;
+package com.farao_community.farao.ce_merging.merging.process.naming_strategy.monita;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.springframework.stereotype.Service;
 
@@ -76,10 +76,10 @@ public class MonitaService {
     private static void addToMontenegroIfFound(final String monitaNode,
                                                final NetPositions montenegrinNetPositions,
                                                final Network italy) {
-        italy.getDanglingLineStream()
+        italy.getBoundaryLineStream()
             .filter(isPairedWith(monitaNode).and(isInCountry(IT)))
             .findFirst()
-            .map(DanglingLine::getP0)
+            .map(BoundaryLine::getP0)
             .ifPresent(monitaFlow -> addToMontenegro(monitaNode, monitaFlow, montenegrinNetPositions));
     }
 

@@ -13,12 +13,11 @@ import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
-import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Country;
-import com.powsybl.iidm.network.DanglingLine;
 import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +27,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.getCountryFromCode;
+import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapItBzToIt;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
 
@@ -38,7 +39,8 @@ public class HvdcXNodeAlignmentService {
     private final CeMergingConfiguration configuration;
     private final MergingTaskRepository repository;
 
-    public HvdcXNodeAlignmentService(CeMergingConfiguration configuration, MergingTaskRepository repository) {
+    public HvdcXNodeAlignmentService(final CeMergingConfiguration configuration,
+                                     final MergingTaskRepository repository) {
         this.configuration = configuration;
         this.repository = repository;
     }
@@ -51,8 +53,8 @@ public class HvdcXNodeAlignmentService {
             final String nodeName = zeroFlowNode.getXnode();
             final String country = zeroFlowNode.getCountryCode();
             getNetworkForCountry(task, country).ifPresentOrElse(
-                network -> updateDanglingLineFlow(task, network, nodeName, country, location),
-                () -> LOGGER.warn("Unable to find the IGM associated to the country {}, The xnode {} flow will not be set to 0", country, nodeName));
+                    network -> updateBoundaryLineFlow(task, network, nodeName, country, location),
+                    () -> LOGGER.warn("Unable to find the IGM associated to the country {}, The xnode {} flow will not be set to 0", country, nodeName));
         });
         repository.save(task);
     }
@@ -83,18 +85,20 @@ public class HvdcXNodeAlignmentService {
     private static String getVirtualHubCountry(final List<VirtualHubRecord> virtualHubRecords,
                                                final String nodeName) {
         VirtualHubRecord virtualHubRecord = virtualHubRecords.stream()
-            .filter(vhRecord -> vhRecord.getNodeName().equals(nodeName))
-            .findFirst()
-            .orElseThrow(() -> {
-                String errorMessage = "Could not find node " + nodeName + " in virtual hub config";
-                LOGGER.error(errorMessage);
-                return new CeMergingException(errorMessage);
-            });
+                .filter(vhRecord -> nodeName.equals(vhRecord.getNodeName()))
+                .findFirst()
+                .orElseThrow(() -> {
+                    String errorMessage = "Could not find node " + nodeName + " in virtual hub config";
+                    LOGGER.error(errorMessage);
+                    return new CeMergingException(errorMessage);
+                });
 
         return CountryCodeUtils.mapDk1ToDk(virtualHubRecord.getRelatedMaCode());
     }
 
-    private static Network getNetworkOrThrow(final MergingTask task, final String country, final String nodeName) {
+    private static Network getNetworkOrThrow(final MergingTask task,
+                                             final String country,
+                                             final String nodeName) {
         return getNetworkForCountry(task, country).orElseThrow(() -> {
             String errorMessage = "Unable to find the IGM associated to the country " + country + " for node " + nodeName;
             LOGGER.error(errorMessage);
@@ -103,50 +107,50 @@ public class HvdcXNodeAlignmentService {
     }
 
     private static Optional<Network> getNetworkForCountry(final MergingTask task,
-                                                          final String country) {
+                                                          final String countryCode) {
         try {
-            final SavedFile igm = switch (Country.valueOf(country)) {
+            final SavedFile igm = switch (getCountryFromCode(countryCode)) {
                 case DE -> task.getArtifacts().getFile(GERMAN_PRE_MERGED_IGM);
                 case DK -> task.getArtifacts().getFile(DK_CONVERTED_FILE);
-                default -> Optional.ofNullable(task.getArtifacts().getPreTreatedIgmMap().get(country))
-                    .orElseGet(() -> getInputIgm(task, country));
+                default -> getIgm(mapItBzToIt(countryCode), task);
             };
             return igm != null ? Optional.of(Network.read(igm.getPath())) : Optional.empty();
         } catch (final Exception e) {
-            LOGGER.warn("Country {} not found in Country enum values", country);
+            LOGGER.warn("Country {} not found in Country enum values", countryCode);
             return Optional.empty();
         }
-
     }
 
-    private static SavedFile getInputIgm(final MergingTask task, final String country) {
-        return task.getInputs().getIgms().stream()
-            .filter(igmData -> igmData.getCountry().equals(country))
-            .findFirst()
-            .map(IgmData::getIgmFile)
-            .orElse(null);
+    private static SavedFile getIgm(final String countryCode,
+                                    final MergingTask task) {
+        return Optional.ofNullable(task.getArtifacts().getPreTreatedIgmMap().get(countryCode))
+                .orElseGet(() -> task.getInputs().getIgm(countryCode).getIgmFile());
     }
 
-    private void updateDanglingLineFlow(final MergingTask task, final Network network, final String nodeName, final String country, final String location) {
-        network.getDanglingLineStream()
-            .filter(danglingLine -> danglingLine.getPairingKey().equals(nodeName))
-            .findFirst()
-            .ifPresentOrElse(
-                danglingLine -> {
-                    setDanglingLineToZeroFlow(danglingLine);
-                    LOGGER.info("Set {} flow to 0.0", nodeName);
-                    saveNetworkInArtifacts(task, network, country, location);
-                },
-                () -> LOGGER.warn(
-                    "Could not update XNode flows, dangling line {} not found in {} network",
-                    nodeName,
-                    network.getNameOrId()
-                ));
+    private void updateBoundaryLineFlow(final MergingTask task,
+                                        final Network network,
+                                        final String nodeName,
+                                        final String country,
+                                        final String location) {
+        network.getBoundaryLineStream()
+                .filter(boundaryLine -> boundaryLine.getPairingKey().equals(nodeName))
+                .findFirst()
+                .ifPresentOrElse(
+                        boundaryLine -> {
+                            setBoundaryLineToZeroFlow(boundaryLine);
+                            LOGGER.info("Set {} flow to 0.0", nodeName);
+                            saveNetworkInArtifacts(task, network, country, location);
+                        },
+                        () -> LOGGER.warn(
+                                "Could not update XNode flows, boundary line {} not found in {} network",
+                                nodeName,
+                                network.getNameOrId()
+                        ));
     }
 
-    private static void setDanglingLineToZeroFlow(final DanglingLine danglingLine) {
-        danglingLine.setP0(0.0);
-        HvdcXNodeAlignment.requireGeneration(danglingLine, "dangling line").setTargetP(0.0);
+    private static void setBoundaryLineToZeroFlow(final BoundaryLine boundaryLine) {
+        boundaryLine.setP0(0.0);
+        HvdcXNodeAlignment.requireGeneration(boundaryLine, "boundary line").setTargetP(0.0);
     }
 
     private void saveNetworkInArtifacts(final MergingTask task,
@@ -155,16 +159,16 @@ public class HvdcXNodeAlignmentService {
                                         final String location) {
 
         final SavedFile savedFile = FileStorageUtils.save(
-            configuration.getArtifactsDirectoryPath(task), network.getNameOrId() + ".uct", location,
-            path -> network.write(UCTE_FORMAT, null, path)
+                configuration.getArtifactsDirectoryPath(task), network.getNameOrId() + ".uct", location,
+                path -> network.write(UCTE_FORMAT, null, path)
         );
 
-        final Country country = Country.valueOf(countryCode);
+        final Country country = getCountryFromCode(countryCode);
 
         switch (country) {
             case DE -> task.getArtifacts().putFile(GERMAN_PRE_MERGED_IGM, savedFile);
             case DK -> task.getArtifacts().putFile(DK_CONVERTED_FILE, savedFile);
-            default -> task.getArtifacts().getPreTreatedIgmMap().put(countryCode, savedFile);
+            default -> task.getArtifacts().getPreTreatedIgmMap().put(country.name(), savedFile);
         }
     }
 }

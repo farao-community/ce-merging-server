@@ -3,59 +3,59 @@
   "dailyTimeInterval" : "2026-01-22T23:00Z/2026-01-23T23:00Z",
   "referenceExchangeDataList" : [ {
     "areaOutId" : "22Y201903144---9",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 200.0
   }, {
     "areaOutId" : "22Y201903145---4",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -200.0
   }, {
     "areaOutId" : "10YAT-APG------L",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -2000.0
   }, {
     "areaOutId" : "10YBE----------2",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -3000.0
   }, {
     "areaOutId" : "10YCZ-CEPS-----N",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 1000.0
   }, {
     "areaOutId" : "10YCB-GERMANY--8",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 4500.0
   }, {
     "areaOutId" : "10YFR-RTE------C",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 2000.0
   }, {
     "areaOutId" : "10YHR-HEP------M",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -1000.0
   }, {
     "areaOutId" : "10YHU-MAVIR----U",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -1500.0
   }, {
     "areaOutId" : "10YNL----------L",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 2000.0
   }, {
     "areaOutId" : "10YPL-AREA-----S",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : 400.0
   }, {
     "areaOutId" : "10YRO-TEL------P",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -1500.0
   }, {
     "areaOutId" : "10YSI-ELES-----O",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -600.0
   }, {
     "areaOutId" : "10YSK-SEPS-----K",
-    "areaInId" : "10Y1001C--00059P",
+    "areaInId" : "10Y1001C--00030C",
     "flow" : -50.0
   }, {
     "areaOutId" : "10YES-REE------0",

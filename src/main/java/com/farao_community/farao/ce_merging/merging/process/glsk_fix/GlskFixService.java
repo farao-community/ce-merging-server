@@ -7,8 +7,8 @@
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.common.util.DateTimeUtils;
+import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKDocument;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKSeriesType;
 import com.powsybl.commons.report.ReportNode;
@@ -40,7 +40,7 @@ public class GlskFixService {
         final GSKDocument glskDocument = importGlskDocument(glskBytes);
         updateCreationDate(glskDocument, fileCreationDate);
         fixGlskSeries(reportNode, targetDate, glskDocument);
-        return exportGLsk(glskDocument);
+        return exportGlsk(glskDocument);
     }
 
     private void fixGlskSeries(final ReportNode reportNode, final Instant targetDate, final GSKDocument glskDocument) {
@@ -95,7 +95,7 @@ public class GlskFixService {
         return JaxbUtils.readFromBytes(GSKDocument.class, glskBytes);
     }
 
-    private byte[] exportGLsk(final GSKDocument glskDocument) {
+    private byte[] exportGlsk(final GSKDocument glskDocument) {
         return JaxbUtils.writeToBytes(GSKDocument.class, glskDocument);
     }
 

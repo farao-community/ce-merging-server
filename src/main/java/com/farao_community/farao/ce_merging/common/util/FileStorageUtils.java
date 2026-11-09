@@ -16,6 +16,7 @@ import com.powsybl.iidm.network.Network;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,7 +44,7 @@ public final class FileStorageUtils {
 
     @FunctionalInterface
     public interface ThrowingConsumer<T> {
-        void accept(T t) throws CeMergingException;
+        void accept(T t) throws CeMergingException, FileNotFoundException;
     }
 
     public static <T> void saveArtifactFile(final ArtifactType fileType,

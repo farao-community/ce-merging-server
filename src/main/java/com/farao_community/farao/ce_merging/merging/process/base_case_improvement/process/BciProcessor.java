@@ -84,7 +84,7 @@ public class BciProcessor {
             saveArtifactFile(BCI_OUTPUT_FILE, processResult, task, configuration);
         } catch (final Exception e) {
             final String errorMessage = "Error while running BCI";
-            LOGGER.error(errorMessage);
+            LOGGER.error(errorMessage, e);
             throw new CeMergingException(errorMessage, e);
         }
     }

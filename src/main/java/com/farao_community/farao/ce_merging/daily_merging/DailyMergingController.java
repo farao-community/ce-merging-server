@@ -69,17 +69,17 @@ public class DailyMergingController {
     @Operation(tags = DAILY_TASK_MANAGEMENT_TAG,
             summary = "Creates a daily merging task from a list of task IDs.")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = CREATED, description = "Daily merging taskc reated successfully"),
+        @ApiResponse(responseCode = CREATED, description = "Daily merging task created successfully"),
         @ApiResponse(responseCode = BAD_REQUEST, description = "Invalid merging task.")
     })
     public ResponseEntity<DailyMergingTask> createDailyTask(@Parameter(description = "List of merging task IDs") @RequestParam final Long[] taskIds,
                                                                   @Parameter(description = "Merging request file") @RequestPart final MultipartFile mergingRequest,
                                                                   @Parameter(description = "Merging version") @RequestParam final int mergingVersion) {
-        final DailyMergingTask dailyCoreMergingEntity = dailyTasksManagementService.createDailyTask(Arrays.asList(taskIds), mergingRequest, mergingVersion);
+        final DailyMergingTask dailyMergingTask = dailyTasksManagementService.createDailyTask(Arrays.asList(taskIds), mergingRequest, mergingVersion);
         final UriComponents taskLocation = MvcUriComponentsBuilder.fromController(getClass())
                 .path("/daily-merging/tasks/{taskId}")
-                .buildAndExpand(dailyCoreMergingEntity.getId());
-        return ResponseEntity.created(taskLocation.toUri()).body(dailyCoreMergingEntity);
+                .buildAndExpand(dailyMergingTask.getId());
+        return ResponseEntity.created(taskLocation.toUri()).body(dailyMergingTask);
 
     }
 

@@ -65,9 +65,9 @@ public class TsoInformationsService {
     }
 
     private double getTsoGlobalNetPosition(final Network network, final String zone, final LoadFlowParameters.ComponentMode componentModeLfParameter, final List<VirtualHubRecord> virtualHubList) {
-        double globalNetPositionWithoutVirtualHubs = network.getDanglingLineStream()
-                .filter(danglingLine -> NetworkUtil.isBorderOfZone(danglingLine, zone) && !NetworkUtil.isPairedWithVirtualHub(danglingLine, virtualHubList))
-                .mapToDouble(danglingLine -> NetworkUtil.getBorderFlow(danglingLine, componentModeLfParameter))
+        double globalNetPositionWithoutVirtualHubs = network.getBoundaryLineStream()
+                .filter(boundaryLine -> NetworkUtil.isBorderOfZone(boundaryLine, zone) && !NetworkUtil.isPairedWithVirtualHub(boundaryLine, virtualHubList))
+                .mapToDouble(boundaryLine -> NetworkUtil.getBorderFlow(boundaryLine, componentModeLfParameter))
                 .sum();
 
         globalNetPositionWithoutVirtualHubs += network.getLineStream()

@@ -18,7 +18,7 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Configurations
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
-import com.powsybl.iidm.network.DanglingLine;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
@@ -58,10 +58,10 @@ public class GermanMismatchCompensationService {
         this.configuration = configuration;
     }
 
-    private static Predicate<DanglingLine> isGermanExternalNode(final List<XnodeConfig> xnodesConfigList) {
+    private static Predicate<BoundaryLine> isGermanExternalNode(final List<XnodeConfig> xnodesConfigList) {
 
-        return danglingLine -> xnodesConfigList.stream()
-                .filter(xnode -> xnode.getName().equals(danglingLine.getPairingKey()))
+        return boundaryLine -> xnodesConfigList.stream()
+                .filter(xnode -> xnode.getName().equals(boundaryLine.getPairingKey()))
                 .findFirst()
                 .filter(isNotDeOnBothSides().or(isLinkedToDenmark()))
                 .isPresent();
@@ -113,25 +113,25 @@ public class GermanMismatchCompensationService {
                                           final List<XnodeConfig> xnodes,
                                           final LoadFlowParameters.ComponentMode componentMode) {
 
-        final List<DanglingLine> externalDanglingLines = network.getDanglingLineStream()
+        final List<BoundaryLine> externalBoundaryLines = network.getBoundaryLineStream()
                 .filter(isGermanExternalNode(xnodes).and(NetworkUtil::hasActivePower).and(not(isPairedWithVirtualHub(virtualHubs))))
                 .toList();
 
         LOGGER.info("Absolute proportional share is applied to compensate German mismatch ({} MW)", mismatch);
-        final double totalExternalNetPosition = externalDanglingLines.stream()
+        final double totalExternalNetPosition = externalBoundaryLines.stream()
                 .map(line -> getBorderFlow(line, componentMode))
                 .mapToDouble(Math::abs)
                 .sum();
 
         LOGGER.info("Sum of external Net positions for Germany is {} MW", totalExternalNetPosition);
         if (totalExternalNetPosition != 0) {
-            externalDanglingLines.forEach(line -> updateBoundaryLineFlow(line, mismatch, totalExternalNetPosition, componentMode));
+            externalBoundaryLines.forEach(line -> updateBoundaryLineFlow(line, mismatch, totalExternalNetPosition, componentMode));
         } else {
-            LOGGER.warn("German dangling lines not updated because total external NP = 0");
+            LOGGER.warn("German boundary lines not updated because total external NP = 0");
         }
     }
 
-    private void updateBoundaryLineFlow(final DanglingLine line,
+    private void updateBoundaryLineFlow(final BoundaryLine line,
                                         final double mismatch,
                                         final double totalExternalNetPosition,
                                         final LoadFlowParameters.ComponentMode componentMode) {
@@ -143,7 +143,7 @@ public class GermanMismatchCompensationService {
         line.setP0(updatedFlow);
 
         if (line.getGeneration() != null) {
-            LOGGER.info("Active Generation is set to zero for dangling line {}", line.getId());
+            LOGGER.info("Active Generation is set to zero for boundary line {}", line.getId());
             line.getGeneration().setTargetP(0);
         }
     }

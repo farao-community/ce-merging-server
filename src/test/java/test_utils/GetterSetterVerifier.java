@@ -8,8 +8,8 @@ package test_utils;
 
 import com.google.common.base.Defaults;
 import com.google.common.collect.Sets;
+import jakarta.annotation.Nonnull;
 
-import javax.annotation.Nonnull;
 import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;

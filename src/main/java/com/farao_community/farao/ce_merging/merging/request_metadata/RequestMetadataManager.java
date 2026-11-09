@@ -47,7 +47,8 @@ public class RequestMetadataManager {
         "external-constraints", Inputs::getExternalConstraints,
         "feasibility-ranges", Inputs::getFeasibilityRanges,
         "net-position-forecast", Inputs::getNetPositionForecast,
-        "dc-links", Inputs::getDcLinks);
+        "dc-links", Inputs::getDcLinks,
+        "internal-bidding-zones", Inputs::getInternalBiddingZones);
 
     private static final Map<String, Function<Configurations, SavedFile>> PARAMETER_GETTERS_BY_LOCATION = Map.of(
         "dc-load-flow-parameters", Configurations::getDcLoadFlowParameters,
