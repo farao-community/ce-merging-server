@@ -43,7 +43,7 @@ One can provide additional files if a change in configuration is needed: [more i
 #### Hourly
 - [Inputs preparation](/doc/hourly_task/inputPreparation.md)
 - [Calculations](/doc/hourly_task/calculations.md)
-- Output Generation
+- [Output Generation](/doc/hourly_task/outputs.md)
 
 #### Daily
 - Check that all provided task IDs correspond to finished tasks, with coherent dates regarding the daily task
