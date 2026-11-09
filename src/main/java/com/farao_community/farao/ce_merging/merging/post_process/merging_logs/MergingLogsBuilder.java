@@ -144,7 +144,7 @@ public class MergingLogsBuilder {
     private MergingLog.TimeSeries.Period.Interval.MergingReport.Report computeCoreReport(final MergingTask task, final ReportInformationInRegion reportInformationInRegion) {
         final MergingLog.TimeSeries.Period.Interval.MergingReport.Report report = new MergingLog.TimeSeries.Period.Interval.MergingReport.Report();
         final ReportCommonsInformation reportCommonsInformation = reportInformationInRegion.reportCommonsInformation();
-        report.setName(Country.valueOf(reportCommonsInformation.countryName()).getName());
+        report.setName(Country.valueOf(reportCommonsInformation.countryName()).getFullName());
         report.setTypeInfo(CE);
         report.setId(task.getConfigurations().getRegionConfiguration().getAreasIn().get(reportCommonsInformation.countryName()));
         report.setBCI(getBci(reportInformationInRegion));
@@ -223,7 +223,7 @@ public class MergingLogsBuilder {
 
     private MergingLog.TimeSeries.Period.Interval.MergingReport.Report computeOutCoreReport(final MergingTask task, final ReportInformationOutRegion reportInformationsOutRegion) {
         MergingLog.TimeSeries.Period.Interval.MergingReport.Report report = new MergingLog.TimeSeries.Period.Interval.MergingReport.Report();
-        report.setName(Country.valueOf(reportInformationsOutRegion.reportCommonsInformation().countryName()).getName());
+        report.setName(Country.valueOf(reportInformationsOutRegion.reportCommonsInformation().countryName()).getFullName());
         report.setTypeInfo(OUT_TYPE);
         report.setId(task.getConfigurations().getRegionConfiguration().getAreasAll().get(reportInformationsOutRegion.reportCommonsInformation().countryName()));
         report.setReferenceProgram(getReferenceProgramOutRegion(reportInformationsOutRegion));

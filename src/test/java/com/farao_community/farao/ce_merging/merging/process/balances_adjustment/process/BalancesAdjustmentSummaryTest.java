@@ -33,7 +33,7 @@ class BalancesAdjustmentSummaryTest {
     void shouldLogCountrySummaryWithBalanceInformation(final CapturedOutput capturedOutput) {
         final Network network = Network.create("test", "test");
 
-        final ReportNode countryNode = mockReportNode(Map.of(REPORT_NODE_AREA_NAME_KEY, mockTypedValue(Country.FR.getName()),
+        final ReportNode countryNode = mockReportNode(Map.of(REPORT_NODE_AREA_NAME_KEY, mockTypedValue(Country.FR.getFullName()),
                                                              REPORT_NODE_BALANCE_KEY, mockTypedValue("100.0"),
                                                              REPORT_NODE_MISMATCH_KEY, mockTypedValue("10.0"),
                                                              REPORT_NODE_TARGET_KEY, mockTypedValue("110.0")));

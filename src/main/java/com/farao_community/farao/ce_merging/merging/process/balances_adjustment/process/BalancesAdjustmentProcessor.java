@@ -222,7 +222,7 @@ public class BalancesAdjustmentProcessor {
         final NetworkAreaFactory networkArea = networkAreas.get(countryCode);
         final Scalable lsk = loadShiftKeysByCountry.get(countryCode);
         final double targetNetPosition = targetNetPositions.get(countryCode);
-        return new BalanceComputationArea(country.getName(), networkArea, lsk, targetNetPosition);
+        return new BalanceComputationArea(country.getFullName(), networkArea, lsk, targetNetPosition);
     }
 
     private Scalable createLoadShiftKey(final Country country) {

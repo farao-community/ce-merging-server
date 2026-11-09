@@ -19,6 +19,7 @@ import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TieLine;
 import com.powsybl.iidm.network.VoltageLevel;
+import com.powsybl.iidm.network.regulation.RegulationMode;
 import com.powsybl.ucte.network.UcteCountryCode;
 
 import java.util.List;
@@ -111,9 +112,9 @@ public final class PisaXnodesReplacer {
                                          .setMinP(generation.getMinP())
                                          .setMaxP(generation.getMaxP())
                                          .setTargetP(generation.getTargetP())
-                                         .setTargetQ(generation.getTargetQ())
-                                         .setTargetV(generation.getTargetV())
-                                         .setVoltageRegulationOn(generation.isVoltageRegulatorOn())
+                                         .setTargetQ(generation.getLocalTargetQ())
+                                         .setTargetV(generation.getLocalTargetV())
+                                         .setVoltageRegulationOn(generation.isRegulatingWithMode(RegulationMode.VOLTAGE))
                                          .add(),
                                  () -> adder.newGeneration() // will be useless in future release : https://github.com/powsybl/powsybl-core/pull/4105
                                          .setMinP(-MAX_FICTITIOUS_P)
