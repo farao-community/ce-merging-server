@@ -31,7 +31,7 @@ RefProg schedules calculations are done depending on the type of border as follo
 - Compute the NP using the formula for the flow on each CE border, noted $X$ ; summing over other countries $i$ :
 ![CE net position formula](refprog_border.png)
   - $K$ is the Sharing-Keys-BEC matrix ⇒ $K_{X,i}$ is the coefficient for an exchange between countries $X$ and $i$.
-  - $NP\_$ $afterBCI$ is the net position of the CGM obtained at the end of CGM calculations. 
+  - $NP\_ afterBCI$ is the net position of the CGM obtained at the end of CGM calculations. 
 - Subtract the Virtual hubs exchanges from global exchanges border by border
 - Modelisation of boundary exchanges follows the following format:
   - From: Country EiC Code 
