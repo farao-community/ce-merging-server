@@ -31,12 +31,12 @@ RefProg schedules calculations are done depending on the type of border as follo
 - Compute the NP using the formula for the flow on each CE border, noted $X$ ; summing over other countries $i$ :
 ![CE net position formula](refprog_border.png)
   - $K$ is the Sharing-Keys-BEC matrix ⇒ $K_{X,i}$ is the coefficient for an exchange between countries $X$ and $i$.
-  - $NP\_afterBCI$ is the net position of the CGM obtained at the end of CGM calculations. 
-  - Subtract the Virtual hubs exchanges from global exchanges border by border
-  - Modelisation of boundary exchanges follows the following format:
-    - From: Country EiC Code 
-    - To:  Country EiC Code 
-    - Value: Flow.
+  - $NP\_$ $afterBCI$ is the net position of the CGM obtained at the end of CGM calculations. 
+- Subtract the Virtual hubs exchanges from global exchanges border by border
+- Modelisation of boundary exchanges follows the following format:
+  - From: Country EiC Code 
+  - To:  Country EiC Code 
+  - Value: Flow.
 
 
 ### Exchanges between Italian bidding zones
@@ -46,7 +46,7 @@ In addition, there's also a computation for internal Italian exchanges, based on
 - Get the internal tie-lines from the Italian bidding zones input file,
 - For each one :
   - Get its flow from the final CGM,
-  - Add it to the flow between zones, using from/to info from the aforementioned file.
+  - Add it to the flow between zones, using from/to info from the aforementioned file, with Italian bidding zones EiCs.
 
 ## Merging Logs
 What is called merging logs (or merging report) is a report file which contains 4 types of reports :
