@@ -9,12 +9,12 @@ package com.farao_community.farao.ce_merging.merging.process.balances_adjustment
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputation;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationArea;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationFactoryImpl;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationParameters;
-import com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult;
-import com.powsybl.balances_adjustment.balance_computation.json_parameters.JsonBalanceComputationParameters;
+import com.powsybl.balancesadjustment.computation.BalanceComputation;
+import com.powsybl.balancesadjustment.computation.BalanceComputationArea;
+import com.powsybl.balancesadjustment.computation.BalanceComputationFactoryImpl;
+import com.powsybl.balancesadjustment.computation.BalanceComputationParameters;
+import com.powsybl.balancesadjustment.computation.BalanceComputationResult;
+import com.powsybl.balancesadjustment.computation.parameters.JsonBalanceComputationParameters;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.computation.DefaultComputationManagerConfig;
 import com.powsybl.iidm.modification.scalable.Scalable;
@@ -52,7 +52,7 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GLSK_QUALITY_CORRECTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
-import static com.powsybl.balances_adjustment.balance_computation.BalanceComputationResult.Status.SUCCESS;
+import static com.powsybl.balancesadjustment.computation.BalanceComputationResult.Status.SUCCESS;
 import static com.powsybl.iidm.modification.scalable.ScalingParameters.Priority.RESPECT_OF_VOLUME_ASKED;
 import static java.lang.Double.MAX_VALUE;
 import static java.lang.Double.isNaN;
@@ -222,7 +222,7 @@ public class BalancesAdjustmentProcessor {
         final NetworkAreaFactory networkArea = networkAreas.get(countryCode);
         final Scalable lsk = loadShiftKeysByCountry.get(countryCode);
         final double targetNetPosition = targetNetPositions.get(countryCode);
-        return new BalanceComputationArea(country.getName(), networkArea, lsk, targetNetPosition);
+        return new BalanceComputationArea(country.getFullName(), networkArea, lsk, targetNetPosition);
     }
 
     private Scalable createLoadShiftKey(final Country country) {

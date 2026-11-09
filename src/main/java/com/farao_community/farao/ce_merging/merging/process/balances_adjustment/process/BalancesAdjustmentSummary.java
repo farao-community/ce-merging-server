@@ -89,7 +89,7 @@ public class BalancesAdjustmentSummary {
     private static Country getCountry(final ReportNode reportNode) {
         final String name = getString(reportNode, REPORT_NODE_AREA_NAME_KEY);
         return stream(Country.values())
-            .filter(country -> country.getName().equals(name))
+            .filter(country -> country.getFullName().equals(name))
             .findFirst()
             .orElseThrow(() -> new CeMergingException("Unknown country name: %s".formatted(name)));
     }
