@@ -3,14 +3,14 @@ Before merging the provided inputs, we have to apply some transformations and do
 
 As of writing, one paragraph below <=> one service called in the **MergingService** class.
 
-### X-Node IGM status
+## X-Node IGM status
 For every X-Node found in IGMs, we check if there are inconsistencies :
 - Is there an X-Node appearing only in one IGM?
 - Is there a difference in statuses between two IGMs?
 - Is there an X-Node undefined in the X-Node configuration file?
 
-If so, these informations are saved in an X-Node inconsistencies file.
-### NPF import
+If so, these discrepancies are saved in an X-Node inconsistencies file.
+## NPF import
 The net position file is an XML that comes from user input; it contains a time period interval that we compare with our task's date to check its validity. 
 
 It also contains a list of time series of power throughout the day, that we filter by [reason code](https://eepublicdownloads.entsoe.eu/clean-documents/EDI/Library/Core/entso-e-code-list-v36r0.pdf) : if it is **A95**, we don't use it for the merging, because it concerns the Frequency Containment Reserve (FCR), which is out of scope here.
@@ -23,20 +23,18 @@ if it's one of these, it defines how we model the intervals of time :
 **A01 :** $end(interval_i) = start(interval_i) + resolution$
 
 **A03 :** $end(interval_i) = start(interval_{i+1})$
-### German pre-merge
+## German pre-merge
 Since there are [several German TSOs](https://www.tsodsoplatform.eu/capacitypedia/germany), we receive 5 different IGMs, with the "country" codes being D2, D4, D6, D7 and D8.
 
 In this step, we merge these into a single German UCTE file, with the country code DE.
-The XNodes merged during the process are then converted into German standard nodes, since these are not representing a border node anymore.
+The XNodes merged during the process are then converted into German non-X nodes, since these are not representing a border node anymore.
 Then we run a first load flow on this merged German network.
 
 Finally, we calculate the german internal mismatch $M$ by summing all internal net positions and distributing this mismatch on boundary lines proportionally :
 
 $FLOW_{UPDATED} = FLOW_{INITIAL} + (M \times | \frac{FLOW_{INITIAL}}{\sum NP_{EXTERNAL}}|)$
 
-
-
-### Denmark renaming
+## Denmark renaming
 The IGM files that we receive from Danish TSO have nodes defined in the **##ZD1** zone and have names starting with D1.
 
 To avoid clash with german country code, any node whose name starts with _D1_ will be moved in the **##ZDK** zone and renamed to start with _K1_.
@@ -45,7 +43,7 @@ An explicit list of specific nodes (HVDC ones) that do not start with _D1_ but a
 will be moved in **##ZDK** zone and renamed to start with X. 
 
 Any element (line, transformer...) that references these nodes is also renamed.
-### HVDC alignment
+## HVDC alignment
 For each couple defined in the HVDC alignment configuration, we check if one of the nodes was not found in the virtual hub configuration. 
 If the two nodes have been recovered correctly, we find the corresponding countries using the _RelatedMa_ field, and then the corresponding IGMs.
 
@@ -58,7 +56,7 @@ If the two dangling lines have been recovered correctly, we apply the HVDC align
 - We also align the outage status of the recessive with the reference.
 
 We then save the modified IGMs in the artifacts with the same name.
-### MONITA renaming
+## MONITA renaming
 The nodes describing the MONITA (**MON**tenegro - **ITA**ly) HVDC don't start with an X. To include them correctly in the following calculations, they have to, so we rename these:
 - ICEPR → XCEPR
 - IKOTR → XKOTR.

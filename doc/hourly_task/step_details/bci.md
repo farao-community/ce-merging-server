@@ -20,4 +20,4 @@ The new target CE NPs calculation depends on the sum of $NeededShift$ for inacti
 
 For the inactive bidding zones, the NPs will be shifted to the max/min of the feasibility range using the real merged GLSK.
 
-The remaining difference between target NP and reference NP is being distributed over the active CE bidding zones, to their newly calculated CE NP using the GLSK.
+The remaining difference between target NP and reference NP is being distributed over the CE bidding zones, to their newly calculated CE NP using the GLSK.

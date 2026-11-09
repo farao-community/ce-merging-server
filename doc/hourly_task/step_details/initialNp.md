@@ -26,7 +26,7 @@ Here's how the X-Nodes are counted depending on their presence in config files :
 
 _\* No such X-node should be encountered in real conditions (merging not allowed by supervisor)_
 
-### Monita post-treatment
+## Monita post-treatment
 
 For the MONITA HVDC, post-treatment is necessary:
 Its nodes are all present in the Italian IGM, but we need to have the XKOTR120 and XKOTR220 nodes in Montenegro's IGM to
@@ -43,5 +43,5 @@ And here's how the balance adjustment targets are calculated :
 $NP_{TARGET} = NP_{BCI w/oHVDC}+ outBciFlows$
 
 It is therefore necessary that the nodes XCEPR120 and XCEPR220 be counted in the _outBciNetPosition_ for Italy and that
-the nodes XKOTR120 and XKTRO220 be counted in the _outBciNetPosition_ for Montenegro to compute the correct balance
+the nodes XKOTR120 and XKOTR220 be counted in the _outBciNetPosition_ for Montenegro to compute the correct balance
 adjustment targets.

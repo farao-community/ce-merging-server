@@ -31,6 +31,7 @@ It works with these input files :
 - **Net Position Forecast (NPF)**: contains the TSO's daily predictions for power generation / consumption, 
 - **Generation Load Shift Key (GLSK)**: describes how a shift in power should be distributed among all the grid's nodes,
 - **Feasibility Ranges & External Constraints**: define constraints on some quantities for nodes / areas,
+- **Italian Bidding Zones**: contains information about Italy's internal bidding zone, in regard to the UCTE nodes
 - **OLF parameters**: there are a few files that specify parameters for the load flow calculation on different occurrences :
   - Base Case Improvement
   - Balances Adjustment
