@@ -49,7 +49,7 @@ In addition, there's also a computation for internal Italian exchanges, based on
   - Add it to the flow between zones, using from/to info from the aforementioned file, with Italian bidding zones EICs.
 
 ## Merging Logs
-What is called merging logs (or merging report) is a report file that contains 4 types of reports :
+What is called merging logs is a report file that contains 4 types of reports :
 
 - **Report for CE hubs :** contains net positions, generation and load quantities, and global balances (global net positions without HVDC) for each Country in CE,
 - **Report for Non-CE hubs :** contains initial and final target global net positions, generation and load quantities, and global balances (global net positions without HVDC), for each country outside CE,
