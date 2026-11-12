@@ -12,7 +12,7 @@ RefProg schedules calculations are done depending on the type of border as follo
 - Retrieve the **CGM Net Positions** artifact file which contains virtual hubs exchanges for each country.
 - Modelisation of boundary exchanges follows the following format:
   - **From:**  Country EIC 
-  - **To:**    Virtual hub 
+  - **To:**    Virtual hub EIC
   - **Value:** Flow on virtual hub connection
 
   
@@ -23,7 +23,7 @@ RefProg schedules calculations are done depending on the type of border as follo
 - Modelisation of boundary exchanges follows the following format:
   - **From:**  Country EIC 
   - **To:**    Country EIC 
-  - **Value:** Calculated net position
+  - **Value:** Flow between countries
 
 ### Exchanges in CE region (without virtual hubs):
 - Retrieve **CGM Net Positions** artifact, which contains target net position in CE region,
