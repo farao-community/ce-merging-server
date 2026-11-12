@@ -54,7 +54,7 @@ What is called merging logs (or merging report) is a report file that contains 4
 - **Report for CE hubs :** contains net positions, generation and load quantities, and global balances (global net positions without HVDC) for each Country in CE,
 - **Report for Non-CE hubs :** contains initial and final target global net positions, generation and load quantities, and global balances (global net positions without HVDC), for each country outside CE,
 - **Report for TSO :** contains global balances, generation and load quantities, only for German TSOs,
-- **Flow report on SI-IT :** contains data about the exchanges between [Divača and Padriciano](/doc/hourly_task/step_details/divacaPadriciano.md).
+- **Flow report on SI-IT :** contains data about the exchanges between [Divača and Padriciano](/doc/hourly_task/step_details/specialPst.md).
 
 ## Quality Checks
 [Previously mentioned](/doc/overview.md) GLSK and IGM quality checks are also part of the outputs provided by the merging tool.

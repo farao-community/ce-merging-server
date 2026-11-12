@@ -6,25 +6,13 @@ the same order as in the process.
 The initial calculation of the net positions is done on all the IGMs:
 either the artifacts created in the previous steps or the input IGMs as-is if it's not concerned by these.
 
-The computation is detailed [here](/doc/hourly_task/step_details/initialNp.md); its result is saved in a JSON file named _igmsNetPositions.json_.
+The computation is detailed [here](/doc/hourly_task/step_details/initialNp.md); its result is saved in an artifact file.
 
 ## Topological merge
 This step consists in merging the previously mentioned IGM in one CGM file, of type 2D / country code UX; this network is then stored as an artifact.
 
 ## PiSa displacement
-In the case of Piemonte-Savoie HVDC, we have to "move" the border to different terminals. In the network model, that means having some X-Nodes transformed into normal nodes, and inversely : 
-- **FFG.IL/11/12/13/14** become X-Nodes (**XFG**...)
-- **XPI_GI11/12** become normal Italian nodes (**IPI**...)
-
-To achieve that, because we are changing two kinds of nodes at the same time, we must proceed in order :
-- Check if any defined line would become a line between X-Nodes. If such a case arise :
-  - if the line is disconnected, remove it from the network
-  - if not, stop there and raise an exception
-- Depending on the appearance/disappearance of boundary lines, there could be [tie lines](https://javadoc.io/doc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/TieLine.html) that would no longer exist: we delete them early on to be able to create the desired network elements.
-- Handle the change of line type : 
-  - A [boundary line](https://javadoc.io/doc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/BoundaryLine.html) could become a [simple line](https://javadoc.io/doc/com.powsybl/powsybl-core/2.6.1/com/powsybl/iidm/network/Line.html), or the other way around,
-  - There could also be a boundary line that we have to "invert": in addition to the changes in names, we have to feed the terminal data from what will become the boundary line's terminal.
-- Then, all the nodes and network elements referring to them are renamed, using a custom [PowSyBl naming strategy](https://powsybl.readthedocs.io/projects/powsybl-core/en/latest/grid_features/network_modifications/topology_modifications.html#naming-strategy).
+Some nodes have to be displaced to be able to represent the PiSa HVDC as desired : [details here](/doc/hourly_task/step_details/pisa.md).
 
 ## Recessivity alignment
 Since two TSOs can provide different statuses for the same X-Node, there is a notion of recessive and reference countries:
@@ -41,99 +29,22 @@ In addition, we align the outage statuses (if one node is disconnected, we do th
 
 ## GLSK quality check
 Consists of analyzing the GLSK input and comparing it to the available network elements.
-This step is decomposed into two parts: GLSK quality report generation and actual GLSK export.
-
-### Quality report generation
-The generated quality report is an XML file that can contain warnings if:
-- An explicitly named node cannot be found in the CGM,
-- An explicitly named node is found, but no correct associated resource (Generator or Load) can be found in the CGM,
-- An explicitly named resource is found, but is not connected to the main synchronous component of the CGM.
-
-### Actual GLSK generation
-We then create a new GLSK, filtering blocks like this:
-- If the associated GLSK is a country GLSK block, no modification is done,
-- If the associated GLSK is an auto GLSK block, invalid nodes are removed,
-- If the associated GLSK is a manual GLSK block, invalid nodes are removed, and explicit factors are rescaled proportionally to their initial value to have a 100% factors sum.
-
-If multiple blocks were used with a share value different of 100% (e.g., one GSK and one LSK), the share is never modified, except if one of the associated blocks is empty after previous filtering.
-In that case, the other associated blocks share value is rescaled proportionally to their initial value to have a 100% share sum.
-
-#### Special case : Italian bidding zones
-In the case of Italy, we may receive a GLSK with data for each [italian bidding zone](https://eepublicdownloads.entsoe.eu/clean-documents/cep/implementation/BZ/A4_BZRM_CSI_SQ.pdf). To be able to use it for the following computations, we have to transform it to a single Italian block. 
-
-Depending on the inputs :
-- If any bidding zone is defined with a *\<CountryGSK\>* block, we create an Italian block with a country block within.
-- Else, we get all Italian bidding zone's nodes and group them in a single Italian block with an *\<AutoNode\>* list. If we encounter manual nodes, we convert them to auto nodes, stripping their factor.
+This step produces two artifacts: GLSK quality report generation and corrected GLSK export. Both are detailed [here](/doc/hourly_task/step_details/glsk.md).
 
 ## Base case improvement
 This step is a first calculation on net positions, to bring the ones outside the feasibility ranges to acceptable values. More details in the [Base Case Improvement page](/doc/hourly_task/step_details/bci.md).
 
-The result of this step is the _bciOutputs.json_ artifact file.
 
 ## Target net positions computation
-The aim of this step is the computation of the target net positions, i.e., the net positions to which we'll shift the CGM in the next step, as follows:
+The aim of this step is the computation of the target net positions, i.e., the net positions to which we'll shift the CGM in the next step, as described [here](/doc/hourly_task/step_details/targetNp.md).
 
-$NP_{TARGET} = NP_{BCIw/oHVDC} + outBciFlows$
+## Balances adjustment
+Balances adjustment consists in shifting the CGM to the global target net positions. it is detailed in [this page](/doc/hourly_task/step_details/balancesAdjustment.md).
 
-with :
-- $NP_{BCIw/oHVDC}$: The net position of the BCI output without the HVDCs,
-- $outBciFlows$: HVDC Flows $+$ Flows out to areas not configured in the region configuration file.
-
-There are a few special cases:
-### Alegro countries
-To compensate for the fact that Alegro initial flows are already taken into account in the BCI target NP,
-we add to the previous formula the gap between target and initial flow for AL_BE for Belgium (respectively AL_DE for germany) :
-
-### German virtual hubs
-Some German virtual hubs have codes not beginning with X (**D2HWKR1D**, **D8BWW_25**...). 
-To keep coherence between the target net position and the net position computed with loadflow, we subtract the flow of these virtual hubs from the target NP.
-
-In the end, given:
-- the Alegro mismatch $M_{AL}(country) =$ Alegro target flow – Alegro initial flow, 
-- $FLOW_{VHw/oX}$ the sum of flows over german VH not starting with X,
-
-we have:
-
-$NP_{TARGET}(BE) = NP_{BCIw/oHVDC}(BE) + outBciFlows + M_{AL}(BE)$
-
-$NP_{TARGET}(DE) = NP_{BCIw/oHVDC}(DE) + outBciFlows + M_{AL}(DE) - FLOW_{VHw/oX}$
-
-## Balances Adjustment
-Balances adjustment consists in shifting the CGM to the global target net positions.
-
-To execute this step, we have to convert the current CGM to XIIDM format, then back to UCTE for the output.
-
-### Balances area definition
-Balances adjustment algorithm is based on the definition of balance areas. Each area is defined by three important elements:
-
-- Area definition: the way to compute its net position on a network instance (e.g., area based on a country),
-- Target net position: the expected value, at the end of the algorithm, of the area net position as calculated using the previous description,
-- GLSK: the way in which a modification in injection changes the net position of the area.
-
-For this particular process, an area is created for each UCTE country. 
-
-### Balancing algorithm
-The net position of the country is calculated as the sum of:
-- Active loads of XNodes connected to a [substation](https://javadoc.io/doc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/Substation.html) in the country,
-- Leaving flows of lines connected :
-  - in the country on one side
-  - outside the country on the other side
-
-The flow leaving side 1 is calculated as $\frac{(P_1 - P_2)}{2}$ with $P_x$ being the flow of side $x$, calculated by a load flow.
-
-With this definition of net position, the target value for each area is the global net position including HVDCs for each country.
-
-If a country does not provide GLSK (as it is the case for countries outside the CE region), 
-a country LSK is created, dispatching the flows proportionally on all loads. 
-The balances adjustment ignores the $P_{min}$ / $P_{max}$ limitation of generators.
-
-The algorithm is iterative: at each iteration, each area's net position mismatch is redispatched via the area's GLSK. 
-
-It continues until the sum of the square mismatches is lower than a certain threshold, or until it reaches the maximum number of iterations. 
-This threshold and the max number of iterations are both configurable in the app.
+The result of this step is a balanced CGM.
 
 ## Special PST treatment
-Some PST (Phase Shift Transformers) require special treatments: [Divača / Padriciano](/doc/hourly_task/step_details/divacaPadriciano.md) and [some austrian PSTs](/doc/hourly_task/step_details/austrianPsts.md).
+Some PST (Phase Shift Transformers) require special treatments Divača / Padriciano described in [this page](/doc/hourly_task/step_details/specialPst.md).
 
 ## Slack compensation
 Before exporting the CGM, this step changes the setpoints of generators and loads to take into account the slack imbalance distributed by the loadflow.

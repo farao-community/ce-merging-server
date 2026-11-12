@@ -1,4 +1,7 @@
-# Divača / Padriciano procedures
+# Special PST procedures
+Reminder : PST = **P**hase **S**hift **T**ransformer
+
+## Divača / Padriciano procedures
 
 The merging process supports two mutually exclusive procedures regarding the tap position of the PST Padriciano and the PST Divača.
 

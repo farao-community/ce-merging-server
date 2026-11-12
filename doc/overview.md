@@ -14,7 +14,7 @@ The nominal merging case is (done either by API call or with Swagger for testing
   - a merging version.
 - Run it with the provided daily task ID.
 
-Each of these steps corresponds to a REST endpoint; there are several other endpoints providing configurations or a given task's specific inputs, outputs, or intermediate files (called **Artifacts**).
+Each of these steps corresponds to a REST endpoint; there are several other endpoints providing configurations or a given task's specific inputs, outputs, or intermediate files (called [**Artifacts**](/doc/hourly_task/artifacts.md)).
 
 For more detail on the endpoints, see the **Controller** classes.
 
