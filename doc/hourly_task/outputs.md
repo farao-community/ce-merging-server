@@ -26,7 +26,7 @@ RefProg schedules calculations are done depending on the type of border as follo
   - **Value:** Calculated net position
 
 ### Exchanges in CE region (without virtual hubs):
-- Retrieve **BCI response** artifact, which contains target net position in CE region,
+- Retrieve **CGM Net Positions** artifact, which contains target net position in CE region,
 - Get the [Bec Sharing Keys](/doc/globalGridConfigurations.md) information as a matrix ,
 - Compute the NP using the formula for the flow on each CE border, noted $X$ ; summing over other countries $i$ :
 ![CE net position formula](refprog_border.png)
@@ -57,4 +57,4 @@ What is called merging logs (or merging report) is a report file that contains 4
 - **Flow report on SI-IT :** contains data about the exchanges between [Divača and Padriciano](/doc/hourly_task/step_details/divacaPadriciano.md).
 
 ## Quality Checks
-[Previously mentioned](/README.md) GLSK and IGM quality checks are also part of the outputs provided by the merging tool.
+[Previously mentioned](/doc/overview.md) GLSK and IGM quality checks are also part of the outputs provided by the merging tool.

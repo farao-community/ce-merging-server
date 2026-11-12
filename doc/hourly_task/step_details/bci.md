@@ -1,10 +1,12 @@
 # Base Case Improvement
-This page describes how the shifts to apply to active bidding zones are calculated if there are inactive bidding zones.
+## Active and inactive bidding zone
+The base case improvement algorithm use the notion of active and inactive bidding zones.
 
 What inactive means is that, for this zone, the initial CE target NP was outside the feasibility ranges. Therefore, its CE NP is fixed to the min or max value defined in its feasibility range.
 
-In contrast, active bidding zones participate in the compensation because their initial CE target NP was inside the feasibility range.
+In contrast, active bidding zones participate in the compensation because their initial CE target NP was inside the feasibility range. These are the zones for which we calculate a shift in this step.
 
+## Actual calculation
 Given :
 - $NPx$: Initial CE NP,
 - $NeededShift$: The difference between the target NP and the feasibility ranges max/min (whichever is closer to NP),

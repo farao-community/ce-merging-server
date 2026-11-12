@@ -94,9 +94,9 @@ In the end, given:
 
 we have:
 
-$NP_{TARGET}(BE) = NP_{BCI}(BE) + outBciFlows + M_{AL}(BE)$
+$NP_{TARGET}(BE) = NP_{BCIw/oHVDC}(BE) + outBciFlows + M_{AL}(BE)$
 
-$NP_{TARGET}(DE) = NP_{BCI}(DE) + outBciFlows + M_{AL}(DE) - FLOW_{VHw/oX}$
+$NP_{TARGET}(DE) = NP_{BCIw/oHVDC}(DE) + outBciFlows + M_{AL}(DE) - FLOW_{VHw/oX}$
 
 ## Balances Adjustment
 Balances adjustment consists in shifting the CGM to the global target net positions.
@@ -119,7 +119,7 @@ The net position of the country is calculated as the sum of:
   - in the country on one side
   - outside the country on the other side
 
-The leaving flow is calculated as the mean of origin and extremity flows calculated by a loadflow.
+The flow leaving side 1 is calculated as $\frac{(P_1 - P_2)}{2}$ with $P_x$ being the flow of side $x$, calculated by a load flow.
 
 With this definition of net position, the target value for each area is the global net position including HVDCs for each country.
 
