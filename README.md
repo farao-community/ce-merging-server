@@ -31,14 +31,16 @@ It works with these input files :
 - **Net Position Forecast (NPF)**: contains the TSO's daily predictions for power generation / consumption, 
 - **Generation Load Shift Key (GLSK)**: describes how a shift in power should be distributed among all the grid's nodes,
 - **Feasibility Ranges & External Constraints**: define constraints on some quantities for nodes / areas,
-- **Italian Bidding Zones**: contains information about Italy's internal bidding zone, in regard to the UCTE nodes
+- **Italian Bidding Zones**: contains information about Italy's internal bidding zone, in regard to the UCTE nodes,
 - **OLF parameters**: there are a few files that specify parameters for the load flow calculation on different occurrences :
   - Base Case Improvement
   - Balances Adjustment
   - AC loadflow
   - DC loadflow
 
-One can provide additional files if a change in configuration is needed: [more info here](/doc/globalGridConfigurations.md).
+#### Global configuration
+These are not inputs as they are not linked to a particular task, but one can apply changes on the [configuration files](/doc/globalGridConfigurations.md).
+
 ### Merging steps
 #### Hourly
 - [Inputs preparation](/doc/hourly_task/inputPreparation.md)

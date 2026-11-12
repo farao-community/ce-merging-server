@@ -1,8 +1,6 @@
 # Task processing - input preparation
 Before merging the provided inputs, we have to apply some transformations and do some checks first on the individual inputs, that we'll describe here.
 
-As of writing, one paragraph below <=> one service called in the **MergingService** class.
-
 ## X-Node IGM status
 For every X-Node found in IGMs, we check if there are inconsistencies :
 - Is there an X-Node appearing only in one IGM?

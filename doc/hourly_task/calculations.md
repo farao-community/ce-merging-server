@@ -20,11 +20,11 @@ To achieve that, because we are changing two kinds of nodes at the same time, we
 - Check if any defined line would become a line between X-Nodes. If such a case arise :
   - if the line is disconnected, remove it from the network
   - if not, stop there and raise an exception
-- Depending on the appearance/disappearance of boundary lines, there could be [tie lines](https://javadoc.io/doc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/TieLine.html) that could no longer exist: we delete them early on to be able to create the desired network elements.
+- Depending on the appearance/disappearance of boundary lines, there could be [tie lines](https://javadoc.io/doc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/TieLine.html) that would no longer exist: we delete them early on to be able to create the desired network elements.
 - Handle the change of line type : 
   - A [boundary line](https://javadoc.io/doc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/BoundaryLine.html) could become a [simple line](https://javadoc.io/doc/com.powsybl/powsybl-core/2.6.1/com/powsybl/iidm/network/Line.html), or the other way around,
   - There could also be a boundary line that we have to "invert": in addition to the changes in names, we have to feed the terminal data from what will become the boundary line's terminal.
-- Then, all the nodes and network elements referring to them are renamed through a custom [PowSyBl naming strategy](https://powsybl.readthedocs.io/projects/powsybl-core/en/latest/grid_features/network_modifications/topology_modifications.html#naming-strategy).
+- Then, all the nodes and network elements referring to them are renamed, using a custom [PowSyBl naming strategy](https://powsybl.readthedocs.io/projects/powsybl-core/en/latest/grid_features/network_modifications/topology_modifications.html#naming-strategy).
 
 ## Recessivity alignment
 Since two TSOs can provide different statuses for the same X-Node, there is a notion of recessive and reference countries:
@@ -59,11 +59,11 @@ If multiple blocks were used with a share value different of 100% (e.g., one GSK
 In that case, the other associated blocks share value is rescaled proportionally to their initial value to have a 100% share sum.
 
 #### Special case : Italian bidding zones
-In the case of Italy, we can receive a GLSK with data for the [italian bidding zones](https://eepublicdownloads.entsoe.eu/clean-documents/cep/implementation/BZ/A4_BZRM_CSI_SQ.pdf) separately. To use it for the following computations, we have to transform it to a single Italian input. 
+In the case of Italy, we may receive a GLSK with data for each [italian bidding zone](https://eepublicdownloads.entsoe.eu/clean-documents/cep/implementation/BZ/A4_BZRM_CSI_SQ.pdf). To be able to use it for the following computations, we have to transform it to a single Italian block. 
 
 Depending on the inputs :
-- If any bidding zone is defined with a <CountryGSK> block, we create an Italian block with a country block within.
-- Else, we get all Italian bidding zone's nodes and group them in a single Italian block with an <AutoNode> list. If we encounter manual nodes, we convert them to auto nodes, stripping their factor.
+- If any bidding zone is defined with a *\<CountryGSK\>* block, we create an Italian block with a country block within.
+- Else, we get all Italian bidding zone's nodes and group them in a single Italian block with an *\<AutoNode\>* list. If we encounter manual nodes, we convert them to auto nodes, stripping their factor.
 
 ## Base case improvement
 This step is a first calculation on net positions, to bring the ones outside the feasibility ranges to acceptable values. More details in the [Base Case Improvement page](/doc/hourly_task/step_details/bci.md).
