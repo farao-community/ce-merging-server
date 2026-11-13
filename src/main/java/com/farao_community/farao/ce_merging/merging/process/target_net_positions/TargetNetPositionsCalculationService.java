@@ -31,7 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isAnXNode;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isNormalNode;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BCI_OUTPUT_FILE;
@@ -94,11 +95,7 @@ public class TargetNetPositionsCalculationService {
     }
 
     private static void applyVirtualHubsGaps(final Map<String, Double> results, final Map<String, Double> virtualHubsGaps) {
-
-        virtualHubsGaps.forEach((country, gap) ->
-                results.put(country, results.getOrDefault(country, 0.0) - gap
-                )
-        );
+        virtualHubsGaps.forEach((country, gap) -> results.put(country, results.getOrDefault(country, 0.0) - gap));
     }
 
     private static double calculateOutBciNetPosition(final String country, final NetPositions netPositions, final AlegroData alegroNetPosition) {
@@ -118,10 +115,7 @@ public class TargetNetPositionsCalculationService {
     }
 
     private static double getGermanNonXVirtualHubFlows(final NetPositions netPositions) {
-        return netPositions.getVirtualHubsExchanges().entrySet().stream()
-                .filter(entry -> !isAnXNode(entry.getKey()))
-                .mapToDouble(Map.Entry::getValue)
-                .sum();
+        return sum(netPositions.getVirtualHubsExchanges().entrySet(), Map.Entry::getValue, e -> isNormalNode(e.getKey()));
     }
 
     private static Map<String, Double> getTargetNetPositionsFromBciOutput(final MergingTask task) {

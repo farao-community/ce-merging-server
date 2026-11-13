@@ -9,7 +9,6 @@ package com.farao_community.farao.ce_merging.merging.process.german_pre_merge;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
-import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
@@ -38,6 +36,7 @@ import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.get
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getComponentMode;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWithVirtualHub;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE;
 import static com.powsybl.iidm.network.Country.DE;
 import static java.lang.Math.abs;
@@ -98,13 +97,9 @@ public class GermanMismatchCompensationService {
     }
 
     double getInitialInternalNetPosition(final NetPositionsResults germanNetPositions) {
-        return Stream.of(GermanTso.values())
-                .map(GermanTso::name)
-                .map(germanNetPositions::get)
-                .filter(Objects::nonNull)
-                .map(NetPositions::getGlobalDetailedExchanges)
-                .mapToDouble(ex -> ex.getOrDefault(DE.name(), 0.))
-                .sum();
+        return sum(GermanTso.stream().map(GermanTso::name).map(germanNetPositions::get),
+                   np -> np.getGlobalDetailedExchanges().getOrDefault(DE.name(), 0.),
+                   Objects::nonNull);
     }
 
     private void compensateGermanMismatch(final Network network,
@@ -118,10 +113,7 @@ public class GermanMismatchCompensationService {
                 .toList();
 
         LOGGER.info("Absolute proportional share is applied to compensate German mismatch ({} MW)", mismatch);
-        final double totalExternalNetPosition = externalBoundaryLines.stream()
-                .map(line -> getBorderFlow(line, componentMode))
-                .mapToDouble(Math::abs)
-                .sum();
+        final double totalExternalNetPosition = sum(externalBoundaryLines.stream(), l -> abs(getBorderFlow(l, componentMode)));
 
         LOGGER.info("Sum of external Net positions for Germany is {} MW", totalExternalNetPosition);
         if (totalExternalNetPosition != 0) {

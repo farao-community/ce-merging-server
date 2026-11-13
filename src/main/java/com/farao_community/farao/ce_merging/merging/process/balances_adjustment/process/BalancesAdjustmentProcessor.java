@@ -8,6 +8,7 @@ package com.farao_community.farao.ce_merging.merging.process.balances_adjustment
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.util.StreamsUtils;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.powsybl.balancesadjustment.computation.BalanceComputation;
 import com.powsybl.balancesadjustment.computation.BalanceComputationArea;
@@ -23,7 +24,6 @@ import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Load;
 import com.powsybl.iidm.network.Network;
-import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.networkarea.CountryAreaFactory;
@@ -46,6 +46,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REP
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactNetwork;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getCountry;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile;
 import static com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process.ZonalDataManager.getZonalDataFromGlsk;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BALANCED_CGM_FILE;
@@ -59,6 +60,7 @@ import static java.lang.Double.isNaN;
 import static java.lang.Math.abs;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
+import static java.util.function.UnaryOperator.identity;
 import static java.util.stream.Collectors.toMap;
 
 public class BalancesAdjustmentProcessor {
@@ -71,9 +73,9 @@ public class BalancesAdjustmentProcessor {
     private final BalanceComputationParameters balanceComputationParameters;
     private final MergingTask task;
     private final Network network;
-    private final Map<String, Double> targetNetPositions;
-    private final Map<String, Scalable> loadShiftKeysByCountry;
-    private Map<String, NetworkAreaFactory> networkAreas;
+    private final Map<Country, Double> targetNetPositions;
+    private final Map<Country, Scalable> loadShiftKeysByCountry;
+    private Map<Country, NetworkAreaFactory> networkAreas;
     private final List<BalanceComputationArea> areas;
     private final CeMergingConfiguration configuration;
 
@@ -83,7 +85,7 @@ public class BalancesAdjustmentProcessor {
                                        final Supplier<BalanceComputationParameters> parametersSupplier) throws IOException {
         this.task = task;
         this.configuration = configuration;
-        this.network = Network.read(Paths.get(task.getArtifactPath(TGM_FILE_AFTER_RECESSIVITY)));
+        this.network = task.getArtifact(TGM_FILE_AFTER_RECESSIVITY, Network.class);
         this.loadFlowRunnerSupplier = runnerSupplier;
         this.balanceComputationParameters = getOrDefaultAdjustmentParameters(task, parametersSupplier);
         this.targetNetPositions = getTargetNetPositionsAreasFromFile(task.getArtifactFile(BALANCES_ADJUSTMENT_TARGET_FILE));
@@ -104,14 +106,16 @@ public class BalancesAdjustmentProcessor {
         }
     }
 
-    final Map<String, Scalable> getLoadShiftKeysByCountry() throws IOException {
+    final Map<Country, Scalable> getLoadShiftKeysByCountry() throws IOException {
         final Map<String, Scalable> eicScalable = getZonalDataFromGlsk(task.getArtifactFile(GLSK_QUALITY_CORRECTED_FILE),
                 network, task.getTargetDate());
 
+        final Map<String, String> countryByEic =  task.getConfigurations().getRegionConfiguration().getCountriesByEicCode();
+
         return eicScalable.entrySet()
                 .stream()
-                .collect(toMap(v -> task.getConfigurations().getRegionConfiguration().getCountriesByEicCode().get(v.getKey()),
-                        Map.Entry::getValue));
+                .collect(toMap(v -> Country.valueOf(countryByEic.get(v.getKey())),
+                               Map.Entry::getValue));
     }
 
     private BalanceComputationParameters getOrDefaultAdjustmentParameters(final MergingTask task,
@@ -164,7 +168,7 @@ public class BalancesAdjustmentProcessor {
     private List<BalanceComputationArea> generateAreas() {
         runLoadFlow(network, loadFlowRunnerSupplier, balanceComputationParameters.getLoadFlowParameters());
 
-        this.networkAreas = network.getCountries().stream().collect(toMap(Country::toString, CountryAreaFactory::new));
+        this.networkAreas = network.getCountries().stream().collect(toMap(identity(), CountryAreaFactory::new));
 
         createMissingData();
         distributeNetPositionsMismatch();
@@ -177,10 +181,8 @@ public class BalancesAdjustmentProcessor {
     }
 
     private void distributeNetPositionsMismatch() {
-        final double initialNetPositionSum = networkAreas.values().stream()
-            .mapToDouble(networkArea -> networkArea.create(network).getNetPosition())
-            .sum();
-        final double targetNetPositionSum = networkAreas.keySet().stream().mapToDouble(targetNetPositions::get).sum();
+        final double initialNetPositionSum =  StreamsUtils.sum(networkAreas.values(), na -> na.create(network).getNetPosition());
+        final double targetNetPositionSum = StreamsUtils.sum(networkAreas.keySet(), targetNetPositions::get);;
 
         final double netPositionMismatch = initialNetPositionSum - targetNetPositionSum;
 
@@ -190,39 +192,34 @@ public class BalancesAdjustmentProcessor {
 
         LOGGER.warn("Important mismatch between initial total net positions ({}) and targeted ones ({}). a redispatch will occur on each area", initialNetPositionSum, targetNetPositionSum);
 
-        final double absTargetNetPositionSum = networkAreas.keySet().stream()
-            .map(targetNetPositions::get)
-            .mapToDouble(Math::abs)
-            .sum();
+        final double absTargetNetPositionSum = StreamsUtils.sum(networkAreas.keySet(), area -> abs(targetNetPositions.get(area)));
 
         if (absTargetNetPositionSum == 0) {
             LOGGER.warn("All net positions of area are 0");
             return;
         }
 
-        networkAreas.forEach((country, areaFactory) -> {
-            double initialTarget = targetNetPositions.get(country);
-            double finalTarget = initialTarget + netPositionMismatch * abs(initialTarget) / absTargetNetPositionSum;
-            LOGGER.info("Country {} target net position modified from {} to {}", country, initialTarget, finalTarget);
-            targetNetPositions.put(country, finalTarget);
-        });
+        networkAreas.forEach((country, f) -> applyMismatchOnArea(country, netPositionMismatch, absTargetNetPositionSum));
+    }
+
+    private void applyMismatchOnArea(final Country country, final double mismatch, final double absTotal) {
+        final double initialTarget = targetNetPositions.get(country);
+        final double finalTarget = initialTarget + mismatch * abs(initialTarget) / absTotal;
+        LOGGER.info("Country {} target net position modified from {} to {}", country, initialTarget, finalTarget);
+        targetNetPositions.put(country, finalTarget);
     }
 
     private void createMissingData() {
         network.getCountries().forEach(country -> {
-            final String countryCode = country.toString();
-            final NetworkAreaFactory countryArea = networkAreas.get(countryCode);
-            targetNetPositions.computeIfAbsent(countryCode, s -> countryArea.create(network).getNetPosition());
-            loadShiftKeysByCountry.computeIfAbsent(countryCode, s -> createLoadShiftKey(country));
+            targetNetPositions.computeIfAbsent(country, s -> networkAreas.get(country).create(network).getNetPosition());
+            loadShiftKeysByCountry.computeIfAbsent(country, s -> createLoadShiftKey(country));
         });
     }
 
     private BalanceComputationArea createArea(final Country country) {
-        final String countryCode = country.toString();
-        final NetworkAreaFactory networkArea = networkAreas.get(countryCode);
-        final Scalable lsk = loadShiftKeysByCountry.get(countryCode);
-        final double targetNetPosition = targetNetPositions.get(countryCode);
-        return new BalanceComputationArea(country.getFullName(), networkArea, lsk, targetNetPosition);
+        final Scalable lsk = loadShiftKeysByCountry.get(country);
+        final double targetNetPosition = targetNetPositions.get(country);
+        return new BalanceComputationArea(country.getFullName(), networkAreas.get(country), lsk, targetNetPosition);
     }
 
     private Scalable createLoadShiftKey(final Country country) {
@@ -233,41 +230,30 @@ public class BalancesAdjustmentProcessor {
             .toList();
         // In case of loads with negative flow (meaning power generation), we should take absolute value.
         // meaning if a country's shift is positive,  loads with negative power will decrease (generation increase) and inversely
-        final double totalCountryP = countryLoads.stream()
-            .map(Load::getP0)
-            .mapToDouble(Math::abs)
-            .sum();
+        final double totalCountryP = StreamsUtils.sum(countryLoads, l -> abs(l.getP0()));
 
         final List<Scalable> lsks = new ArrayList<>();
         final List<Double> percentages = new ArrayList<>();
         if (totalCountryP != 0) {
+            final double percentagePerMW = 100 / totalCountryP;
             countryLoads.forEach(load -> {
-                final double percentage = 100 * abs(load.getP0()) / totalCountryP;
-                percentages.add(percentage);
+                percentages.add(abs(load.getP0()) * percentagePerMW);
                 lsks.add(Scalable.onLoad(load.getId(), -MAX_VALUE, MAX_VALUE));
             });
         } else {
-            LOGGER.warn("Total country P is 0");
+            LOGGER.warn("Total {} active power is 0", country.getFullName());
         }
         return Scalable.proportional(percentages, lsks);
 
     }
 
     private static boolean isSynchronizedWithCountry(final Terminal terminal, final Country country) {
-        return terminal.isConnected() && hasBusInMainSynchronousComponent(terminal) && isInCountry(terminal, country);
+        return terminal.isConnected() && hasBusInMainSynchronousComponent(terminal) && getCountry(terminal) == country;
     }
 
     private static boolean hasBusInMainSynchronousComponent(final Terminal terminal) {
         final Bus bus = terminal.getBusBreakerView().getConnectableBus();
         return bus != null && bus.isInMainSynchronousComponent();
-    }
-
-    private static boolean isInCountry(final Terminal terminal, final Country country) {
-        return terminal.getVoltageLevel()
-            .getSubstation()
-            .map(Substation::getNullableCountry)
-            .map(country::equals)
-            .orElse(false);
     }
 
     private void balanceAreas() {

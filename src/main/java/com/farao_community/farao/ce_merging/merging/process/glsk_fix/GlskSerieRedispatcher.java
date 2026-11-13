@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -11,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 
 public final class GlskSerieRedispatcher {
     private static final double TARGET_SHARE_VALUE = 100.0;
@@ -26,7 +35,7 @@ public final class GlskSerieRedispatcher {
 
     static void redispatchShareValue(final Map<String, List<GlskRedispatchingEntity>> valuesByArea, final GSKDocument gskDocument) {
         valuesByArea.forEach((area, entities) -> {
-            final double shareSum = calculateShareSum(entities);
+            final double shareSum =sum(entities, GlskRedispatchingEntity::getShare);
             if (shareSum < TARGET_SHARE_VALUE) {
                 LOGGER.info("The sum of shares for area {} is {}, a share adjustment will be made.", area, shareSum);
                 final double shareAdjustment = TARGET_SHARE_VALUE - shareSum;
@@ -55,11 +64,4 @@ public final class GlskSerieRedispatcher {
                 .filter(gskSeriesType -> gskSeriesType.getTimeSeriesIdentification().getV().equals(id))
                 .findFirst();
     }
-
-    private static double calculateShareSum(final List<GlskRedispatchingEntity> entities) {
-        return entities.stream()
-                .mapToDouble(GlskRedispatchingEntity::getShare)
-                .sum();
-    }
-
 }

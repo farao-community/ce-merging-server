@@ -20,6 +20,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
+
 public final class GlskBlockRedispatcher {
     private static final double ROUNDING_SCALE = 1e6;
     private static final double EXPECTED_FACTOR_SUM = 1.0;
@@ -27,7 +29,10 @@ public final class GlskBlockRedispatcher {
     private GlskBlockRedispatcher() {
     }
 
-    static void storeValue(final Map<String, List<GlskRedispatchingEntity>> redispatchingEntitiesByGskName, final String gskName, final String nodeName, final double factor) {
+    static void storeValue(final Map<String, List<GlskRedispatchingEntity>> redispatchingEntitiesByGskName,
+                           final String gskName,
+                           final String nodeName,
+                           final double factor) {
         redispatchingEntitiesByGskName.computeIfAbsent(gskName, key -> new ArrayList<>()).add(new GlskRedispatchingEntity(nodeName, factor));
     }
 
@@ -42,17 +47,18 @@ public final class GlskBlockRedispatcher {
 
         nodes.forEach(node -> fixFactorValue(incorrectValuesByGskName, correctValuesByGskName, gskName, node));
 
-        final double factorSum = nodes.stream()
-                .mapToDouble(node -> {
-                    if (node.getFactor() == null || node.getFactor().getV() == null) {
-                        throw new CeMergingException("Missing factor value for GLSK node");
-                    }
-                    return node.getFactor().getV().doubleValue();
-                })
-                .sum();
+        final double factorSum = sum(nodes, GlskBlockRedispatcher::getValidNodeFactor);
+
         if (factorSum != EXPECTED_FACTOR_SUM) {
             normalizeFactors(factorSum, nodes);
         }
+    }
+
+    private static double getValidNodeFactor(final ManualNodesType node) {
+        if (node.getFactor() == null || node.getFactor().getV() == null) {
+            throw new CeMergingException("Missing factor value for GLSK node");
+        }
+        return node.getFactor().getV().doubleValue();
     }
 
     private static void fixFactorValue(final Map<String, List<GlskRedispatchingEntity>> incorrectValuesByGskName,
@@ -81,23 +87,21 @@ public final class GlskBlockRedispatcher {
         return roundGlsk(factorValue + incorrectSum * factorValue / correctSum);
     }
 
-    private static double calculateBlockSum(final Map<String, List<GlskRedispatchingEntity>> valueByGskName, final String gskName) {
-        return valueByGskName.getOrDefault(gskName, Collections.emptyList()).stream()
-                .collect(Collectors.toMap(
-                        GlskRedispatchingEntity::getId,
-                        GlskRedispatchingEntity::getShare,
-                        (existing, replacement) -> replacement
-                ))
-                .values()
-                .stream()
-                .mapToDouble(Double::doubleValue)
-                .sum();
+    private static double calculateBlockSum(final Map<String, List<GlskRedispatchingEntity>> valueByGskName,
+                                            final String gskName) {
+        return sum(valueByGskName.getOrDefault(gskName, Collections.emptyList()).stream()
+                           .collect(Collectors.toMap(
+                                   GlskRedispatchingEntity::getId,
+                                   GlskRedispatchingEntity::getShare,
+                                   (existing, replacement) -> replacement
+                           )).values());
     }
 
-    private static void normalizeFactors(final double factorSum, final List<ManualNodesType> nodes) {
+    private static void normalizeFactors(final double factorSum,
+                                         final List<ManualNodesType> nodes) {
         final double difference = factorSum - EXPECTED_FACTOR_SUM;
         nodes.stream()
-                .max(Comparator.comparingDouble((ManualNodesType node) -> getFactor(node)))
+                .max(Comparator.comparingDouble(GlskBlockRedispatcher::getFactor))
                 .filter(node -> getFactor(node) > 0)
                 .ifPresent(maxNode -> {
                     final double factorValue = getFactor(maxNode);

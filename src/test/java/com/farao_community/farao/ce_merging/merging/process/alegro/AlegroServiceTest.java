@@ -31,6 +31,7 @@ import java.util.List;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.BCI_OUTPUT_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
@@ -151,7 +152,7 @@ class AlegroServiceTest {
         final SavedFile tgmFile = copyResource("network_alegro_outage.uct");
         final Network network = Network.read(tgmFile.getPath());
         final List<BoundaryLine> alegroBoundaryLines = network.getBoundaryLineStream()
-                .filter(boundaryLine -> VIRTUAL_HUB_ALEGRO_BE_NODE_NAME.equals(boundaryLine.getPairingKey()) || VIRTUAL_HUB_ALEGRO_DE_NODE_NAME.equals(boundaryLine.getPairingKey()))
+                .filter(isPairedWith(VIRTUAL_HUB_ALEGRO_BE_NODE_NAME).or(isPairedWith(VIRTUAL_HUB_ALEGRO_DE_NODE_NAME)))
                 .toList();
         assertEquals(-100., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_BE_NODE_NAME), ASSERTION_DELTA);
         assertEquals(100., getAlegroP0(network, VIRTUAL_HUB_ALEGRO_DE_NODE_NAME), ASSERTION_DELTA);
@@ -175,12 +176,12 @@ class AlegroServiceTest {
         }
     }
 
-    private double getAlegroP0(final Network network, final String pairingKey) {
+    private double getAlegroP0(final Network network, final String node) {
         return network.getBoundaryLineStream()
-                .filter(boundaryLine -> pairingKey.equals(boundaryLine.getPairingKey()))
+                .filter(isPairedWith(node))
                 .findFirst()
                 .orElseThrow(() -> new CeMergingException(
-                        "No boundary line found with pairing key " + pairingKey))
+                        "No boundary line found with pairing key " + node))
                 .getP0();
     }
 

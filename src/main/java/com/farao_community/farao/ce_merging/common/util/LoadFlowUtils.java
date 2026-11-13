@@ -8,8 +8,8 @@ package com.farao_community.farao.ce_merging.common.util;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.powsybl.commons.report.ReportNode;
-import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.BoundaryLine;
+import com.powsybl.iidm.network.Bus;
 import com.powsybl.iidm.network.Generator;
 import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Network;
@@ -30,6 +30,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DC;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getLeavingFlow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInMainConnectedComponent;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 import static com.powsybl.iidm.network.ComponentConstants.MAIN_NUM;
 import static com.powsybl.loadflow.LoadFlowParameters.BalanceType.PROPORTIONAL_TO_GENERATION_P;
 import static com.powsybl.loadflow.LoadFlowParameters.BalanceType.PROPORTIONAL_TO_LOAD;
@@ -114,7 +115,7 @@ public final class LoadFlowUtils {
     }
 
     private static boolean hasBalancedGeneration(final Network network) {
-        return 0 == network.getGeneratorStream().mapToDouble(Generator::getTargetP).sum();
+        return 0 == sum(network.getGeneratorStream(), Generator::getTargetP);
     }
 
     private static String getDivergenceMessage(final String networkId,
@@ -147,7 +148,7 @@ public final class LoadFlowUtils {
         return results.isEmpty() || results.getFirst().getStatus() != CONVERGED;
     }
 
-    public static Predicate<Injection> isConnected(final LoadFlowParameters.ComponentMode componentMode) {
+    public static <T extends Injection<?>> Predicate<T> isConnected(final LoadFlowParameters.ComponentMode componentMode) {
         return injection -> isTerminalConnected(injection.getTerminal(), componentMode);
     }
 
