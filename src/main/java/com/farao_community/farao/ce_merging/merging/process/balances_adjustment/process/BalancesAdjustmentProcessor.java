@@ -182,7 +182,7 @@ public class BalancesAdjustmentProcessor {
 
     private void distributeNetPositionsMismatch() {
         final double initialNetPositionSum =  StreamsUtils.sum(networkAreas.values(), na -> na.create(network).getNetPosition());
-        final double targetNetPositionSum = StreamsUtils.sum(networkAreas.keySet(), targetNetPositions::get);;
+        final double targetNetPositionSum = StreamsUtils.sum(networkAreas.keySet(), targetNetPositions::get);
 
         final double netPositionMismatch = initialNetPositionSum - targetNetPositionSum;
 

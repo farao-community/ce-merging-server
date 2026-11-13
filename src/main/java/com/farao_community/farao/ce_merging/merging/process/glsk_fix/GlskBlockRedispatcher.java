@@ -13,14 +13,14 @@ import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualNodesType;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
+import static java.util.Collections.emptyList;
+import static java.util.Comparator.comparingDouble;
+import static java.util.stream.Collectors.toMap;
 
 public final class GlskBlockRedispatcher {
     private static final double ROUNDING_SCALE = 1e6;
@@ -66,10 +66,7 @@ public final class GlskBlockRedispatcher {
                                        final String gskName,
                                        final ManualNodesType manualNode) {
         if (incorrectValuesByGskName.containsKey(gskName) && correctValuesByGskName.containsKey(gskName)) {
-            if (manualNode.getFactor() == null || manualNode.getFactor().getV() == null) {
-                throw new CeMergingException("Missing factor value for GLSK node");
-            }
-            final double factorValue = manualNode.getFactor().getV().doubleValue();
+            final double factorValue = getValidNodeFactor(manualNode);
             final double newFactor = calculateRedispatchedFactorValue(incorrectValuesByGskName, correctValuesByGskName, gskName, factorValue);
             manualNode.getFactor().setV(BigDecimal.valueOf(newFactor));
         }
@@ -89,8 +86,8 @@ public final class GlskBlockRedispatcher {
 
     private static double calculateBlockSum(final Map<String, List<GlskRedispatchingEntity>> valueByGskName,
                                             final String gskName) {
-        return sum(valueByGskName.getOrDefault(gskName, Collections.emptyList()).stream()
-                           .collect(Collectors.toMap(
+        return sum(valueByGskName.getOrDefault(gskName, emptyList()).stream()
+                           .collect(toMap(
                                    GlskRedispatchingEntity::getId,
                                    GlskRedispatchingEntity::getShare,
                                    (existing, replacement) -> replacement
@@ -101,7 +98,7 @@ public final class GlskBlockRedispatcher {
                                          final List<ManualNodesType> nodes) {
         final double difference = factorSum - EXPECTED_FACTOR_SUM;
         nodes.stream()
-                .max(Comparator.comparingDouble(GlskBlockRedispatcher::getFactor))
+                .max(comparingDouble(GlskBlockRedispatcher::getFactor))
                 .filter(node -> getFactor(node) > 0)
                 .ifPresent(maxNode -> {
                     final double factorValue = getFactor(maxNode);

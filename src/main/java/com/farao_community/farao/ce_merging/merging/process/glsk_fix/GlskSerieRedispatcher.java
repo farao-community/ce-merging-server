@@ -35,7 +35,7 @@ public final class GlskSerieRedispatcher {
 
     static void redispatchShareValue(final Map<String, List<GlskRedispatchingEntity>> valuesByArea, final GSKDocument gskDocument) {
         valuesByArea.forEach((area, entities) -> {
-            final double shareSum =sum(entities, GlskRedispatchingEntity::getShare);
+            final double shareSum = sum(entities, GlskRedispatchingEntity::getShare);
             if (shareSum < TARGET_SHARE_VALUE) {
                 LOGGER.info("The sum of shares for area {} is {}, a share adjustment will be made.", area, shareSum);
                 final double shareAdjustment = TARGET_SHARE_VALUE - shareSum;

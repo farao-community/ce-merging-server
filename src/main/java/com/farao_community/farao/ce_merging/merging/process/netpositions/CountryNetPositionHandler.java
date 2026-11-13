@@ -170,7 +170,6 @@ public final class CountryNetPositionHandler {
                    isInCountry(country).and(isConnected(componentMode)));
     }
 
-
     /**
      * Applies to nodes present in virtual hubs configuration but not starting by X (such as D2HWKR1D)
      * This flow is not taken into account in NetworkArea.getNetposition,

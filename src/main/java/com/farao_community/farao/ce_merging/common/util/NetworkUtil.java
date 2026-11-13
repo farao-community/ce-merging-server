@@ -134,7 +134,7 @@ public final class NetworkUtil {
     }
 
     public static boolean isNormalNode(final String nodeName) {
-        return nodeName.startsWith(XNODES_PREFIX);
+        return !nodeName.startsWith(XNODES_PREFIX);
     }
 
     /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
