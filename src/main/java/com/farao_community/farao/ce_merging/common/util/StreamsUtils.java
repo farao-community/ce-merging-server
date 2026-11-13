@@ -21,38 +21,38 @@ public final class StreamsUtils {
         // utility class
     }
 
-    public static Double sumCollection(final Collection<Double> collection) {
-        return sumProperty(collection, d -> d);
+    public static Double sum(final Collection<Double> collection) {
+        return sum(collection, d -> d);
     }
 
-    public static <T> Double sumProperty(final Collection<T> collection,
-                                         final ToDoubleFunction<T> getter) {
-        return sumProperty(collection.stream(), getter);
+    public static <T> Double sum(final Collection<? extends T> collection,
+                                 final ToDoubleFunction<? super T> term) {
+        return sum(collection.stream(), term);
     }
 
-    public static <T> Double sumPropertyFiltered(final Collection<T> collection,
-                                                 final ToDoubleFunction<T> getter,
-                                                 final Predicate<T> filter) {
-        return sumPropertyFiltered(collection.stream(), getter, filter);
+    public static <T> Double sum(final Collection<? extends T> collection,
+                                 final ToDoubleFunction<? super T> term,
+                                 final Predicate<? super T> filter) {
+        return sum(collection.stream(), term, filter);
     }
 
-    public static <T> Double sumProperty(final Stream<T> stream,
-                                         final ToDoubleFunction<T> getter) {
+    public static <T> Double sum(final Stream<? extends T> stream,
+                                 final ToDoubleFunction<? super T> term) {
         return stream
-                .mapToDouble(getter)
+                .mapToDouble(term)
                 .sum();
     }
 
-    public static <T> Double sumPropertyFiltered(final Stream<T> stream,
-                                                 final ToDoubleFunction<T> getter,
-                                                 final Predicate<T> filter) {
+    public static <T> Double sum(final Stream<? extends T> stream,
+                                 final ToDoubleFunction<? super T> term,
+                                 final Predicate<? super T> filter) {
         return stream
                 .filter(filter)
-                .mapToDouble(getter)
+                .mapToDouble(term)
                 .sum();
     }
 
-    public static <T> Stream<T> streamIterable(final Iterable<T> iterable) {
+    public static <T> Stream<T> stream(final Iterable<T> iterable) {
         return StreamSupport.stream(iterable.spliterator(), false);
     }
 

@@ -29,6 +29,7 @@ import java.util.Optional;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.getCountryFromCode;
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapItBzToIt;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_PRE_MERGED_IGM;
 
@@ -133,7 +134,7 @@ public class HvdcXNodeAlignmentService {
                                         final String country,
                                         final String location) {
         network.getBoundaryLineStream()
-                .filter(boundaryLine -> boundaryLine.getPairingKey().equals(nodeName))
+                .filter(isPairedWith(nodeName))
                 .findFirst()
                 .ifPresentOrElse(
                         boundaryLine -> {

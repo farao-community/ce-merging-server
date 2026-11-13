@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumProperty;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE;
 import static com.powsybl.iidm.network.Country.DE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -120,17 +120,16 @@ class GermanMismatchCompensationServiceTest {
         final double sumIntNetPositions = service.getInitialInternalNetPosition(results);
         final double sumExtNetPositions = getInitialExternalNetPosition(results);
         final double sumInitialNetPositionWithoutVirtualHubs = sumExtNetPositions + sumIntNetPositions;
-        final double otherWayToSumInitialNpWoVh = results.netPositionsByCountryMap().values()
-                .stream().mapToDouble(netPositions -> netPositions.getGlobalNetPosition()
-                        .getWithoutVirtualHubs()).sum();
+        final double otherWayToSumInitialNpWoVh = sum(results.netPositionsByCountryMap().values(),
+                                                      np -> np.getGlobalNetPosition().getWithoutVirtualHubs());
 
         assertEquals(0, sumIntNetPositions, VALUE_TOLERANCE);
         assertEquals(3820, sumExtNetPositions, VALUE_TOLERANCE);
         assertEquals(3820, sumInitialNetPositionWithoutVirtualHubs, VALUE_TOLERANCE); //values from convergence
         assertEquals(otherWayToSumInitialNpWoVh, sumInitialNetPositionWithoutVirtualHubs, VALUE_TOLERANCE);
 
-        final double sumInitialGeneration = sumProperty(getInjectionValues(results), GenerationAndLoadQuantity::generation);
-        final double sumInitialLoad = sumProperty(getInjectionValues(results), GenerationAndLoadQuantity::load);
+        final double sumInitialGeneration = sum(getInjectionValues(results), GenerationAndLoadQuantity::generation);
+        final double sumInitialLoad = sum(getInjectionValues(results), GenerationAndLoadQuantity::load);
 
         assertEquals(-40, sumInitialGeneration, VALUE_TOLERANCE);
         assertEquals(1580, sumInitialLoad, VALUE_TOLERANCE);
@@ -145,13 +144,9 @@ class GermanMismatchCompensationServiceTest {
     }
 
     private double getInitialExternalNetPosition(final NetPositionsResults germanNetPositionResults) {
-        return GermanTso.stream()
-                .map(GermanTso::name)
-                .map(germanNetPositionResults::get)
-                .filter(Objects::nonNull)
-                .mapToDouble(res -> res.getGlobalNetPosition().getWithoutVirtualHubs()
-                                    - res.getGlobalDetailedExchanges().getOrDefault(DE.name(), 0.))
-                .sum();
+        return sum(GermanTso.stream().map(GermanTso::name).map(germanNetPositionResults::get),
+                   res -> res.getGlobalNetPosition().getWithoutVirtualHubs() - res.getGlobalDetailedExchanges().getOrDefault(DE.name(), 0.),
+                   Objects::nonNull);
     }
 
 }
