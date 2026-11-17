@@ -9,21 +9,23 @@ It calculates continental (i.e. no virtual hubs) and virtual hubs exchanges on t
 RefProg schedules calculations are done depending on the type of border as follows:
 
 ### Virtual hubs exchanges in and outside CE region:
-- Retrieve the **CGM Net Positions** artifact file which contains virtual hubs exchanges for each country.
-- Modelisation of boundary exchanges follows the following format:
-  - **From:**  Country EIC 
-  - **To:**    Virtual hub EIC
-  - **Value:** Flow on virtual hub connection
+Retrieve the **CGM Net Positions** artifact file which contains virtual hubs exchanges for each country.
+
+Modelisation of boundary exchanges follows the following format:
+- **From:**  Country EIC 
+- **To:**    Virtual hub EIC
+- **Value:** Flow on virtual hub connection
 
   
 ### Exchanges outside CE region (without virtual hubs):
 - Retrieve the **Net Position Forecast** file (PEVF) from task inputs,
 - Extract the exchanges out of CE region,
 - Sum them to get an area's net position.
-- Modelisation of boundary exchanges follows the following format:
-  - **From:**  Country EIC 
-  - **To:**    Country EIC 
-  - **Value:** Flow between countries
+
+Modelisation of boundary exchanges follows the following format:
+- **From:**  Country EIC 
+- **To:**    Country EIC 
+- **Value:** Flow between countries
 
 ### Exchanges in CE region (without virtual hubs):
 - Retrieve **CGM Net Positions** artifact, which contains target net position in CE region,
