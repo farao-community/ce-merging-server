@@ -9,44 +9,47 @@ It calculates continental (i.e. no virtual hubs) and virtual hubs exchanges on t
 RefProg schedules calculations are done depending on the type of border as follows:
 
 ### Virtual hubs exchanges in and outside CE region:
-- Retrieve the **CGM Net Positions** artifact file which contains virtual hubs exchanges for each country.
-- Modelisation of boundary exchanges follows the following format:
-  - **From:**  Country EIC 
-  - **To:**    Virtual hub EIC
-  - **Value:** Flow on virtual hub connection
+Retrieve the **CGM Net Positions** artifact file which contains virtual hubs exchanges for each country.
+
+Modelisation of boundary exchanges follows the following format:
+- **From:**  Country EIC 
+- **To:**    Virtual hub EIC
+- **Value:** Flow on virtual hub connection
 
   
 ### Exchanges outside CE region (without virtual hubs):
 - Retrieve the **Net Position Forecast** file (PEVF) from task inputs,
 - Extract the exchanges out of CE region,
 - Sum them to get an area's net position.
-- Modelisation of boundary exchanges follows the following format:
-  - **From:**  Country EIC 
-  - **To:**    Country EIC 
-  - **Value:** Flow between countries
+
+Modelisation of boundary exchanges follows the following format:
+- **From:**  Country EIC 
+- **To:**    Country EIC 
+- **Value:** Flow between countries
 
 ### Exchanges in CE region (without virtual hubs):
 - Retrieve **CGM Net Positions** artifact, which contains target net position in CE region,
 - Get the [Bec Sharing Keys](/doc/globalGridConfigurations.md) information as a matrix ,
 - Compute the NP using the formula for the flow on each CE border, noted $X$ ; summing over other countries $i$ :
+
 ![CE net position formula](refprog_border.png)
   - $K$ is the Sharing-Keys-BEC matrix ⇒ $K_{X,i}$ is the coefficient for an exchange between countries $X$ and $i$.
   - $NP$ is the net position of the CGM obtained at the end of CGM calculations. 
 - Subtract the virtual hubs exchanges from global exchanges border by border
-- Modelisation of boundary exchanges follows the following format:
-  - **From:** Country EIC 
-  - **To:**  Country EIC 
-  - **Value:** Flow between countries
 
+Modelisation of boundary exchanges follows the following format:
+- **From:** Country EIC 
+- **To:**  Country EIC 
+- **Value:** Flow between countries
 
 ### Exchanges between Italian bidding zones
 The reference program should reference Italian bidding zones, not Italy as a whole. 
 
 In addition, there's also a computation for internal Italian exchanges, based on the notion of "internal tie-lines" :
 - Get the internal tie-lines from the Italian bidding zones input file,
-- For each one :
-  - Get its flow from the final CGM,
-  - Add it to the flow between zones, using from/to info from the aforementioned file, with Italian bidding zones EICs.
+- For each one, there is a branch object with nodes "from" and "to" :
+  - Find all the CGM lines linking these two,
+  - For each line, add the flow on it to the flow between its related bidding zones
 
 ## Merging Logs
 What is called merging logs is a report file that contains 4 types of reports :

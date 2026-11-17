@@ -48,6 +48,7 @@ class InternalBiddingZonesManagerTest {
 
     private static final String LINE_1 = "LINE_1";
     private static final String LINE_2 = "LINE_2";
+    private static final String LINE_3 = "LINE_3";
     private static final String NODE_A = "NODE_A";
     private static final String NODE_B = "NODE_B";
     private static final String NODE_C = "NODE_C";
@@ -56,6 +57,7 @@ class InternalBiddingZonesManagerTest {
     private static final String BZ_PATH = "path/to/ita_bz";
     private static final double A_TO_B_FLOW = 100;
     private static final double C_TO_D_FLOW = 50;
+    private static final double A_TO_B_FLOW_2 = 25;
 
     @Test
     void shouldSumFlowsOnInternalTieLines() {
@@ -65,7 +67,8 @@ class InternalBiddingZonesManagerTest {
         final Network network = mock(Network.class);
         final Line line1 = mockLine(LINE_1, NODE_A, NODE_B, A_TO_B_FLOW);
         final Line line2 = mockLine(LINE_2, NODE_C, NODE_D, C_TO_D_FLOW);
-        doAnswer(call -> Stream.of(line1, line2))
+        final Line line3 = mockLine(LINE_3, NODE_A, NODE_B, A_TO_B_FLOW_2);
+        doAnswer(call -> Stream.of(line1, line2, line3))
                 .when(network).getLineStream();
         try (final MockedStatic<JaxbUtils> jaxbUtils = mockStatic(JaxbUtils.class);
              final MockedStatic<Network> networkStatic = mockStatic(Network.class);
@@ -82,12 +85,14 @@ class InternalBiddingZonesManagerTest {
                     .thenReturn(100.0);
             networkUtil.when(() -> getLineFlow(line2))
                     .thenReturn(50.0);
+            networkUtil.when(() -> getLineFlow(line3))
+                    .thenReturn(A_TO_B_FLOW_2);
 
             final InternalBiddingZonesManager manager = new InternalBiddingZonesManager(getTask(),
                                                                                         CeTestUtils::mockLoadFlowRunner);
 
-            // Expected: sum of flows on both lines
-            assertEquals(A_TO_B_FLOW + C_TO_D_FLOW, manager.getTotalFlow(INOR, ICNO), 0.01);
+            // Expected: sum of flows on all three lines, including both parallel A-to-B lines
+            assertEquals(A_TO_B_FLOW + C_TO_D_FLOW + A_TO_B_FLOW_2, manager.getTotalFlow(INOR, ICNO), 0.01);
         }
     }
 
@@ -96,9 +101,10 @@ class InternalBiddingZonesManagerTest {
         final InternalTieLinesType internalTieLines = mock(InternalTieLinesType.class);
         when(biddingZoneDoc.getInternalTieLines()).thenReturn(internalTieLines);
 
-        // Create two "tie lines" from INOR to ICNO
+        // Create three "tie lines" from INOR to ICNO, including two between the same nodes
         when(internalTieLines.getInternalTieLine()).thenReturn(List.of(mockItalianTieLine(LINE_1, NODE_A, NODE_B),
-                                                                       mockItalianTieLine(LINE_2, NODE_C, NODE_D)));
+                                                                       mockItalianTieLine(LINE_2, NODE_C, NODE_D),
+                                                                       mockItalianTieLine(LINE_3, NODE_A, NODE_B)));
         return biddingZoneDoc;
     }
 

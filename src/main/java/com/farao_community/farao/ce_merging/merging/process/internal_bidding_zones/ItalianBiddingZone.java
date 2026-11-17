@@ -12,6 +12,7 @@ import com.farao_community.farao.ce_merging.xsd.internal_bidding_zones.InternalT
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 public enum ItalianBiddingZone {
     INOR("10Y1001A1001A73I"),
@@ -40,11 +41,10 @@ public enum ItalianBiddingZone {
         }
     }
 
-    public static boolean lineJoinsZones(final InternalTieLineType line,
-                                         final ItalianBiddingZone bz1,
-                                         final ItalianBiddingZone bz2) {
-        return lineComesFrom(line, bz1) && lineGoesTo(line, bz2)
-               || lineComesFrom(line, bz2) && lineGoesTo(line, bz1);
+    public static Predicate<InternalTieLineType> lineJoinsZones(final ItalianBiddingZone bz1,
+                                                                final ItalianBiddingZone bz2) {
+        return line -> lineComesFrom(line, bz1) && lineGoesTo(line, bz2)
+                       || lineComesFrom(line, bz2) && lineGoesTo(line, bz1);
     }
 
     public static ItalianBiddingZone getByEic(final String eic) {
