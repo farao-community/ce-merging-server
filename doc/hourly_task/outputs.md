@@ -29,15 +29,16 @@ RefProg schedules calculations are done depending on the type of border as follo
 - Retrieve **CGM Net Positions** artifact, which contains target net position in CE region,
 - Get the [Bec Sharing Keys](/doc/globalGridConfigurations.md) information as a matrix ,
 - Compute the NP using the formula for the flow on each CE border, noted $X$ ; summing over other countries $i$ :
+
 ![CE net position formula](refprog_border.png)
   - $K$ is the Sharing-Keys-BEC matrix ⇒ $K_{X,i}$ is the coefficient for an exchange between countries $X$ and $i$.
   - $NP$ is the net position of the CGM obtained at the end of CGM calculations. 
 - Subtract the virtual hubs exchanges from global exchanges border by border
-- Modelisation of boundary exchanges follows the following format:
-  - **From:** Country EIC 
-  - **To:**  Country EIC 
-  - **Value:** Flow between countries
 
+Modelisation of boundary exchanges follows the following format:
+- **From:** Country EIC 
+- **To:**  Country EIC 
+- **Value:** Flow between countries
 
 ### Exchanges between Italian bidding zones
 The reference program should reference Italian bidding zones, not Italy as a whole. 

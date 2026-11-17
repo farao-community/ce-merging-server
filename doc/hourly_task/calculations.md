@@ -44,7 +44,7 @@ Balances adjustment consists in shifting the CGM to the global target net positi
 The result of this step is a balanced CGM.
 
 ## Special PST treatment
-Some PST (Phase Shift Transformers) require special treatments Divača / Padriciano described in [this page](/doc/hourly_task/step_details/specialPst.md).
+Some PST (Phase Shift Transformers) require special treatments, as described in [this page](/doc/hourly_task/step_details/specialPst.md).
 
 ## Slack compensation
 Before exporting the CGM, this step changes the setpoints of generators and loads to take into account the slack imbalance distributed by the loadflow.

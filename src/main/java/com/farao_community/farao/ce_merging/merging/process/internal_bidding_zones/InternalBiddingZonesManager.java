@@ -18,12 +18,13 @@ import com.powsybl.loadflow.LoadFlow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getLineFlow;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getVlIdOnSide;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.distinctByKey;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.lineJoinsZones;
 import static com.powsybl.iidm.network.TwoSides.ONE;
 import static com.powsybl.iidm.network.TwoSides.TWO;
@@ -44,27 +45,38 @@ public class InternalBiddingZonesManager {
     public double getTotalFlow(final ItalianBiddingZone bzFrom,
                                final ItalianBiddingZone bzTo) {
         double sum = 0.0;
-        for (final InternalTieLineType tieLine : biddingZoneData.getInternalTieLines().getInternalTieLine()) {
+
+        final List<InternalTieLineType> tieLinesNoDuplicates = biddingZoneData.getInternalTieLines().getInternalTieLine().stream()
+                .filter(distinctByKey(l -> l.getBranch().getFrom() + "-" + l.getBranch().getTo()))
+                .toList();
+
+        for (final InternalTieLineType tieLine : tieLinesNoDuplicates) {
             if (lineJoinsZones(tieLine, bzFrom, bzTo)) {
+                final BranchType branch = tieLine.getBranch();
                 // from -> to and to -> from must be counted with opposite signs (respectively +/-)
                 final double flowSign = bzFrom.getFlowSign(tieLine);
-                sum += toLine(tieLine.getBranch()).map(line -> flowSign * getLineFlow(line)).orElse(0.);
+                final List<Line> lines = getLines(branch);
+
+                if (lines.isEmpty()) {
+                    LOGGER.warn("[{}-{}] line {} linking {} to {} through element {} not found in CGM",
+                                bzFrom, bzTo, tieLine.getId(), branch.getFrom(), branch.getTo(), branch.getElementName());
+                } else {
+                    for (final Line line : lines) {
+                        final double lineFlow = flowSign * getLineFlow(line);
+                        LOGGER.info("[{}-{}] adding {} MW flowing from {} to {} through line {}",
+                                    bzFrom, bzTo, lineFlow, branch.getFrom(), branch.getTo(), line.getId());
+                        sum += lineFlow;
+                    }
+                }
             }
         }
         return sum;
     }
 
-    private Optional<Line> toLine(final BranchType branch) {
-        final Optional<Line> optLine = cgm.getLineStream()
+    private List<Line> getLines(final BranchType branch) {
+        return cgm.getLineStream()
                 .filter(line -> areSameBranches(branch, line))
-                .findFirst();
-
-        if (optLine.isEmpty()) {
-            LOGGER.warn("line {} linking {} to {} either doesn't exist or is in outage",
-                        branch.getElementName(), branch.getFrom(), branch.getTo());
-        }
-
-        return optLine;
+                .toList();
     }
 
     private static boolean areSameBranches(final BranchType branch,
