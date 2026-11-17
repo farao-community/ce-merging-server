@@ -29,7 +29,7 @@ import static java.util.stream.Collectors.toMap;
 public class InternalBiddingZoneImportPostProcessor {//implements UcteExportPostProcessor {
 
     public static final String NAME = "ITA-BZ-POST-PROCESSOR";
-    private static final Function<Bus,String> BIDDING_ZONES_GROUP = b -> Optional.ofNullable(b.getProperty("internalBiddingZone")).orElse("UNKNOWN");
+    private static final Function<Bus, String> BIDDING_ZONES_GROUP = b -> Optional.ofNullable(b.getProperty("internalBiddingZone")).orElse("UNKNOWN");
     private static final String BZ_SUMMARY_PREFIX = "Bidding zones grouped in nodes of IT: ";
     private static final String BZ_INFO_FORMAT = "%s %d Nodes First Node: %s, Last Node: %s";
 
@@ -49,7 +49,7 @@ public class InternalBiddingZoneImportPostProcessor {//implements UcteExportPost
         final Map<String, List<Bus>> busesByBiddingZone = network.getBusBreakerView().getBusStream().collect(groupingBy(BIDDING_ZONES_GROUP));
         busesByBiddingZone.forEach((bz, buses) -> buses.sort(comparing(Bus::getId)));
 
-        return  network.getBusBreakerView().getBusStream().collect(toMap(Bus::getId, BIDDING_ZONES_GROUP));
+        return network.getBusBreakerView().getBusStream().collect(toMap(Bus::getId, BIDDING_ZONES_GROUP));
     }
 
     //@Override
@@ -67,9 +67,9 @@ public class InternalBiddingZoneImportPostProcessor {//implements UcteExportPost
         });
 
         headerComments.addFirst(nodeCountByBz.entrySet()
-                .stream()
-                .map(entry -> entry.getKey()+"="+entry.getValue().toString())
-                .collect(Collectors.joining(", "))
+                                        .stream()
+                                        .map(entry -> entry.getKey() + "=" + entry.getValue().toString())
+                                        .collect(Collectors.joining(", "))
         );
     }
 
@@ -82,10 +82,11 @@ public class InternalBiddingZoneImportPostProcessor {//implements UcteExportPost
 
     private Comparator<UcteNode> getZoneComparator(Network network) {
         final Map<String, String> bzByNodeName = biddingZoneByNodeName(network);
-       return (n1,n2) -> getZoneOf(n1, bzByNodeName).compareTo(getZoneOf(n2, bzByNodeName));
+        return (n1, n2) -> getZoneOf(n1, bzByNodeName).compareTo(getZoneOf(n2, bzByNodeName));
     }
 
-    private String getZoneOf(final UcteNode node, final Map<String, String> bzByNodeName) {
+    private String getZoneOf(final UcteNode node,
+                             final Map<String, String> bzByNodeName) {
         return bzByNodeName.get(node.getCode().toString());
     }
 
