@@ -47,9 +47,9 @@ The reference program should reference Italian bidding zones, not Italy as a who
 
 In addition, there's also a computation for internal Italian exchanges, based on the notion of "internal tie-lines" :
 - Get the internal tie-lines from the Italian bidding zones input file,
-- For each one :
-  - Get its flow from the final CGM,
-  - Add it to the flow between zones, using from/to info from the aforementioned file, with Italian bidding zones EICs.
+- For each one, there is a branch object with nodes "from" and "to" :
+  - Find all the CGM lines linking these two,
+  - For each line, add the flow on it to the flow between its related bidding zones
 
 ## Merging Logs
 What is called merging logs is a report file that contains 4 types of reports :
