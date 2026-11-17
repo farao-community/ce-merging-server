@@ -79,6 +79,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianGskFix.handleItalianRegionsGlsk;
 
 @Service
@@ -200,9 +201,9 @@ public class GlskQualityCheckService {
         gskSeries.getManualGSKBlock().forEach(manualblock -> manualNodes.addAll(manualblock.getManualNodes()));
         manualNodes.forEach(manualnode -> nodeNames.add(manualnode.getNodeName().getV()));
 
-        for (String nodeName : nodeNames) {
+        for (final String nodeName : nodeNames) {
             List<BoundaryLine> boundaryLines = network.getBoundaryLineStream()
-                    .filter(boundaryLine -> boundaryLine.getPairingKey().equals(nodeName))
+                    .filter(isPairedWith(nodeName))
                     .toList();
             if (boundaryLines.isEmpty()) {
                 reportNode.newReportNode()

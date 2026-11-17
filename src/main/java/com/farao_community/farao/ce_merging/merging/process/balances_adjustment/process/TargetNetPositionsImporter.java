@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process;
 
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.powsybl.iidm.network.Country;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,17 +24,18 @@ public final class TargetNetPositionsImporter {
         /* This utility class should not be instantiated */
     }
 
-    public static Map<String, Double> getTargetNetPositionsAreasFromFile(final File inputFile) throws IOException {
+    public static Map<Country, Double> getTargetNetPositionsAreasFromFile(final File inputFile) throws IOException {
         try (final FileInputStream fis = new FileInputStream(inputFile)) {
             return getTargetNetPositionsAreasFromFile(fis);
         }
     }
 
-    public static Map<String, Double> getTargetNetPositionsAreasFromFile(final InputStream input) {
+    public static Map<Country, Double> getTargetNetPositionsAreasFromFile(final InputStream input) {
         return JsonUtils.read(NetPositionJson.class, input)
             .netPositions()
             .stream()
-            .collect(toMap(AreaNetPosition::area, AreaNetPosition::netPosition));
+            .collect(toMap(areaNetPosition -> Country.valueOf(areaNetPosition.area),
+                           AreaNetPosition::netPosition));
     }
 
 

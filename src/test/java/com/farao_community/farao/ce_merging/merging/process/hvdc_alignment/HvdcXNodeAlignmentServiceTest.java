@@ -29,6 +29,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
@@ -115,7 +116,7 @@ public class HvdcXNodeAlignmentServiceTest {
 
     private static BoundaryLine getBoundaryLineFromNetwork(final Network network, final String nodeName) {
         return network.getBoundaryLineStream()
-                .filter(boundaryLine -> boundaryLine.getPairingKey().equals(nodeName))
+                .filter(isPairedWith(nodeName))
                 .findFirst()
                 .orElseThrow(() -> new CeMergingException("Unable to find boundary line " + nodeName + " in network " + network.getNameOrId()));
     }

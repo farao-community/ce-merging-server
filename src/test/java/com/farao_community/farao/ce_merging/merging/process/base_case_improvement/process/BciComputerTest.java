@@ -10,7 +10,6 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.Interval;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.inputs.ReferenceProgram;
-import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.netpositions.InRegionNetPositions;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciAreaResults;
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciComputationResult;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.process.BciComputerTest.ExpectedBciResults.values;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.assertions.BciAreaResultsAssert.assertThat;
@@ -172,13 +172,7 @@ class BciComputerTest {
     }
 
     private void assertRegionIsBalanced(final Map<String, BciAreaResults> results) {
-        final double totalInRegionNetPosition = results
-                .values()
-                .stream()
-                .map(BciAreaResults::getInRegionNetPositions)
-                .mapToDouble(InRegionNetPositions::target)
-                .sum();
-        assertEquals(0, totalInRegionNetPosition, EPSILON);
+        assertEquals(0, sum(results.values(), res -> res.getInRegionNetPositions().target()), EPSILON);
     }
 
     private record BciTestCase(ReferenceProgram referenceProgram,

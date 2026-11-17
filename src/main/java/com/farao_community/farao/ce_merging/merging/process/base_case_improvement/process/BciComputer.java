@@ -25,8 +25,7 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.function.ToDoubleFunction;
 
-import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumProperty;
-import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumPropertyFiltered;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 import static com.powsybl.iidm.network.Country.BE;
 import static com.powsybl.iidm.network.Country.DE;
 import static java.lang.Boolean.FALSE;
@@ -220,7 +219,7 @@ public class BciComputer {
     private void compensateRemainingImbalances() {
         final double totalImbalance = targetInRegionNpByArea.getTotalFlow();
 
-        final double totalFeasibilityRanges = sumProperty(feasibilityRanges.values(), Interval::getRange);
+        final double totalFeasibilityRanges = sum(feasibilityRanges.values(), Interval::getRange);
 
         if (totalFeasibilityRanges != 0) {
             targetInRegionNpByArea.shiftAllFlowsWith(areaId -> -totalImbalance
@@ -270,7 +269,7 @@ public class BciComputer {
         final double totalViolations = violationsByArea.getTotalFlow();
         final ToDoubleFunction<Double> toContraryViolation = v -> totalViolations < 0 ? max(v, 0.0) : min(v, 0.0);
 
-        return sumProperty(violationsByArea.values(), toContraryViolation);
+        return sum(violationsByArea.values(), toContraryViolation);
     }
 
     private double getAvailableShiftWithContraryViolation(final String area) {
@@ -289,7 +288,7 @@ public class BciComputer {
     private double computeTotalShiftAvailableFor(final Predicate<String> filterOnArea,
                                                  final ToDoubleFunction<String> areaToShift) {
 
-        return sumPropertyFiltered(targetInRegionNpByArea.keySet(), areaToShift, filterOnArea);
+        return sum(targetInRegionNpByArea.keySet(), areaToShift, filterOnArea);
     }
 
     private boolean isInContraryViolation(final double violation) {

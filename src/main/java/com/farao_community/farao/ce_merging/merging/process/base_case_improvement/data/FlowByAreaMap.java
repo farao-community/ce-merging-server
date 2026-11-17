@@ -13,7 +13,7 @@ import java.util.function.Function;
 import java.util.function.ToDoubleFunction;
 import java.util.stream.Collector;
 
-import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumCollection;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toMap;
@@ -63,7 +63,7 @@ public class FlowByAreaMap extends HashMap<String, Double> {
     }
 
     public Double getTotalFlow() {
-        return sumCollection(values());
+        return sum(values());
     }
 
     public static <T> Collector<T, ?, FlowByAreaMap> toFlowByAreaMap(final Function<? super T, String> keyMapper,

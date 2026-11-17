@@ -8,47 +8,58 @@ package com.farao_community.farao.ce_merging.merging.post_process.merging_logs;
 
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
-import com.farao_community.farao.ce_merging.common.util.JsonUtils;
 import com.farao_community.farao.ce_merging.common.util.LoadFlowUtils;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
+import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
+import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.getBorderFlow;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.isConnected;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isBorderOfZone;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWithVirtualHub;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
+import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE;
 
 @Service
 public class TsoInformationsService {
     private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
 
-    public TsoInformationsService(Supplier<LoadFlow.Runner> loadFlowRunnerSupplier) {
+    public TsoInformationsService(final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier) {
         this.loadFlowRunnerSupplier = loadFlowRunnerSupplier;
     }
 
-    public List<ReportCommonsInformation> calculateTsoInformations(final MergingTask task) {
+    public List<ReportCommonsInformation> calculateTsoInformations(final MergingTask task) throws FileNotFoundException {
         final LoadFlowParameters loadFlowParameters = task.getConfigurations().getLoadFlowParameters();
-        final LoadFlowParameters.ComponentMode componentModeLfParameter = LoadFlowUtils.getComponentMode(loadFlowParameters);
         final Network cgmNetwork = Network.read(task.getArtifactPath(ArtifactType.CGM_FILE_AFTER_PST));
         LoadFlowUtils.runLoadFlow(cgmNetwork, loadFlowRunnerSupplier, loadFlowParameters);
-        List<ReportCommonsInformation> reportCommonsInformationList = new ArrayList<>();
-        List<VirtualHubRecord> virtualHubList = task.getConfigurations().getVirtualHubList();
-        Set<String> germanZones = task.getConfigurations().getRegionConfiguration().getGermanyZone().keySet();
-        NetPositionsResults germanNetPositions = JsonUtils.read(NetPositionsResults.class, task.getArtifactPath(ArtifactType.GERMAN_IGMS_NET_POSITIONS_FILE));
-        germanZones.forEach(zone -> reportCommonsInformationList.add(
-                createReportCommonsInformationForZone(germanNetPositions, cgmNetwork, zone, componentModeLfParameter, virtualHubList)));
-        return reportCommonsInformationList;
+
+        NetPositionsResults germanNetPositions = task.getArtifact(GERMAN_IGMS_NET_POSITIONS_FILE, NetPositionsResults.class);
+
+        return task.getConfigurations().getRegionConfiguration().getGermanyZone().keySet().stream()
+                .map(zone -> createReportCommonsInformationForZone(germanNetPositions,
+                                                                   cgmNetwork,
+                                                                   zone,
+                                                                   LoadFlowUtils.getComponentMode(loadFlowParameters),
+                                                                   task.getConfigurations().getVirtualHubList()))
+                .toList();
     }
 
-    private ReportCommonsInformation createReportCommonsInformationForZone(final NetPositionsResults germanNetPositions, final Network cgmNetwork, final String zone, final LoadFlowParameters.ComponentMode componentModeLfParameter, List<VirtualHubRecord> virtualHubList) {
+    private ReportCommonsInformation createReportCommonsInformationForZone(final NetPositionsResults germanNetPositions,
+                                                                           final Network cgmNetwork,
+                                                                           final String zone,
+                                                                           final LoadFlowParameters.ComponentMode componentMode,
+                                                                           List<VirtualHubRecord> virtualHubList) {
         double generationIgm = 0.;
         double loadIgm = 0.;
         double globalBalanceIgm = 0.;
@@ -58,43 +69,43 @@ public class TsoInformationsService {
             loadIgm = netPositions.getGenerationAndLoadQuantity().load();
             globalBalanceIgm = netPositions.getGlobalNetPosition().getWithoutVirtualHubs();
         }
-        final double generationCgm = getCgmGenerationQuantity(cgmNetwork, zone, componentModeLfParameter);
-        final double loadCgm = getCgmLoadQuantity(cgmNetwork, zone, componentModeLfParameter);
-        final double globalBalanceCgm = getTsoGlobalNetPosition(cgmNetwork, zone, componentModeLfParameter, virtualHubList);
+        final double generationCgm = getCgmGenerationQuantity(cgmNetwork, zone, componentMode);
+        final double loadCgm = getCgmLoadQuantity(cgmNetwork, zone, componentMode);
+        final double globalBalanceCgm = getTsoGlobalNetPosition(cgmNetwork, zone, componentMode, virtualHubList);
         return new ReportCommonsInformation(zone, generationIgm, loadIgm, globalBalanceIgm, generationCgm, loadCgm, globalBalanceCgm);
     }
 
-    private double getTsoGlobalNetPosition(final Network network, final String zone, final LoadFlowParameters.ComponentMode componentModeLfParameter, final List<VirtualHubRecord> virtualHubList) {
-        double globalNetPositionWithoutVirtualHubs = network.getBoundaryLineStream()
-                .filter(boundaryLine -> NetworkUtil.isBorderOfZone(boundaryLine, zone) && !NetworkUtil.isPairedWithVirtualHub(boundaryLine, virtualHubList))
-                .mapToDouble(boundaryLine -> NetworkUtil.getBorderFlow(boundaryLine, componentModeLfParameter))
-                .sum();
+    private double getTsoGlobalNetPosition(final Network network,
+                                           final String zone,
+                                           final LoadFlowParameters.ComponentMode componentMode,
+                                           final List<VirtualHubRecord> virtualHubList) {
 
-        globalNetPositionWithoutVirtualHubs += network.getLineStream()
-                .filter(line -> NetworkUtil.isBorderOfZone(line, zone))
-                .mapToDouble(line -> NetworkUtil.getBorderFlow(line, zone))
-                .sum();
-
-        return globalNetPositionWithoutVirtualHubs;
+        return sum(network.getBoundaryLineStream(), bl -> getBorderFlow(bl, componentMode), isPairedWithVirtualHub(virtualHubList).and(isBorderOfZone(zone)))
+               + sum(network.getLineStream(), l -> NetworkUtil.getBorderFlow(l, zone), isBorderOfZone(zone));
     }
 
-    private double getCgmLoadQuantity(final Network network, final String zone, final LoadFlowParameters.ComponentMode componentModeLfParameter) {
-        return network.getLoadStream()
-                .filter(load -> belongsToZone(load.getNameOrId(), zone))
-                .filter(isConnected(componentModeLfParameter))
-                .mapToDouble(load -> Double.isNaN(load.getTerminal().getP()) ? 0 : load.getTerminal().getP())
-                .sum();
+    private double getCgmLoadQuantity(final Network network,
+                                      final String zone,
+                                      final LoadFlowParameters.ComponentMode componentMode) {
+        return sum(network.getLoadStream(),
+                   NetworkUtil::getInjectedPower,
+                   belongsToZone(zone).and(isConnected(componentMode)));
     }
 
-    private double getCgmGenerationQuantity(final Network network, final String zone, final LoadFlowParameters.ComponentMode componentModeLfParameter) {
-        return network.getGeneratorStream()
-                .filter(generator -> belongsToZone(generator.getNameOrId(), zone))
-                .filter(isConnected(componentModeLfParameter))
-                .mapToDouble(generator -> Double.isNaN(generator.getTerminal().getP()) ? 0 : -generator.getTerminal().getP())
-                .sum();
+    private double getCgmGenerationQuantity(final Network network,
+                                            final String zone,
+                                            final LoadFlowParameters.ComponentMode componentMode) {
+        return sum(network.getGeneratorStream(),
+                   NetworkUtil::getInjectedPower,
+                   belongsToZone(zone).and(isConnected(componentMode)));
     }
 
-    private boolean belongsToZone(final String nameOrId, final String zone) {
+    private <T extends Injection<?>> Predicate<T> belongsToZone(final String zone) {
+        return i -> belongsToZone(i.getNameOrId(), zone);
+    }
+
+    private boolean belongsToZone(final String nameOrId,
+                                  final String zone) {
         return nameOrId != null && nameOrId.length() >= 2 && zone.equals(nameOrId.substring(0, 2));
     }
 

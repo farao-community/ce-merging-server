@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.powsybl.ucte.converter.util.UcteConverterConstants.IS_COUPLER_PROPERTY_KEY;
 
 final class HvdcXNodeAlignment {
@@ -75,9 +76,9 @@ final class HvdcXNodeAlignment {
         }
     }
 
-    private Optional<BoundaryLine> findBoundaryLine(final Network network, final String pairingKey) {
+    private Optional<BoundaryLine> findBoundaryLine(final Network network, final String node) {
         return network.getBoundaryLineStream()
-                .filter(boundaryLine -> pairingKey.equals(boundaryLine.getPairingKey()))
+                .filter(isPairedWith(node))
                 .findFirst();
     }
 

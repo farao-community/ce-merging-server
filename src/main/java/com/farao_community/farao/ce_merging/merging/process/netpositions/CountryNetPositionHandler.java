@@ -25,7 +25,6 @@ import com.powsybl.iidm.network.Injection;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
-import com.powsybl.iidm.network.Terminal;
 import com.powsybl.loadflow.LoadFlowParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +50,8 @@ import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isHvd
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInCountry;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWithVirtualHub;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.zeroIfNaN;
-import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.streamIterable;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.stream;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.Country.DK;
 import static java.util.stream.Collectors.toSet;
@@ -165,12 +165,9 @@ public final class CountryNetPositionHandler {
     }
 
     private double sumOverCountry(final Stream<? extends Injection<?>> injectionStream) {
-        return injectionStream
-                .filter(isInCountry(country).and(isConnected(componentMode)))
-                .map(Injection::getTerminal)
-                .map(Terminal::getP)
-                .mapToDouble(NetworkUtil::zeroIfNaN)
-                .sum();
+        return sum(injectionStream,
+                   NetworkUtil::getInjectedPower,
+                   isInCountry(country).and(isConnected(componentMode)));
     }
 
     /**
@@ -276,8 +273,8 @@ public final class CountryNetPositionHandler {
     }
 
     private Stream<Bus> getSubstationBuses(final Substation substation) {
-        return streamIterable(substation.getVoltageLevels())
-                .flatMap(vl -> streamIterable(vl.getBusBreakerView().getBuses()));
+        return stream(substation.getVoltageLevels())
+                .flatMap(vl -> stream(vl.getBusBreakerView().getBuses()));
     }
 
     private void addToBorderExchange(final double flow,

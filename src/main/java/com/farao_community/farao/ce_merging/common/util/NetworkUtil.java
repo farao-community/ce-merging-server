@@ -68,6 +68,10 @@ public final class NetworkUtil {
         return countryCode.getUcteCode() + previousElementId.substring(1, endIndex);
     }
 
+    public static <T extends Injection<?>> double getInjectedPower(final T injection) {
+        return zeroIfNaN(injection.getTerminal().getP());
+    }
+
     /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                     CHECKS & PREDICATES
      -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
@@ -79,25 +83,25 @@ public final class NetworkUtil {
         return branch.getTerminal1().isConnected() && branch.getTerminal2().isConnected();
     }
 
-    public static Predicate<Injection> isInCountry(final Country country) {
+    public static <T extends Injection<?>> Predicate<T> isInCountry(final Country country) {
         return i -> getCountry(i) == country;
     }
 
-    public static Predicate<Branch> hasInId(final String nodeId) {
+    public static <T extends Branch<?>> Predicate<T> hasInId(final String nodeId) {
         return branch -> branch.getId().contains(nodeId);
     }
 
-    public static Predicate<Identifiable> isIdentifiedBy(final String idRegex) {
+    public static <T extends Identifiable<?>> Predicate<T> isIdentifiedBy(final String idRegex) {
         final Pattern idPattern = Pattern.compile(idRegex);
         return identifiable -> idPattern.matcher(identifiable.getId()).matches();
     }
 
-    public static boolean isInOutage(final Connectable connectable) {
+    public static <T extends Connectable<?>> boolean isInOutage(final T connectable) {
         return switch (connectable) {
             case TieLine tieLine -> isInOutage(tieLine.getBoundaryLine1()) || isInOutage(tieLine.getBoundaryLine2());
             case BoundaryLine boundaryLine -> isInOutage(boundaryLine);
             case Terminal terminal -> isInOutage(terminal);
-            case Branch<?> branch -> isInOutage(branch);
+            case Branch branch -> isInOutage(branch);
             default -> throw new CeMergingException("outage check not implemented for class %s".formatted(connectable.getClass().getName()));
         };
     }
@@ -110,7 +114,7 @@ public final class NetworkUtil {
         return terminal == null || !terminal.isConnected();
     }
 
-    private static boolean isInOutage(final Branch branch) {
+    private static <T extends Branch<?>> boolean isInOutage(final T branch) {
         return branch == null || isInOutage(branch.getTerminal1()) || isInOutage(branch.getTerminal2());
     }
 
@@ -129,8 +133,8 @@ public final class NetworkUtil {
         return l -> l.getPairingKey().equals(nodeName);
     }
 
-    public static boolean isAnXNode(final String nodeName) {
-        return nodeName.startsWith(XNODES_PREFIX);
+    public static boolean isNormalNode(final String nodeName) {
+        return !nodeName.startsWith(XNODES_PREFIX);
     }
 
     /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -256,14 +260,8 @@ public final class NetworkUtil {
         return boundaryLine.getTerminal().isConnected() ? zeroIfNaN(-boundaryLine.getBoundary().getP()) : 0;
     }
 
-    public static boolean isBorderOfZone(final BoundaryLine boundaryLine,
-                                         final String zone) {
-        return isBorderOfZone(boundaryLine.getId(), zone);
-    }
-
-    public static boolean isBorderOfZone(final Line line,
-                                         final String zone) {
-        return isBorderOfZone(line.getId(), zone);
+    public static <T extends Identifiable<?>> Predicate<T> isBorderOfZone(final String zone) {
+        return line -> isBorderOfZone(line.getId(), zone);
     }
 
     private static boolean isBorderOfZone(final String lineId,

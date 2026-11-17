@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.balances_adjustment.process;
 
+import com.powsybl.iidm.network.Country;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -20,7 +21,7 @@ class TargetNetPositionsImporterTest {
     @Test
     void getReferenceNetPositionsAreasFromFileTest() throws IOException {
         final File netPositionsFile = new File(getClass().getResource("/balances/NetPositions.json").getFile());
-        final Map<String, Double> netPositionNetworkAreas = TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile(netPositionsFile);
+        final Map<Country, Double> netPositionNetworkAreas = TargetNetPositionsImporter.getTargetNetPositionsAreasFromFile(netPositionsFile);
 
         assertFalse(netPositionNetworkAreas.isEmpty());
         assertEquals(12, netPositionNetworkAreas.size());

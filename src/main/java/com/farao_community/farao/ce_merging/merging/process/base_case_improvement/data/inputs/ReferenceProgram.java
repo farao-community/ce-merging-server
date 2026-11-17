@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sumPropertyFiltered;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap.toFlowByAreaMap;
 import static java.util.function.Function.identity;
 
@@ -96,7 +96,7 @@ public class ReferenceProgram implements Serializable {
     }
 
     private double sumFlowsGiven(final Predicate<ReferenceExchangeData> condition) {
-        return sumPropertyFiltered(referenceExchangeDataList, ReferenceExchangeData::getFlow, condition);
+        return sum(referenceExchangeDataList, ReferenceExchangeData::getFlow, condition);
     }
 
     /*+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-

@@ -25,6 +25,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -82,7 +83,7 @@ class VirtualHubsShiftingTest {
 
     private BoundaryLine getBoundaryLine(final Network network) {
         return network.getBoundaryLineStream()
-                .filter(boundaryLine -> NODE_NAME.equals(boundaryLine.getPairingKey()))
+                .filter(isPairedWith(NODE_NAME))
                 .findFirst()
                 .orElseThrow();
     }

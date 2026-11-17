@@ -37,6 +37,7 @@ import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapDk1ToDk;
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapItBzToIt;
+import static com.farao_community.farao.ce_merging.common.util.StreamsUtils.sum;
 import static com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.FlowByAreaMap.toFlowByAreaMap;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.isItalianBiddingZone;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.isItalianBiddingZoneEic;
@@ -161,13 +162,7 @@ public final class RefProgCalculator {
         final Border realBorder = new Border(eicFrom, eicTo);
         final Border bexBorder = new Border(mapItaBzToItaCountry(eicFrom), mapItaBzToItaCountry(eicTo));
 
-        final double flow = getBexFactors(bexBorder)
-                .getCoefficientByCountry()
-                .stream()
-                .mapToDouble(this::getBorderExchange)
-                .sum();
-
-        acExchanges.put(realBorder, flow);
+        acExchanges.put(realBorder, sum(getBexFactors(bexBorder).getCoefficientByCountry(), this::getBorderExchange));
     }
 
     private String mapItaBzToItaCountry(final String eic) {
@@ -225,11 +220,10 @@ public final class RefProgCalculator {
     }
 
     private double computeAcNetPositionOutCountry(final String countryEic) {
-        return referenceProgram.getReferenceExchangeDataList()
-                .stream()
-                .filter(isAcExchangeWith(countryEic))
-                .mapToDouble(exc -> exc.getAreaOutId().equals(countryEic) ? exc.getFlow() : -exc.getFlow())
-                .sum();
+        return sum(referenceProgram.getReferenceExchangeDataList(),
+                   exc -> exc.getAreaOutId().equals(countryEic) ? exc.getFlow() : -exc.getFlow(),
+                   isAcExchangeWith(countryEic));
+
     }
 
     private Predicate<ReferenceExchangeData> isAcExchangeWith(final String countryEic) {

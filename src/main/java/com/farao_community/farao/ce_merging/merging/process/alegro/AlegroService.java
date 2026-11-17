@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
@@ -35,6 +34,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.ALEGRO_NET_POSITIONS;
 
 @Service
@@ -123,7 +123,7 @@ public class AlegroService {
     }
 
     void checkFlowDirection(final double albeFlow, final double aldeFlow, final int alegroThreshold) {
-        if (!isAlegroLoadsBelowOrEqualToThreshold(albeFlow, aldeFlow, alegroThreshold) && isAlegroLoadsHasSameSign(albeFlow, aldeFlow)) {
+        if (!areBothFlowsUnderThreshold(albeFlow, aldeFlow, alegroThreshold) && areFlowsSamesSign(albeFlow, aldeFlow)) {
             LOGGER.error("ALBE load and ALDE load have the same sign");
             throw new CeMergingException("ALBE load and ALDE load have the same sign");
         }
@@ -154,46 +154,38 @@ public class AlegroService {
         return new AlegroData(alegroInOutage, aldeFlows, albeFlows);
     }
 
-    private boolean isAlegroLoadsHasSameSign(final double albeFlow, final double aldeFlow) {
+    private boolean areFlowsSamesSign(final double albeFlow, final double aldeFlow) {
         return albeFlow > 0 && aldeFlow > 0 || albeFlow < 0 && aldeFlow < 0;
     }
 
-    private boolean isAlegroLoadsBelowOrEqualToThreshold(final double albeFlow, final double aldeFlow, final int threshold) {
+    private boolean areBothFlowsUnderThreshold(final double albeFlow, final double aldeFlow, final int threshold) {
         return Math.abs(albeFlow) <= threshold && Math.abs(aldeFlow) <= threshold;
     }
 
     private List<BoundaryLine> getAlegroBoundaryLines(final Network network) {
         return network.getBoundaryLineStream()
-                .filter(boundaryLine ->
-                        VIRTUAL_HUB_ALEGRO_BE_NODE_NAME.equals(boundaryLine.getPairingKey())
-                                || VIRTUAL_HUB_ALEGRO_DE_NODE_NAME.equals(boundaryLine.getPairingKey()))
-                .collect(Collectors.toList());
+                .filter(isPairedWith(VIRTUAL_HUB_ALEGRO_BE_NODE_NAME).or(isPairedWith(VIRTUAL_HUB_ALEGRO_DE_NODE_NAME)))
+                .toList();
     }
 
-    private BoundaryLine getAlegroBoundaryLine(final List<BoundaryLine> alegroBoundaryLinesList, final String pairingKey) {
+    private BoundaryLine getAlegroBoundaryLine(final List<BoundaryLine> alegroBoundaryLinesList, final String alegroNode) {
         return alegroBoundaryLinesList.stream()
-                .filter(boundaryLine -> pairingKey.equals(boundaryLine.getPairingKey()))
+                .filter(isPairedWith(alegroNode))
                 .findFirst()
-                .orElseThrow(() -> new CeMergingException("No boundary line found for: " + pairingKey));
+                .orElseThrow(() -> new CeMergingException("No boundary line found for: " + alegroNode));
     }
 
     private void checkAlegroFlowGap(final double gap, final double threshold, final String alegroNode) {
-        if (Math.abs(gap) <= threshold) {
-            return;
+        if (Math.abs(gap) > threshold) {
+            final String formattedGap = String.format(Locale.ROOT, "%.2f", Math.abs(gap));
+            LOGGER.error("The gap between the net position forecast value and the initial net position for {} is {}. It exceeds the threshold ({})",
+                         alegroNode, formattedGap, threshold);
+            throw new CeMergingException("The " + alegroNode + " flow gap is " + formattedGap + ", exceeding the threshold of " + threshold);
         }
-        final String formattedGap = String.format(Locale.ROOT, "%.2f", Math.abs(gap));
-        LOGGER.error("The absolute value of the difference between the net position forecast value and the initial net position for {} is {}. It exceeds the threshold which is {}", alegroNode, formattedGap, threshold);
-        throw new CeMergingException("The " + alegroNode + " flow gap is " + formattedGap + ", exceeding the threshold of " + threshold);
     }
 
     private double calculateAlegroFinalFlow(final double targetFlow, final double minEc, final double maxEc) {
-        if (targetFlow > maxEc) {
-            return maxEc;
-        }
-        if (targetFlow < minEc) {
-            return minEc;
-        }
-        return targetFlow;
+        return Math.clamp(targetFlow, minEc, maxEc);
     }
 
     private double getAlegroEcLimit(final BciAlegroData bciAlegroData) {

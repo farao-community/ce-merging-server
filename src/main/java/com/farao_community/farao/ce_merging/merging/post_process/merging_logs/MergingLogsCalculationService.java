@@ -38,11 +38,18 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.FileNotFoundException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.*;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.AC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALBE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_NODE_NAME;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
+import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_NODE_NAME;
 
 @Service
 public class MergingLogsCalculationService {
@@ -75,7 +82,7 @@ public class MergingLogsCalculationService {
         }
     }
 
-    private MergingLog buildMergingLog(final MergingTask task) {
+    private MergingLog buildMergingLog(final MergingTask task) throws FileNotFoundException {
         final JsonBciOutputStructure bciOutputs = JsonUtils.read(JsonBciOutputStructure.class, task.getArtifactPath(ArtifactType.BCI_OUTPUT_FILE));
         final PstOutput pstOutputs = JsonUtils.read(PstOutput.class, task.getArtifactPath(ArtifactType.PST_OUTPUT_FILE));
         final NetPositionsResults igmNetPositionsResults = JsonUtils.read(NetPositionsResults.class, task.getArtifactPath(ArtifactType.IGMS_NET_POSITIONS_FILE));
