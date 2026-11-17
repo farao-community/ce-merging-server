@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlow;
@@ -46,34 +47,37 @@ public class InternalBiddingZonesManager {
                                final ItalianBiddingZone bzTo) {
         double sum = 0.0;
 
-        final List<InternalTieLineType> tieLinesNoDuplicates = biddingZoneData.getInternalTieLines().getInternalTieLine().stream()
-                .filter(distinctByKey(l -> l.getBranch().getFrom() + "-" + l.getBranch().getTo()))
+        final List<InternalTieLineType> internalTieLines = biddingZoneData.getInternalTieLines().getInternalTieLine()
+                .stream()
+                .filter(distinctBranches().and(lineJoinsZones(bzFrom, bzTo)))
                 .toList();
 
-        for (final InternalTieLineType tieLine : tieLinesNoDuplicates) {
-            if (lineJoinsZones(tieLine, bzFrom, bzTo)) {
-                final BranchType branch = tieLine.getBranch();
-                // from -> to and to -> from must be counted with opposite signs (respectively +/-)
-                final double flowSign = bzFrom.getFlowSign(tieLine);
-                final List<Line> lines = getLines(branch);
+        for (final InternalTieLineType internalTieLine : internalTieLines) {
+            final BranchType branch = internalTieLine.getBranch();
+            // from -> to and to -> from must be counted with opposite signs (respectively +/-)
+            final double flowSign = bzFrom.getFlowSign(internalTieLine);
+            final List<Line> branchLines = getCorrespondingLines(branch);
 
-                if (lines.isEmpty()) {
-                    LOGGER.warn("[{}-{}] line {} linking {} to {} through element {} not found in CGM",
-                                bzFrom, bzTo, tieLine.getId(), branch.getFrom(), branch.getTo(), branch.getElementName());
-                } else {
-                    for (final Line line : lines) {
-                        final double lineFlow = flowSign * getLineFlow(line);
-                        LOGGER.info("[{}-{}] adding {} MW flowing from {} to {} through line {}",
-                                    bzFrom, bzTo, lineFlow, branch.getFrom(), branch.getTo(), line.getId());
-                        sum += lineFlow;
-                    }
+            if (branchLines.isEmpty()) {
+                LOGGER.warn("[{}-{}] line {} linking {} to {} through element {} not found in CGM",
+                            bzFrom, bzTo, internalTieLine.getId(), branch.getFrom(), branch.getTo(), branch.getElementName());
+            } else {
+                for (final Line line : branchLines) {
+                    final double lineFlow = flowSign * getLineFlow(line);
+                    LOGGER.info("[{}-{}] adding {} MW flowing from {} to {} through line {}",
+                                bzFrom, bzTo, lineFlow, branch.getFrom(), branch.getTo(), line.getId());
+                    sum += lineFlow;
                 }
             }
         }
         return sum;
     }
 
-    private List<Line> getLines(final BranchType branch) {
+    private Predicate<InternalTieLineType> distinctBranches() {
+        return distinctByKey(l -> l.getBranch().getFrom() + l.getBranch().getTo());
+    }
+
+    private List<Line> getCorrespondingLines(final BranchType branch) {
         return cgm.getLineStream()
                 .filter(line -> areSameBranches(branch, line))
                 .toList();
