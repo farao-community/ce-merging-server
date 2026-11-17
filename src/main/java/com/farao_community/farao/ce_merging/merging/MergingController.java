@@ -57,6 +57,8 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.OUT
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_CONFIGURATIONS_TAG;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_MANAGEMENT_TAG;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_NOT_RUN;
+import static com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument.fromData;
+import static com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument.fromServiceException;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.toAttachmentFileResponse;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
@@ -100,9 +102,9 @@ public class MergingController {
 
             return ResponseEntity
                     .created(taskLocation.toUri())
-                    .body(JsonApiDocument.fromData(createdTask));
-        } catch (ServiceIOException e) {
-            return ResponseEntity.badRequest().build();
+                    .body(fromData(createdTask));
+        } catch (final ServiceIOException e) {
+            return ResponseEntity.badRequest().body(fromServiceException(e));
         }
     }
 
@@ -121,11 +123,11 @@ public class MergingController {
             return ResponseEntity.notFound().build();
         }
         try {
-            return ResponseEntity.ok().body(JsonApiDocument.fromData(taskManager.runTask(taskId)));
+            return ResponseEntity.ok().body(fromData(taskManager.runTask(taskId)));
         } catch (final TaskAlreadyRunningException e) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(fromServiceException(e));
         } catch (final CeMergingException e) {
-            return ResponseEntity.internalServerError().body(JsonApiDocument.fromServiceException(e));
+            return ResponseEntity.internalServerError().body(fromServiceException(e));
         }
     }
 

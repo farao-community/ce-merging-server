@@ -168,7 +168,7 @@ public class MergingTaskManagementService {
             LOGGER.error(error, e);
             repository.delete(task);
             deleteQuietly(inputsPath.toFile());
-            throw new ServiceIOException(error, e);
+            throw new ServiceIOException(e.getMessage(), e);
         }
     }
 
