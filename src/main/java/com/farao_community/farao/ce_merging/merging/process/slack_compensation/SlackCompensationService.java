@@ -10,6 +10,7 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
+import com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.InternalBiddingZonesManager;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.commons.report.ReportNodeNoOp;
@@ -32,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
@@ -71,10 +73,13 @@ public class SlackCompensationService {
         LogsCustomisationUtils.setExtraFieldsInLogsMdc(task, MergingStep.SLACK_COMPENSATION);
         final Network compensatedNetwork = compensateNetwork(task);
         addSlackNode(compensatedNetwork, task);
+        final Properties parameters = new Properties();
+        //parameters.put(UcteExporter.POST_PROCESSORS, InternalBiddingZoneImportPostProcessor.NAME);
+        new InternalBiddingZonesManager(task, loadFlowRunnerSupplier).feedBiddingZonesInfo();
         final SavedFile cgmFile = save(configuration.getOutputsDirectoryPath(task),
                                        task.getOutputCgmFileName(),
                                        String.format("/tasks/%d/outputs/cgm", task.getId()),
-                                       path -> compensatedNetwork.write(UCTE_FORMAT, null, path));
+                                       path -> compensatedNetwork.write(UCTE_FORMAT, parameters, path));
 
         task.getOutputs().setCgm(cgmFile);
     }

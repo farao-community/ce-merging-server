@@ -21,6 +21,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.INTERNAL_BIDDING_ZONE_PROPERTY_KEY;
+import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianBiddingZone.UNMAPPED;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.stream.Collectors.groupingBy;
@@ -29,7 +31,7 @@ import static java.util.stream.Collectors.toMap;
 public class InternalBiddingZoneImportPostProcessor {//implements UcteExportPostProcessor {
 
     public static final String NAME = "ITA-BZ-POST-PROCESSOR";
-    private static final Function<Bus, String> BIDDING_ZONES_GROUP = b -> Optional.ofNullable(b.getProperty("internalBiddingZone")).orElse("UNKNOWN");
+    private static final Function<Bus, String> BIDDING_ZONES_GROUP = b -> Optional.ofNullable(b.getProperty(INTERNAL_BIDDING_ZONE_PROPERTY_KEY)).orElse(UNMAPPED);
     private static final String BZ_SUMMARY_PREFIX = "Bidding zones grouped in nodes of IT: ";
     private static final String BZ_INFO_FORMAT = "%s %d Nodes First Node: %s, Last Node: %s";
 
@@ -66,7 +68,7 @@ public class InternalBiddingZoneImportPostProcessor {//implements UcteExportPost
             nodeCountByBz.put(biddingZone, nodeCount);
         });
 
-        headerComments.addFirst(nodeCountByBz.entrySet()
+        headerComments.addFirst(BZ_SUMMARY_PREFIX + nodeCountByBz.entrySet()
                                         .stream()
                                         .map(entry -> entry.getKey() + "=" + entry.getValue().toString())
                                         .collect(Collectors.joining(", "))

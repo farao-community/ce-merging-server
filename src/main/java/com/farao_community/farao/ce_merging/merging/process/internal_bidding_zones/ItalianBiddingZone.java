@@ -20,6 +20,9 @@ public enum ItalianBiddingZone {
     ISOU("10Y1001A1001A788"),
     ICAL("10Y1001C--00096J");
 
+    public static final String INTERNAL_BIDDING_ZONE_PROPERTY_KEY = "internalBiddingZone";
+    public static final String UNMAPPED = "UNMAPPED";
+
     private final String eic;
 
     ItalianBiddingZone(final String eic) {
