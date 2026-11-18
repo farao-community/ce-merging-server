@@ -10,10 +10,12 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
-import com.farao_community.farao.ce_merging.merging.process.naming_strategy.monita.MonitaService;
+import com.farao_community.farao.ce_merging.merging.process.monita.MonitaService;
+import com.farao_community.farao.ce_merging.merging.process.pisa.PisaService;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -83,7 +85,8 @@ public class NetPositionService {
                                     .collect(toMap(Map.Entry::getKey,
                                                    e -> computeNetPositions(task, e.getValue(), e.getKey()))));
 
-            MonitaService.postTreatmentForMonita(task, netPositionsFile);
+            MonitaService.fixMonitaNetPositions(task, netPositionsFile);
+            PisaService.fixPisaNetPositions(task, netPositionsFile);
 
             FileStorageUtils.saveArtifactFile(IGMS_NET_POSITIONS_FILE, netPositionsFile, task, configuration);
             tasksRepository.save(task);
@@ -137,6 +140,22 @@ public class NetPositionService {
                 Map.of(DE.name(), computeCountryNetPositions(DE, network, task.getConfigurations()))
         );
         return netPositionsFile.netPositionsByCountryMap().getOrDefault(DE.name(), null);
+    }
+
+    public static void removeVirtualHubFlow(final Double virtualHubFlow,
+                                            final NetPositions countryNetPositions) {
+        addVirtualHubFlow(-virtualHubFlow, countryNetPositions);
+    }
+
+    public static void addVirtualHubFlow(final Double virtualHubFlow,
+                                         final NetPositions countryNetPositions) {
+        final NetPositionsValues globalNp = countryNetPositions.getGlobalNetPosition();
+
+        final double globalNetPosition = globalNp.getWithVirtualHubs();
+        globalNp.setWithVirtualHubs(globalNetPosition + virtualHubFlow);
+
+        final double outBciNetPosition = countryNetPositions.getOutBciNetPosition();
+        countryNetPositions.setOutBciNetPosition(outBciNetPosition + virtualHubFlow);
     }
 
 }

@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa;
+package com.farao_community.farao.ce_merging.merging.process.monita;
 
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Branch;
@@ -13,25 +13,20 @@ import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Switch;
 import com.powsybl.ucte.converter.NamingStrategy;
 import com.powsybl.ucte.converter.UcteException;
-import com.powsybl.ucte.network.UcteCountryCode;
 import com.powsybl.ucte.network.UcteElementId;
 import com.powsybl.ucte.network.UcteNodeCode;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PISA_NAMING_STRATEGY;
 import static com.powsybl.ucte.network.UcteCountryCode.XX;
 import static com.powsybl.ucte.network.UcteElementId.parseUcteElementId;
 import static com.powsybl.ucte.network.UcteNodeCode.parseUcteNodeCode;
 
-public class PisaNamingStrategy implements NamingStrategy {
+public class MonitaNamingStrategy implements NamingStrategy {
     private final Map<String, UcteNodeCode> ucteNodeIds = new HashMap<>();
     private final Map<String, UcteElementId> ucteElementIds = new HashMap<>();
-    public static final Pattern FFG_NODE_NAME_PATTERN = Pattern.compile("FFG\\.IL1[1-4]");
-    public static final Pattern XFG_NODE_NAME_PATTERN = Pattern.compile("XFG\\.IL1[1-4]");
-    public static final Pattern XPI_NODE_NAME_PATTERN = Pattern.compile("XPI_GI1[1-2]");
+    private static final String MONITA_NODE_NAME_REGEX = "I(KOT|CEP)R[12]2[0-9A-Z]";
 
     @Override
     public void initializeNetwork(Network network) {
@@ -40,13 +35,13 @@ public class PisaNamingStrategy implements NamingStrategy {
 
     @Override
     public String getName() {
-        return PISA_NAMING_STRATEGY;
+        return "MonitaNamingStrategy";
     }
 
     @Override
     public UcteNodeCode getUcteNodeCode(final String id) {
-        return ucteNodeIds.computeIfAbsent(id, code -> parseUcteNodeCode(code).map(this::convertPisaNode)
-                .orElseThrow(() -> new UcteException("Invalid UCTE node identifier: " + code)));
+        return ucteNodeIds.computeIfAbsent(id, code -> parseUcteNodeCode(code).map(this::convertMonitaNode)
+            .orElseThrow(() -> new UcteException("Invalid UCTE node identifier: " + code)));
     }
 
     @Override
@@ -61,8 +56,8 @@ public class PisaNamingStrategy implements NamingStrategy {
 
     @Override
     public UcteElementId getUcteElementId(final String id) {
-        return ucteElementIds.computeIfAbsent(id, code -> parseUcteElementId(code).map(this::convertPisaBranch)
-                .orElseThrow(() -> new UcteException("Invalid UCTE element identifier: " + code)));
+        return ucteElementIds.computeIfAbsent(id, code -> parseUcteElementId(code).map(this::convertMonitaBranch)
+            .orElseThrow(() -> new UcteException("Invalid UCTE element identifier: " + code)));
     }
 
     @Override
@@ -80,19 +75,17 @@ public class PisaNamingStrategy implements NamingStrategy {
         return getUcteElementId(boundaryLine.getId());
     }
 
-    private UcteNodeCode convertPisaNode(final UcteNodeCode ucteNodeCode) {
-        if (FFG_NODE_NAME_PATTERN.matcher(ucteNodeCode.toString()).matches()) {
+    private UcteNodeCode convertMonitaNode(final UcteNodeCode ucteNodeCode) {
+        if (ucteNodeCode.toString().matches(MONITA_NODE_NAME_REGEX)) {
             ucteNodeCode.setUcteCountryCode(XX);
-        }
-        if (XPI_NODE_NAME_PATTERN.matcher(ucteNodeCode.toString()).matches()) {
-            ucteNodeCode.setUcteCountryCode(UcteCountryCode.IT);
+            ucteNodeCode.setBusbar('0');
         }
         return ucteNodeCode;
     }
 
-    private UcteElementId convertPisaBranch(final UcteElementId ucteElementId) {
-        convertPisaNode(ucteElementId.getNodeCode1());
-        convertPisaNode(ucteElementId.getNodeCode2());
+    private UcteElementId convertMonitaBranch(final UcteElementId ucteElementId) {
+        convertMonitaNode(ucteElementId.getNodeCode1());
+        convertMonitaNode(ucteElementId.getNodeCode2());
         return ucteElementId;
     }
 }

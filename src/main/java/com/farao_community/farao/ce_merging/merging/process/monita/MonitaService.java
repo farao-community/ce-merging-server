@@ -4,18 +4,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.naming_strategy.monita;
+package com.farao_community.farao.ce_merging.merging.process.monita;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
+import com.farao_community.farao.ce_merging.merging.process.netpositions.NetPositionService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Properties;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.MONITA1_ME_NODE_NAME;
@@ -27,6 +27,7 @@ import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isInC
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPairedWith;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.ME;
+import static org.apache.commons.lang3.ObjectUtils.anyNull;
 
 @Service
 public class MonitaService {
@@ -40,7 +41,7 @@ public class MonitaService {
         final Properties properties = new Properties();
         properties.setProperty(UCTE_EXPORT_NAMING_STRATEGY_PROPERTY, MONITA_NAMING_STRATEGY);
         FileStorageUtils.savePreTreatedIgm(IT,
-                                           getItalianIgm(task),
+                                           task.getPreTreatedOrInputIgm(IT),
                                            properties,
                                            UCTE_FORMAT,
                                            "igms-after-monita-renaming",
@@ -48,24 +49,20 @@ public class MonitaService {
                                            configuration);
     }
 
-    private static Network getItalianIgm(final MergingTask task) {
-        return Network.read(Optional.ofNullable(task.getArtifacts().getPreTreatedIgm(IT))
-                                .orElse(task.getInputs().getIgm(IT).getIgmFile()).getPath());
-    }
-
     /*
         MONITA nodes are in the italian IGM; we move them to ME to correct the outBciNetPosition value of ME
         in the igmsNetPositions.json file, to correct the target value for ME before balances adjustment.
      */
-    public static void postTreatmentForMonita(final MergingTask task, final NetPositionsResults netPositionsFile) {
+    public static void fixMonitaNetPositions(final MergingTask task,
+                                             final NetPositionsResults netPositionsFile) {
         final NetPositions italyNetPosition = netPositionsFile.get(IT);
         final NetPositions montenegroNetPosition = netPositionsFile.get(ME);
 
-        if (italyNetPosition == null || montenegroNetPosition == null) {
+        if (anyNull(italyNetPosition, montenegroNetPosition)) {
             return;
         }
 
-        final Network italy = getItalianIgm(task);
+        final Network italy = task.getPreTreatedOrInputIgm(IT);
 
         removeFromItaly(MONITA1_ME_NODE_NAME, italyNetPosition);
         removeFromItaly(MONITA2_ME_NODE_NAME, italyNetPosition);
@@ -77,34 +74,24 @@ public class MonitaService {
                                                final NetPositions montenegrinNetPositions,
                                                final Network italy) {
         italy.getBoundaryLineStream()
-            .filter(isPairedWith(monitaNode).and(isInCountry(IT)))
-            .findFirst()
-            .map(BoundaryLine::getP0)
-            .ifPresent(monitaFlow -> addToMontenegro(monitaNode, monitaFlow, montenegrinNetPositions));
+                .filter(isPairedWith(monitaNode).and(isInCountry(IT)))
+                .findFirst()
+                .map(BoundaryLine::getP0)
+                .ifPresent(monitaFlow -> addToMontenegro(monitaNode, monitaFlow, montenegrinNetPositions));
     }
 
     private static void addToMontenegro(final String monitaNode,
                                         final double monitaFlow,
                                         final NetPositions montenegrinNetPositions) {
-        final double initialGlobal = montenegrinNetPositions.getGlobalNetPosition().getWithVirtualHubs();
-        montenegrinNetPositions.getGlobalNetPosition().setWithVirtualHubs(initialGlobal + monitaFlow);
-
-        final double initialOutBci = montenegrinNetPositions.getOutBciNetPosition();
-        montenegrinNetPositions.setOutBciNetPosition(initialOutBci + monitaFlow);
-
+        NetPositionService.addVirtualHubFlow(monitaFlow, montenegrinNetPositions);
         final double flowUpdated = montenegrinNetPositions.getVirtualHubFlow(monitaNode) + monitaFlow;
         montenegrinNetPositions.getVirtualHubsExchanges().put(monitaNode, flowUpdated);
     }
 
-    private static void removeFromItaly(final String monitaNode, final NetPositions italianNetPositions) {
-        final double virtualHubFlow = italianNetPositions.getVirtualHubFlow(monitaNode);
-
-        final double globalNetPosition = italianNetPositions.getGlobalNetPosition().getWithVirtualHubs();
-        italianNetPositions.getGlobalNetPosition().setWithVirtualHubs(globalNetPosition - virtualHubFlow);
-
-        final double outBciNetPosition = italianNetPositions.getOutBciNetPosition();
-        italianNetPositions.setOutBciNetPosition(outBciNetPosition - virtualHubFlow);
-
+    private static void removeFromItaly(final String monitaNode,
+                                        final NetPositions italianNetPositions) {
+        final double monitaFlow = italianNetPositions.getVirtualHubFlow(monitaNode);
+        NetPositionService.removeVirtualHubFlow(monitaFlow, italianNetPositions);
         italianNetPositions.getVirtualHubsExchanges().remove(monitaNode);
     }
 }

@@ -4,10 +4,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa;
+package com.farao_community.farao.ce_merging.merging.process.pisa;
 
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.powsybl.iidm.network.BoundaryLine;
@@ -28,10 +30,13 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCT
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UCTE_FORMAT;
 import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFileWithWriter;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getNodeName;
-import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaNamingStrategy.FFG_NODE_NAME_PATTERN;
-import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaNamingStrategy.XPI_NODE_NAME_PATTERN;
+import static com.farao_community.farao.ce_merging.merging.process.pisa.PisaNamingStrategy.FFG_NODE_NAME_PATTERN;
+import static com.farao_community.farao.ce_merging.merging.process.pisa.PisaNamingStrategy.XPI_NODE_NAME_PATTERN;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.CGM_FILE_AFTER_PISA_RENAMING;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TOPOLOGICAL_MERGE_FILE;
+import static com.powsybl.iidm.network.Country.FR;
+import static com.powsybl.iidm.network.Country.IT;
+import static org.apache.commons.lang3.ObjectUtils.anyNull;
 
 @Service
 public class PisaService {
@@ -46,8 +51,22 @@ public class PisaService {
         properties.setProperty(UCTE_EXPORT_NAMING_STRATEGY_PROPERTY, PISA_NAMING_STRATEGY);
 
         final Network cgm = displacePisaNodes(task.getArtifact(TOPOLOGICAL_MERGE_FILE, Network.class));
-
         saveArtifactFileWithWriter(CGM_FILE_AFTER_PISA_RENAMING, task, configuration, path -> cgm.write(UCTE_FORMAT, properties, path));
+    }
+
+    public static void fixPisaNetPositions(final MergingTask task, final NetPositionsResults netPositionsFile) {
+        final NetPositions italyNetPosition = netPositionsFile.get(IT);
+        final NetPositions frenchNetPosition = netPositionsFile.get(FR);
+
+        if (anyNull(italyNetPosition, frenchNetPosition)) {
+            return;
+        }
+
+        final Network italy = task.getPreTreatedOrInputIgm(IT);
+        final Network france = task.getPreTreatedOrInputIgm(FR);
+
+        //TODO similar to MONITA
+
     }
 
     private static Network displacePisaNodes(final Network cgm) {
