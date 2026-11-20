@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -25,13 +25,13 @@ public class BECKeyConfigurationRecord {
     protected LocalDateTime validTo;
     protected LocalDateTime publishedOn;
     @OneToMany(cascade = ALL)
-    private List<BecByBoundaryDto> becMatrix = new ArrayList<>();
+    private List<BecByBoundary> becMatrix = new ArrayList<>();
 
     public BECKeyConfigurationRecord(final String id,
                                      final LocalDateTime validFrom,
                                      final LocalDateTime validTo,
                                      final LocalDateTime publishedOn,
-                                     final List<BecByBoundaryDto> becMatrix) {
+                                     final List<BecByBoundary> becMatrix) {
         this.id = id;
         this.validFrom = validFrom;
         this.validTo = validTo;
@@ -42,11 +42,11 @@ public class BECKeyConfigurationRecord {
     public BECKeyConfigurationRecord() {
     }
 
-    public List<BecByBoundaryDto> getBecMatrix() {
+    public List<BecByBoundary> getBecMatrix() {
         return becMatrix;
     }
 
-    public void setBecMatrix(final List<BecByBoundaryDto> becMatrix) {
+    public void setBecMatrix(final List<BecByBoundary> becMatrix) {
         this.becMatrix = becMatrix;
     }
 

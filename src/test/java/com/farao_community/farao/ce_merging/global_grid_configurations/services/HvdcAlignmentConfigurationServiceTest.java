@@ -7,6 +7,8 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
+import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.HvdcAlignmentXNodeCoupleMapper;
+import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.ZeroFlowNodeMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.HvdcAlignmentConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.repository.HvdcAlignmentConfigurationRepository;
 import com.farao_community.farao.ce_merging.global_grid_configurations.repository.VirtualHubsConfigurationRepository;
@@ -30,7 +32,9 @@ class HvdcAlignmentConfigurationServiceTest {
     private final HvdcAlignmentConfigurationRepository repository = mock(HvdcAlignmentConfigurationRepository.class);
     private final VirtualHubsConfigurationRepository vhRepo = mock(VirtualHubsConfigurationRepository.class);
     private final VirtualHubsConfigurationService vhService = new VirtualHubsConfigurationService(vhRepo);
-    private final HvdcAlignmentConfigurationService service = new HvdcAlignmentConfigurationService(vhService, repository);
+    private final HvdcAlignmentXNodeCoupleMapper hvdcAlignmentXNodeCoupleMapper = mock(HvdcAlignmentXNodeCoupleMapper.class);
+    private final ZeroFlowNodeMapper zeroFlowNodeMapper = mock(ZeroFlowNodeMapper.class);
+    private final HvdcAlignmentConfigurationService service = new HvdcAlignmentConfigurationService(vhService, repository, hvdcAlignmentXNodeCoupleMapper, zeroFlowNodeMapper);
 
     @Test
     void shouldThrowIfCoupleNotInVirtualHubs() {

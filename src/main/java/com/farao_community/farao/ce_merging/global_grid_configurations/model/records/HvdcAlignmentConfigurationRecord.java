@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -27,10 +27,10 @@ public class HvdcAlignmentConfigurationRecord {
     protected LocalDateTime validTo;
     protected LocalDateTime publishedOn;
     @ElementCollection(fetch = LAZY)
-    private List<VirtualHubsAlignmentCoupleDto> hvdcXNodeAlignmentCouplesDto = new ArrayList<>();
+    private List<VirtualHubsAlignmentCouple> hvdcXNodeAlignmentCouples = new ArrayList<>();
 
     @ElementCollection(fetch = LAZY)
-    private List<ZeroFlowNodeDto> zeroFlowNodeDtos = new ArrayList<>();
+    private List<ZeroFlowNode> zeroFlowNodes = new ArrayList<>();
 
     @ElementCollection(fetch = LAZY)
     private List<String> dkHvdcXnodes = new ArrayList<>();
@@ -41,16 +41,16 @@ public class HvdcAlignmentConfigurationRecord {
                                             final LocalDateTime validFrom,
                                             final LocalDateTime validTo,
                                             final LocalDateTime publishedOn,
-                                            final List<VirtualHubsAlignmentCoupleDto> hvdcXNodeAlignmentCouplesDto,
-                                            final List<ZeroFlowNodeDto> zeroFlowNodeDtos,
+                                            final List<VirtualHubsAlignmentCouple> hvdcXNodeAlignmentCouples,
+                                            final List<ZeroFlowNode> zeroFlowNodes,
                                             final List<String> dkHvdcXnodes,
                                             final String defaultSlackNode) {
         this.id = id;
         this.validFrom = validFrom;
         this.validTo = validTo;
         this.publishedOn = publishedOn;
-        this.hvdcXNodeAlignmentCouplesDto = hvdcXNodeAlignmentCouplesDto;
-        this.zeroFlowNodeDtos = zeroFlowNodeDtos;
+        this.hvdcXNodeAlignmentCouples = new ArrayList<>(hvdcXNodeAlignmentCouples);
+        this.zeroFlowNodes = new ArrayList<>(zeroFlowNodes);
         this.dkHvdcXnodes = dkHvdcXnodes;
         this.defaultSlackNode = defaultSlackNode;
     }
@@ -66,20 +66,20 @@ public class HvdcAlignmentConfigurationRecord {
         this.defaultSlackNode = defaultSlackNode;
     }
 
-    public List<VirtualHubsAlignmentCoupleDto> getHvdcXNodeAlignmentCouplesDto() {
-        return new ArrayList<>(hvdcXNodeAlignmentCouplesDto);
+    public List<VirtualHubsAlignmentCouple> getHvdcXNodeAlignmentCouples() {
+        return new ArrayList<>(hvdcXNodeAlignmentCouples);
     }
 
-    public void setHvdcXNodeAlignmentCouplesDto(final List<VirtualHubsAlignmentCoupleDto> hvdcXNodeAlignmentCouplesDto) {
-        this.hvdcXNodeAlignmentCouplesDto = new ArrayList<>(hvdcXNodeAlignmentCouplesDto);
+    public void setHvdcXNodeAlignmentCouples(final List<VirtualHubsAlignmentCouple> hvdcXNodeAlignmentCouples) {
+        this.hvdcXNodeAlignmentCouples = new ArrayList<>(hvdcXNodeAlignmentCouples);
     }
 
-    public List<ZeroFlowNodeDto> getZeroFlowNodeDtos() {
-        return new ArrayList<>(zeroFlowNodeDtos);
+    public List<ZeroFlowNode> getZeroFlowNodes() {
+        return new ArrayList<>(zeroFlowNodes);
     }
 
-    public void setZeroFlowNodeDtos(final List<ZeroFlowNodeDto> zeroFlowNodeDtos) {
-        this.zeroFlowNodeDtos = new ArrayList<>(zeroFlowNodeDtos);
+    public void setZeroFlowNodes(final List<ZeroFlowNode> zeroFlowNodes) {
+        this.zeroFlowNodes = new ArrayList<>(zeroFlowNodes);
     }
 
     public List<String> getDkHvdcXnodes() {

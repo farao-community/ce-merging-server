@@ -15,4 +15,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface XnodeMapper {
     List<XnodeConfig> mapToXnodeList(List<XnodeConfigDto> xnodeConfigDtoList);
+
+    List<XnodeConfigDto> mapToXnodeDtoList(List<XnodeConfig> xnodeConfigList);
 }

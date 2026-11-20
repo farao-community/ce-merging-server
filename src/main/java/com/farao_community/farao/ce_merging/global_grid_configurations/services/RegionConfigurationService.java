@@ -8,6 +8,7 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.RegionConfigurationMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.RegionConfigurationRecord;
@@ -30,9 +31,12 @@ public class RegionConfigurationService extends AbstractGridConfigurationService
     private static final Logger LOGGER = LoggerFactory.getLogger(RegionConfigurationService.class);
 
     private final RegionConfigurationRepository repository;
+    private final RegionConfigurationMapper regionConfigurationMapper;
 
-    public RegionConfigurationService(final RegionConfigurationRepository repository) {
+    public RegionConfigurationService(final RegionConfigurationRepository repository,
+                                      final RegionConfigurationMapper regionConfigurationMapper) {
         this.repository = repository;
+        this.regionConfigurationMapper = regionConfigurationMapper;
     }
 
     public JsonRegionConfiguration getConfiguration(OffsetDateTime targetDate) {
@@ -70,7 +74,7 @@ public class RegionConfigurationService extends AbstractGridConfigurationService
 
     @Override
     protected JsonRegionConfiguration getJsonConfigurationFromRecord(final RegionConfigurationRecord cfgRecord) {
-        return new JsonRegionConfiguration(cfgRecord.getRegionConfiguration());
+        return new JsonRegionConfiguration(regionConfigurationMapper.mapToRegionConfigurationDto(cfgRecord.getRegionConfiguration()));
     }
 
     @Override
@@ -86,6 +90,6 @@ public class RegionConfigurationService extends AbstractGridConfigurationService
                                              toUtcLocalDateTime(validFrom),
                                              toUtcLocalDateTime(validTo),
                                              LocalDateTime.now(UTC_ZONE_ID),
-                                             regionConfiguration);
+                                             regionConfigurationMapper.mapToRegionConfiguration(regionConfiguration));
     }
 }

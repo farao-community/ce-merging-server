@@ -6,36 +6,18 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
-import jakarta.persistence.Basic;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ID;
-import static jakarta.persistence.FetchType.LAZY;
-import static jakarta.persistence.GenerationType.IDENTITY;
-
-@Entity
 public class BecByBoundaryDto {
 
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    @Basic(optional = false)
-    @Column(name = ID, unique = true, nullable = false)
     private Long id;
 
-    @Embedded
     private BorderDto border;
 
-    @ElementCollection(fetch = LAZY)
     private List<BecCoefficientsDto> coefficientByCountry;
 
     public BecByBoundaryDto(final BorderDto border,
@@ -87,3 +69,4 @@ public class BecByBoundaryDto {
         return ToStringBuilder.reflectionToString(this);
     }
 }
+

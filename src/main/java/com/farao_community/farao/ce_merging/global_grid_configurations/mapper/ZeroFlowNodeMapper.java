@@ -15,4 +15,6 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ZeroFlowNodeMapper {
     List<ZeroFlowNode> mapToZeroFlowNodeList(List<ZeroFlowNodeDto> zeroFlowNodeDtoList);
+
+    List<ZeroFlowNodeDto> mapToZeroFlowNodeDtoList(List<ZeroFlowNode> zeroFlowNodeList);
 }

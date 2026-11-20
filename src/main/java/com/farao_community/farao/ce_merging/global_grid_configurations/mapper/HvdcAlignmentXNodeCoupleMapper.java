@@ -15,4 +15,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface HvdcAlignmentXNodeCoupleMapper {
     List<VirtualHubsAlignmentCouple> mapToHvdcAlignmentXNodeCoupleList(List<VirtualHubsAlignmentCoupleDto> virtualHubsAlignmentCouplesDtoList);
+
+    List<VirtualHubsAlignmentCoupleDto> mapToHvdcAlignmentXNodeCoupleDtoList(List<VirtualHubsAlignmentCouple> virtualHubsAlignmentCouplesList);
+
 }

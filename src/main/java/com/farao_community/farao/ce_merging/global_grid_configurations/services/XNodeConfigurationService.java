@@ -8,6 +8,7 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.XnodeMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.XnodeConfigDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonXNodeConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.XNodeConfigurationRecord;
@@ -31,9 +32,12 @@ import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.toU
 public class XNodeConfigurationService extends AbstractGridConfigurationService<XNodeConfigurationRecord, JsonXNodeConfiguration> {
     private static final Logger LOGGER = LoggerFactory.getLogger(XNodeConfigurationService.class);
     private final XNodeConfigurationRepository repository;
+    private final XnodeMapper xnodeMapper;
 
-    public XNodeConfigurationService(final XNodeConfigurationRepository repository) {
+    public XNodeConfigurationService(final XNodeConfigurationRepository repository,
+                                     final XnodeMapper xnodeMapper) {
         this.repository = repository;
+        this.xnodeMapper = xnodeMapper;
     }
 
     public JsonXNodeConfiguration getConfiguration(OffsetDateTime targetDate) {
@@ -62,7 +66,7 @@ public class XNodeConfigurationService extends AbstractGridConfigurationService<
     protected JsonXNodeConfiguration getDefaultJsonConfiguration(final OffsetDateTime targetDate) {
         try {
             final Xnodes xnodes = JaxbUtils.readFromBytes(Xnodes.class, getDefaultFileBytes());
-            return new JsonXNodeConfiguration(fromXnodeEntityToDtoList(xnodes));
+            return new JsonXNodeConfiguration(fromXnodesToDtoList(xnodes));
         } catch (IOException e) {
             throw new CeMergingException("Default configuration not found, cause: ", e);
         }
@@ -70,7 +74,7 @@ public class XNodeConfigurationService extends AbstractGridConfigurationService<
 
     @Override
     protected JsonXNodeConfiguration getJsonConfigurationFromRecord(final XNodeConfigurationRecord xNodesConfig) {
-        return new JsonXNodeConfiguration(xNodesConfig.getXNodeList());
+        return new JsonXNodeConfiguration(xnodeMapper.mapToXnodeDtoList(xNodesConfig.getXNodeList()));
     }
 
     @Override
@@ -78,15 +82,15 @@ public class XNodeConfigurationService extends AbstractGridConfigurationService<
                                                                       final OffsetDateTime validFrom,
                                                                       final OffsetDateTime validTo) throws IOException {
         final Xnodes xnodes = JaxbUtils.readFromBytes(Xnodes.class, configurationFile.getInputStream().readAllBytes());
-        final List<XnodeConfigDto> xNodeList = fromXnodeEntityToDtoList(xnodes);
+        final List<XnodeConfigDto> xNodeList = fromXnodesToDtoList(xnodes);
         return new XNodeConfigurationRecord(generateUuidString(),
                                             toUtcLocalDateTime(validFrom),
                                             toUtcLocalDateTime(validTo),
                                             LocalDateTime.now(UTC_ZONE_ID),
-                                            xNodeList);
+                                            xnodeMapper.mapToXnodeList(xNodeList));
     }
 
-    private List<XnodeConfigDto> fromXnodeEntityToDtoList(final Xnodes xnodes) {
+    private List<XnodeConfigDto> fromXnodesToDtoList(final Xnodes xnodes) {
         return xnodes
                 .getXnode()
                 .stream()
