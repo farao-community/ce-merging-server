@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.RegionConfigurationMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.RegionConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.repository.RegionConfigurationRepository;
 import org.assertj.core.api.Assertions;
@@ -20,7 +21,8 @@ import java.time.OffsetDateTime;
 class RegionConfigurationServiceTest {
 
     private final RegionConfigurationRepository repository = Mockito.mock(RegionConfigurationRepository.class);
-    private final RegionConfigurationService service = new RegionConfigurationService(repository);
+    private final RegionConfigurationMapper mapper = Mockito.mock(RegionConfigurationMapper.class);
+    private final RegionConfigurationService service = new RegionConfigurationService(repository, mapper);
 
     @Test
     void getConfigurationRecordFromFile()  throws IOException {

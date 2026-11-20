@@ -6,7 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.RegionConfiguration;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
@@ -23,13 +23,13 @@ public class RegionConfigurationRecord {
     protected LocalDateTime validTo;
     protected LocalDateTime publishedOn;
     @OneToOne(cascade = ALL)
-    private RegionConfigurationDto regionConfiguration;
+    private RegionConfiguration regionConfiguration;
 
     public RegionConfigurationRecord(final String id,
                                      final LocalDateTime validFrom,
                                      final LocalDateTime validTo,
                                      final LocalDateTime publishedOn,
-                                     final RegionConfigurationDto regionConfiguration) {
+                                     final RegionConfiguration regionConfiguration) {
         this.id = id;
         this.validFrom = validFrom;
         this.validTo = validTo;
@@ -38,14 +38,14 @@ public class RegionConfigurationRecord {
     }
 
     public RegionConfigurationRecord() {
-        this.regionConfiguration = new RegionConfigurationDto();
+        this.regionConfiguration = new RegionConfiguration();
     }
 
-    public RegionConfigurationDto getRegionConfiguration() {
+    public RegionConfiguration getRegionConfiguration() {
         return regionConfiguration;
     }
 
-    public void setRegionConfiguration(final RegionConfigurationDto regionConfiguration) {
+    public void setRegionConfiguration(final RegionConfiguration regionConfiguration) {
         this.regionConfiguration = regionConfiguration;
     }
 

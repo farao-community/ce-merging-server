@@ -8,6 +8,8 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.JsonUtils;
+import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.HvdcAlignmentXNodeCoupleMapper;
+import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.ZeroFlowNodeMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonHvdcAlignmentConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.HvdcAlignmentConfigurationRecord;
@@ -33,11 +35,17 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
     private static final Logger LOGGER = LoggerFactory.getLogger(HvdcAlignmentConfigurationService.class);
     private final VirtualHubsConfigurationService virtualHubsConfigurationService;
     private final HvdcAlignmentConfigurationRepository repository;
+    private final HvdcAlignmentXNodeCoupleMapper hvdcAlignmentXNodeCoupleMapper;
+    private final ZeroFlowNodeMapper zeroFlowNodeMapper;
 
     public HvdcAlignmentConfigurationService(final VirtualHubsConfigurationService virtualHubsConfigurationService,
-                                             final HvdcAlignmentConfigurationRepository repository) {
+                                             final HvdcAlignmentConfigurationRepository repository,
+                                             final HvdcAlignmentXNodeCoupleMapper hvdcAlignmentXNodeCoupleMapper,
+                                             final ZeroFlowNodeMapper zeroFlowNodeMapper) {
         this.virtualHubsConfigurationService = virtualHubsConfigurationService;
         this.repository = repository;
+        this.hvdcAlignmentXNodeCoupleMapper = hvdcAlignmentXNodeCoupleMapper;
+        this.zeroFlowNodeMapper = zeroFlowNodeMapper;
     }
 
     public JsonHvdcAlignmentConfiguration getConfiguration(OffsetDateTime targetDate) {
@@ -73,8 +81,8 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
 
     @Override
     protected JsonHvdcAlignmentConfiguration getJsonConfigurationFromRecord(final HvdcAlignmentConfigurationRecord cfgRecord) {
-        return new JsonHvdcAlignmentConfiguration(cfgRecord.getHvdcXNodeAlignmentCouplesDto(),
-                                                  cfgRecord.getZeroFlowNodeDtos(),
+        return new JsonHvdcAlignmentConfiguration(hvdcAlignmentXNodeCoupleMapper.mapToHvdcAlignmentXNodeCoupleDtoList(cfgRecord.getHvdcXNodeAlignmentCouples()),
+                                                  zeroFlowNodeMapper.mapToZeroFlowNodeDtoList(cfgRecord.getZeroFlowNodes()),
                                                   cfgRecord.getDkHvdcXnodes(),
                                                   cfgRecord.getDefaultSlackNode());
     }
@@ -95,8 +103,8 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
                 toUtcLocalDateTime(validFrom),
                 toUtcLocalDateTime(validTo),
                 LocalDateTime.now(UTC_ZONE_ID),
-                xNodeCouples,
-                alignmentConfiguration.getSetZeroFlowNodes(),
+                hvdcAlignmentXNodeCoupleMapper.mapToHvdcAlignmentXNodeCoupleList(xNodeCouples),
+                zeroFlowNodeMapper.mapToZeroFlowNodeList(alignmentConfiguration.getSetZeroFlowNodes()),
                 alignmentConfiguration.getDkHvdcXnodes(),
                 alignmentConfiguration.getDefaultSlackNode());
     }

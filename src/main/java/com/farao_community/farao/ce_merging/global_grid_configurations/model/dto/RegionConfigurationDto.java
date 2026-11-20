@@ -10,53 +10,22 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.MapKeyColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-
 import java.util.HashMap;
 import java.util.Map;
 
-import static jakarta.persistence.CascadeType.ALL;
-import static jakarta.persistence.GenerationType.AUTO;
-
-@Entity
-@Table(name = "regionconfigurationdto")
 public class RegionConfigurationDto {
 
-    @Id
-    @GeneratedValue(strategy = AUTO)
     private Long ref;
 
-    @Column(name = "name")
     private String name;
 
-    @Column(name = "id")
     protected String id;
 
-    @ElementCollection
-    @CollectionTable(name = "regionconfigurationdto_areasin_code_mapping",
-            joinColumns = {@JoinColumn(name = "regionconfigurationdto_ref", referencedColumnName = "ref")})
-    @MapKeyColumn(name = "areasin_name")
-    @Column(name = "areasin_eic")
     protected Map<String, String> areasIn = new HashMap<>();
 
-    @ElementCollection
-    @CollectionTable(name = "regionconfigurationdto_areasout_code_mapping",
-            joinColumns = {@JoinColumn(name = "regionconfigurationdto_ref", referencedColumnName = "ref")})
-    @MapKeyColumn(name = "areasout_name")
-    @Column(name = "areasout_eic")
     protected Map<String, String> areasOut = new HashMap<>();
 
-    @OneToMany(cascade = ALL)
-    @JsonProperty(value = "germanyZones")
+    @JsonProperty("germanyZones")
     protected Map<String, TsoInfosDto> germanyZone;
 
     public Long getRef() {

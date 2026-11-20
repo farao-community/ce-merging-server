@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.records;
 
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.VirtualHubsAlignmentCoupleDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.ZeroFlowNodeDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.VirtualHubsAlignmentCouple;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.ZeroFlowNode;
 import org.junit.jupiter.api.Test;
 import test_utils.GetterSetterVerifier;
 
@@ -20,26 +20,26 @@ class HvdcAlignmentConfigurationRecordTest {
     @Test
     void listSettersShouldNotCopyListRefs() {
         GetterSetterVerifier.forClass(HvdcAlignmentConfigurationRecord.class)
-            .exclude("hvdcXNodeAlignmentCouplesDto")
-            .exclude("zeroFlowNodeDtos")
+            .exclude("hvdcXNodeAlignmentCouples")
+            .exclude("zeroFlowNodes")
             .exclude("dkHvdcXnodes")
             .verify();
 
         final HvdcAlignmentConfigurationRecord configurationRecord = new HvdcAlignmentConfigurationRecord();
         final List<String> dkHvdcNodes = new ArrayList<>(List.of("a"));
-        final List<VirtualHubsAlignmentCoupleDto> couples = new ArrayList<>(List.of(new VirtualHubsAlignmentCoupleDto()));
-        final List<ZeroFlowNodeDto> zeroFlowNodes = new ArrayList<>(List.of(new ZeroFlowNodeDto()));
+        final List<VirtualHubsAlignmentCouple> couples = new ArrayList<>(List.of(new VirtualHubsAlignmentCouple()));
+        final List<ZeroFlowNode> zeroFlowNodes = new ArrayList<>(List.of(new ZeroFlowNode()));
         configurationRecord.setDkHvdcXnodes(dkHvdcNodes);
-        configurationRecord.setHvdcXNodeAlignmentCouplesDto(couples);
-        configurationRecord.setZeroFlowNodeDtos(zeroFlowNodes);
+        configurationRecord.setHvdcXNodeAlignmentCouples(couples);
+        configurationRecord.setZeroFlowNodes(zeroFlowNodes);
 
         dkHvdcNodes.add("b");
-        couples.add(new VirtualHubsAlignmentCoupleDto());
-        zeroFlowNodes.add(new ZeroFlowNodeDto());
+        couples.add(new VirtualHubsAlignmentCouple());
+        zeroFlowNodes.add(new ZeroFlowNode());
 
         List.of(configurationRecord.getDkHvdcXnodes(),
-                configurationRecord.getHvdcXNodeAlignmentCouplesDto(),
-                configurationRecord.getZeroFlowNodeDtos())
+                configurationRecord.getHvdcXNodeAlignmentCouples(),
+                configurationRecord.getZeroFlowNodes())
             .forEach(list -> assertThat(list).hasSize(1));
     }
 

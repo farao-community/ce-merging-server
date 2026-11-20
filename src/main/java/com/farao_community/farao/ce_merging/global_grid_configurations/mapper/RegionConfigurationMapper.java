@@ -16,4 +16,6 @@ public interface RegionConfigurationMapper {
     // The DTO ref belongs to the global configuration table: the task gets its own rows
     @Mapping(target = "ref", ignore = true)
     RegionConfiguration mapToRegionConfiguration(RegionConfigurationDto regionConfigurationDto);
+
+    RegionConfigurationDto mapToRegionConfigurationDto(RegionConfiguration regionConfiguration);
 }
