@@ -13,6 +13,7 @@ import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositio
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
+import com.farao_community.farao.ce_merging.merging.process.monita.MonitaService;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
@@ -126,7 +127,7 @@ class MonitaServiceTest {
             when(network.getBoundaryLineStream()).thenAnswer(i -> Stream.of(monita1, monita2));
 
             // when :
-            MonitaService.postTreatmentForMonita(task, results);
+            MonitaService.fixMonitaNetPositions(task, results);
 
             // then :
             assertEquals(0, italyNetPos.getGlobalNetPosition().getWithVirtualHubs());

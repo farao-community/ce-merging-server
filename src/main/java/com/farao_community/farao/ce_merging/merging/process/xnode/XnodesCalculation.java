@@ -9,7 +9,7 @@ package com.farao_community.farao.ce_merging.merging.process.xnode;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.XnodeConfig;
-import com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaService;
+import com.farao_community.farao.ce_merging.merging.process.pisa.PisaService;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
 import com.powsybl.iidm.network.BoundaryLine;

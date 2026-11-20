@@ -7,6 +7,7 @@
 package com.farao_community.farao.ce_merging.merging.process.naming_strategy.dk_renaming;
 
 import com.farao_community.farao.ce_merging.common.CeMergingConstants;
+import com.farao_community.farao.ce_merging.merging.process.dk_renaming.DKNamingStrategy;
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Bus;

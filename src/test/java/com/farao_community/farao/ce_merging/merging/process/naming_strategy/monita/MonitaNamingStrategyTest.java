@@ -6,9 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.naming_strategy.monita;
 
+import com.farao_community.farao.ce_merging.merging.process.monita.MonitaNamingStrategy;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Bus;
-import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.ucte.converter.NamingStrategy;
 import com.powsybl.ucte.network.UcteElementId;
 import org.junit.jupiter.api.Test;

@@ -20,7 +20,6 @@ import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
-import com.powsybl.iidm.network.TieLine;
 import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.ucte.network.UcteCountryCode;
@@ -68,6 +67,14 @@ public final class NetworkUtil {
         return countryCode.getUcteCode() + previousElementId.substring(1, endIndex);
     }
 
+    public static Double getTerminalFlow(final Terminal terminal) {
+        return terminal.isConnected() ? zeroIfNaN(terminal.getP()) : 0;
+    }
+
+    public static double getLineFlow(final Line line) {
+        return (getTerminalFlow(line.getTerminal1()) - getTerminalFlow(line.getTerminal2())) / 2;
+    }
+
     /*-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                     CHECKS & PREDICATES
      -+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+*/
@@ -87,31 +94,13 @@ public final class NetworkUtil {
         return branch -> branch.getId().contains(nodeId);
     }
 
-    public static Predicate<Identifiable> isIdentifiedBy(final String idRegex) {
+    public static Predicate<Identifiable> matches(final String idRegex) {
         final Pattern idPattern = Pattern.compile(idRegex);
         return identifiable -> idPattern.matcher(identifiable.getId()).matches();
     }
 
-    public static boolean isInOutage(final Connectable connectable) {
-        return switch (connectable) {
-            case TieLine tieLine -> isInOutage(tieLine.getBoundaryLine1()) || isInOutage(tieLine.getBoundaryLine2());
-            case BoundaryLine boundaryLine -> isInOutage(boundaryLine);
-            case Terminal terminal -> isInOutage(terminal);
-            case Branch<?> branch -> isInOutage(branch);
-            default -> throw new CeMergingException("outage check not implemented for class %s".formatted(connectable.getClass().getName()));
-        };
-    }
-
-    private static boolean isInOutage(final BoundaryLine line) {
-        return isInOutage(line.getTerminal());
-    }
-
-    private static boolean isInOutage(final Terminal terminal) {
-        return terminal == null || !terminal.isConnected();
-    }
-
-    private static boolean isInOutage(final Branch branch) {
-        return branch == null || isInOutage(branch.getTerminal1()) || isInOutage(branch.getTerminal2());
+    public static boolean isInOutage(final Connectable<?> connectable) {
+        return connectable.getTerminals().stream().noneMatch(Terminal::isConnected);
     }
 
     public static Predicate<BoundaryLine> isPairedWithVirtualHub(final List<VirtualHubRecord> virtualHubList) {
@@ -220,14 +209,6 @@ public final class NetworkUtil {
                 throw new CeMergingException(ERROR_COMPONENT_NUMBER_PARAMETER);
             }
         };
-    }
-
-    public static Double getTerminalFlow(final Terminal terminal) {
-        return terminal.isConnected() ? zeroIfNaN(terminal.getP()) : 0;
-    }
-
-    public static double getLineFlow(final Line line) {
-        return (getTerminalFlow(line.getTerminal1()) - getTerminalFlow(line.getTerminal2())) / 2;
     }
 
     public static String getVlIdOnSide(final Branch<?> branch, final TwoSides side) {

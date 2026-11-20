@@ -19,22 +19,26 @@ Here's how the X-Nodes are counted depending on their presence in config files :
 
 | X-Node is present in  …              | X-Node & VH config                                                      | VH Config                         | X-Node config                                                 | neither*           | 
 |--------------------------------------|-------------------------------------------------------------------------|-----------------------------------|---------------------------------------------------------------|--------------------|
-| examples                             | Alegro, GR-IT, Cobra and HVDC cables going outside the synchronous area | XCEPR120 (created during process) | X-nodes modeled as AC links (including FR-ES and FR-IT HVDCs) | XHR_HR12, XMO_HO11 |
+| examples                             | Alegro, GR-IT, Cobra and HVDC cables going outside the synchronous area | XCEPR120 and PiSa nodes (created during process) | X-nodes modeled as AC links (including FR-ES and FR-IT HVDCs) | XHR_HR12, XMO_HO11 |
 | load counted in Global NP with VH    | ✅                                                                      | ✅                                | ✅                                                            | ✅                 | 
 | load counted in Global NP without VH | ❌                                                                      | ❌                                | ✅                                                            | ✅                 |
 | load counted in outBciNetPosition    | ✅                                                                      | ✅                                | ❌                                                            | ✅                 |
 
 _\* No such X-node should be encountered in real conditions (merging not allowed by supervisor)_
 
-## Monita post-treatment
+## Post-process adjustment
+For some HVDCs, post-treatment is necessary because some X-Nodes are to be displaced, which impacts the net position result.
+### PiSa HVDC
+Process detailed in the [PiSa section](/doc/hourly_task/step_details/pisa.md).
 
-For the MONITA HVDC, post-treatment is necessary:
+### MonIta HVDC
+For the MonIta HVDC, it is because
 Its nodes are all present in the Italian IGM, but we need to have the XKOTR120 and XKOTR220 nodes in Montenegro's IGM to
 be able to apply the BCI step correctly.
 
 Indeed, as we can see in the reference program file provided in outputs, we have :
 
-$NP(IT) = NP(IT→FR) + NP(IT→AT) + NP(IT→SI) + NP(IT→CH) + (XAR\_GA1I + XCEPR220 + XCEPR120)$
+$NP(IT) = NP(IT→FR) + NP(IT→AT) + NP(IT→SI) + NP(IT→CH) + (XAR \\_ GA1I + XCEPR220 + XCEPR120)$
 
 $NP(ME) = NP(ME→RS) + NP(ME→AL) + NP(ME→XK) + NP(ME→BA) + (XKOTR120 + XKOTR220)$
 

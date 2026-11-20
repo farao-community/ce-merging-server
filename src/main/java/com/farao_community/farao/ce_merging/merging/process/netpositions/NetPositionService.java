@@ -13,7 +13,8 @@ import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositio
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
-import com.farao_community.farao.ce_merging.merging.process.naming_strategy.monita.MonitaService;
+import com.farao_community.farao.ce_merging.merging.process.monita.MonitaService;
+import com.farao_community.farao.ce_merging.merging.process.pisa.PisaService;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -83,7 +84,8 @@ public class NetPositionService {
                                     .collect(toMap(Map.Entry::getKey,
                                                    e -> computeNetPositions(task, e.getValue(), e.getKey()))));
 
-            MonitaService.postTreatmentForMonita(task, netPositionsFile);
+            MonitaService.fixMonitaNetPositions(task, netPositionsFile);
+            PisaService.fixPisaNetPositions(task, netPositionsFile);
 
             FileStorageUtils.saveArtifactFile(IGMS_NET_POSITIONS_FILE, netPositionsFile, task, configuration);
             tasksRepository.save(task);
@@ -138,5 +140,4 @@ public class NetPositionService {
         );
         return netPositionsFile.netPositionsByCountryMap().getOrDefault(DE.name(), null);
     }
-
 }

@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.pst_special_process;
 
-import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.BoundaryLine;
+import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isIdentifiedBy;
+import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.matches;
 import static com.powsybl.iidm.network.PhaseTapChanger.RegulationMode.ACTIVE_POWER_CONTROL;
 import static java.lang.Double.isNaN;
 
@@ -88,7 +88,7 @@ public final class PstUtils {
     }
 
     public static <T extends Identifiable> T getPstIdentifiable(final String idRegex, final Stream<T> stream) {
-        final T identifiable = stream.filter(isIdentifiedBy(idRegex)).findFirst().orElse(null);
+        final T identifiable = stream.filter(matches(idRegex)).findFirst().orElse(null);
 
         if (identifiable == null) {
             LOGGER.warn("Cannot find element matching the regex: '{}'", idRegex);
