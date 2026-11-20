@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.pst_special_process;
 
+import com.farao_community.farao.ce_merging.common.util.NetworkUtil;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Network;
@@ -17,7 +18,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isIdentifiedBy;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.Country.SI;
 import static java.util.function.Function.identity;
@@ -51,7 +51,7 @@ public enum SpecialPst {
     }
 
     public boolean matches(final Identifiable<?> identifiable) {
-        return isIdentifiedBy(idRegex).test(identifiable);
+        return NetworkUtil.matches(idRegex).test(identifiable);
     }
 
     public TwoWindingsTransformer findInNetwork(final Network network) {

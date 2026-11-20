@@ -10,7 +10,6 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
-import com.farao_community.farao.ce_merging.merging.process.netpositions.NetPositionService;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
@@ -83,7 +82,7 @@ public class MonitaService {
     private static void addToMontenegro(final String monitaNode,
                                         final double monitaFlow,
                                         final NetPositions montenegrinNetPositions) {
-        NetPositionService.addVirtualHubFlow(monitaFlow, montenegrinNetPositions);
+        montenegrinNetPositions.addVirtualHubFlow(monitaFlow);
         final double flowUpdated = montenegrinNetPositions.getVirtualHubFlow(monitaNode) + monitaFlow;
         montenegrinNetPositions.getVirtualHubsExchanges().put(monitaNode, flowUpdated);
     }
@@ -91,7 +90,7 @@ public class MonitaService {
     private static void removeFromItaly(final String monitaNode,
                                         final NetPositions italianNetPositions) {
         final double monitaFlow = italianNetPositions.getVirtualHubFlow(monitaNode);
-        NetPositionService.removeVirtualHubFlow(monitaFlow, italianNetPositions);
+        italianNetPositions.removeVirtualHubFlow(monitaFlow);
         italianNetPositions.getVirtualHubsExchanges().remove(monitaNode);
     }
 }

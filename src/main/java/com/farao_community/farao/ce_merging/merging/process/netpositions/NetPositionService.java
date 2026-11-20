@@ -10,7 +10,6 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
-import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
 import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
@@ -141,21 +140,4 @@ public class NetPositionService {
         );
         return netPositionsFile.netPositionsByCountryMap().getOrDefault(DE.name(), null);
     }
-
-    public static void removeVirtualHubFlow(final Double virtualHubFlow,
-                                            final NetPositions countryNetPositions) {
-        addVirtualHubFlow(-virtualHubFlow, countryNetPositions);
-    }
-
-    public static void addVirtualHubFlow(final Double virtualHubFlow,
-                                         final NetPositions countryNetPositions) {
-        final NetPositionsValues globalNp = countryNetPositions.getGlobalNetPosition();
-
-        final double globalNetPosition = globalNp.getWithVirtualHubs();
-        globalNp.setWithVirtualHubs(globalNetPosition + virtualHubFlow);
-
-        final double outBciNetPosition = countryNetPositions.getOutBciNetPosition();
-        countryNetPositions.setOutBciNetPosition(outBciNetPosition + virtualHubFlow);
-    }
-
 }

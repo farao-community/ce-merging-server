@@ -34,7 +34,7 @@ be able to apply the BCI step correctly.
 
 Indeed, as we can see in the reference program file provided in outputs, we have :
 
-$NP(IT) = NP(IT→FR) + NP(IT→AT) + NP(IT→SI) + NP(IT→CH) + (XAR\_GA1I + XCEPR220 + XCEPR120)$
+$NP(IT) = NP(IT→FR) + NP(IT→AT) + NP(IT→SI) + NP(IT→CH) + (XAR \_ GA1I + XCEPR220 + XCEPR120)$
 
 $NP(ME) = NP(ME→RS) + NP(ME→AL) + NP(ME→XK) + NP(ME→BA) + (XKOTR120 + XKOTR220)$
 
