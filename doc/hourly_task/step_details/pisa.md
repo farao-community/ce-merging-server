@@ -43,5 +43,5 @@ $$= -IPI \\_ GI11/12 →XFG.IL11/13$$
 
 $$= FFG.IL11/13→XPI \\_ GI11/12$$
 
-$⇒$ it would remain unchanged
+$⇒$ it remains unchanged
 
