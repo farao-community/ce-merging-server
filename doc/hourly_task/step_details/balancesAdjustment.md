@@ -1,6 +1,6 @@
 # Balances Adjustment
 
-To execute this step, we have to convert the current CGM to XIIDM format, then back to UCTE for the output.
+To execute this step, we have to convert the current CGM to [XIIDM format](https://powsybl.readthedocs.io/projects/powsybl-core/en/stable/grid_exchange_formats/iidm/index.html), then back to UCTE for the output.
 
 ## Balances area definition
 Balances adjustment algorithm is based on the definition of balance areas. Each area is defined by three important elements:
@@ -13,7 +13,7 @@ For this particular process, an area is created for each UCTE country.
 
 ## Balancing algorithm
 The net position of the country is calculated as the sum of:
-- Active loads of XNodes connected to a [substation](https://javadoc.io/doc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/Substation.html) in the country,
+- Active loads of XNodes connected to a [substation](https://javadoc.iodoc/com.powsybl/powsybl-core/latest/com/powsybl/iidm/network/Substation.html) in the country,
 - Leaving flows of lines connected :
   - in the country on one side
   - outside the country on the other side

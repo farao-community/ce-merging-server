@@ -10,7 +10,6 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
-import com.farao_community.farao.ce_merging.common.util.FileStorageUtils;
 import com.farao_community.farao.ce_merging.common.util.LogsCustomisationUtils;
 import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.MergingStep;
 import com.farao_community.farao.ce_merging.merging.process.monita.MonitaService;
@@ -36,6 +35,7 @@ import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DANISH_TSO;
 import static com.farao_community.farao.ce_merging.common.util.CountryCodeUtils.mapItBzToIt;
+import static com.farao_community.farao.ce_merging.common.util.FileStorageUtils.saveArtifactFile;
 import static com.farao_community.farao.ce_merging.common.util.LoadFlowUtils.runLoadFlowWithBalanceTypeCorrection;
 import static com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler.computeCountryNetPositions;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.DK_CONVERTED_FILE;
@@ -87,9 +87,11 @@ public class NetPositionService {
             MonitaService.fixMonitaNetPositions(task, netPositionsFile);
             PisaService.fixPisaNetPositions(task, netPositionsFile);
 
-            FileStorageUtils.saveArtifactFile(IGMS_NET_POSITIONS_FILE, netPositionsFile, task, configuration);
+            LOGGER.info(netPositionsFile.toString());
+
+            saveArtifactFile(IGMS_NET_POSITIONS_FILE, netPositionsFile, task, configuration);
             tasksRepository.save(task);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             String errorMessage = String.format("Initial net positions calculation failed for task %d with target date %s, cause: %s", task.getId(), task.getInputs().getTargetDate(), e.getMessage());
             LOGGER.error(errorMessage);
             throw new CeMergingException(errorMessage, e);

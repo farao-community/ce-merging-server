@@ -90,25 +90,18 @@ public class PisaService {
             return;
         }
 
-        //  since XPI will no longer be XNodes, we remove IPIOTA11->IPI = IPIOTA11->XPI from italian NP
-        CURRENT_TO_FUTURE_ITA_HUBS.forEach((xpi, xfg) -> {
-            italyNetPosition.removeVirtualHubFlow(getPisaBoundaryP0(xpi, IT, task));
-            italyNetPosition.getVirtualHubsExchanges().put(xfg, -getPisaBoundaryP0(xpi, FR, task));
-            italyNetPosition.getVirtualHubsExchanges().remove(xpi);
+        CURRENT_TO_FUTURE_ITA_HUBS.forEach((current, future) -> {
+            italyNetPosition.removeVirtualHubFlow(getPisaBoundaryP0(current, IT, task));
+            italyNetPosition.getVirtualHubsExchanges().put(future, -getPisaBoundaryP0(current, FR, task));
+            italyNetPosition.getVirtualHubsExchanges().remove(current);
         });
 
-        // since FFG will become XNodes, we add IPI->XFG(ITA) to italian NP
-        //                                      = -XFG(ITA)->IPI = FFG(FR)->XPI
-        CURRENT_TO_FUTURE_FR_HUBS.forEach((xpi, xfg) -> {
-            final double ffgToXpi = getPisaBoundaryP0(xpi, FR, task);
+        CURRENT_TO_FUTURE_FR_HUBS.forEach((current, future) -> {
+            final double ffgToXpi = getPisaBoundaryP0(current, FR, task);
             italyNetPosition.addVirtualHubFlow(ffgToXpi);
-            franceNetPosition.getVirtualHubsExchanges().put(xfg, ffgToXpi);
-            franceNetPosition.getVirtualHubsExchanges().remove(xpi);
+            franceNetPosition.getVirtualHubsExchanges().put(future, ffgToXpi);
+            franceNetPosition.getVirtualHubsExchanges().remove(current);
         });
-
-        // for french NP we remove FFG(FR)->XPI and add FG.ILE->XFG(FR) = -IPI->XFG(ITA) = FFG(FR)->XPI
-        // <=> it remains unchanged
-
     }
 
     private static double getPisaBoundaryP0(final String pisaNode, final Country country, final MergingTask task) {

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
@@ -23,6 +24,21 @@ public class NetPositions {
     private final Map<String, Double> virtualHubsExchanges;
     private final Map<String, Double> globalDetailedExchanges;
     private final GenerationAndLoadQuantity generationAndLoadQuantity;
+
+    @Override
+    public String toString() {
+        return "\tglobal " + globalNetPosition + '\n' +
+               "\tin region " + inRegionNetPosition + '\n' +
+               "\tout BCI: " + (int) outBciNetPosition + " MW\n" +
+               "\tvirtual hub exchanges: " + printExchanges(virtualHubsExchanges) + '\n' +
+               '\t' + generationAndLoadQuantity;
+    }
+
+    private String printExchanges(final Map<String, Double> exchanges) {
+        return exchanges.entrySet().stream()
+                .map(e -> e.getKey() + ": " + e.getValue().intValue() + " MW")
+                .collect(Collectors.joining(", "));
+    }
 
     @JsonCreator
     public NetPositions(@JsonProperty("globalNetPosition") final NetPositionsValues globalNetPosition,

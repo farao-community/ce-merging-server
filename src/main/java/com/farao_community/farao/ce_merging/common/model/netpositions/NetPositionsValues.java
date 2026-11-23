@@ -36,4 +36,10 @@ public class NetPositionsValues {
     public void setWithoutVirtualHubs(double withoutVirtualHubs) {
         this.withoutVirtualHubs = withoutVirtualHubs;
     }
+
+    @Override
+    public String toString() {
+        return "with virtual hubs: " + (int) withVirtualHubs + " MW,"
+               + ", without : " + (int) withoutVirtualHubs + " MW";
+    }
 }

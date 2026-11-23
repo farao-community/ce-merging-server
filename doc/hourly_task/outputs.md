@@ -1,5 +1,5 @@
 # Hourly merging - additonal outputs
-In addition to the CGM computed in [the previous steps](/doc/hourly_task/calculations.md), there are other inputs :
+In addition to the CGM computed in [the previous steps](doc/hourly_task/calculations.md), there are other inputs :
 
 ## Reference Program (RefProg)
 A Reference Program computation is run for each hour. 
@@ -29,7 +29,7 @@ Modelisation of boundary exchanges follows the following format:
 
 ### Exchanges in CE region (without virtual hubs):
 - Retrieve **CGM Net Positions** artifact, which contains target net position in CE region,
-- Get the [Bec Sharing Keys](/doc/globalGridConfigurations.md) information as a matrix ,
+- Get the [Bec Sharing Keys](doc/globalGridConfigurations.md) information as a matrix ,
 - Compute the NP using the formula for the flow on each CE border, noted $X$ ; summing over other countries $i$ :
 
 ![CE net position formula](refprog_border.png)
@@ -57,7 +57,7 @@ What is called merging logs is a report file that contains 4 types of reports :
 - **Report for CE hubs :** contains net positions, generation and load quantities, and global balances (global net positions without HVDC) for each Country in CE,
 - **Report for Non-CE hubs :** contains initial and final target global net positions, generation and load quantities, and global balances (global net positions without HVDC), for each country outside CE,
 - **Report for TSO :** contains global balances, generation and load quantities, only for German TSOs,
-- **Flow report on SI-IT :** contains data about the exchanges between [Divača and Padriciano](/doc/hourly_task/step_details/specialPst.md).
+- **Flow report on SI-IT :** contains data about the exchanges between [Divača and Padriciano](doc/hourly_task/step_details/specialPst.md).
 
 ## Quality Checks
-[Previously mentioned](/doc/overview.md) GLSK and IGM quality checks are also part of the outputs provided by the merging tool.
+[Previously mentioned](doc/overview.md) GLSK and IGM quality checks are also part of the outputs provided by the merging tool.

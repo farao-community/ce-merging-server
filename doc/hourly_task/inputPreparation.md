@@ -7,7 +7,7 @@ For every X-Node found in IGMs, we check if there are inconsistencies :
 - Is there a difference in statuses between two IGMs?
 - Is there an X-Node undefined in the X-Node configuration file?
 
-If so, these discrepancies are saved in an X-Node inconsistencies file.
+If so, these discrepancies are saved in an [X-Node inconsistencies artifact](doc/hourly_task/artifacts.md).
 ## NPF import
 The net position file is an XML that comes from user input; it contains a time period interval that we compare with our task's date to check its validity. 
 
@@ -24,7 +24,7 @@ if it's one of these, it defines how we model the intervals of time :
 ## German pre-merge
 Since there are [several German TSOs](https://www.tsodsoplatform.eu/capacitypedia/germany), we receive 5 different IGMs, with the "country" codes being D2, D4, D6, D7 and D8.
 
-In this step, we merge these into a single German UCTE file, with the country code DE.
+In this step, we merge these into a single German UCTE file, with the country code DE; this is the [German pre-merged IGM artifact](doc/hourly_task/artifacts.md).
 The XNodes merged during the process are then converted into German non-X nodes, since these are not representing a border node anymore.
 Then we run a first load flow on this merged German network.
 
@@ -33,7 +33,7 @@ Finally, we calculate the german internal mismatch $M$ by summing all internal n
 $FLOW_{UPDATED} = FLOW_{INITIAL} + (M \times | \frac{FLOW_{INITIAL}}{\sum NP_{EXTERNAL}}|)$
 
 ## Denmark renaming
-The IGM files that we receive from Danish TSO have nodes defined in the **##ZD1** zone and have names starting with D1.
+The IGM files that we receive from Danish TSO have nodes defined in the **##ZD1** zone and have names starting with D1. The converted network is saved as a [Denmark converted IGM artifact](doc/hourly_task/artifacts.md).
 
 To avoid clash with german country code, any node whose name starts with _D1_ will be moved in the **##ZDK** zone and renamed to start with _K1_.
 
@@ -42,7 +42,7 @@ will be moved in **##ZDK** zone and renamed to start with X.
 
 Any element (line, transformer...) that references these nodes is also renamed.
 ## HVDC alignment
-For each couple defined in the HVDC alignment configuration, we check if one of the nodes was not found in the virtual hub configuration. 
+For each couple defined in the [HVDC alignment configuration](doc/globalGridConfigurations.md#hvdc-alignment-configuration), we check if one of the nodes was not found in the virtual hub configuration. 
 If the two nodes have been recovered correctly, we find the corresponding countries using the _RelatedMa_ field, and then the corresponding IGMs.
 
 If we cannot find any one of these, we emit an error.
@@ -56,6 +56,6 @@ If the two dangling lines have been recovered correctly, we apply the HVDC align
 We then save the modified IGMs in the artifacts with the same name.
 ## MONITA renaming
 The nodes describing the MONITA (**MON**tenegro - **ITA**ly) HVDC don't start with an X. To include them correctly in the following calculations, they have to, so we rename these:
-- ICEPR → XCEPR
-- IKOTR → XKOTR.
+- $ICEPR → XCEPR$
+- $IKOTR → XKOTR$
 
