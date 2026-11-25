@@ -13,6 +13,8 @@ There could also be multi-terminal (MT) HVDC as depicted below :
 
 ![MT example](MT_HVDC.svg)
 
+![MT configuration](MT_cfg.png)
+
 ## Mapping and flow calculation
 
 When an internal HVDC is encountered in the configuration, the CGM value should be based on the NPF.
@@ -29,6 +31,7 @@ For each line of a pole :
   - If both are $0$, set the generation to $+F_{node}$
 
 Here is an example of **D4** input with the generations and loads:
+
 ![UCTE example](Ultranet_UCTE.png)
 
 
