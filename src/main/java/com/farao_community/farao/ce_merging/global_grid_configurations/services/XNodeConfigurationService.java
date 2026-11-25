@@ -39,10 +39,10 @@ public class XNodeConfigurationService extends AbstractGridConfigurationService<
     public JsonXNodeConfiguration getConfiguration(OffsetDateTime targetDate) {
         try {
             XNodeConfigurationRecord configRecord = repository.findLatestValidOfType(toUtcLocalDateTime(targetDate));
-            LOGGER.info("configuration retrieved from server");
+            LOGGER.info(getRetrievedMessage("X-Node"));
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {
-            LOGGER.warn("configuration cannot be retrieved, default configuration will be used, cause : ", e);
+            LOGGER.warn(getFallbackToDefaultMessage("X-Node"));
             return getDefaultJsonConfiguration(targetDate);
         }
     }

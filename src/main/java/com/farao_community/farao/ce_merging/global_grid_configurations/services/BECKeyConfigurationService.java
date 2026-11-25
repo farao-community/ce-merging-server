@@ -50,10 +50,10 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
     public JsonBecConfiguration getConfiguration(OffsetDateTime targetDate) {
         try {
             BECKeyConfigurationRecord configRecord = repository.findLatestValidOfType(toUtcLocalDateTime(targetDate));
-            LOGGER.info("configuration retrieved from server");
+            LOGGER.info(getRetrievedMessage("BEC keys"));
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {
-            LOGGER.warn("configuration cannot be retrieved, default configuration will be used, cause : ", e);
+            LOGGER.warn(getFallbackToDefaultMessage("BEC keys"));
             return getDefaultJsonConfiguration(targetDate);
         }
     }

@@ -87,8 +87,6 @@ public class NetPositionService {
             MonitaService.fixMonitaNetPositions(task, netPositionsFile);
             PisaService.fixPisaNetPositions(task, netPositionsFile);
 
-            LOGGER.info("Initial net positions : {}", netPositionsFile);
-
             saveArtifactFile(IGMS_NET_POSITIONS_FILE, netPositionsFile, task, configuration);
             tasksRepository.save(task);
         } catch (final Exception e) {

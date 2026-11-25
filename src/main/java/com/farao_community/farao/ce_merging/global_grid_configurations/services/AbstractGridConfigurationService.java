@@ -63,4 +63,12 @@ public abstract class AbstractGridConfigurationService<R, C> {
         return fileContent;
     }
 
+    protected String getRetrievedMessage(final String configurationName) {
+        return "%s configuration retrieved from server".formatted(configurationName);
+    }
+
+    protected String getFallbackToDefaultMessage(final String configurationName) {
+        return "%s configuration cannot be retrieved, default configuration will be used".formatted(configurationName);
+    }
+
 }

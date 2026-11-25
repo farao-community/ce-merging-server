@@ -38,10 +38,10 @@ public class RegionConfigurationService extends AbstractGridConfigurationService
     public JsonRegionConfiguration getConfiguration(OffsetDateTime targetDate) {
         try {
             RegionConfigurationRecord configRecord = repository.findLatestValidOfType(toUtcLocalDateTime(targetDate));
-            LOGGER.info("configuration retrieved from server");
+            LOGGER.info(getRetrievedMessage("Region"));
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {
-            LOGGER.warn("configuration cannot be retrieved, default configuration will be used, cause : ", e);
+            LOGGER.warn(getFallbackToDefaultMessage("Region"));
             return getDefaultJsonConfiguration(targetDate);
         }
     }

@@ -39,10 +39,10 @@ public class VirtualHubsConfigurationService extends AbstractGridConfigurationSe
     public VirtualHubsConfiguration getConfiguration(OffsetDateTime targetDate) {
         try {
             VirtualHubsConfigurationRecord configRecord = repository.findLatestValidOfType(toUtcLocalDateTime(targetDate));
-            LOGGER.info("configuration retrieved from server");
+            LOGGER.info(getRetrievedMessage("Virtual hubs"));
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {
-            LOGGER.warn("configuration cannot be retrieved, default configuration will be used, cause : ", e);
+            LOGGER.warn(getFallbackToDefaultMessage("Virtual hubs"));
             return getDefaultJsonConfiguration(targetDate);
         }
     }
