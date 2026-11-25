@@ -13,14 +13,12 @@ import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingT
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
-import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -74,7 +72,7 @@ class CgmResultsServiceTest {
     }
 
     @Test
-    void shouldCreateCgmZip() throws IOException, JAXBException, ParserConfigurationException {
+    void shouldCreateCgmZip() throws IOException {
 
         try (final MockedStatic<CgmRecognitionBuilder> cgmRecoMock = mockStatic(CgmRecognitionBuilder.class)) {
             final byte[] cgmRecognitionFile = Files.readAllBytes(Paths.get("src", "test", "resources", "cgmResult", "cgmRecognition_mock.xml"));

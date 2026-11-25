@@ -39,6 +39,7 @@ import static java.nio.file.Files.newInputStream;
 
 public final class JaxbUtils {
     private static final String WRITING_BYTES = "writing a %s object to bytes";
+
     private JaxbUtils() {
         // utility class
     }
