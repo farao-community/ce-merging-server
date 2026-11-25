@@ -20,8 +20,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.util.FileSystemUtils;
 import test_utils.CeTestUtils;
 
@@ -39,11 +37,11 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.readAllBytes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.getTestConfiguration;
 import static test_utils.CeTestUtils.stringPathOf;
 import static test_utils.assertions.BciAreaResultsAssert.assertThat;
 import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
-@SpringBootTest
 class BciProcessorTest {
     private BciProcessor bciProcessor;
 
@@ -58,13 +56,11 @@ class BciProcessorTest {
     private String alegroDataPath;
     private String initialNetPositionsPath;
 
-    private OffsetDateTime processTargetDate = OffsetDateTime.parse("2019-06-18T00:30Z");
+    private final OffsetDateTime processTargetDate = OffsetDateTime.parse("2019-06-18T00:30Z");
 
     private RegionConfiguration regionConfiguration;
-    private String jsonEicConfig;
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
 
     @BeforeEach
     void setUp() throws IOException {
@@ -81,7 +77,7 @@ class BciProcessorTest {
 
         ObjectMapper objectMapper = new ObjectMapper();
         File resourceRegion = CeTestUtils.pathOf("bci/region_configuration.json").toFile();
-        jsonEicConfig = new String(readAllBytes(resourceRegion.toPath()));
+        final String jsonEicConfig = new String(readAllBytes(resourceRegion.toPath()));
         regionConfiguration = objectMapper.readValue(jsonEicConfig, RegionConfiguration.class);
     }
 

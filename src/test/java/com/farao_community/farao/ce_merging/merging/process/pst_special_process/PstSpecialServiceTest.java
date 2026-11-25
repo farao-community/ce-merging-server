@@ -17,20 +17,12 @@ import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.openloadflow.OpenLoadFlowProvider;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.function.Supplier;
 
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.DIVACA;
 import static com.farao_community.farao.ce_merging.merging.process.pst_special_process.SpecialPst.PADRICIANO;
@@ -40,33 +32,17 @@ import static java.lang.Double.isNaN;
 import static java.nio.file.Files.createDirectories;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static test_utils.CeTestUtils.getTestConfiguration;
 import static test_utils.TaskTestUtils.setLoadflowParameters;
 
-@SpringBootTest
-@ActiveProfiles("testForPST")
 class PstSpecialServiceTest {
 
-    @TestConfiguration()
-    @Profile("testForPST")
-    static class PlatformConfigTestContextConfig {
-        @Bean
-        @Primary
-        public Supplier<LoadFlow.Runner> testLoadflowSupplier() {
-            return this::getLoadFlowRunner;
-        }
-
-        private LoadFlow.Runner getLoadFlowRunner() {
-            return new LoadFlow.Runner(new OpenLoadFlowProvider());
-        }
-    }
-
-    @Autowired
-    PstSpecialService pstSpecialService;
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
 
     private final Path resourceDirectory = Paths.get("src", "test", "resources", "pst_special");
     private final String absolutePath = resourceDirectory.toFile().getAbsolutePath();
+
+    private final PstSpecialService service = new PstSpecialService(configuration, () -> new LoadFlow.Runner(new OpenLoadFlowProvider()));
 
     @Test
     void shouldApplyProcess1WhenNoDivacaTargetFlow() throws IOException {
@@ -75,7 +51,7 @@ class PstSpecialServiceTest {
                                             "/process1/20260620_1130_2D3_AT3.uct",
                                             "/process1/20260620_1130_2D3_UX0.uct");
 
-        pstSpecialService.fixPst(task);
+        service.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
         assertEquals(1, result.getProcessNumber());
@@ -95,7 +71,7 @@ class PstSpecialServiceTest {
                                             "/process1/20260620_1130_2D3_AT3.uct",
                                             "/process1/divacaOutage/20260620_1130_2D1_UX0.uct");
 
-        pstSpecialService.fixPst(task);
+        service.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
         assertEquals(1, result.getProcessNumber());
@@ -115,7 +91,7 @@ class PstSpecialServiceTest {
                                             "/process1/20260620_1130_2D3_AT3.uct",
                                             "/process1/padricianoOutage/20260620_1130_2D1_UX0.uct");
 
-        pstSpecialService.fixPst(task);
+        service.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
         assertEquals(1, result.getProcessNumber());
@@ -135,7 +111,7 @@ class PstSpecialServiceTest {
                                             "/process1/20260620_1130_2D3_AT3.uct",
                                             "/error/20260620_1130_2D3_UX0.uct");
 
-        pstSpecialService.fixPst(task);
+        service.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
         assertEquals(1, result.getProcessNumber());
@@ -155,7 +131,7 @@ class PstSpecialServiceTest {
                                             "/process2/20260620_1130_2D3_AT3.uct",
                                             "/process2/20260620_1130_2D3_UX0.uct");
 
-        pstSpecialService.fixPst(task);
+        service.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
         assertEquals(2, result.getProcessNumber());
@@ -175,7 +151,7 @@ class PstSpecialServiceTest {
                                             "/process2/20260620_1130_2D3_AT3.uct",
                                             "/process2/padricianoOutage/20260620_1130_2D1_UX0.uct");
 
-        pstSpecialService.fixPst(task);
+        service.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
         assertEquals(2, result.getProcessNumber());
@@ -196,7 +172,7 @@ class PstSpecialServiceTest {
                                             "/process2/20260620_1130_2D3_AT3.uct",
                                             "/process2/divacaOutage/20260620_1130_2D1_UX0.uct");
 
-        pstSpecialService.fixPst(task);
+        service.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
         assertEquals(2, result.getProcessNumber());
@@ -217,7 +193,7 @@ class PstSpecialServiceTest {
                                             "/process1/20260620_1130_2D3_AT3.uct",
                                             "/process3/20260620_1130_2D1_UX0.uct");
 
-        pstSpecialService.fixPst(task);
+        service.fixPst(task);
         final PstOutput result = task.getArtifact(PST_OUTPUT_FILE, PstOutput.class);
 
         assertEquals(3, result.getProcessNumber());

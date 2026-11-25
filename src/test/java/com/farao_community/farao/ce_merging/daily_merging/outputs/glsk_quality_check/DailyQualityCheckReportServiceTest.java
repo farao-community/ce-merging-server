@@ -16,8 +16,6 @@ import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.QualityCheckReport;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,19 +28,17 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockDailyMergingRepository;
 
-@SpringBootTest
 class DailyQualityCheckReportServiceTest {
     private final Path resourceDirectory = Paths.get("src", "test", "resources", "glskFix");
 
-    @Autowired
-    private DailyMergingRepository dailyCeMergingRepository;
+    private final DailyMergingRepository repository = mockDailyMergingRepository();
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
 
-    @Autowired
-    private DailyQualityCheckReportService dailyQualityCheckReportService;
+    private final DailyQualityCheckReportService dailyQualityCheckReportService = new DailyQualityCheckReportService(configuration, repository);
 
     private MergingTask task1;
     private MergingTask task2;
@@ -94,7 +90,7 @@ class DailyQualityCheckReportServiceTest {
         final DailyMergingTask dailyMergingTask = new DailyMergingTask();
         dailyMergingTask.setVersion(4);
         dailyMergingTask.setDailyInputs(new DailyInputs());
-        return dailyCeMergingRepository.save(dailyMergingTask);
+        return repository.save(dailyMergingTask);
     }
 }
 

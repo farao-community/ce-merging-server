@@ -10,22 +10,17 @@ import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingT
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.dailyTaskWithId;
+import static test_utils.CeTestUtils.getTestConfiguration;
 import static test_utils.CeTestUtils.taskWithIdAndStatus;
 
-@SpringBootTest
-@TestConfiguration
 class CeMergingConfigurationTest {
 
-    @Autowired
-    CeMergingConfiguration configuration;
+    CeMergingConfiguration configuration = getTestConfiguration();
 
     @Test
     void shouldObtainCorrectPaths() {

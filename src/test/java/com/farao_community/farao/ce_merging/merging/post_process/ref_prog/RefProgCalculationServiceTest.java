@@ -14,6 +14,7 @@ import com.farao_community.farao.ce_merging.global_grid_configurations.model.ent
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecCoefficients;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.Border;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
+import com.farao_community.farao.ce_merging.global_grid_configurations.services.RegionConfigurationService;
 import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
@@ -25,8 +26,7 @@ import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import test_utils.CeTestUtils;
 import test_utils.TaskTestUtils;
 
 import java.math.BigDecimal;
@@ -43,9 +43,12 @@ import java.util.stream.Collectors;
 import static java.math.BigInteger.valueOf;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockBECKeyConfigurationRepository;
+import static test_utils.CeTestUtils.mockMergingTaskRepository;
+import static test_utils.CeTestUtils.mockRegionConfigurationRepository;
 import static test_utils.CeTestUtils.mockSavedFile;
 
-@SpringBootTest
 class RefProgCalculationServiceTest {
     private static final String BIDDING_ZONE_FILE_PATH = "src/test/resources/request-metadata/inputs/biddingzoneucte.xml";
     private static final String LF_PARAMS_FILE_PATH = "loadflow_parameters/ac-load-flow-parameters_all_components.json";
@@ -61,17 +64,12 @@ class RefProgCalculationServiceTest {
     private Map<String, Double> nonCeExpectedResults;
     private Map<String, PublicationDocument.PublicationTimeSeries> indexedTimeSeries;
 
-    @Autowired
-    BECKeyConfigurationService becKeyConfigurationService;
+    RegionConfigurationService regionConfigurationService = new RegionConfigurationService(mockRegionConfigurationRepository());
+    private final BECKeyConfigurationService becKeyConfigurationService = new BECKeyConfigurationService(regionConfigurationService, mockBECKeyConfigurationRepository());
+    private final CeMergingConfiguration configuration = getTestConfiguration();
+    MergingTaskRepository repository = mockMergingTaskRepository();
 
-    @Autowired
-    private CeMergingConfiguration configuration;
-
-    @Autowired
-    RefProgCalculationService refProgCalculationService;
-
-    @Autowired
-    MergingTaskRepository repository;
+    RefProgCalculationService refProgCalculationService = new RefProgCalculationService(repository, configuration, CeTestUtils::mockLoadFlowRunner);
 
     MergingTask task = new MergingTask();
 

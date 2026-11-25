@@ -16,8 +16,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.xsd.merging_logs.MergingLog;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,8 +27,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockDailyMergingRepository;
 
-@SpringBootTest
 class DailyMergingLogsServiceTest {
 
     private static final Path RESOURCE_DIRECTORY = Paths.get("src", "test", "resources", "mergingLogs");
@@ -39,14 +38,11 @@ class DailyMergingLogsServiceTest {
     private MergingTask task2;
     private MergingTask task3;
 
-    @Autowired
-    private DailyMergingRepository repository;
+    private final DailyMergingRepository repository = mockDailyMergingRepository();
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
 
-    @Autowired
-    private DailyMergingLogsService service;
+    private final DailyMergingLogsService service = new DailyMergingLogsService(configuration, repository);
 
     @BeforeEach
     void setUp() {

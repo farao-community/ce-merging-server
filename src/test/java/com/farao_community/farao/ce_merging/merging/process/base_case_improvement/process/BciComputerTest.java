@@ -15,12 +15,6 @@ import com.farao_community.farao.ce_merging.merging.process.base_case_improvemen
 import com.farao_community.farao.ce_merging.merging.process.base_case_improvement.data.result.BciComputationResult;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.HashMap;
 import java.util.List;
@@ -42,11 +36,8 @@ import static test_utils.mockdata.ReferenceProgramTestData.mockRefProg5;
 import static test_utils.mockdata.ReferenceProgramTestData.mockRefProg6;
 import static test_utils.mockdata.ReferenceProgramTestData.mockRefProg7;
 
-@SpringBootTest
-@ActiveProfiles("BciComputationTest")
 class BciComputerTest {
-    @Autowired
-    private RegionConfiguration regionConfiguration;
+    private final RegionConfiguration regionConfiguration = getRegionConfiguration();
 
     private static final double EPSILON = 0.01;
     private static final List<BciTestCase> TEST_CASES = List.of(
@@ -152,23 +143,17 @@ class BciComputerTest {
         assertRegionIsBalanced(results);
     }
 
-    @Configuration
-    @Profile("BciComputationTest")
-    static class ContextConfiguration {
-
-        @Bean
-        public RegionConfiguration regionConfiguration() {
-            RegionConfiguration regionConfiguration = new RegionConfiguration();
-            Map<String, String> areasId = new HashMap<>();
-            areasId.put("N1", "ONE");
-            areasId.put("N12", "TWELVE");
-            areasId.put("N8", "EIGHT");
-            areasId.put("BE", "TWENTYFIVE");
-            regionConfiguration.setId("CE");
-            regionConfiguration.setName("CE");
-            regionConfiguration.setAreasIn(areasId);
-            return regionConfiguration;
-        }
+    public RegionConfiguration getRegionConfiguration() {
+        RegionConfiguration regionConfiguration = new RegionConfiguration();
+        Map<String, String> areasId = new HashMap<>();
+        areasId.put("N1", "ONE");
+        areasId.put("N12", "TWELVE");
+        areasId.put("N8", "EIGHT");
+        areasId.put("BE", "TWENTYFIVE");
+        regionConfiguration.setId("CE");
+        regionConfiguration.setName("CE");
+        regionConfiguration.setAreasIn(areasId);
+        return regionConfiguration;
     }
 
     private void assertRegionIsBalanced(final Map<String, BciAreaResults> results) {

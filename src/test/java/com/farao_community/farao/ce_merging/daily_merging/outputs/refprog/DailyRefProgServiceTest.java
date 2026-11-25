@@ -15,8 +15,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,10 +26,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockDailyMergingRepository;
 import static test_utils.CeTestUtils.mockTaskWithRefProgResult;
 import static test_utils.assertions.TimeSeriesAssert.assertThat;
 
-@SpringBootTest
 class DailyRefProgServiceTest {
     private MergingTask task1;
     private MergingTask task2;
@@ -39,14 +38,11 @@ class DailyRefProgServiceTest {
     private MergingTask task4;
     private MergingTask task5;
 
-    @Autowired
-    private DailyMergingRepository repository;
+    private final DailyMergingRepository repository = mockDailyMergingRepository();
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
 
-    @Autowired
-    private DailyRefProgService builder;
+    private final DailyRefProgService service = new DailyRefProgService(configuration, repository);
 
     @BeforeEach
     void setUp() {
@@ -60,7 +56,7 @@ class DailyRefProgServiceTest {
     @Test
     void shouldBuildDailyRefProg() {
         final List<MergingTask> tasksList = List.of(task1, task2);
-        final PublicationDocument publicationDocument = builder.buildDailyRefProg(1, tasksList, 24);
+        final PublicationDocument publicationDocument = service.buildDailyRefProg(1, tasksList, 24);
         assertEquals(1, publicationDocument.getDtdVersion().intValue());
         assertEquals(0, publicationDocument.getDtdRelease().intValue());
 
@@ -93,7 +89,7 @@ class DailyRefProgServiceTest {
     @Test
     void shouldExportBorderWhenBorderPresentForTaskButNotForAnother() {
         final List<MergingTask> tasksList = Arrays.asList(task3, task4);
-        final PublicationDocument publicationDocument = builder.buildDailyRefProg(1, tasksList, 24);
+        final PublicationDocument publicationDocument = service.buildDailyRefProg(1, tasksList, 24);
         final List<String> timeSeriesIdentificationList = publicationDocument.getPublicationTimeSeries()
                 .stream()
                 .map(publication -> publication.getTimeSeriesIdentification().getV())
@@ -104,13 +100,13 @@ class DailyRefProgServiceTest {
     @Test
     void shouldThrowExceptionWhenTasksHaveDifferentInterval() {
         final List<MergingTask> tasksList = Arrays.asList(task4, task5);
-        assertThrows(CeMergingException.class, () -> builder.buildDailyRefProg(1, tasksList, 24));
+        assertThrows(CeMergingException.class, () -> service.buildDailyRefProg(1, tasksList, 24));
     }
 
     @Test
     void shouldNotThrowExceptionWhenTasksHaveSameInterval() {
         final List<MergingTask> tasksList = Arrays.asList(task1, task2, task3, task4);
-        builder.buildDailyRefProg(1, tasksList, 24);
+        service.buildDailyRefProg(1, tasksList, 24);
     }
 
     @Test
@@ -127,7 +123,7 @@ class DailyRefProgServiceTest {
                                                                        "CORESO",
                                                                        "123456"
         );
-        builder.computeDailyRefProg(dailyTask, tasksList, requestInformation);
+        service.computeDailyRefProg(dailyTask, tasksList, requestInformation);
         assertTrue(new File(dailyTask.getDailyOutputs().getRefProg().getPath()).exists());
         final String expectedName = "22XCORESO------S_10V1001C--00236Y_CORE-FB-A45-101_20200106-F101-04.xml";
         assertEquals(expectedName, dailyTask.getDailyOutputs().getRefProg().getOriginalName());

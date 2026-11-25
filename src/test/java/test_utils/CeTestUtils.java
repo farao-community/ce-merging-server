@@ -9,7 +9,15 @@ package test_utils;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.daily_merging.DailyMergingRepository;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
+import com.farao_community.farao.ce_merging.global_grid_configurations.repository.BECKeyConfigurationRepository;
+import com.farao_community.farao.ce_merging.global_grid_configurations.repository.HvdcAlignmentConfigurationRepository;
+import com.farao_community.farao.ce_merging.global_grid_configurations.repository.RegionConfigurationRepository;
+import com.farao_community.farao.ce_merging.global_grid_configurations.repository.VirtualHubsConfigurationRepository;
+import com.farao_community.farao.ce_merging.global_grid_configurations.repository.XNodeConfigurationRepository;
+import com.farao_community.farao.ce_merging.merging.post_process.merging_supervisor_logs.LoggingEventRepository;
+import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -34,6 +42,7 @@ import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowResult;
 import com.powsybl.loadflow.LoadFlowRunParameters;
 import org.assertj.core.api.ThrowableAssert;
+import org.springframework.data.repository.CrudRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +56,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ELEMENT_NAME_PROPERTY;
@@ -84,6 +96,63 @@ public final class CeTestUtils {
 
     private CeTestUtils() {
         // utility class
+    }
+
+    public static DailyMergingRepository mockDailyMergingRepository() {
+        final DailyMergingRepository repository = mock(DailyMergingRepository.class);
+        stubSave(repository, task -> task.setId(ThreadLocalRandom.current().nextLong()));
+        return repository;
+    }
+
+    public static MergingTaskRepository mockMergingTaskRepository() {
+        final MergingTaskRepository repository = mock(MergingTaskRepository.class);
+        stubSave(repository, task -> task.setId(ThreadLocalRandom.current().nextLong()));
+        return repository;
+    }
+
+    public static LoggingEventRepository mockLoggingEventRepository() {
+        final LoggingEventRepository repository = mock(LoggingEventRepository.class);
+        stubSave(repository, event -> event.setEventId(ThreadLocalRandom.current().nextLong()));
+        return repository;
+    }
+
+    public static BECKeyConfigurationRepository mockBECKeyConfigurationRepository() {
+        final BECKeyConfigurationRepository repository = mock(BECKeyConfigurationRepository.class);
+        stubSave(repository, record -> record.setId(UUID.randomUUID().toString()));
+        return repository;
+    }
+
+    public static HvdcAlignmentConfigurationRepository mockHvdcAlignmentConfigurationRepository() {
+        final HvdcAlignmentConfigurationRepository repository = mock(HvdcAlignmentConfigurationRepository.class);
+        stubSave(repository, record -> record.setId(UUID.randomUUID().toString()));
+        return repository;
+    }
+
+    public static RegionConfigurationRepository mockRegionConfigurationRepository() {
+        final RegionConfigurationRepository repository = mock(RegionConfigurationRepository.class);
+        stubSave(repository, record -> record.setId(UUID.randomUUID().toString()));
+        return repository;
+    }
+
+    public static VirtualHubsConfigurationRepository mockVirtualHubsConfigurationRepository() {
+        final VirtualHubsConfigurationRepository repository = mock(VirtualHubsConfigurationRepository.class);
+        stubSave(repository, record -> record.setId(UUID.randomUUID().toString()));
+        return repository;
+    }
+
+    public static XNodeConfigurationRepository mockXNodeConfigurationRepository() {
+        final XNodeConfigurationRepository repository = mock(XNodeConfigurationRepository.class);
+        stubSave(repository, record -> record.setId(UUID.randomUUID().toString()));
+        return repository;
+    }
+
+    private static <T, ID> void stubSave(final CrudRepository<T, ID> repository,
+                                         final Consumer<T> assignId) {
+        when(repository.save(any())).thenAnswer(invocation -> {
+            final T entity = invocation.getArgument(0);
+            assignId.accept(entity);
+            return entity;
+        });
     }
 
     public static Path pathOf(final String fileName) {
@@ -396,4 +465,12 @@ public final class CeTestUtils {
 
         return line;
     }
+
+    public static CeMergingConfiguration getTestConfiguration() {
+        final CeMergingConfiguration mock = new CeMergingConfiguration();
+        mock.setCeMergingRoot("/tmp/testFiles");
+        mock.setDailyMergingRoot("/tmp/testFiles/daily");
+        return mock;
+    }
+
 }

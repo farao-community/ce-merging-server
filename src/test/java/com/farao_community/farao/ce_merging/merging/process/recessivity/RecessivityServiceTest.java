@@ -14,7 +14,6 @@ import com.farao_community.farao.ce_merging.merging.process.xnode.XnodesCheck;
 import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodeIncomplete;
 import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodeIncorrect;
 import com.farao_community.farao.ce_merging.merging.process.xnode.inconsistencies.XnodesInconsistencies;
-import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -28,8 +27,6 @@ import com.powsybl.iidm.network.VoltageLevel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import test_utils.TaskTestUtils;
 
 import java.io.FileNotFoundException;
@@ -72,26 +69,21 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockMergingTaskRepository;
 
-@SpringBootTest
 class RecessivityServiceTest {
 
     private static final String BE_FR_NODE = "XAC_LO11";
     private static final String DE_DE_NODE = "XDE_LO11";
-
-    @Autowired
-    private RecessivityService recessivityService;
-
-    @Autowired
-    private MergingTaskRepository tasksRepository;
 
     private MergingTask task;
     private MergingTask taskFr;
     private MergingTask taskDe;
     private MergingTask taskWithAlegro;
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
+    private final RecessivityService recessivityService = new RecessivityService(mockMergingTaskRepository(), configuration);
 
     private Network network;
     private Terminal terminalBe;

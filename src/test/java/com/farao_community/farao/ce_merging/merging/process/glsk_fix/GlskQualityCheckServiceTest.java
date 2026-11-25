@@ -6,15 +6,22 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.*;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.AreaType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.AutoGSKBlockType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.AutoNodesType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.BusinessType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.BusinessTypeList;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKSeriesType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.MessageTypeList;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.QualityCheckReport;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.QualityCheckType;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.commons.report.TypedValue;
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.Terminal;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -30,13 +37,13 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.REP
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TSO;
 import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.NODE_ID_KEY;
 import static com.farao_community.farao.ce_merging.merging.process.glsk_fix.GlskQualityCheckService.TYPE_KEY;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static test_utils.CeTestUtils.getTestConfiguration;
 
-@SpringBootTest
 public class GlskQualityCheckServiceTest {
 
     private static final String ALEGRO_FILE = "20160728_Alegro.xml";
@@ -44,12 +51,11 @@ public class GlskQualityCheckServiceTest {
     private static final String NODE_NAME = "NODE_1";
     public static final String GLSK_NODE_NOT_FOUND = "glsk.node.not.found";
 
-    @Autowired
-    private GlskQualityCheckService glskQualityCheckService;
+    private final GlskQualityCheckService service = new GlskQualityCheckService(getTestConfiguration(), new GlskFixService());
 
     @Test
     public void shouldReturnAlegroSeries() throws IOException, URISyntaxException {
-        final List<GSKSeriesType> alegroGskSeries = glskQualityCheckService.getAlegroGskSeries(
+        final List<GSKSeriesType> alegroGskSeries = service.getAlegroGskSeries(
                 loadGlsk(ALEGRO_FILE),
                 toInstant(VALID_DATE)
         );
@@ -58,7 +64,7 @@ public class GlskQualityCheckServiceTest {
 
     @Test
     public void shouldReturnEmptyListWhenTargetDateDoesNotMatch() throws IOException, URISyntaxException {
-        final List<GSKSeriesType> alegroGskSeries = glskQualityCheckService.getAlegroGskSeries(
+        final List<GSKSeriesType> alegroGskSeries = service.getAlegroGskSeries(
                 loadGlsk(ALEGRO_FILE),
                 toInstant("2019-08-29T23:30:00Z")
         );
@@ -67,7 +73,7 @@ public class GlskQualityCheckServiceTest {
 
     @Test
     public void shouldReturnEmptyListWhenFileContainsNoAlegroSeries() throws IOException, URISyntaxException {
-        final List<GSKSeriesType> alegroGskSeries = glskQualityCheckService.getAlegroGskSeries(
+        final List<GSKSeriesType> alegroGskSeries = service.getAlegroGskSeries(
                 loadGlsk("20160728_GLSK.xml"),
                 toInstant(VALID_DATE));
         assertTrue(alegroGskSeries.isEmpty());
@@ -79,7 +85,7 @@ public class GlskQualityCheckServiceTest {
         addReport(rootReportNode, "glsk.node.not.found", "XLI_OB1A", "Load", "22Y201903145---4");
         addReport(rootReportNode, "glsk.node.connected", "XLI_OB1B", "Generator", "22Y201903144---9");
         addReport(rootReportNode, "glsk.node.not.found", "XNODE", "Load", "NL");
-        final ReportNode newReporter = glskQualityCheckService.createReportWithoutAlegroReports(rootReportNode);
+        final ReportNode newReporter = service.createReportWithoutAlegroReports(rootReportNode);
         assertEquals(1, newReporter.getChildren().size());
     }
 
@@ -89,7 +95,7 @@ public class GlskQualityCheckServiceTest {
         final Network network = mock(Network.class);
         when(network.getBoundaryLineStream()).thenReturn(Stream.empty());
         final ReportNode reportNode = createReport();
-        glskQualityCheckService.checkAlegroGSKSeries(series, network, reportNode);
+        service.checkAlegroGSKSeries(series, network, reportNode);
         assertEquals(1, reportNode.getChildren().size());
         final ReportNode child = reportNode.getChildren().getFirst();
         assertEquals(GLSK_NODE_NOT_FOUND, child.getMessageKey());
@@ -101,7 +107,7 @@ public class GlskQualityCheckServiceTest {
         final ReportNode reportNode = createReport();
         final GSKSeriesType series = createSeriesWithNode(NODE_NAME);
         final Network network = createNetwork(false);
-        glskQualityCheckService.checkAlegroGSKSeries(series, network, reportNode);
+        service.checkAlegroGSKSeries(series, network, reportNode);
         assertEquals(1, reportNode.getChildren().size());
         assertEquals("glsk.node.connected", reportNode.getChildren().getFirst().getMessageKey());
     }
@@ -111,7 +117,7 @@ public class GlskQualityCheckServiceTest {
         final ReportNode reportNode = createReport();
         final GSKSeriesType series = createSeriesWithNode(NODE_NAME);
         final Network network = createNetwork(true);
-        glskQualityCheckService.checkAlegroGSKSeries(series, network, reportNode);
+        service.checkAlegroGSKSeries(series, network, reportNode);
         assertTrue(reportNode.getChildren().isEmpty());
     }
 
@@ -126,7 +132,7 @@ public class GlskQualityCheckServiceTest {
         when(childReport.getMessage()).thenReturn("Invalid GLSK node");
         final ReportNode reporter = mock(ReportNode.class);
         when(reporter.getChildren()).thenReturn(List.of(childReport));
-        final QualityCheckReport result = glskQualityCheckService.exportQualityReport(reporter, targetDateTime);
+        final QualityCheckReport result = service.exportQualityReport(reporter, targetDateTime);
         assertNotNull(result);
         assertEquals("0", result.getDtdVersion());
         assertEquals("1", result.getDtdRelease());
