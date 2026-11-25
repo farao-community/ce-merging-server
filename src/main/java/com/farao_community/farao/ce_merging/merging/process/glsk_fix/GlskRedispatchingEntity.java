@@ -6,20 +6,5 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
-public class GlskRedispatchingEntity {
-    private String id;
-    private double share;
-
-    public GlskRedispatchingEntity(String id, double share) {
-        this.id = id;
-        this.share = share;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public double getShare() {
-        return share;
-    }
+public record GlskRedispatchingEntity(String id, double share) {
 }

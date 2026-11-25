@@ -42,28 +42,28 @@ public class RegionConfiguration implements Serializable {
     private Long ref;
 
     @Column(name = "name")
-    protected String name;
+    private String name;
 
     @Column(name = "id")
-    protected String id;
+    private String id;
 
     @ElementCollection
     @CollectionTable(name = "regionconfiguration_areasin_code_mapping",
         joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
     @MapKeyColumn(name = "areasin_name")
     @Column(name = "areasin_eic")
-    protected Map<String, String> areasIn;
+    private Map<String, String> areasIn;
 
     @ElementCollection
     @CollectionTable(name = "regionconfiguration_areasout_code_mapping",
         joinColumns = {@JoinColumn(name = "regionconfiguration_ref", referencedColumnName = "ref")})
     @MapKeyColumn(name = "areasout_name")
     @Column(name = "areasout_eic")
-    protected Map<String, String> areasOut;
+    private Map<String, String> areasOut;
 
     @OneToMany(cascade = ALL)
     @JsonProperty(value = "germanyZones")
-    protected Map<String, TsoInfos> germanyZone;
+    private Map<String, TsoInfos> germanyZone;
 
     @Override
     public String toString() {

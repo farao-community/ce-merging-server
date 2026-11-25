@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2026, RTE (http://www.rte-france.com)
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
@@ -41,11 +48,11 @@ public final class GlskSerieRedispatcher {
         if (shareSum == 0.0) {
             throw new CeMergingException("Division by zero: share sum cannot be zero");
         }
-        final double initialShare = entity.getShare();
+        final double initialShare = entity.share();
         final long updatedShare = Math.round(initialShare + (initialShare / shareSum) * adjustment);
-        getGSKSeriesTypeById(gskDocument, entity.getId())
+        getGSKSeriesTypeById(gskDocument, entity.id())
                 .ifPresent(gskSeriesType -> {
-                    LOGGER.info("Updating the share of GSKSeries with id {} from {} to {}.", entity.getId(), initialShare, updatedShare);
+                    LOGGER.info("Updating the share of GSKSeries with id {} from {} to {}.", entity.id(), initialShare, updatedShare);
                     gskSeriesType.getBusinessType().setShare(BigDecimal.valueOf(updatedShare));
                 });
     }
@@ -58,7 +65,7 @@ public final class GlskSerieRedispatcher {
 
     private static double calculateShareSum(final List<GlskRedispatchingEntity> entities) {
         return entities.stream()
-                .mapToDouble(GlskRedispatchingEntity::getShare)
+                .mapToDouble(GlskRedispatchingEntity::share)
                 .sum();
     }
 

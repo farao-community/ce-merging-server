@@ -20,9 +20,6 @@ public class JsonBciResult {
     @JsonProperty("bciApplied")
     private boolean bciApplied;
 
-    public JsonBciResult() {
-    }
-
     public JsonInRegionNetPositions getJsonInRegionNetPositions() {
         return jsonInRegionNetPositions;
     }

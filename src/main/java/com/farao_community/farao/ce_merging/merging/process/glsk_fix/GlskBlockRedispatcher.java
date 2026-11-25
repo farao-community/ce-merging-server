@@ -84,8 +84,8 @@ public final class GlskBlockRedispatcher {
     private static double calculateBlockSum(final Map<String, List<GlskRedispatchingEntity>> valueByGskName, final String gskName) {
         return valueByGskName.getOrDefault(gskName, Collections.emptyList()).stream()
                 .collect(Collectors.toMap(
-                        GlskRedispatchingEntity::getId,
-                        GlskRedispatchingEntity::getShare,
+                        GlskRedispatchingEntity::id,
+                        GlskRedispatchingEntity::share,
                         (existing, replacement) -> replacement
                 ))
                 .values()

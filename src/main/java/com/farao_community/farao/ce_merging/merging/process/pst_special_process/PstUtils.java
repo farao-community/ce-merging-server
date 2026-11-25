@@ -6,8 +6,8 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.pst_special_process;
 
-import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.BoundaryLine;
+import com.powsybl.iidm.network.Branch;
 import com.powsybl.iidm.network.Identifiable;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.iidm.network.PhaseTapChanger;
@@ -117,9 +117,9 @@ public final class PstUtils {
 
     public static void logProcedure(final int number, final String node) {
         // 2nd formatted is only useful for case 9
-        LOGGER.info("{}{}",
-                    GENERIC_PROCEDURE_MESSAGE.formatted(number),
-                    PROCEDURE_DETAIL_BY_NUMBER.getOrDefault(number, "").formatted(node));
+        final String numberInfo = GENERIC_PROCEDURE_MESSAGE.formatted(number);
+        final String details = PROCEDURE_DETAIL_BY_NUMBER.getOrDefault(number, "").formatted(node);
+        LOGGER.info("{}{}", numberInfo, details);
     }
 
 }

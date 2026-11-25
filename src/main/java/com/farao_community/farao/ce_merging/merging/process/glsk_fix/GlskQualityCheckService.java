@@ -80,6 +80,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianGskFix.handleItalianRegionsGlsk;
+import static java.time.ZoneOffset.UTC;
 
 @Service
 public class GlskQualityCheckService {
@@ -331,7 +332,7 @@ public class GlskQualityCheckService {
         qualityCheckReport.setReceiverRole(receiverRoleType);
 
         MessageDateTimeType messageDateTimeType = new MessageDateTimeType();
-        GregorianCalendar c = GregorianCalendar.from(ZonedDateTime.now());
+        GregorianCalendar c = GregorianCalendar.from(ZonedDateTime.now(UTC));
         XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
         xmlGregorianCalendar.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
         xmlGregorianCalendar.setTimezone(0);

@@ -34,6 +34,10 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 public class VirtualHubsShifting {
     private static final Logger LOGGER = LoggerFactory.getLogger(VirtualHubsShifting.class);
 
+    private VirtualHubsShifting() {
+        // class should not be instantiated
+    }
+
     public static Map<String, Double> applyVirtualHubFlows(final MergingTask task, final CeMergingConfiguration configuration) throws FileNotFoundException {
         Map<String, Double> virtualHubsGaps = new HashMap<>();
         final ReferenceProgram referenceProgram = JsonUtils.read(ReferenceProgram.class, task.getArtifactPath(REFERENCE_PROGRAM_FORECAST_FILE));

@@ -17,9 +17,6 @@ public class JsonGlobalNetPositions {
     @JsonProperty("target")
     private double target;
 
-    public JsonGlobalNetPositions() {
-    }
-
     public double getForecast() {
         return forecast;
     }

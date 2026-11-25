@@ -38,7 +38,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.nio.file.Files.newInputStream;
 
 public final class JaxbUtils {
-
+    private static final String WRITING_BYTES = "writing a %s object to bytes";
     private JaxbUtils() {
         // utility class
     }
@@ -101,7 +101,7 @@ public final class JaxbUtils {
             marshaller(clazz).marshal(object, bos);
             return bos.toByteArray();
         } catch (final Exception e) {
-            throw errorWhile(e, "writing a %s object to bytes", clazz.getSimpleName());
+            throw errorWhile(e, WRITING_BYTES, clazz.getSimpleName());
         }
     }
 
@@ -119,7 +119,7 @@ public final class JaxbUtils {
                                                   bos);
             return bos.toByteArray();
         } catch (final Exception e) {
-            throw errorWhile(e, "writing a %s object to bytes", clazz.getSimpleName());
+            throw errorWhile(e, WRITING_BYTES, clazz.getSimpleName());
         }
     }
 
@@ -138,7 +138,7 @@ public final class JaxbUtils {
                                                   path.toFile());
             return bos.toByteArray();
         } catch (final Exception e) {
-            throw errorWhile(e, "writing a %s object to bytes", clazz.getSimpleName());
+            throw errorWhile(e, WRITING_BYTES, clazz.getSimpleName());
         }
     }
 

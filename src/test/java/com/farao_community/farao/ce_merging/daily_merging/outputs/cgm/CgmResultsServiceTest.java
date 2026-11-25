@@ -44,7 +44,6 @@ class CgmResultsServiceTest {
     private final DailyMergingRepository tasksRepository = mock(DailyMergingRepository.class);
 
     private DailyMergingTask dailyMergingTask;
-    private final CgmRecognitionBuilder cgmRecognitionBuilder = mock(CgmRecognitionBuilder.class);
 
     private List<MergingTask> tasks;
     private static final String CGM_RECOGNITION_OUTPUT_NAME = "22XCORESO------S_10V1001C--00236Y_CORE-FB-100_%s-F100-%02d.xml";

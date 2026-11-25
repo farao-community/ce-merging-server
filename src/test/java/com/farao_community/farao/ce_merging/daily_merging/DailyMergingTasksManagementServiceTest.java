@@ -159,7 +159,6 @@ class DailyMergingTasksManagementServiceTest {
 
     @Test
     void shouldCreateDailyTask() throws Exception {
-        final MergingTask mergingTask = mockSuccessfulMergingTask();
         givenDailyTaskPaths();
 
         final MockMultipartFile mergingRequest = new MockMultipartFile(
@@ -248,15 +247,6 @@ class DailyMergingTasksManagementServiceTest {
 
     private void givenTaskNotFound() {
         when(repository.findById(TASK_ID_1)).thenReturn(Optional.empty());
-    }
-
-    private MergingTask mockSuccessfulMergingTask() {
-        final MergingTask mergingTask = mock(MergingTask.class);
-        when(mergingTask.getStatus()).thenReturn(TaskStatus.SUCCESS);
-        when(service.checkTaskExist(TASK_ID_1)).thenReturn(true);
-        when(service.getTaskById(TASK_ID_1)).thenReturn(mergingTask);
-
-        return mergingTask;
     }
 
     private void givenDailyTaskPaths() {

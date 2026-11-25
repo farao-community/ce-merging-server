@@ -6,12 +6,12 @@
  */
 package com.farao_community.farao.ce_merging.merging.process.glsk_fix;
 
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKSeriesType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.AutoGSKBlockType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKSeriesType;
+import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualGSKBlockType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualNodesType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.TimeIntervalType;
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.commons.report.TypedValue;
 import org.threeten.extra.Interval;
@@ -28,6 +28,10 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.powsybl.glsk.commons.GlskReports.NODE_ID_KEY;
 
 public final class GlskBlockFix {
+
+    private GlskBlockFix() {
+        // class should not be instantiated
+    }
 
     static void removeInvalidGskBlocks(final Map<String, List<GlskRedispatchingEntity>> incorrectValuesByGskName,
                                        final Map<String, List<GlskRedispatchingEntity>> correctValuesByGskName,

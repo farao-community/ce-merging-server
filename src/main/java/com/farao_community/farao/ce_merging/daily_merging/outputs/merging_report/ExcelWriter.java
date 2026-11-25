@@ -114,8 +114,7 @@ public final class ExcelWriter {
                     case Long l -> cell.setCellValue(l);
                     case Integer i -> cell.setCellValue(i);
                     case Double v -> cell.setCellValue(v);
-                    default -> {
-                    }
+                    default -> LOGGER.warn("Unexpected cell value: {}", cellValue);
                 }
             }
             columnCount++;
