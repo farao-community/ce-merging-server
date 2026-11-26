@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.BecByBoundaryMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
@@ -29,7 +30,9 @@ class BECKeyConfigurationServiceTest {
     private final RegionConfigurationService rcService = mock(RegionConfigurationService.class);
 
     private final BECKeyConfigurationRepository repository = mock(BECKeyConfigurationRepository.class);
-    private final BECKeyConfigurationService service = new BECKeyConfigurationService(rcService, repository);
+    private final BecByBoundaryMapper mapper = mock(BecByBoundaryMapper.class);
+
+    private final BECKeyConfigurationService service = new BECKeyConfigurationService(rcService, repository, mapper);
 
     @Test
     void shouldThrowWhenParsingEmptyFile() {

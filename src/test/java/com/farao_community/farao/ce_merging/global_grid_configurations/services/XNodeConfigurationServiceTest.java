@@ -6,6 +6,7 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.services;
 
+import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.XnodeMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.XNodeConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.repository.XNodeConfigurationRepository;
 import org.assertj.core.api.Assertions;
@@ -20,7 +21,8 @@ import java.time.OffsetDateTime;
 class XNodeConfigurationServiceTest {
 
     private final XNodeConfigurationRepository repository = Mockito.mock(XNodeConfigurationRepository.class);
-    private final XNodeConfigurationService service = new XNodeConfigurationService(repository);
+    private final XnodeMapper mapper = Mockito.mock(XnodeMapper.class);
+    private final XNodeConfigurationService service = new XNodeConfigurationService(repository, mapper);
 
     @Test
     void getConfigurationRecordFromFile() throws IOException {

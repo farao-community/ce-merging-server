@@ -7,33 +7,19 @@
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.io.Serializable;
 
-import static com.farao_community.farao.ce_merging.common.CeMergingConstants.NAME;
-
-@Entity
-@Table(name = "tsoinfosdto")
 public class TsoInfosDto implements Serializable {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long ref;
 
-    @Column(name = NAME)
     @JsonProperty(value = "tsoName")
     private String name;
 
-    @Column(name = "eic")
     private String eic;
 
     public Long getRef() {

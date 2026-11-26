@@ -8,10 +8,12 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.services
 
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.global_grid_configurations.mapper.BecByBoundaryMapper;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecCoefficientsDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BorderDto;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
+import com.farao_community.farao.ce_merging.global_grid_configurations.model.entity.BecByBoundary;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonBecConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.records.BECKeyConfigurationRecord;
 import com.farao_community.farao.ce_merging.global_grid_configurations.repository.BECKeyConfigurationRepository;
@@ -40,11 +42,14 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
     private static final Logger LOGGER = LoggerFactory.getLogger(BECKeyConfigurationService.class);
     private final RegionConfigurationService regionConfigurationService;
     private final BECKeyConfigurationRepository repository;
+    private final BecByBoundaryMapper becByBoundaryMapper;
 
     public BECKeyConfigurationService(final RegionConfigurationService regionConfigurationService,
-                                      final BECKeyConfigurationRepository repository) {
+                                      final BECKeyConfigurationRepository repository,
+                                      final BecByBoundaryMapper becByBoundaryMapper) {
         this.regionConfigurationService = regionConfigurationService;
         this.repository = repository;
+        this.becByBoundaryMapper = becByBoundaryMapper;
     }
 
     public JsonBecConfiguration getConfiguration(OffsetDateTime targetDate) {
@@ -81,7 +86,7 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
 
     @Override
     protected JsonBecConfiguration getJsonConfigurationFromRecord(final BECKeyConfigurationRecord cfgRecord) {
-        return new JsonBecConfiguration(cfgRecord.getBecMatrix());
+        return new JsonBecConfiguration(becByBoundaryMapper.mapToBecByBoundaryDtoList(cfgRecord.getBecMatrix()));
     }
 
     @Override
@@ -89,7 +94,7 @@ public class BECKeyConfigurationService extends AbstractGridConfigurationService
                                                                        final OffsetDateTime validFrom,
                                                                        final OffsetDateTime validTo) throws IOException {
         final String configFileCsvContent = getTextContent(configurationFile);
-        final List<BecByBoundaryDto> becMatrix = parseBecSharingKeys(validFrom, configFileCsvContent);
+        final List<BecByBoundary> becMatrix = becByBoundaryMapper.mapToBecByBoundaryList(parseBecSharingKeys(validFrom, configFileCsvContent));
         return new BECKeyConfigurationRecord(generateUuidString(),
                                              toUtcLocalDateTime(validFrom),
                                              toUtcLocalDateTime(validTo),

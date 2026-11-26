@@ -9,7 +9,6 @@ package com.farao_community.farao.ce_merging.global_grid_configurations.model.dt
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
 import com.farao_community.farao.ce_merging.xsd.xnodes.Xnode;
 import com.powsybl.iidm.network.Country;
-import jakarta.persistence.Embeddable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -20,7 +19,6 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAN
 import static com.powsybl.iidm.network.Country.DE;
 import static com.powsybl.iidm.network.Country.DK;
 
-@Embeddable
 public class XnodeConfigDto implements Serializable {
 
     private String name;

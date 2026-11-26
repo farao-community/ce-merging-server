@@ -21,4 +21,5 @@ public interface VirtualHubMapper {
     VirtualHubRecord mapToVirtualHubRecord(VirtualHub virtualHub);
 
     List<VirtualHubRecord> mapToVirtualHubRecordList(List<VirtualHub> virtualHubList);
+
 }

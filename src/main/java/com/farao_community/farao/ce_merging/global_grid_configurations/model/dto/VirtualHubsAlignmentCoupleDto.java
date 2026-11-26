@@ -6,12 +6,10 @@
  */
 package com.farao_community.farao.ce_merging.global_grid_configurations.model.dto;
 
-import jakarta.persistence.Embeddable;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@Embeddable
 public class VirtualHubsAlignmentCoupleDto {
 
     private String referenceXNode;

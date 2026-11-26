@@ -17,7 +17,10 @@ import java.util.List;
 public interface BecByBoundaryMapper {
     List<BecByBoundary> mapToBecByBoundaryList(List<BecByBoundaryDto> becByBoundaryDtoList);
 
-    // The DTO id belongs to the global configuration table: the task gets its own rows
     @Mapping(target = "id", ignore = true)
     BecByBoundary mapToBecByBoundary(BecByBoundaryDto becByBoundaryDto);
+
+    List<BecByBoundaryDto> mapToBecByBoundaryDtoList(List<BecByBoundary> becByBoundaryList);
+
+    BecByBoundaryDto mapToBecByBoundaryDto(BecByBoundary becByBoundary);
 }
