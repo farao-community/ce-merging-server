@@ -159,7 +159,7 @@ class DailyMergingTasksManagementServiceTest {
 
     @Test
     void shouldCreateDailyTask() throws Exception {
-        final MergingTask mergingTask = mockSuccessfulMergingTask();
+        mockSuccessfulMergingTask();
         givenDailyTaskPaths();
 
         final MockMultipartFile mergingRequest = new MockMultipartFile(

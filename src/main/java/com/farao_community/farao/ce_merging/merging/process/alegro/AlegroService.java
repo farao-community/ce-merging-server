@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.ALDE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_BE_EIC;
@@ -167,7 +166,7 @@ public class AlegroService {
                 .filter(boundaryLine ->
                         VIRTUAL_HUB_ALEGRO_BE_NODE_NAME.equals(boundaryLine.getPairingKey())
                                 || VIRTUAL_HUB_ALEGRO_DE_NODE_NAME.equals(boundaryLine.getPairingKey()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private BoundaryLine getAlegroBoundaryLine(final List<BoundaryLine> alegroBoundaryLinesList, final String pairingKey) {

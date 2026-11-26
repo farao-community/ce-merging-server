@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -110,7 +111,7 @@ class DailyRefProgServiceTest {
     @Test
     void shouldNotThrowExceptionWhenTasksHaveSameInterval() {
         final List<MergingTask> tasksList = Arrays.asList(task1, task2, task3, task4);
-        builder.buildDailyRefProg(1, tasksList, 24);
+        assertDoesNotThrow(() -> builder.buildDailyRefProg(1, tasksList, 24));
     }
 
     @Test
@@ -122,10 +123,10 @@ class DailyRefProgServiceTest {
         Files.createDirectories(Paths.get(configuration.getDailyOutputsDirectoryPath(dailyTask)));
         final List<MergingTask> tasksList = Arrays.asList(task1, task2);
         final RequestInformation requestInformation = new RequestInformation("2020-01-05T23:00Z/2020-01-06T23:00Z",
-                                                                       "regprog",
-                                                                       "test",
-                                                                       "CORESO",
-                                                                       "123456"
+                                                                             "refprog",
+                                                                             "test",
+                                                                             "CORESO",
+                                                                             "123456"
         );
         builder.computeDailyRefProg(dailyTask, tasksList, requestInformation);
         assertTrue(new File(dailyTask.getDailyOutputs().getRefProg().getPath()).exists());

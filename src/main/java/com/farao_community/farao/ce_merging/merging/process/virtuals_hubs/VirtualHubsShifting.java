@@ -31,8 +31,12 @@ import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.isPai
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.REFERENCE_PROGRAM_FORECAST_FILE;
 import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType.TGM_FILE_AFTER_RECESSIVITY;
 
-public class VirtualHubsShifting {
+public final class VirtualHubsShifting {
     private static final Logger LOGGER = LoggerFactory.getLogger(VirtualHubsShifting.class);
+
+    private VirtualHubsShifting() {
+        // class should not be instantiated
+    }
 
     public static Map<String, Double> applyVirtualHubFlows(final MergingTask task, final CeMergingConfiguration configuration) throws FileNotFoundException {
         Map<String, Double> virtualHubsGaps = new HashMap<>();

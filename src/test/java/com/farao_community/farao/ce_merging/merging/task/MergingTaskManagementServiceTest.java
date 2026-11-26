@@ -58,6 +58,7 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.RUNNING;
 import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus.SUCCESS;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -356,11 +357,13 @@ class MergingTaskManagementServiceTest {
                 new byte[0]
         );
 
-        service.publishBECKeyConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
-        service.publishHvdcXNodeAlignmentConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
-        service.publishXNodesConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
-        service.publishRegionConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
-        service.publishVirtualHubsConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+        assertDoesNotThrow(() -> {
+            service.publishBECKeyConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+            service.publishHvdcXNodeAlignmentConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+            service.publishXNodesConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+            service.publishRegionConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+            service.publishVirtualHubsConfiguration(file, BEGINNING_OF_2000, BEGINNING_OF_2000);
+        });
     }
 
     @Test

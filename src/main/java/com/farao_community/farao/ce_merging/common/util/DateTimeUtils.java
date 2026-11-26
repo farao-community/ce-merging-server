@@ -26,6 +26,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.DAT
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.FILENAME_DATE_FMT;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.PARIS_ZONE_ID;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.UTC_ZONE_ID;
+import static java.time.ZoneOffset.UTC;
 import static java.time.format.DateTimeFormatter.ISO_DATE_TIME;
 
 public final class DateTimeUtils {
@@ -51,6 +52,10 @@ public final class DateTimeUtils {
 
     public static String formatDate(final OffsetDateTime dateTime) {
         return FILENAME_DATE_FMT.format(dateTime);
+    }
+
+    public static OffsetDateTime nowUtcOffset() {
+        return OffsetDateTime.now(UTC);
     }
 
     static ZonedDateTime nowAtParisZone() {

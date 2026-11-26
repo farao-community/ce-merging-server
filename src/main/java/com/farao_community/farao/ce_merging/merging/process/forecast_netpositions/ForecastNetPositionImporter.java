@@ -29,6 +29,10 @@ public final class ForecastNetPositionImporter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ForecastNetPositionImporter.class);
 
+    private ForecastNetPositionImporter() {
+        // class should not be instantiated
+    }
+
     public static ReferenceProgram importFromFile(final String netPositionFilePath, final OffsetDateTime targetDateTime) {
         final ReportingInformationMarketDocument document = JaxbUtils.readFromPath(ReportingInformationMarketDocument.class, netPositionFilePath);
         if (!isDateTimeInDocumentInterval(document, targetDateTime)) {
@@ -36,7 +40,7 @@ public final class ForecastNetPositionImporter {
             throw new CeMergingException("Net position file is not valid for this date " + targetDateTime);
         }
         final List<ReferenceExchangeData> exchangeDataList = document.getTimeSeries().stream()
-                .filter(timeSeries -> isUsedForTheMerging(timeSeries))
+                .filter(ForecastNetPositionImporter::isUsedForTheMerging)
                 .map(timeSeries -> new ReferenceExchangeData(
                         timeSeries.getOutDomainMRID().getValue(),
                         timeSeries.getInDomainMRID().getValue(),
@@ -101,7 +105,7 @@ public final class ForecastNetPositionImporter {
     }
 
     private static long getResolutionInSeconds(final Duration resolution) {
-        return resolution.getHours() * 3600 + resolution.getMinutes() * 60 + (long) resolution.getSeconds();
+        return resolution.getHours() * 3600L + resolution.getMinutes() * 60L + (long) resolution.getSeconds();
     }
 
     private static double getFlowFromConstantResolutionCurve(final OffsetDateTime dateTime, final OffsetDateTime startDateTime, final long resolutionInSeconds, final List<Point> points) {
@@ -123,14 +127,14 @@ public final class ForecastNetPositionImporter {
         while (position < points.size() - 1) {
             final Point actualPoint = points.get(position);
             final Point nextPoint = points.get(position + 1);
-            final OffsetDateTime intervalEnd = startDateTime.plus((nextPoint.getPosition() - 1) * resolutionInSeconds, ChronoUnit.SECONDS);
+            final OffsetDateTime intervalEnd = startDateTime.plusSeconds((nextPoint.getPosition() - 1) * resolutionInSeconds);
             if (dateTime.isBefore(intervalEnd)) {
                 return actualPoint.getQuantity().doubleValue();
             }
             position++;
         }
         if (dateTime.isBefore(endDateTime)) {
-            return points.get(points.size() - 1).getQuantity().doubleValue();
+            return points.getLast().getQuantity().doubleValue();
         }
         return 0.0;
     }

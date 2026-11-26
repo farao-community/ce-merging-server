@@ -22,9 +22,6 @@ public class JsonBciComputationResult {
     @JsonProperty("bciResults")
     private Map<String, JsonBciResult> bciResults;
 
-    public JsonBciComputationResult() {
-    }
-
     public boolean isBciActive() {
         return bciActive;
     }

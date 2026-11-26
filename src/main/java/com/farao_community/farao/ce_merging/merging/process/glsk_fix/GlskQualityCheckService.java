@@ -20,7 +20,6 @@ import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.AreaType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.AutoGSKBlockType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.AutoNodesType;
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKDocument;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.GSKSeriesType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.IdentificationType;
@@ -28,15 +27,12 @@ import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualGSKBlockType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.ManualNodesType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.MessageDateTimeType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.MessageType;
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.MessageTypeList;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.PartyType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.ProcessType;
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.ProcessTypeList;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.QualityCheckReport;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.QualityCheckType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.QualityChecksType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.RoleType;
-import com.farao_community.farao.ce_merging.xsd.glsk_fix.RoleTypeList;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.TimeIntervalType;
 import com.farao_community.farao.ce_merging.xsd.glsk_fix.VersionType;
 import com.powsybl.commons.report.ReportNode;
@@ -53,7 +49,6 @@ import org.springframework.stereotype.Service;
 import org.threeten.extra.Interval;
 
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.ByteArrayInputStream;
@@ -80,6 +75,13 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIR
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_CODE;
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.VIRTUAL_HUB_ALEGRO_DE_EIC;
 import static com.farao_community.farao.ce_merging.merging.process.internal_bidding_zones.ItalianGskFix.handleItalianRegionsGlsk;
+import static com.farao_community.farao.ce_merging.xsd.glsk_fix.CodingSchemeType.A_01;
+import static com.farao_community.farao.ce_merging.xsd.glsk_fix.MessageTypeList.A_16;
+import static com.farao_community.farao.ce_merging.xsd.glsk_fix.ProcessTypeList.A_48;
+import static com.farao_community.farao.ce_merging.xsd.glsk_fix.RoleTypeList.A_36;
+import static com.farao_community.farao.ce_merging.xsd.glsk_fix.RoleTypeList.A_44;
+import static java.time.ZoneOffset.UTC;
+import static javax.xml.datatype.DatatypeConstants.FIELD_UNDEFINED;
 
 @Service
 public class GlskQualityCheckService {
@@ -290,69 +292,68 @@ public class GlskQualityCheckService {
         qualityCheckType.setSeverity("WARNING");
         qualityCheckType.setTimeInterval(DateTimeUtils.toHourlyInterval(targetDateTime));
         final AreaType area = new AreaType();
-        area.setCodingScheme(CodingSchemeType.A_01);
+        area.setCodingScheme(A_01);
         area.setV(getReportValue(reportNode, TSO));
         qualityCheckType.setArea(area);
         return qualityCheckType;
     }
 
-    private void fillHeader(QualityCheckReport qualityCheckReport, OffsetDateTime targetDateTime) throws DatatypeConfigurationException {
+    private void fillHeader(final QualityCheckReport qualityCheckReport, final OffsetDateTime targetDateTime) throws DatatypeConfigurationException {
         qualityCheckReport.setDtdVersion("0");
         qualityCheckReport.setDtdRelease("1");
 
-        IdentificationType identificationObject = new IdentificationType();
-        identificationObject.setV(targetDateTime.toString());
-        qualityCheckReport.setMessageIdentification(identificationObject);
+        final IdentificationType identification = new IdentificationType();
+        identification.setV(targetDateTime.toString());
+        qualityCheckReport.setMessageIdentification(identification);
 
-        VersionType versionType = new VersionType();
-        versionType.setV(1);
-        qualityCheckReport.setMessageVersion(versionType);
+        final VersionType version = new VersionType();
+        version.setV(1);
+        qualityCheckReport.setMessageVersion(version);
 
-        ProcessType processType = new ProcessType();
-        processType.setV(ProcessTypeList.A_48);
-        qualityCheckReport.setProcessType(processType);
+        final ProcessType process = new ProcessType();
+        process.setV(A_48);
+        qualityCheckReport.setProcessType(process);
 
-        PartyType senderPartyType = new PartyType();
-        senderPartyType.setCodingScheme(CodingSchemeType.A_01);
-        senderPartyType.setV(SENDER_ID);
-        qualityCheckReport.setSenderIdentification(senderPartyType);
+        final PartyType senderParty = new PartyType();
+        senderParty.setCodingScheme(A_01);
+        senderParty.setV(SENDER_ID);
+        qualityCheckReport.setSenderIdentification(senderParty);
 
-        RoleType senderRoleType = new RoleType();
-        senderRoleType.setV(RoleTypeList.A_44);
-        qualityCheckReport.setSenderRole(senderRoleType);
+        final RoleType senderRole = new RoleType();
+        senderRole.setV(A_44);
+        qualityCheckReport.setSenderRole(senderRole);
 
-        PartyType receiverPartyType = new PartyType();
-        receiverPartyType.setCodingScheme(CodingSchemeType.A_01);
-        receiverPartyType.setV(RECEIVER_ID);
-        qualityCheckReport.setReceiverIdentification(receiverPartyType);
+        final PartyType receiverParty = new PartyType();
+        receiverParty.setCodingScheme(A_01);
+        receiverParty.setV(RECEIVER_ID);
+        qualityCheckReport.setReceiverIdentification(receiverParty);
 
-        RoleType receiverRoleType = new RoleType();
-        receiverRoleType.setV(RoleTypeList.A_36);
-        qualityCheckReport.setReceiverRole(receiverRoleType);
+        final RoleType receiverRole = new RoleType();
+        receiverRole.setV(A_36);
+        qualityCheckReport.setReceiverRole(receiverRole);
 
-        MessageDateTimeType messageDateTimeType = new MessageDateTimeType();
-        GregorianCalendar c = GregorianCalendar.from(ZonedDateTime.now());
-        XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
-        xmlGregorianCalendar.setMillisecond(DatatypeConstants.FIELD_UNDEFINED);
+        final MessageDateTimeType messageDateTime = new MessageDateTimeType();
+        final XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(GregorianCalendar.from(ZonedDateTime.now(UTC)));
+        xmlGregorianCalendar.setMillisecond(FIELD_UNDEFINED);
         xmlGregorianCalendar.setTimezone(0);
-        messageDateTimeType.setV(xmlGregorianCalendar);
-        qualityCheckReport.setMessageDateTime(messageDateTimeType);
+        messageDateTime.setV(xmlGregorianCalendar);
+        qualityCheckReport.setMessageDateTime(messageDateTime);
 
-        TimeIntervalType timeIntervalType = new TimeIntervalType();
-        timeIntervalType.setV(DateTimeUtils.toHourlyInterval(targetDateTime));
-        qualityCheckReport.setQualityCheckTimeInterval(timeIntervalType);
+        final TimeIntervalType timeInterval = new TimeIntervalType();
+        timeInterval.setV(DateTimeUtils.toHourlyInterval(targetDateTime));
+        qualityCheckReport.setQualityCheckTimeInterval(timeInterval);
 
-        MessageType messageType = new MessageType();
-        messageType.setV(MessageTypeList.A_16);
-        qualityCheckReport.setMessageType(messageType);
+        final MessageType message = new MessageType();
+        message.setV(A_16);
+        qualityCheckReport.setMessageType(message);
 
-        AreaType domain = new AreaType();
-        domain.setCodingScheme(CodingSchemeType.A_01);
+        final AreaType domain = new AreaType();
+        domain.setCodingScheme(A_01);
         domain.setV(CE_REGION_ID);
         qualityCheckReport.setDomain(domain);
     }
 
-    private String getReportValue(ReportNode reportNode, String key) {
+    private String getReportValue(final ReportNode reportNode, final String key) {
         return reportNode.getValue(key)
                 .orElseThrow(() -> new IllegalArgumentException("Missing report value: " + key))
                 .getValue()

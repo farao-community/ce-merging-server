@@ -15,9 +15,6 @@ public class JsonOutRegionResults {
     @JsonProperty("globalForecastNetPositions")
     private Map<String, Double> globalForecastNetPositions;
 
-    public JsonOutRegionResults() {
-    }
-
     public Map<String, Double> getGlobalForecastNetPositions() {
         return globalForecastNetPositions;
     }

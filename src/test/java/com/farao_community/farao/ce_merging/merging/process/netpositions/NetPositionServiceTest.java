@@ -158,11 +158,11 @@ class NetPositionServiceTest {
         soft.assertThat(danishNetPositions.getGlobalNetPosition().getWithVirtualHubs())
                 .isCloseTo(20., PERCENT_TOLERANCE);
 
-        Stream.of(danishNetPositions.getGlobalNetPosition().getWithoutVirtualHubs(),
-                  danishNetPositions.getInRegionNetPosition().getWithVirtualHubs(),
-                  danishNetPositions.getInRegionNetPosition().getWithoutVirtualHubs())
-                .map(soft::assertThat)
-                .forEach(d -> d.isCloseTo(0, PERCENT_TOLERANCE));
+        for (final Double np : List.of(danishNetPositions.getGlobalNetPosition().getWithoutVirtualHubs(),
+                                             danishNetPositions.getInRegionNetPosition().getWithVirtualHubs(),
+                                             danishNetPositions.getInRegionNetPosition().getWithoutVirtualHubs())) {
+            soft.assertThat(np).isCloseTo(0, PERCENT_TOLERANCE);
+        }
 
         soft.assertAll();
     }

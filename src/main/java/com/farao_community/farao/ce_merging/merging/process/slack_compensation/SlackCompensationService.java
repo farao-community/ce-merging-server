@@ -64,7 +64,7 @@ public class SlackCompensationService {
 
     private static void compensateGenerator(final Generator generator) {
         generator.setTargetP(-generator.getTerminal().getP());
-        generator.setTargetQ(-zeroIfNaN(generator.getTerminal().getQ()));
+        generator.setLocalTargetQ(-zeroIfNaN(generator.getTerminal().getQ()));
     }
 
     public void compensateFinalCgmSlackImbalance(final MergingTask task) {
@@ -122,8 +122,9 @@ public class SlackCompensationService {
             updateSlackBus(cgm, slackNode.get());
         } else {
             updateSlackBus(cgm, defaultSlackNode);
-            LOGGER.warn("No slack node defined in ES IGM, default slack node %s will be added to the final CGM"
-                                .formatted(defaultSlackNode));
+            final String warnMessage = "No slack node defined in ES IGM, default slack node %s will be added to the final CGM"
+                    .formatted(defaultSlackNode);
+            LOGGER.warn(warnMessage);
         }
 
     }
