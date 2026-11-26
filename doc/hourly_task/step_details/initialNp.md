@@ -20,7 +20,7 @@ Here's how the X-Nodes are counted depending on their presence in config files :
 
 | X-Node is present in  …              | X-Node & VH config                                                      | VH Config                         | X-Node config                                                 | neither*           | 
 |--------------------------------------|-------------------------------------------------------------------------|-----------------------------------|---------------------------------------------------------------|--------------------|
-| examples                             | Alegro, GR-IT, Cobra and HVDC cables going outside the synchronous area | XCEPR120 and PiSa nodes (created during process) | X-Nodes modeled as AC links (including FR-ES and FR-IT HVDCs) | XHR_HR12, XMO_HO11 |
+| examples                             | Alegro, GR-IT, Cobra and HVDC cables going outside the synchronous area | XCEPR120 and PiSa nodes (created during process) | X-Nodes modeled as AC links (including FR-ES HVDCs) | XHR_HR12, XMO_HO11 |
 | load counted in Global NP with VH    | ✅                                                                      | ✅                                | ✅                                                            | ✅                 | 
 | load counted in Global NP without VH | ❌                                                                      | ❌                                | ✅                                                            | ✅                 |
 | load counted in outBciNetPosition    | ✅                                                                      | ✅                                | ❌                                                            | ✅                 |
