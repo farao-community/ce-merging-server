@@ -9,12 +9,9 @@ package com.farao_community.farao.ce_merging.common.model.netpositions;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.powsybl.iidm.network.Country;
-import jakarta.annotation.Nonnull;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static java.util.stream.Collectors.joining;
 
 /**
  * WARNING: this class is used by the merging supervisor. Please contact them if any modification is needed to check compatibility
@@ -61,13 +58,5 @@ public record NetPositionsResults(Map<String, NetPositions> netPositionsByCountr
 
     public void putIfAbsent(final String region, final NetPositions netPositions) {
         netPositionsByCountryMap.putIfAbsent(region, netPositions);
-    }
-
-    @Override
-    @Nonnull
-    public String toString() {
-        return netPositionsByCountryMap.entrySet().stream()
-                .map(e -> e.getKey() + ": \n" + e.getValue())
-                .collect(joining("\n"));
     }
 }

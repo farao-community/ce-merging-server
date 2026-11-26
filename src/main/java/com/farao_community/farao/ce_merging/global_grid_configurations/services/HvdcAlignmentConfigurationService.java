@@ -40,13 +40,13 @@ public class HvdcAlignmentConfigurationService extends AbstractGridConfiguration
         this.repository = repository;
     }
 
-    public JsonHvdcAlignmentConfiguration getConfiguration(final OffsetDateTime targetDate) {
+    public JsonHvdcAlignmentConfiguration getConfiguration(OffsetDateTime targetDate) {
         try {
             HvdcAlignmentConfigurationRecord configRecord = repository.findLatestValidOfType(toUtcLocalDateTime(targetDate));
-            LOGGER.info(getRetrievedMessage("HVDC X-Node alignment"));
+            LOGGER.info("configuration retrieved from server");
             return getJsonConfigurationFromRecord(configRecord);
         } catch (final Exception e) {
-            LOGGER.warn(getFallbackToDefaultMessage("HVDC X-Node alignment"));
+            LOGGER.warn("configuration cannot be retrieved, default configuration will be used, cause : ", e);
             return getDefaultJsonConfiguration(targetDate);
         }
     }
