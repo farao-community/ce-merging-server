@@ -1,6 +1,6 @@
 # Balances Adjustment
 
-To execute this step, we have to convert the current CGM to XIIDM format, then back to UCTE for the output.
+To execute this step, we have to convert the current CGM to [XIIDM format](https://powsybl.readthedocs.io/projects/powsybl-core/en/stable/grid_exchange_formats/iidm/index.html), then back to UCTE for the output.
 
 ## Balances area definition
 Balances adjustment algorithm is based on the definition of balance areas. Each area is defined by three important elements:

@@ -4,7 +4,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
-package com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa;
+package com.farao_community.farao.ce_merging.merging.process.pisa;
 
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Branch;
@@ -30,7 +30,6 @@ public class PisaNamingStrategy implements NamingStrategy {
     private final Map<String, UcteNodeCode> ucteNodeIds = new HashMap<>();
     private final Map<String, UcteElementId> ucteElementIds = new HashMap<>();
     public static final Pattern FFG_NODE_NAME_PATTERN = Pattern.compile("FFG\\.IL1[1-4]");
-    public static final Pattern XFG_NODE_NAME_PATTERN = Pattern.compile("XFG\\.IL1[1-4]");
     public static final Pattern XPI_NODE_NAME_PATTERN = Pattern.compile("XPI_GI1[1-2]");
 
     @Override

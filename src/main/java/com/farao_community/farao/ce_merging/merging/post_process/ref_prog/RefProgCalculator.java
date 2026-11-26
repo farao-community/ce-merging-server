@@ -25,6 +25,8 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.VirtualHubRecord;
 import com.farao_community.farao.ce_merging.xsd.ref_prog.PublicationDocument;
 import com.powsybl.loadflow.LoadFlow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -47,6 +49,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 public final class RefProgCalculator {
+    private static final Logger LOGGER = LoggerFactory.getLogger(RefProgCalculator.class);
     private final MergingTask task;
     private final Map<Border, Double> virtualHubsExchanges = new HashMap<>();
     private final Map<Border, Double> acExchanges = new HashMap<>();
@@ -93,6 +96,7 @@ public final class RefProgCalculator {
         final String borderTo = mapDk1ToDk(borderDirection.getBorderTo());
         final Optional<VirtualHubRecord> optVirtualHub = findVirtualHub(borderFrom, borderTo);
 
+        LOGGER.info("------ Calculating {}-{} exchange", borderFrom, borderTo);
         if (optVirtualHub.isPresent()) {
             addVirtualHubExchange(optVirtualHub.get());
         } else if (isInternalItalianExchange(borderFrom, borderTo)) {
@@ -133,16 +137,18 @@ public final class RefProgCalculator {
     }
 
     private void addVirtualHubExchange(final VirtualHubRecord virtualHub) {
-        virtualHubsExchanges.put(new Border(virtualHub.getRelatedMaEic(), virtualHub.getEic()),
-                                 getVirtualHubsExchangesFromCgm().getOrDefault(virtualHub.getNodeName(), 0.));
+
+        final double flow = getVirtualHubsExchangesFromCgm().getOrDefault(virtualHub.getNodeName(), 0.);
+        LOGGER.info("Exchange with virtual hub : {} MW", (int) flow);
+
+        virtualHubsExchanges.put(new Border(virtualHub.getRelatedMaEic(), virtualHub.getEic()), flow);
     }
 
     private void addNonCeExchange(final String eicFrom,
                                   final String eicTo) {
-        acExchanges.put(new Border(eicFrom, eicTo),
-                        getExchangeFromRefProg(mapItaBzToItaCountry(eicFrom),
-                                               mapItaBzToItaCountry(eicTo))
-                                .getFlow());
+        final double flow = getExchangeFromRefProg(mapItaBzToItaCountry(eicFrom), mapItaBzToItaCountry(eicTo)).getFlow();
+        LOGGER.info("Exchange outside CE zone: {} MW", (int) flow);
+        acExchanges.put(new Border(eicFrom, eicTo), flow);
     }
 
     private void addInternalItalianExchange(final String borderFrom,
@@ -150,6 +156,7 @@ public final class RefProgCalculator {
         final ItalianBiddingZone from = ItalianBiddingZone.valueOf(borderFrom);
         final ItalianBiddingZone to = ItalianBiddingZone.valueOf(borderTo);
 
+        LOGGER.info("Italian internal exchange :");
         acExchanges.put(new Border(from.getEic(), to.getEic()),
                         biddingZonesManager.getTotalFlow(from, to));
     }
@@ -161,6 +168,7 @@ public final class RefProgCalculator {
         final Border realBorder = new Border(eicFrom, eicTo);
         final Border bexBorder = new Border(mapItaBzToItaCountry(eicFrom), mapItaBzToItaCountry(eicTo));
 
+        LOGGER.info("Exchange within CE zone : summing BEX coefficient x (NP without VH - AC flows outside country)");
         final double flow = getBexFactors(bexBorder)
                 .getCoefficientByCountry()
                 .stream()
@@ -180,11 +188,12 @@ public final class RefProgCalculator {
 
     private double getBorderExchange(final BecCoefficients becCoefficients) {
         final String country = becCoefficients.getCountryCode();
-
         final NetPositions netPositions = npByCountry.get(country);
         final double globalWithoutVirtualHubs = netPositions.getGlobalNetPosition().getWithoutVirtualHubs();
         final double acNetPositionOutsideCountry = acNetPositionOutCountry.getOrZero(toEicCode(country));
-
+        LOGGER.info("[{}] Adding {}x({}-{}) to border exchanges",
+                    country, becCoefficients.getCoefficient(),
+                    (int) globalWithoutVirtualHubs, (int) acNetPositionOutsideCountry);
         return becCoefficients.getCoefficient() * (globalWithoutVirtualHubs - acNetPositionOutsideCountry);
     }
 

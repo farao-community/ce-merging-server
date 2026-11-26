@@ -59,13 +59,13 @@ public class InternalBiddingZonesManager {
             final List<Line> branchLines = getCorrespondingLines(branch);
 
             if (branchLines.isEmpty()) {
-                LOGGER.warn("[{}-{}] line {} linking {} to {} through element {} not found in CGM",
-                            bzFrom, bzTo, internalTieLine.getId(), branch.getFrom(), branch.getTo(), branch.getElementName());
+                LOGGER.warn("Line {} linking {} to {} through element {} not found in CGM",
+                            internalTieLine.getId(), branch.getFrom(), branch.getTo(), branch.getElementName());
             } else {
                 for (final Line line : branchLines) {
                     final double lineFlow = flowSign * getLineFlow(line);
-                    LOGGER.info("[{}-{}] adding {} MW flowing from {} to {} through line {}",
-                                bzFrom, bzTo, lineFlow, branch.getFrom(), branch.getTo(), line.getId());
+                    LOGGER.info("Adding {} MW flowing from {} to {} through line {}",
+                                (int) lineFlow, branch.getFrom(), branch.getTo(), line.getId());
                     sum += lineFlow;
                 }
             }

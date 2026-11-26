@@ -121,6 +121,7 @@ public final class CountryNetPositionHandler {
     }
 
     private NetPositions computeNetPositions() {
+        LOGGER.info("------ Computing net position of {} ({})", country.name(), country.getFullName());
         fillNetPositionsFromBoundaryLines();
         fillNetPositionsFromLines();
         fillNetPositionsFromVirtualHubNodes();
@@ -205,59 +206,99 @@ public final class CountryNetPositionHandler {
 
     private void handleVirtualHubBus(final Bus bus) {
         final double flow = zeroIfNaN(bus.getP());
+        LOGGER.info("[{}] Adding virtual hub {} {} MW flow to global NP without VH: {} => {} MW",
+                    country.name(), bus.getId(), (int) flow, (int) globalPosition, (int) (globalPosition + flow));
         globalPosition += flow;
+        LOGGER.info("[{}] Adding virtual hub {} {} MW flow to outBciNetPosition: {} => {} MW",
+                    country.name(), bus.getId(), (int) flow, (int) outBciNetPosition, (int) (outBciNetPosition + flow));
         outBciNetPosition += flow;
 
         addToVirtualHubExchange(bus.getId(), flow);
 
         if (isCountryInRegionConfig()) {
+            LOGGER.info("[{}] Adding virtual hub {} {} MW flow to region NP without VH: {} => {} MW",
+                        country.name(), bus.getId(), (int) flow, (int) regionPosition, (int) (regionPosition + flow));
             regionPosition += flow;
         }
     }
 
     private void handleHvdcLine(final HvdcLine hvdcLine) {
         double borderFlow = getBorderFlow(hvdcLine, country);
-        updatePositions(borderFlow, getCountryOnOtherSide(hvdcLine, country), false);
+        final String updatedPositions = updatePositions(borderFlow, getCountryOnOtherSide(hvdcLine, country), false);
+        LOGGER.info("[{}] HVDC line {}: {} and to outBciNetPosition", country.name(), hvdcLine.getId(), updatedPositions);
         outBciNetPosition += borderFlow;
     }
 
     private void handleLine(final Line line) {
-        updatePositions(getBorderFlow(line, country), getCountryOnOtherSide(line, country), true);
+        final String updatedPositions = updatePositions(getBorderFlow(line, country), getCountryOnOtherSide(line, country), true);
+        LOGGER.info("[{}] Line {}: {}", country.name(), line.getId(), updatedPositions);
     }
 
     private void handleBoundaryLine(final BoundaryLine boundaryLine) {
         final double borderFlow = LoadFlowUtils.getBorderFlow(boundaryLine, componentMode);
         final Country countryOnOtherSide = otherCountry(boundaryLine);
 
-        updatePositions(borderFlow, countryOnOtherSide, !isPairedWithVirtualHub(boundaryLine, virtualHubList));
+        final String updatedPositions = updatePositions(borderFlow, countryOnOtherSide, !isPairedWithVirtualHub(boundaryLine, virtualHubList));
+        LOGGER.info("[{}] Boundary line {}: {}", country.name(), boundaryLine.getId(), updatedPositions);
+        final String xNode = boundaryLine.getPairingKey();
 
         if (isPairedWithVirtualHub(boundaryLine, virtualHubList)) {
+            LOGGER.info("Adding boundary line {} {} MW flow to outBciNetPosition: {} => {} MW",
+                        xNode, (int) borderFlow, (int) outBciNetPosition, (int) (outBciNetPosition + borderFlow));
             outBciNetPosition += borderFlow;
-            addToVirtualHubExchange(boundaryLine.getPairingKey(), borderFlow);
+            addToVirtualHubExchange(xNode, borderFlow);
         } else if (!bciCountries.contains(countryOnOtherSide)) {
+            LOGGER.info("Adding X-Node {} {} MW flow to outBciNetPosition: {} => {} MW",
+                        xNode, (int) borderFlow, (int) outBciNetPosition, (int) (outBciNetPosition + borderFlow));
             outBciNetPosition += borderFlow;
         }
     }
 
-    private void updatePositions(final double borderFlow,
-                                 final Country countryOnOtherSide,
-                                 final boolean updateWithoutVirtualHub) {
+    private String updatePositions(final double borderFlow,
+                                   final Country countryOnOtherSide,
+                                   final boolean updateWithoutVirtualHub) {
         addToBorderExchange(borderFlow, countryOnOtherSide);
+        final StringBuilder sb = new StringBuilder("Adding ")
+                .append((int) borderFlow)
+                .append(" MW to global NP with VH (")
+                .append((int) globalPosition)
+                .append(" => ")
+                .append((int) (globalPosition + borderFlow))
+                .append(" MW)");
+
         globalPosition += borderFlow;
         if (updateWithoutVirtualHub) {
+            sb.append(" & without (")
+                    .append((int) globalPositionNoVh)
+                    .append(" => ")
+                    .append((int) (globalPositionNoVh + borderFlow))
+                    .append(" MW)");
+
             globalPositionNoVh += borderFlow;
         }
 
         if (areBothInRegions(country, countryOnOtherSide)) {
+            sb.append(", and to region NP with VH (").append((int) regionPosition)
+                    .append(" => ")
+                    .append((int) (regionPosition + borderFlow))
+                    .append(" MW)");
             regionPosition += borderFlow;
             if (updateWithoutVirtualHub) {
+                sb.append(" & without (")
+                        .append((int) regionPositionNoVh)
+                        .append(" => ")
+                        .append((int) (regionPositionNoVh + borderFlow))
+                        .append(" MW)");
                 regionPositionNoVh += borderFlow;
             }
         }
+
+        return sb.toString();
     }
 
     private void addToVirtualHubExchange(final String hubName,
                                          final double flow) {
+        LOGGER.info("[{}] Set exchange with virtual hub {} to {} MW", country.name(), hubName, (int) flow);
         virtualHubsExchanges.computeIfPresent(hubName, (h, f) -> f + flow);
         virtualHubsExchanges.putIfAbsent(hubName, flow);
     }
@@ -283,6 +324,7 @@ public final class CountryNetPositionHandler {
     private void addToBorderExchange(final double flow,
                                      final Country country) {
         if (country != null) {
+            LOGGER.info("Adding {} MW to globalDetailedExchanges with {}", (int) flow, country.getFullName());
             globalDetailedExchanges.computeIfPresent(country.name(), (z, exchange) -> exchange + flow);
             globalDetailedExchanges.putIfAbsent(country.name(), flow);
         }

@@ -9,6 +9,8 @@ package test_utils;
 import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration;
 import com.farao_community.farao.ce_merging.common.exception.CeMergingException;
 import com.farao_community.farao.ce_merging.common.exception.ServiceIOException;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
+import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
 import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingTask;
 import com.farao_community.farao.ce_merging.merging.task.dto.MergingTaskDto;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
@@ -23,9 +25,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.powsybl.commons.report.ReportNode;
 import com.powsybl.commons.report.TypedValue;
+import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Country;
 import com.powsybl.iidm.network.Line;
 import com.powsybl.iidm.network.Network;
+import com.powsybl.iidm.network.Substation;
 import com.powsybl.iidm.network.Terminal;
 import com.powsybl.iidm.network.TwoSides;
 import com.powsybl.iidm.network.VoltageLevel;
@@ -44,6 +48,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.OffsetDateTime;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -173,7 +178,7 @@ public final class CeTestUtils {
     }
 
     public static Artifacts withArtifact(final ArtifactType type,
-                                              final String name,
+                                         final String name,
                                          final String path) {
         final Artifacts artifacts = new Artifacts();
         artifacts.putFile(type, mockSavedFile(name, path));
@@ -395,5 +400,33 @@ public final class CeTestUtils {
         when(vl2.getId()).thenReturn(nodeTo);
 
         return line;
+    }
+
+    public static BoundaryLine mockBoundaryLine(final String pairingKey,
+                                                final double p0,
+                                                final Country country) {
+        final BoundaryLine boundaryLine = mock(BoundaryLine.class);
+        final Terminal terminal = mock(Terminal.class);
+        final VoltageLevel voltageLevel = mock(VoltageLevel.class);
+        final Substation substation = mock(Substation.class);
+        when(boundaryLine.getPairingKey()).thenReturn(pairingKey);
+        when(boundaryLine.getP0()).thenReturn(p0);
+        when(boundaryLine.getTerminal()).thenReturn(terminal);
+        when(terminal.getVoltageLevel()).thenReturn(voltageLevel);
+        when(voltageLevel.getSubstation()).thenReturn(Optional.of(substation));
+        when(substation.getNullableCountry()).thenReturn(country);
+        return boundaryLine;
+    }
+
+    public static NetPositions mockNetPositions(final double globalWithVirtualHubs,
+                                                final double globalWithoutVirtualHubs,
+                                                final double outBciNetPosition,
+                                                final Map<String, Double> virtualHubsExchanges) {
+        return new NetPositions(new NetPositionsValues(globalWithVirtualHubs, globalWithoutVirtualHubs),
+                                new NetPositionsValues(0, 0),
+                                outBciNetPosition,
+                                new HashMap<>(virtualHubsExchanges),
+                                new HashMap<>(),
+                                null);
     }
 }

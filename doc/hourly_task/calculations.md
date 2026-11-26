@@ -3,13 +3,13 @@ This page describes the computation steps following the [inputs preparation](/do
 the same order as in the process.
 
 ## Initial net positions computation
-The initial calculation of the net positions is done on all the IGMs:
+The initial calculation of the net positions is done on all the IGMs; the result is saved in the [IGMs net positions artifact](/doc/hourly_task/artifacts.md):
 either the artifacts created in the previous steps or the input IGMs as-is if it's not concerned by these.
 
 The computation is detailed [here](/doc/hourly_task/step_details/initialNp.md); its result is saved in an artifact file.
 
 ## Topological merge
-This step consists in merging the previously mentioned IGM in one CGM file, of type 2D / country code UX; this network is then stored as an artifact.
+This step consists in merging the previously mentioned IGM in one CGM file, of type 2D / country code UX; this network is then stored as the [topological merge artifact](/doc/hourly_task/artifacts.md).
 
 ## PiSa displacement
 Some nodes have to be displaced to be able to represent the PiSa HVDC as desired : [details here](/doc/hourly_task/step_details/pisa.md).
@@ -18,7 +18,7 @@ Some nodes have to be displaced to be able to represent the PiSa HVDC as desired
 Since two TSOs can provide different statuses for the same X-Node, there is a notion of recessive and reference countries:
 In case of conflict, we use the value provided by the reference country.
 
-This step handles such conflicts and cases where there's missing information on the provided X-Nodes, trying to fix these using information present in [configuration files](/doc/globalGridConfigurations.md).
+This step handles such conflicts and cases where there's missing information on the provided X-Nodes, trying to fix these using information present in [configuration files](/doc/globalGridConfigurations.md). The resulting network is saved as the [CGM after recessivity artifact](/doc/hourly_task/artifacts.md).
 
 It also performs a status check between the Alegro nodes, but no fix.
 
@@ -55,7 +55,7 @@ We then export the CGM as an UCT file.
 
 ## CGM net positions calculation
 
-The final net positions computation is done on the CGM.
+The final net positions computation is done on the CGM, and the results are saved in the [CGM net positions artifact](/doc/hourly_task/artifacts.md).
 
 It starts by running a load flow, and then computes the following net positions for each country of the CGM:
 - **Global with HVDC:** active loads summed over X-Nodes + flows leaving the country's interconnections

@@ -5,7 +5,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/.
  */
 
-package com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa;
+package com.farao_community.farao.ce_merging.merging.process.pisa;
 
 import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.BoundaryLineAdder;
@@ -35,7 +35,7 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.XNO
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getBusGenerator;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.getNodeName;
 import static com.farao_community.farao.ce_merging.common.util.NetworkUtil.toCountryElementId;
-import static com.farao_community.farao.ce_merging.merging.process.naming_strategy.pisa.PisaService.willBecomeFrenchXnode;
+import static com.farao_community.farao.ce_merging.merging.process.pisa.PisaService.willBecomeFrenchXnode;
 import static com.powsybl.iidm.network.Country.IT;
 import static com.powsybl.iidm.network.TopologyKind.BUS_BREAKER;
 import static com.powsybl.ucte.network.UcteCountryCode.FR;

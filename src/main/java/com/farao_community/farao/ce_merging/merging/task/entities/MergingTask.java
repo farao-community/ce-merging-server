@@ -198,4 +198,9 @@ public class MergingTask implements Serializable {
     public SavedFile getIgmFile(final Country country) {
         return inputs.getIgm(country.toString()).getIgmFile();
     }
+
+    public Network getPreTreatedOrInputIgm(final Country country) {
+        return Network.read(Optional.ofNullable(artifacts.getPreTreatedIgm(country))
+                                    .orElse(getIgmFile(country)).getPath());
+    }
 }

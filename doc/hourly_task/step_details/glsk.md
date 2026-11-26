@@ -3,7 +3,7 @@ The computations described here are done on the input [GLSK](https://powsybl.rea
 ## Quality report generation
 The generated quality report is an XML file that can contain warnings if:
 - An explicitly named node cannot be found in the CGM,
-- An explicitly named node is found, but no correct associated resource (Generator or Load) can be found in the CGM,
+- An explicitly named node is found, but no correct associated resource ([Generator](https://powsybl.readthedocs.io/projects/powsybl-core/en/stable/grid_model/network_subnetwork.html#generator) or [Load](https://powsybl.readthedocs.io/projects/powsybl-core/en/stable/grid_model/network_subnetwork.html#load)) can be found in the CGM,
 - An explicitly named resource is found, but is not connected to the main synchronous component of the CGM.
 
 ## Actual GLSK generation

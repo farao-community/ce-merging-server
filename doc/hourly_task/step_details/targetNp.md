@@ -1,17 +1,16 @@
 # Target Net Positions calculation
 To calculate target net position $NP$, we have :
 
-
 $NP = NP_{BCIw/oHVDC} + outBciFlows$
 
 with :
-- $NP_{BCIw/oHVDC}$: The net position of the BCI output without the HVDCs,
-- $outBciFlows$: HVDC Flows + Flows out to areas not configured in the region configuration file.
+- $NP_{BCIw/oHVDC}$: The net position of the [BCI](/doc/hourly_task/step_details/bci.md) output without the HVDCs,
+- $outBciFlows$: HVDC Flows + Flows out to areas not configured in the region [configuration](/doc/globalGridConfigurations.md) file.
 
 There are a few special cases:
 ### Alegro countries
 To compensate for the fact that Alegro initial flows are already taken into account in the BCI target NP,
-we add to the previous formula the gap between target and initial flow for AL_BE for Belgium (respectively AL_DE for germany) :
+we add to the previous formula the gap between target and initial flow for $AL_{BE}$ for Belgium (respectively $AL_{DE}$ for germany) :
 
 ### German virtual hubs
 Some German virtual hubs have codes not beginning with X (**D2HWKR1D**, **D8BWW_25**...).
