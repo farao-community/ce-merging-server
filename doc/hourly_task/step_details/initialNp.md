@@ -1,10 +1,10 @@
 # Initial net positions calculation details
-This calculation is part of the [hourly calculations process](doc/hourly_task/calculations.md#initial-net-positions-computation).
+This calculation is part of the [hourly calculations process](/doc/hourly_task/calculations.md#initial-net-positions-computation).
 
 For each IGM, it starts by running a loadflow in AC, and if it does not converge, another in DC. It then computes the following net positions:
 
 - **Global with VH**: active loads summed over all the X-Nodes/Nodes present on the virtual hubs
-  [config file](doc/globalGridConfigurations.md),
+  [config file](/doc/globalGridConfigurations.md),
 - **Global without VH**: active powers summed over AC interconnections,
 - **CE with VH**: active loads summed over the CE X-Nodes/Nodes present on the virtual hubs
   config file,
@@ -30,12 +30,12 @@ _\* No such X-Node should be encountered in real conditions (merging not allowed
 ## Post-process adjustment
 For some HVDCs, post-treatment is necessary because some X-Nodes are to be displaced, which impacts the net position result.
 ### PiSa HVDC
-Process detailed in the [PiSa section](doc/hourly_task/step_details/pisa.md).
+Process detailed in the [PiSa section](/doc/hourly_task/step_details/pisa.md).
 
 ### MonIta HVDC
 For the MonIta HVDC, it is because
 Its nodes are all present in the Italian IGM, but we need to have the $XKOTR120$ and $XKOTR220$ nodes in Montenegro's IGM to
-be able to apply the [BCI step](doc/hourly_task/step_details/bci.md) correctly.
+be able to apply the [BCI step](/doc/hourly_task/step_details/bci.md) correctly.
 
 Indeed, as we can see in the reference program file provided in outputs, we have :
 
@@ -49,4 +49,4 @@ $NP_{TARGET} = NP_{BCI w/oHVDC}+ outBciFlows$
 
 It is therefore necessary that the nodes $XCEPR120$ and $XCEPR220$ be counted in the _outBciNetPosition_ for Italy and that
 the nodes $XKOTR120$ and $XKOTR220$ be counted in the _outBciNetPosition_ for Montenegro to compute the correct [balance
-adjustment](doc/hourly_task/step_details/balancesAdjustment.md) targets.
+adjustment](/doc/hourly_task/step_details/balancesAdjustment.md) targets.

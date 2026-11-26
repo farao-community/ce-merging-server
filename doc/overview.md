@@ -1,5 +1,5 @@
 # Functional Overview
-Here's a list of acronyms used across this documentation: [acronyms](doc/acronyms.md).
+Here's a list of acronyms used across this documentation: [acronyms](/doc/acronyms.md).
 
 ## Nominal process
 
@@ -14,7 +14,7 @@ The nominal merging case is (done either by API call or with Swagger for testing
   - a merging version.
 - Run it with the provided daily task ID.
 
-Each of these steps corresponds to a REST endpoint; there are several other endpoints providing configurations or a given task's specific inputs, outputs, or intermediate files (called [**Artifacts**](doc/hourly_task/artifacts.md)).
+Each of these steps corresponds to a REST endpoint; there are several other endpoints providing configurations or a given task's specific inputs, outputs, or intermediate files (called [**Artifacts**](/doc/hourly_task/artifacts.md)).
 
 For more detail on the endpoints, see the **Controller** classes.
 
@@ -33,13 +33,13 @@ It works with these input files :
   - DC loadflow
 
 ### Global configuration
-These are not inputs as they are not linked to a particular task, but one can apply changes on the [configuration files](doc/globalGridConfigurations.md).
+These are not inputs as they are not linked to a particular task, but one can apply changes on the [configuration files](/doc/globalGridConfigurations.md).
 
 ## Merging steps
 ### Hourly
-- [Inputs preparation](doc/hourly_task/inputPreparation.md)
-- [Calculations](doc/hourly_task/calculations.md)
-- [Output Generation](doc/hourly_task/outputs.md)
+- [Inputs preparation](/doc/hourly_task/inputPreparation.md)
+- [Calculations](/doc/hourly_task/calculations.md)
+- [Output Generation](/doc/hourly_task/outputs.md)
 
 ### Daily
 - Check that all provided task IDs correspond to finished tasks, with coherent dates regarding the daily task

@@ -1,24 +1,24 @@
 # Task processing - calculations
-This page describes the computation steps following the [inputs preparation](doc/hourly_task/inputPreparation.md), in
+This page describes the computation steps following the [inputs preparation](/doc/hourly_task/inputPreparation.md), in
 the same order as in the process.
 
 ## Initial net positions computation
-The initial calculation of the net positions is done on all the IGMs; the result is saved in the [IGMs net positions artifact](doc/hourly_task/artifacts.md):
+The initial calculation of the net positions is done on all the IGMs; the result is saved in the [IGMs net positions artifact](/doc/hourly_task/artifacts.md):
 either the artifacts created in the previous steps or the input IGMs as-is if it's not concerned by these.
 
-The computation is detailed [here](doc/hourly_task/step_details/initialNp.md); its result is saved in an artifact file.
+The computation is detailed [here](/doc/hourly_task/step_details/initialNp.md); its result is saved in an artifact file.
 
 ## Topological merge
-This step consists in merging the previously mentioned IGM in one CGM file, of type 2D / country code UX; this network is then stored as the [topological merge artifact](doc/hourly_task/artifacts.md).
+This step consists in merging the previously mentioned IGM in one CGM file, of type 2D / country code UX; this network is then stored as the [topological merge artifact](/doc/hourly_task/artifacts.md).
 
 ## PiSa displacement
-Some nodes have to be displaced to be able to represent the PiSa HVDC as desired : [details here](doc/hourly_task/step_details/pisa.md).
+Some nodes have to be displaced to be able to represent the PiSa HVDC as desired : [details here](/doc/hourly_task/step_details/pisa.md).
 
 ## Recessivity alignment
 Since two TSOs can provide different statuses for the same X-Node, there is a notion of recessive and reference countries:
 In case of conflict, we use the value provided by the reference country.
 
-This step handles such conflicts and cases where there's missing information on the provided X-Nodes, trying to fix these using information present in [configuration files](doc/globalGridConfigurations.md). The resulting network is saved as the [CGM after recessivity artifact](doc/hourly_task/artifacts.md).
+This step handles such conflicts and cases where there's missing information on the provided X-Nodes, trying to fix these using information present in [configuration files](/doc/globalGridConfigurations.md). The resulting network is saved as the [CGM after recessivity artifact](/doc/hourly_task/artifacts.md).
 
 It also performs a status check between the Alegro nodes, but no fix.
 
@@ -29,22 +29,22 @@ In addition, we align the outage statuses (if one node is disconnected, we do th
 
 ## GLSK quality check
 Consists of analyzing the GLSK input and comparing it to the available network elements.
-This step produces two artifacts: GLSK quality report generation and corrected GLSK export. Both are detailed [here](doc/hourly_task/step_details/glsk.md).
+This step produces two artifacts: GLSK quality report generation and corrected GLSK export. Both are detailed [here](/doc/hourly_task/step_details/glsk.md).
 
 ## Base case improvement
-This step is a first calculation on net positions, to bring the ones outside the feasibility ranges to acceptable values. More details in the [Base Case Improvement page](doc/hourly_task/step_details/bci.md).
+This step is a first calculation on net positions, to bring the ones outside the feasibility ranges to acceptable values. More details in the [Base Case Improvement page](/doc/hourly_task/step_details/bci.md).
 
 
 ## Target net positions computation
-The aim of this step is the computation of the target net positions, i.e., the net positions to which we'll shift the CGM in the next step, as described [here](doc/hourly_task/step_details/targetNp.md).
+The aim of this step is the computation of the target net positions, i.e., the net positions to which we'll shift the CGM in the next step, as described [here](/doc/hourly_task/step_details/targetNp.md).
 
 ## Balances adjustment
-Balances adjustment consists in shifting the CGM to the global target net positions. it is detailed in [this page](doc/hourly_task/step_details/balancesAdjustment.md).
+Balances adjustment consists in shifting the CGM to the global target net positions. it is detailed in [this page](/doc/hourly_task/step_details/balancesAdjustment.md).
 
 The result of this step is a balanced CGM.
 
 ## Special PST treatment
-Some PST (Phase Shift Transformers) require special treatments, as described in [this page](doc/hourly_task/step_details/specialPst.md).
+Some PST (Phase Shift Transformers) require special treatments, as described in [this page](/doc/hourly_task/step_details/specialPst.md).
 
 ## Slack compensation
 Before exporting the CGM, this step changes the setpoints of generators and loads to take into account the slack imbalance distributed by the loadflow.
@@ -55,7 +55,7 @@ We then export the CGM as an UCT file.
 
 ## CGM net positions calculation
 
-The final net positions computation is done on the CGM, and the results are saved in the [CGM net positions artifact](doc/hourly_task/artifacts.md).
+The final net positions computation is done on the CGM, and the results are saved in the [CGM net positions artifact](/doc/hourly_task/artifacts.md).
 
 It starts by running a load flow, and then computes the following net positions for each country of the CGM:
 - **Global with HVDC:** active loads summed over X-Nodes + flows leaving the country's interconnections

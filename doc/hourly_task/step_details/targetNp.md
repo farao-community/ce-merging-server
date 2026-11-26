@@ -4,8 +4,8 @@ To calculate target net position $NP$, we have :
 $NP = NP_{BCIw/oHVDC} + outBciFlows$
 
 with :
-- $NP_{BCIw/oHVDC}$: The net position of the [BCI](doc/hourly_task/step_details/bci.md) output without the HVDCs,
-- $outBciFlows$: HVDC Flows + Flows out to areas not configured in the region [configuration](doc/globalGridConfigurations.md) file.
+- $NP_{BCIw/oHVDC}$: The net position of the [BCI](/doc/hourly_task/step_details/bci.md) output without the HVDCs,
+- $outBciFlows$: HVDC Flows + Flows out to areas not configured in the region [configuration](/doc/globalGridConfigurations.md) file.
 
 There are a few special cases:
 ### Alegro countries
