@@ -59,8 +59,8 @@ import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TAS
 import static com.farao_community.farao.ce_merging.common.CeMergingConstants.TASK_NOT_RUN;
 import static com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument.fromData;
 import static com.farao_community.farao.ce_merging.common.json_api.JsonApiDocument.fromServiceException;
+import static com.farao_community.farao.ce_merging.common.util.DateTimeUtils.nowUtcOffset;
 import static com.farao_community.farao.ce_merging.common.util.FileUtils.toAttachmentFileResponse;
-import static java.time.ZoneOffset.UTC;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM_VALUE;
 import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
@@ -364,7 +364,7 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getVirtualHubsConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
-            return toAttachmentFileResponse(taskManager.getVirtualHubsConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now(UTC))), "virtual-hubs-config.json");
+            return toAttachmentFileResponse(taskManager.getVirtualHubsConfiguration(Optional.ofNullable(instant).orElse(nowUtcOffset())), "virtual-hubs-config.json");
         } catch (IOException e) {
             throw new CeMergingException("Cannot generate virtual hubs configuration file", e);
         }
@@ -398,7 +398,7 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getXNodesConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime instant) throws CeMergingException {
         try {
-            return toAttachmentFileResponse(taskManager.getXNodesConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now(UTC))), "xnodes-config.json");
+            return toAttachmentFileResponse(taskManager.getXNodesConfiguration(Optional.ofNullable(instant).orElse(nowUtcOffset())), "xnodes-config.json");
         } catch (IOException e) {
             throw new CeMergingException("Cannot generate XNodes configuration file", e);
         }
@@ -432,7 +432,7 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getHvdcXnodeAlignementConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
-            return toAttachmentFileResponse(taskManager.getHvdcXNodeAlignmentConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now(UTC))), "hvdc-xnode-alignment-configuration.json");
+            return toAttachmentFileResponse(taskManager.getHvdcXNodeAlignmentConfiguration(Optional.ofNullable(instant).orElse(nowUtcOffset())), "hvdc-xnode-alignment-configuration.json");
         } catch (IOException e) {
             throw new CeMergingException("Cannot generate HVDC XNode alignment configuration file", e);
         }
@@ -466,7 +466,7 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getBecConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) {
         try {
-            return toAttachmentFileResponse(taskManager.getBECKeyConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now(UTC))), "sharingKeysBEC.json");
+            return toAttachmentFileResponse(taskManager.getBECKeyConfiguration(Optional.ofNullable(instant).orElse(nowUtcOffset())), "sharingKeysBEC.json");
         } catch (IOException e) {
             throw new CeMergingException("Cannot generate BEC configuration file", e);
         }
@@ -500,7 +500,7 @@ public class MergingController {
     })
     public ResponseEntity<byte[]> getEICConfiguration(@Parameter(description = "Instant") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) final OffsetDateTime instant) throws CeMergingException {
         try {
-            return toAttachmentFileResponse(taskManager.getRegionConfiguration(Optional.ofNullable(instant).orElse(OffsetDateTime.now(UTC))), "region_configuration.json");
+            return toAttachmentFileResponse(taskManager.getRegionConfiguration(Optional.ofNullable(instant).orElse(nowUtcOffset())), "region_configuration.json");
         } catch (IOException e) {
             throw new CeMergingException("Cannot generate EIC Code configuration file", e);
         }

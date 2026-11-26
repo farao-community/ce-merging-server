@@ -123,7 +123,7 @@ class DailyRefProgServiceTest {
         Files.createDirectories(Paths.get(configuration.getDailyOutputsDirectoryPath(dailyTask)));
         final List<MergingTask> tasksList = Arrays.asList(task1, task2);
         final RequestInformation requestInformation = new RequestInformation("2020-01-05T23:00Z/2020-01-06T23:00Z",
-                                                                             "regprog",
+                                                                             "refprog",
                                                                              "test",
                                                                              "CORESO",
                                                                              "123456"
