@@ -12,6 +12,7 @@ import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositio
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
 import com.farao_community.farao.ce_merging.merging.process.netpositions.CountryNetPositionHandler;
+import com.farao_community.farao.ce_merging.merging.process.netpositions.NetPositionService;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -20,11 +21,9 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.enums.GermanTso;
 import com.powsybl.iidm.network.Network;
 import com.powsybl.loadflow.LoadFlow;
+import com.powsybl.openloadflow.OpenLoadFlowProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import test_utils.TaskTestUtils;
 
 import java.io.FileNotFoundException;
@@ -43,23 +42,22 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.ArtifactTy
 import static com.powsybl.iidm.network.Country.DE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockMergingTaskRepository;
 import static test_utils.CeTestUtils.stringPathOf;
 
-@SpringBootTest
-@ActiveProfiles("OpenLoadFlow")
 class GermanMismatchCompensationServiceTest {
     private static final double VALUE_TOLERANCE = 1;
-    @Autowired
-    private GermanMismatchCompensationService service;
 
-    @Autowired
-    private Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
+    private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier = () -> new LoadFlow.Runner(new OpenLoadFlowProvider());
 
     private MergingTask task;
     private Configurations configurations;
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
+    private final NetPositionService npService = new NetPositionService(mockMergingTaskRepository(), configuration, loadFlowRunnerSupplier);
+
+    private final GermanMismatchCompensationService service = new GermanMismatchCompensationService(loadFlowRunnerSupplier, npService, configuration);
 
     @BeforeEach
     void setUp() throws IOException {

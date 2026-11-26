@@ -17,8 +17,6 @@ import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
@@ -33,13 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
+import static test_utils.CeTestUtils.getTestConfiguration;
 import static test_utils.CeTestUtils.mockTaskWithCgmResult;
 
-@SpringBootTest
 class CgmResultsServiceTest {
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
 
     private final DailyMergingRepository tasksRepository = mock(DailyMergingRepository.class);
 

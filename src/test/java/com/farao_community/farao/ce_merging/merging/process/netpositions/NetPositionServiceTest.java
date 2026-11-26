@@ -11,7 +11,6 @@ import com.farao_community.farao.ce_merging.common.config.CeMergingConfiguration
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositions;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsResults;
 import com.farao_community.farao.ce_merging.common.model.netpositions.NetPositionsValues;
-import com.farao_community.farao.ce_merging.merging.task.MergingTaskRepository;
 import com.farao_community.farao.ce_merging.merging.task.entities.Artifacts;
 import com.farao_community.farao.ce_merging.merging.task.entities.Configurations;
 import com.farao_community.farao.ce_merging.merging.task.entities.IgmData;
@@ -19,12 +18,10 @@ import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.powsybl.loadflow.LoadFlow;
+import com.powsybl.openloadflow.OpenLoadFlowProvider;
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.data.Percentage;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import test_utils.TaskTestUtils;
 
 import java.io.IOException;
@@ -56,34 +53,21 @@ import static com.powsybl.iidm.network.Country.SK;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static test_utils.CeTestUtils.anyTask;
 import static test_utils.CeTestUtils.assertSumEquals;
 import static test_utils.CeTestUtils.getIgm;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockMergingTaskRepository;
 import static test_utils.CeTestUtils.stringPathOf;
 
-@SpringBootTest
 class NetPositionServiceTest {
 
     private static final Percentage PERCENT_TOLERANCE = Percentage.withPercentage(1);
     private static final double VALUE_TOLERANCE = .1;
 
-    @Autowired
-    private CeMergingConfiguration configuration;
-    @Autowired
-    private Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
+    private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier = () -> new LoadFlow.Runner(new OpenLoadFlowProvider());
 
-    private NetPositionService netPositionService;
-    private String loadflowParametersFile;
-
-    @BeforeEach
-    void setUp() {
-        loadflowParametersFile = "loadflow_parameters/ac-load-flow-parameters_main_component.json";
-        final MergingTaskRepository repository = mock(MergingTaskRepository.class);
-        when(repository.save(anyTask())).thenAnswer(invocation -> invocation.getArgument(0));
-        netPositionService = new NetPositionService(repository, configuration, loadFlowRunnerSupplier);
-    }
+    private final NetPositionService service = new NetPositionService(mockMergingTaskRepository(), configuration, loadFlowRunnerSupplier);
 
     @Test
     void computeInitialNetPositionsTest() throws IOException {
@@ -124,11 +108,12 @@ class NetPositionServiceTest {
         task.setArtifacts(artifacts);
         task.setConfigurations(new Configurations());
         TaskTestUtils.setTaskDefaultConfigurations(task);
+        final String loadflowParametersFile = "loadflow_parameters/ac-load-flow-parameters_main_component.json";
         TaskTestUtils.setLoadflowParameters(task, loadflowParametersFile);
 
         Files.createDirectories(Paths.get(configuration.getOutputsDirectoryPath(task)));
         Files.createDirectories(Paths.get(configuration.getArtifactsDirectoryPath(task)));
-        netPositionService.computeInitialNetPositions(task);
+        service.computeInitialNetPositions(task);
 
         final NetPositionsResults netPositionsFile = task.getArtifact(IGMS_NET_POSITIONS_FILE, NetPositionsResults.class);
         testNetPositionsValues(netPositionsFile);

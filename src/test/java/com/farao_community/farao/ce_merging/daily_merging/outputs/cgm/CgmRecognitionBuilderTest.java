@@ -11,13 +11,12 @@ import com.farao_community.farao.ce_merging.common.util.JaxbUtils;
 import com.farao_community.farao.ce_merging.daily_merging.merging_request.RequestInformation;
 import com.farao_community.farao.ce_merging.merging.task.entities.Inputs;
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
+import com.farao_community.farao.ce_merging.xsd.merging_request.EventMessageType;
 import com.farao_community.farao.ce_merging.xsd.merging_response.ResponseItem;
 import com.farao_community.farao.ce_merging.xsd.merging_response.ResponseItems;
-import com.farao_community.farao.ce_merging.xsd.merging_request.EventMessageType;
 import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.xml.parsers.ParserConfigurationException;
 import java.time.OffsetDateTime;
@@ -29,7 +28,6 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static test_utils.CeTestUtils.mockTaskWithCgmResult;
 
-@SpringBootTest
 class CgmRecognitionBuilderTest {
     private List<MergingTask> tasks;
     private RequestInformation requestInformation;

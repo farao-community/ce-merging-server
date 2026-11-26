@@ -19,9 +19,6 @@ import com.powsybl.iidm.network.BoundaryLine;
 import com.powsybl.iidm.network.Network;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import test_utils.TaskTestUtils;
 
 import java.io.IOException;
@@ -30,8 +27,9 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockMergingTaskRepository;
 
-@SpringBootTest
 public class HvdcXNodeAlignmentServiceTest {
     private static final String RESOURCES_PATH = "src/test/resources/hvdc_alignment";
     private static final String NL_COUNTRY_CODE = "NL";
@@ -47,16 +45,12 @@ public class HvdcXNodeAlignmentServiceTest {
     private static final String XAR_GA1I = "XAR_GA1I";
     private static final String XAR_GA1G = "XAR_GA1G";
 
-    @Autowired
-    private HvdcXNodeAlignmentService hvdcXNodeAlignmentService;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
+    private final MergingTaskRepository repository = mockMergingTaskRepository();
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final HvdcXNodeAlignmentService hvdcXNodeAlignmentService = new HvdcXNodeAlignmentService(configuration, repository);
 
-    @MockitoBean
-    private MergingTaskRepository tasksRepository;
-
-    private MergingTask task = new MergingTask();
+    private final MergingTask task = new MergingTask();
 
     @BeforeEach
     void setUp() throws IOException {

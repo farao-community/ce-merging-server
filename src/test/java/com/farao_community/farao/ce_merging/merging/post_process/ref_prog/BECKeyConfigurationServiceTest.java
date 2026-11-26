@@ -7,47 +7,24 @@
 package com.farao_community.farao.ce_merging.merging.post_process.ref_prog;
 
 import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.BecByBoundaryDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.dto.RegionConfigurationDto;
-import com.farao_community.farao.ce_merging.global_grid_configurations.model.json.JsonRegionConfiguration;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.BECKeyConfigurationService;
 import com.farao_community.farao.ce_merging.global_grid_configurations.services.RegionConfigurationService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
+import static test_utils.CeTestUtils.mockBECKeyConfigurationRepository;
+import static test_utils.CeTestUtils.mockRegionConfigurationRepository;
 
-@SpringBootTest
 class BECKeyConfigurationServiceTest {
 
     private static final String REGION_CONFIGURATION_JSON = "gridDefaultConfigurations/region_configuration.json";
     private static final OffsetDateTime TEST_DATE = OffsetDateTime.parse("2023-11-03T00:30Z");
-    @Autowired
-    private BECKeyConfigurationService becKeyConfigurationService;
 
-    @MockitoBean
-    RegionConfigurationService regionConfigurationService;
-
-    @BeforeEach
-    void setUp() throws IOException {
-        final File resource = new ClassPathResource(REGION_CONFIGURATION_JSON).getFile();
-        final String jsonConfig = Files.readString(resource.toPath());
-        ObjectMapper objectMapper = new ObjectMapper();
-        RegionConfigurationDto regionConfiguration = objectMapper.readValue(jsonConfig, RegionConfigurationDto.class);
-        when(regionConfigurationService.getConfiguration(Mockito.any())).thenReturn(new JsonRegionConfiguration(regionConfiguration));
-    }
+    RegionConfigurationService regionConfigurationService = new RegionConfigurationService(mockRegionConfigurationRepository());
+    private final BECKeyConfigurationService becKeyConfigurationService = new BECKeyConfigurationService(regionConfigurationService, mockBECKeyConfigurationRepository());
 
     @Test
     void parseSharingKeysBEC() {

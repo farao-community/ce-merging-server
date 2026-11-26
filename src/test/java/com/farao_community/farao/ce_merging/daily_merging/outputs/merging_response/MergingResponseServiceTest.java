@@ -23,8 +23,6 @@ import com.farao_community.farao.ce_merging.xsd.merging_response.ResponseItems;
 import jakarta.xml.bind.JAXBException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.w3c.dom.Element;
 
 import java.io.IOException;
@@ -39,8 +37,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockDailyMergingRepository;
 
-@SpringBootTest
 class MergingResponseServiceTest {
 
     private static final Path RESOURCE_DIRECTORY = Paths.get("src", "test", "resources", "merging_response");
@@ -57,14 +56,11 @@ class MergingResponseServiceTest {
     private List<MergingTask> mergingTasks;
     private RequestInformation requestInformation;
 
-    @Autowired
-    private DailyMergingRepository dailyMergingRepository;
+    private final DailyMergingRepository repository = mockDailyMergingRepository();
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
 
-    @Autowired
-    private MergingResponseService mergingResponseService;
+    private final MergingResponseService mergingResponseService = new MergingResponseService(configuration, repository);
 
     @BeforeEach
     void setUp() throws IOException {
@@ -79,7 +75,7 @@ class MergingResponseServiceTest {
         dailyInputs.setMergingRequest(mergingRequestFile);
         dailyTask.setDailyInputs(dailyInputs);
         dailyTask.setVersion(3);
-        dailyTask = dailyMergingRepository.save(dailyTask);
+        dailyTask = repository.save(dailyTask);
         Files.createDirectories(Paths.get(configuration.getDailyOutputsDirectoryPath(dailyTask)));
         requestInformation = new RequestInformation(
                 "2020-01-05T23:00Z/2020-01-06T23:00Z",

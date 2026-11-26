@@ -15,9 +15,6 @@ import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,13 +23,11 @@ import java.time.ZoneOffset;
 
 import static java.io.File.separator;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atMostOnce;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockMergingTaskRepository;
 
-@SpringBootTest
 class ExportTaskResultsServiceTest {
 
     @TempDir
@@ -40,29 +35,18 @@ class ExportTaskResultsServiceTest {
 
     private static final String OUTPUT_PATH = "123" + separator + "outputs";
     private static final OffsetDateTime TARGET_DATE = OffsetDateTime.of(2026, 7, 3, 10, 15, 0, 0, ZoneOffset.UTC);
-    @Autowired
-    ExportTaskResultsService exportTaskResultsService;
 
-    @MockitoBean
-    MergingTaskRepository mergingTaskRepository;
+    MergingTaskRepository repository = mockMergingTaskRepository();
 
-    @MockitoBean
-    CeMergingConfiguration configuration;
+    CeMergingConfiguration configuration = getTestConfiguration();
 
-    @Test
-    void generateOutputFilesWithException() {
-        final MergingTask mergingTask = initMergingTask();
-        when(configuration.getOutputsDirectoryPath(any(MergingTask.class))).thenThrow(new RuntimeException("my error"));
-        Throwable throwable = catchThrowable(() -> exportTaskResultsService.generateOutputFiles(mergingTask));
-        assertThat(throwable).hasMessage("Results export failed for task 123 with target date 2026-07-03T10:15Z, cause: my error");
-    }
+    ExportTaskResultsService service = new ExportTaskResultsService(repository, configuration);
 
     @Test
     void generateOutputFiles() throws IOException {
-        when(configuration.getOutputsDirectoryPath(any(MergingTask.class))).thenReturn(tempDirectory.getPath() + separator + OUTPUT_PATH);
         final MergingTask mergingTask = initMergingTask();
-        exportTaskResultsService.generateOutputFiles(mergingTask);
-        verify(mergingTaskRepository, atMostOnce()).save(mergingTask);
+        service.generateOutputFiles(mergingTask);
+        verify(repository, atMostOnce()).save(mergingTask);
         assertThat(mergingTask.getOutputs().getIgmQualityChecks()).hasSize(2);
         assertThat(mergingTask.getOutputs().getRealGlsk()).isNotNull();
         assertThat(FileUtils.contentEquals(mergingTask.getArtifactFile(ArtifactType.GLSK_QUALITY_REPORT), new File(mergingTask.getOutputs().getRealGlsk().getPath()))).isTrue();

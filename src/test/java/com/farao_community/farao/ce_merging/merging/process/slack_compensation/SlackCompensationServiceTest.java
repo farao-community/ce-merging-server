@@ -17,18 +17,9 @@ import com.powsybl.iidm.network.extensions.SlackTerminal;
 import com.powsybl.loadflow.LoadFlow;
 import com.powsybl.loadflow.LoadFlowParameters;
 import com.powsybl.loadflow.LoadFlowRunParameters;
-import com.powsybl.openloadflow.OpenLoadFlowProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,29 +35,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static test_utils.CeTestUtils.createMockTask;
 import static test_utils.CeTestUtils.createTempFolders;
+import static test_utils.CeTestUtils.getTestConfiguration;
 import static test_utils.CeTestUtils.mockLoadFlowRunner;
 import static test_utils.CeTestUtils.singletonArtifact;
 import static test_utils.CeTestUtils.singletonIgmInputs;
 
-@SpringBootTest
-@ActiveProfiles("OpenLoadFlow")
 class SlackCompensationServiceTest {
 
-    @Autowired
-    SlackCompensationService slackCompensationService;
     @TempDir
     Path tempDir;
-    @MockitoBean
-    private Supplier<LoadFlow.Runner> loadFlowRunnerSupplier;
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final Supplier<LoadFlow.Runner> loadFlowRunnerSupplier = mock(Supplier.class);
+    private final CeMergingConfiguration configuration = getTestConfiguration();
     private MergingTask task1;
     private MergingTask task2;
     private MergingTask task3;
+
+    SlackCompensationService slackCompensationService = new SlackCompensationService(loadFlowRunnerSupplier, configuration);
 
     @BeforeEach
     void setUp() {
@@ -161,22 +150,6 @@ class SlackCompensationServiceTest {
                 .filter(Objects::nonNull)
                 .map(SlackTerminal.class::cast)
                 .toList();
-    }
-
-    @TestConfiguration
-    @Profile("OpenLoadFlow")
-    static class PlatformTestConfig {
-
-        @Bean
-        @Primary
-        public Supplier<LoadFlow.Runner> testLoadflowSupplier() {
-            return this::getLoadFlowRunner;
-        }
-
-        private LoadFlow.Runner getLoadFlowRunner() {
-            return new LoadFlow.Runner(new OpenLoadFlowProvider());
-        }
-
     }
 
 }

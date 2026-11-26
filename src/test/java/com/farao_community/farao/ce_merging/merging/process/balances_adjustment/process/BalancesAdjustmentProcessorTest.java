@@ -19,8 +19,6 @@ import com.powsybl.openloadflow.OpenLoadFlowProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 
@@ -39,16 +37,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static test_utils.CeTestUtils.getTestConfiguration;
 import static test_utils.CeTestUtils.stringPathOf;
 
-@SpringBootTest
 @ExtendWith(OutputCaptureExtension.class)
 class BalancesAdjustmentProcessorTest {
 
     private static final OffsetDateTime PROCESS_TARGET_DATE = OffsetDateTime.parse("2019-06-17T22:30Z");
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
 
     private MergingTask task;
     private final Supplier<LoadFlow.Runner> testLoadflowSupplier = this::getLoadFlowRunner;

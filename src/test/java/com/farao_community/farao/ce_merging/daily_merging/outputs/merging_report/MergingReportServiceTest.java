@@ -20,8 +20,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,24 +38,22 @@ import static com.farao_community.farao.ce_merging.merging.task.enums.TaskStatus
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static test_utils.CeTestUtils.createMockTask;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockDailyMergingRepository;
 import static test_utils.CeTestUtils.stringPathOf;
 import static test_utils.CeTestUtils.withTargetDateAndIgms;
 
-@SpringBootTest
 class MergingReportServiceTest {
     private DailyMergingTask dailyTask;
     private List<MergingTask> tasksList;
     private RequestInformation requestInformation;
     private MergingReportBuilder builder;
 
-    @Autowired
-    private DailyMergingRepository repository;
+    private final DailyMergingRepository repository = mockDailyMergingRepository();
 
-    @Autowired
-    private CeMergingConfiguration configuration;
+    private final CeMergingConfiguration configuration = getTestConfiguration();
 
-    @Autowired
-    MergingReportService mergingReportService;
+    MergingReportService mergingReportService = new MergingReportService(configuration, repository);
 
     @BeforeEach
     void setUp() {

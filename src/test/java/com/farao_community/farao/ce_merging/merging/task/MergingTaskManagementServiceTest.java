@@ -30,9 +30,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.FieldSource;
 import org.mockito.MockedStatic;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
@@ -78,18 +75,16 @@ import static test_utils.CeTestUtils.METADATA;
 import static test_utils.CeTestUtils.MIME_ZIP;
 import static test_utils.CeTestUtils.anyTask;
 import static test_utils.CeTestUtils.byteContentOf;
+import static test_utils.CeTestUtils.getTestConfiguration;
 import static test_utils.CeTestUtils.stringContentOf;
 import static test_utils.CeTestUtils.taskDtoWithIdAndStatus;
 import static test_utils.CeTestUtils.taskWithIdAndStatus;
 import static test_utils.assertions.CeTaskAssert.assertThat;
 import static test_utils.assertions.CeThrowableAssert.assertThatThrownBy;
 
-@SpringBootTest
-@TestConfiguration
 @ExtendWith(OutputCaptureExtension.class)
 class MergingTaskManagementServiceTest {
-    @Autowired
-    CeMergingConfiguration ceMergingConfiguration;
+    CeMergingConfiguration ceMergingConfiguration = getTestConfiguration();
 
     private final MergingService mergingService = mock(MergingService.class);
     private final MergingTaskRepository repository = mock(MergingTaskRepository.class);

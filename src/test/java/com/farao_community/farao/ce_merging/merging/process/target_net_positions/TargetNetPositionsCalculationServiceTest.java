@@ -15,8 +15,6 @@ import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import com.farao_community.farao.ce_merging.merging.task.enums.ArtifactType;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import test_utils.TaskTestUtils;
 
 import java.io.IOException;
@@ -26,9 +24,10 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static test_utils.CeTestUtils.getTestConfiguration;
+import static test_utils.CeTestUtils.mockMergingTaskRepository;
 import static test_utils.CeTestUtils.mockSavedFile;
 
-@SpringBootTest
 class TargetNetPositionsCalculationServiceTest {
     private static final String RESOURCES_PATH = "src/test/resources/targetNetPositionCalculation/";
     private static final String IGMS_NET_POSITIONS_FILENAME = "igmsNetPositions.json";
@@ -38,20 +37,17 @@ class TargetNetPositionsCalculationServiceTest {
     private static final String BALANCE_ADJUSTMENT_TARGET_FILENAME = "balancesAdjustmentTarget.json";
     private static final String RECESSIVITY_FILENAME = "20260123_0130_2D5_UX0_RECESSIVITY_APPLIED.uct";
     private static final OffsetDateTime TARGET_DATE = OffsetDateTime.of(2026, 1, 23, 10, 0, 0, 0, ZoneOffset.UTC);
-    @Autowired
-    TargetNetPositionsCalculationService targetNetPositionsCalculationService;
 
-    @Autowired
-    CeMergingConfiguration configuration;
+    CeMergingConfiguration configuration = getTestConfiguration();
+    MergingTaskRepository repository = mockMergingTaskRepository();
 
-    @Autowired
-    MergingTaskRepository repository;
+    TargetNetPositionsCalculationService service = new TargetNetPositionsCalculationService(repository, configuration);
 
     @Test
     void computeTargetNetPositions() throws IOException {
         final MergingTask taskEntity = getMergingTaskEntityWithoutVirtualHubsShifting();
 
-        targetNetPositionsCalculationService.computeTargetNetPositions(taskEntity);
+        service.computeTargetNetPositions(taskEntity);
 
         final BalancesAdjustmentTarget balancesAdjustmentTarget = taskEntity.getArtifact(ArtifactType.BALANCES_ADJUSTMENT_TARGET_FILE, BalancesAdjustmentTarget.class);
         final BalancesAdjustmentTarget balancesAdjustmentTargetExpected = JsonUtils.read(BalancesAdjustmentTarget.class, RESOURCES_PATH + BALANCE_ADJUSTMENT_TARGET_FILENAME);

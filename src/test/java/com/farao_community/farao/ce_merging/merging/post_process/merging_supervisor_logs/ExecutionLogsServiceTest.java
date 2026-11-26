@@ -11,15 +11,13 @@ import com.farao_community.farao.ce_merging.merging.post_process.merging_supervi
 import com.farao_community.farao.ce_merging.merging.task.entities.MergingTask;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@SpringBootTest
+import static test_utils.CeTestUtils.mockLoggingEventRepository;
+
 class ExecutionLogsServiceTest {
     private static final String LONG_FORMATTED_MESSAGE = "Long formatted message giving full details from log";
     private static final String WARNING = "WARNING";
@@ -27,11 +25,9 @@ class ExecutionLogsServiceTest {
     private static final long TIMESTMP = 12L;
     private static final long EVENT_ID = 23L;
 
-    @Autowired
-    ExecutionLogsService executionLogsService;
+    LoggingEventRepository repository = mockLoggingEventRepository();
 
-    @Mock
-    LoggingEventRepository repository;
+    ExecutionLogsService service = new ExecutionLogsService(repository);
 
     LoggingEvent setupModel() {
         LoggingEvent log = new LoggingEvent();
@@ -62,7 +58,7 @@ class ExecutionLogsServiceTest {
         task.setId(152L);
         Set<LoggingEvent> logs = Set.of(setupModel());
         Mockito.when(repository.findLogsByTaskId(EVENT_ID)).thenReturn(logs);
-        byte[] output = executionLogsService.generateLogsForMergingSupervisor(task);
+        byte[] output = service.generateLogsForMergingSupervisor(task);
         Assertions.assertThat(output).isNotEmpty();
     }
 

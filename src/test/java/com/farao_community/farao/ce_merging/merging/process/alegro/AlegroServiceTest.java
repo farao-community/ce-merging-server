@@ -19,8 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,8 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static test_utils.CeTestUtils.getTestConfiguration;
 
-@SpringBootTest
 class AlegroServiceTest {
 
     private static final double ASSERTION_DELTA = 1e-6;
@@ -51,8 +49,7 @@ class AlegroServiceTest {
     @TempDir
     Path tempDirectory;
 
-    @Autowired
-    private AlegroService alegroService;
+    private final AlegroService alegroService = new AlegroService(getTestConfiguration());
 
     @Test
     void shouldThrowExceptionWhenTwoFlowsHaveTheSameSignAndLoadsNotBelowThreshold() {

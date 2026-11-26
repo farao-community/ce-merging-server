@@ -11,21 +11,17 @@ import com.farao_community.farao.ce_merging.daily_merging.entities.DailyMergingT
 import com.farao_community.farao.ce_merging.merging.task.entities.SavedFile;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@SpringBootTest
 class MergingRequestServiceTest {
 
     private static final long DAILY_TASK_ID = 1L;
     private static final String MERGING_REQUEST_FILE = "merging_request.xml";
 
-    @Autowired
-    private MergingRequestService mergingRequestService;
+    private final MergingRequestService mergingRequestService = new MergingRequestService();
 
     private DailyMergingTask dailyTask;
 
