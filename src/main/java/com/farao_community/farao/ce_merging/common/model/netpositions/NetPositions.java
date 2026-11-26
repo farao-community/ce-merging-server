@@ -71,4 +71,18 @@ public class NetPositions {
         return globalDetailedExchanges;
     }
 
+    public void addVirtualHubFlow(final double virtualHubFlow) {
+        final NetPositionsValues globalNp = this.getGlobalNetPosition();
+
+        final double globalNetPosition = globalNp.getWithVirtualHubs();
+        globalNp.setWithVirtualHubs(globalNetPosition + virtualHubFlow);
+
+        final double outBciNetPosition = this.getOutBciNetPosition();
+        this.setOutBciNetPosition(outBciNetPosition + virtualHubFlow);
+    }
+
+    public void removeVirtualHubFlow(final double virtualHubFlow) {
+        addVirtualHubFlow(-virtualHubFlow);
+    }
+
 }
